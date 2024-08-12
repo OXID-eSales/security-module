@@ -11,5 +11,4 @@ namespace OxidEsales\SecurityModule\PasswordPolicy\Validation\Service;
 
 interface PasswordValidatorChainInterface
 {
-
 }

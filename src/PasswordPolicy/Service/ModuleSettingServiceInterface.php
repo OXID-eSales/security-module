@@ -11,5 +11,4 @@ namespace OxidEsales\SecurityModule\PasswordPolicy\Service;
 
 interface ModuleSettingServiceInterface
 {
-
 }

@@ -33,8 +33,8 @@
         "phpstan": "phpstan -ctests/PhpStan/phpstan.neon analyse src/",
         "phpstan-report": "phpstan -ctests/PhpStan/phpstan.neon analyse src/ --error-format=json > phpstan.report.json",
 
-        "phpmd": "phpmd src text cleancode,codesize,design,unusedcode",
-        "phpmd-report": "phpmd src json cleancode,codesize,design,naming,unusedcode --reportfile phpmd.report.json",
+        "phpmd": "phpmd src ansi tests/PhpMd/standard.xml --ignore-errors-on-exit --ignore-violations-on-exit",
+        "phpmd-report": "phpmd src json tests/PhpMd/standard.xml --ignore-errors-on-exit --ignore-violations-on-exit --reportfile tests/Reports/phpmd.report.json",
 
         "deptrac": "deptrac analyze",
 

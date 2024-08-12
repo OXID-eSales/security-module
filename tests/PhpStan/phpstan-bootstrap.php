@@ -6,9 +6,3 @@
  */
 
 declare(strict_types=1);
-
-namespace OxidEsales\SecurityModule\PasswordPolicy\Service;
-
-class ModuleSettingService implements ModuleSettingServiceInterface
-{
-}
