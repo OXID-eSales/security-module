@@ -1,0 +1,7 @@
+services:
+  _defaults:
+    public: false
+    autowire: true
+
+  OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordValidatorChainInterface:
+    class: OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordValidatorChain
