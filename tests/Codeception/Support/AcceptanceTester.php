@@ -28,5 +28,4 @@ namespace OxidEsales\SecurityModule\Tests\Codeception\Support;
 final class AcceptanceTester extends \Codeception\Actor
 {
     use _generated\AcceptanceTesterActions;
-
 }
