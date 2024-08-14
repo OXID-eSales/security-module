@@ -7,8 +7,9 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\SecurityModule\PasswordPolicy\Service;
+namespace OxidEsales\SecurityModule\Core;
 
-class ModuleSettingService implements ModuleSettingServiceInterface
+final class Module
 {
+    public const MODULE_ID = 'oe_security_module';
 }

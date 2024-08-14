@@ -1,0 +1,27 @@
+<?php
+
+/**
+ * Copyright © OXID eSales AG. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
+declare(strict_types=1);
+
+namespace OxidEsales\SecurityModule\PasswordPolicy\Service;
+
+interface ModuleSettingInterface
+{
+    public function getPasswordMinimumLength(): int;
+
+    public function getPasswordAcceptableLength(): int;
+
+    public function getPasswordPerfectLength(): int;
+
+    public function getPasswordUppercase(): bool;
+
+    public function getPasswordLowercase(): bool;
+
+    public function getPasswordDigit(): bool;
+
+    public function getPasswordSpecialChar(): bool;
+}
