@@ -5,3 +5,7 @@ services:
   _defaults:
     public: false
     autowire: true
+
+  OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingInterface:
+    class: OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSetting
+    public: true

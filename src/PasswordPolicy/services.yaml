@@ -3,5 +3,24 @@ services:
     public: false
     autowire: true
 
+  OxidEsales\SecurityModule\PasswordPolicy\Validation\Validator\MinimumLengthValidator:
+    tags: [ 'security.password.validator' ]
+
+  OxidEsales\SecurityModule\PasswordPolicy\Validation\Validator\SpecialCharValidator:
+    tags: [ 'security.password.validator' ]
+
+  OxidEsales\SecurityModule\PasswordPolicy\Validation\Validator\DigitValidator:
+    tags: [ 'security.password.validator' ]
+
+  OxidEsales\SecurityModule\PasswordPolicy\Validation\Validator\UpperCaseValidator:
+    tags: [ 'security.password.validator' ]
+
+  OxidEsales\SecurityModule\PasswordPolicy\Validation\Validator\LowerCaseValidator:
+    tags: [ 'security.password.validator' ]
+
+
   OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordValidatorChainInterface:
     class: OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordValidatorChain
+    public: true
+    arguments:
+      $validators: !tagged 'security.password.validator'
