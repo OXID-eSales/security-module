@@ -53,8 +53,7 @@ class MinimumLengthValidatorTest extends TestCase
 
     private function createValidator(
         int $minimumLength = 8,
-    )
-    {
+    ) {
         $settingService = $this->createMock(ModuleSettingInterface::class);
         $settingService->method('getPasswordMinimumLength')->willReturn($minimumLength);
 

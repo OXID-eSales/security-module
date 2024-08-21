@@ -32,10 +32,10 @@ class SpecialCharValidator implements PasswordValidatorInterface
         $passwordChars = array_keys($passwordChars);
 
         $symbol = 0;
-        foreach ($passwordChars as $char) {
+        foreach ($passwordChars as $charCode) {
             if (
-                $this->passwordStrength->hasSpecialChar($char) or
-                $this->passwordStrength->hasOtherChar($char)
+                $this->passwordStrength->hasSpecialChar($charCode) or
+                $this->passwordStrength->hasOtherChar($charCode)
             ) {
                 $symbol++;
             }

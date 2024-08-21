@@ -11,83 +11,99 @@ namespace OxidEsales\SecurityModule\PasswordPolicy\Validation\Service;
 
 class PasswordStrength implements PasswordStrengthInterface
 {
-    public function estimateStrength(string $password): float
+    public const STRENGTH_VERY_WEAK = 0;
+    public const STRENGTH_WEAK = 1;
+    public const STRENGTH_MEDIUM = 2;
+    public const STRENGTH_STRONG = 3;
+    public const STRENGTH_VERY_STRONG = 4;
+
+    public function estimateStrength(string $password): int
     {
         $length = strlen($password);
-        $password = count_chars($password, 1);
-        $chars = \count($password);
+
+        /** @var array $passwordChars */
+        $passwordChars = count_chars($password, 1);
+        $passwordChars = array_keys($passwordChars);
+        $chars = \count($passwordChars);
 
         $control = $digit = $upper = $lower = $symbol = $other = 0;
 
-        foreach ($password as $chr => $count) {
-            if ($this->hasControlChar($chr)) {
+        foreach ($passwordChars as $charCode) {
+            if ($this->hasControlChar($charCode)) {
                 $control = 33;
             }
-            if ($this->hasDigit($chr)) {
+            if ($this->hasDigit($charCode)) {
                 $digit = 10;
             }
-            if ($this->hasUpperCase($chr)) {
+            if ($this->hasUpperCase($charCode)) {
                 $upper = 26;
             }
-            if ($this->hasLowerCase($chr)) {
+            if ($this->hasLowerCase($charCode)) {
                 $lower = 26;
             }
-            if ($this->hasSpecialChar($chr)) {
+            if ($this->hasSpecialChar($charCode)) {
                 $other = 33;
             }
-            if ($this->hasOtherChar($chr)) {
+            if ($this->hasOtherChar($charCode)) {
                 $symbol = 128;
             }
         }
 
         $pool = $lower + $upper + $digit + $symbol + $control + $other;
+        $entropy =  $chars * log($pool, 2) + ($length - $chars) * log($chars, 2);
 
-        return $chars * log($pool, 2) + ($length - $chars) * log($chars, 2);
+        return match (true) {
+            $entropy >= 120 => PasswordStrength::STRENGTH_VERY_STRONG,
+            $entropy >= 100 => PasswordStrength::STRENGTH_STRONG,
+            $entropy >= 80 => PasswordStrength::STRENGTH_MEDIUM,
+            $entropy >= 60 => PasswordStrength::STRENGTH_WEAK,
+            default => PasswordStrength::STRENGTH_VERY_WEAK,
+        };
     }
 
-    public function hasControlChar(int $char): bool
+    public function hasControlChar(int $charCode): bool
     {
-        if ($char < 32 || 127 === $char) {
+        if ($charCode < 32 || 127 === $charCode) {
             return true;
         }
 
         return false;
     }
 
-    public function hasDigit(int $char): bool
+    public function hasDigit(int $charCode): bool
     {
-        if (48 <= $char && $char <= 57) {
+        if (48 <= $charCode && $charCode <= 57) {
             return true;
         }
 
         return false;
     }
 
-    public function hasUpperCase(int $char): bool
+    public function hasUpperCase(int $charCode): bool
     {
-        if (65 <= $char && $char <= 90) {
+        if (65 <= $charCode && $charCode <= 90) {
             return true;
         }
 
         return false;
     }
 
-    public function hasLowerCase(int $char): bool
+    public function hasLowerCase(int $charCode): bool
     {
-        if (97 <= $char && $char <= 122) {
+        if (97 <= $charCode && $charCode <= 122) {
             return true;
         }
 
         return false;
     }
 
-    public function hasSpecialChar(int $char): bool
+    public function hasSpecialChar(int $charCode): bool
     {
         if (
-            ($char >= 32 && $char <= 47) or
-            ($char >= 58 && $char <= 64) or
-            ($char >= 91 && $char <= 96) or
-            ($char >= 123 && $char <= 126)
+            ($charCode >= 32 && $charCode <= 47) or
+            ($charCode >= 58 && $charCode <= 64) or
+            ($charCode >= 91 && $charCode <= 96) or
+            ($charCode >= 123 && $charCode <= 126)
         ) {
             return true;
         }
@@ -95,9 +111,9 @@ class PasswordStrength implements PasswordStrengthInterface
         return false;
     }
 
-    public function hasOtherChar(int $char): bool
+    public function hasOtherChar(int $charCode): bool
     {
-        if ($char >= 128) {
+        if ($charCode >= 128) {
             return true;
         }
 

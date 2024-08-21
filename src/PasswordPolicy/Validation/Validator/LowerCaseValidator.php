@@ -32,8 +32,8 @@ class LowerCaseValidator implements PasswordValidatorInterface
         $passwordChars = array_keys($passwordChars);
 
         $upper = 0;
-        foreach ($passwordChars as $char) {
-            if ($this->passwordStrength->hasLowerCase($char)) {
+        foreach ($passwordChars as $charCode) {
+            if ($this->passwordStrength->hasLowerCase($charCode)) {
                 $upper++;
             }
         }

@@ -32,8 +32,8 @@ class DigitValidator implements PasswordValidatorInterface
         $passwordChars = array_keys($passwordChars);
 
         $digit = 0;
-        foreach ($passwordChars as $char) {
-            if ($this->passwordStrength->hasDigit($char)) {
+        foreach ($passwordChars as $charCode) {
+            if ($this->passwordStrength->hasDigit($charCode)) {
                 $digit++;
             }
         }

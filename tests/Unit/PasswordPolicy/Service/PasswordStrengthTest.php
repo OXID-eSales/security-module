@@ -15,6 +15,26 @@ use PHPUnit\Framework\TestCase;
 
 class PasswordStrengthTest extends TestCase
 {
+    #[DataProvider('dataProviderPasswordStrength')]
+    public function testPasswordStrengthEstimation(string $password, int $expectedStrength): void
+    {
+        $passwordStrengthService = new PasswordStrength();
+        $passwordStrength = $passwordStrengthService->estimateStrength($password);
+
+        $this->assertSame($expectedStrength, $passwordStrength);
+    }
+
+
+    public static function dataProviderPasswordStrength(): iterable
+    {
+        yield ['123456', PasswordStrength::STRENGTH_VERY_WEAK];
+        yield ['weak-password', PasswordStrength::STRENGTH_WEAK];
+        yield ['medium-passw0rd', PasswordStrength::STRENGTH_MEDIUM];
+        yield ['g00d-enough-passw0rd', PasswordStrength::STRENGTH_STRONG];
+        yield ['very-str00ng-Pa55word!', PasswordStrength::STRENGTH_VERY_STRONG];
+        yield ['very-str00ng-Pa55word¿' . chr(127), PasswordStrength::STRENGTH_VERY_STRONG];
+    }
+
     #[DataProvider('dataProviderPasswordContainsChar')]
     public function testCheckers($method, $value, $expected): void
     {
