@@ -24,3 +24,7 @@ services:
     public: true
     arguments:
       $validators: !tagged 'security.password.validator'
+
+  OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordStrengthInterface:
+    class: OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordStrength
+    public: true

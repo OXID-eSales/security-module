@@ -11,6 +11,7 @@ namespace OxidEsales\SecurityModule\PasswordPolicy\Tests\Unit\PasswordPolicy\Val
 
 use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordValidate;
+use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordStrengthInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Validator\SpecialCharValidator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -83,8 +84,12 @@ class SpecialCharValidatorTest extends TestCase
         $settingService = $this->createMock(ModuleSettingInterface::class);
         $settingService->method('getPasswordSpecialChar')->willReturn($settingValue);
 
+        $passwordStrength = $this->createMock(PasswordStrengthInterface::class);
+        $passwordStrength->method('hasSpecialChar')->willReturn(true);
+
         return new SpecialCharValidator(
-            $settingService
+            $settingService,
+            $passwordStrength
         );
     }
 }

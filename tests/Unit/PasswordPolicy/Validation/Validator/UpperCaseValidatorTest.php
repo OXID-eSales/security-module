@@ -11,6 +11,7 @@ namespace OxidEsales\SecurityModule\PasswordPolicy\Tests\Unit\PasswordPolicy\Val
 
 use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordValidate;
+use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordStrengthInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Validator\UpperCaseValidator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -69,8 +70,12 @@ class UpperCaseValidatorTest extends TestCase
         $settingService = $this->createMock(ModuleSettingInterface::class);
         $settingService->method('getPasswordUppercase')->willReturn($settingValue);
 
+        $passwordStrength = $this->createMock(PasswordStrengthInterface::class);
+        $passwordStrength->method('hasUpperCase')->willReturn(true);
+
         return new UpperCaseValidator(
-            $settingService
+            $settingService,
+            $passwordStrength
         );
     }
 }

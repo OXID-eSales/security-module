@@ -11,6 +11,7 @@ namespace OxidEsales\SecurityModule\PasswordPolicy\Tests\Unit\PasswordPolicy\Val
 
 use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordValidate;
+use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordStrengthInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Validator\LowerCaseValidator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -70,8 +71,12 @@ class LowerCaseValidatorTest extends TestCase
         $settingService = $this->createMock(ModuleSettingInterface::class);
         $settingService->method('getPasswordLowercase')->willReturn($settingValue);
 
+        $passwordStrength = $this->createMock(PasswordStrengthInterface::class);
+        $passwordStrength->method('hasLowerCase')->willReturn(true);
+
         return new LowerCaseValidator(
-            $settingService
+            $settingService,
+            $passwordStrength
         );
     }
 }

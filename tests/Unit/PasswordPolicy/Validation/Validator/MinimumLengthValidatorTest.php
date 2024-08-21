@@ -43,10 +43,20 @@ class MinimumLengthValidatorTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    private function createValidator()
+    public function testValidationWithDisabledSetting(): void
+    {
+        $digitValidator = $this->createValidator(0);
+        $digitValidator->validate('noDigitPassword');
+
+        $this->addToAssertionCount(1);
+    }
+
+    private function createValidator(
+        int $minimumLength = 8,
+    )
     {
         $settingService = $this->createMock(ModuleSettingInterface::class);
-        $settingService->method('getPasswordMinimumLength')->willReturn(8);
+        $settingService->method('getPasswordMinimumLength')->willReturn($minimumLength);
 
         return new MinimumLengthValidator(
             $settingService
