@@ -15,7 +15,7 @@ use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordValida
 class MinimumLengthValidator implements PasswordValidatorInterface
 {
     public function __construct(
-        private ModuleSettingInterface $moduleSetting
+        private readonly ModuleSettingInterface $moduleSetting
     ) {
     }
 

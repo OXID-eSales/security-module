@@ -78,6 +78,7 @@ sonarcloud:
     -Dsonar.scm.provider=git
     -Dsonar.sources=src
     -Dsonar.tests=tests
+    -Dsonar.php.phpstan.reportPaths=coverage-reports/phpstan.report.json
 
 finish:
   slack_title: 'Security module ({{ .Data.global.git.shop_ref }}) by {{ .Github.Actor }}'

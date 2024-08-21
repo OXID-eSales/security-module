@@ -16,8 +16,8 @@ use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordStrength
 class SpecialCharValidator implements PasswordValidatorInterface
 {
     public function __construct(
-        private ModuleSettingInterface $moduleSetting,
-        private PasswordStrengthInterface $passwordStrength
+        private readonly ModuleSettingInterface $moduleSetting,
+        private readonly PasswordStrengthInterface $passwordStrength
     ) {
     }
 
@@ -34,8 +34,8 @@ class SpecialCharValidator implements PasswordValidatorInterface
         $symbol = 0;
         foreach ($passwordChars as $charCode) {
             if (
-                $this->passwordStrength->hasSpecialChar($charCode) or
-                $this->passwordStrength->hasOtherChar($charCode)
+                $this->passwordStrength->isSpecialChar($charCode) or
+                $this->passwordStrength->isOtherChar($charCode)
             ) {
                 $symbol++;
             }

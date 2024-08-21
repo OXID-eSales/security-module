@@ -27,4 +27,3 @@ services:
 
   OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordStrengthInterface:
     class: OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordStrength
-    public: true

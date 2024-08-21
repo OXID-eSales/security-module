@@ -6,15 +6,15 @@ interface PasswordStrengthInterface
 {
     public function estimateStrength(string $password): int;
 
-    public function hasControlChar(int $charCode): bool;
+    public function isControlChar(int $charCode): bool;
 
-    public function hasDigit(int $charCode): bool;
+    public function isDigit(int $charCode): bool;
 
-    public function hasUpperCase(int $charCode): bool;
+    public function isUpperCase(int $charCode): bool;
 
-    public function hasLowerCase(int $charCode): bool;
+    public function isLowerCase(int $charCode): bool;
 
-    public function hasSpecialChar(int $charCode): bool;
+    public function isSpecialChar(int $charCode): bool;
 
-    public function hasOtherChar(int $charCode): bool;
+    public function isOtherChar(int $charCode): bool;
 }

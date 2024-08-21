@@ -49,87 +49,87 @@ class PasswordStrengthTest extends TestCase
         return [
             //Control chars
             [
-                'method'   => 'hasControlChar',
+                'method'   => 'isControlChar',
                 'value'    => chr(127),
                 'expected' => true,
             ],
             [
-                'method'   => 'hasControlChar',
+                'method'   => 'isControlChar',
                 'value'    => '0',
                 'expected' => false,
             ],
             //Digit chars
             [
-                'method'   => 'hasDigit',
+                'method'   => 'isDigit',
                 'value'    => '6',
                 'expected' => true,
             ],
             [
-                'method'   => 'hasDigit',
+                'method'   => 'isDigit',
                 'value'    => 'D',
                 'expected' => false,
             ],
             //Upper case chars
             [
-                'method'   => 'hasUpperCase',
+                'method'   => 'isUpperCase',
                 'value'    => 'U',
                 'expected' => true,
             ],
             [
-                'method'   => 'hasUpperCase',
+                'method'   => 'isUpperCase',
                 'value'    => 'u',
                 'expected' => false,
             ],
             //Lower case chars
             [
-                'method'   => 'hasLowerCase',
+                'method'   => 'isLowerCase',
                 'value'    => 'l',
                 'expected' => true,
             ],
             [
-                'method'   => 'hasLowerCase',
+                'method'   => 'isLowerCase',
                 'value'    => 'L',
                 'expected' => false,
             ],
             //Special symbol chars
             [
-                'method'   => 'hasSpecialChar',
+                'method'   => 'isSpecialChar',
                 'value'    => '!',
                 'expected' => true,
             ],
             [
-                'method'   => 'hasSpecialChar',
+                'method'   => 'isSpecialChar',
                 'value'    => '@',
                 'expected' => true,
             ],
             [
-                'method'   => 'hasSpecialChar',
+                'method'   => 'isSpecialChar',
                 'value'    => '_',
                 'expected' => true,
             ],
             [
-                'method'   => 'hasSpecialChar',
+                'method'   => 'isSpecialChar',
                 'value'    => '~',
                 'expected' => true,
             ],
             [
-                'method'   => 'hasSpecialChar',
+                'method'   => 'isSpecialChar',
                 'value'    => 'S',
                 'expected' => false,
             ],
             [
-                'method'   => 'hasSpecialChar',
+                'method'   => 'isSpecialChar',
                 'value'    => 's',
                 'expected' => false,
             ],
             //Other chars
             [
-                'method'   => 'hasOtherChar',
+                'method'   => 'isOtherChar',
                 'value'    => 'ö',
                 'expected' => true,
             ],
             [
-                'method'   => 'hasOtherChar',
+                'method'   => 'isOtherChar',
                 'value'    => '!',
                 'expected' => false,
             ],

@@ -29,22 +29,22 @@ class PasswordStrength implements PasswordStrengthInterface
         $control = $digit = $upper = $lower = $symbol = $other = 0;
 
         foreach ($passwordChars as $charCode) {
-            if ($this->hasControlChar($charCode)) {
+            if ($this->isControlChar($charCode)) {
                 $control = 33;
             }
-            if ($this->hasDigit($charCode)) {
+            if ($this->isDigit($charCode)) {
                 $digit = 10;
             }
-            if ($this->hasUpperCase($charCode)) {
+            if ($this->isUpperCase($charCode)) {
                 $upper = 26;
             }
-            if ($this->hasLowerCase($charCode)) {
+            if ($this->isLowerCase($charCode)) {
                 $lower = 26;
             }
-            if ($this->hasSpecialChar($charCode)) {
+            if ($this->isSpecialChar($charCode)) {
                 $other = 33;
             }
-            if ($this->hasOtherChar($charCode)) {
+            if ($this->isOtherChar($charCode)) {
                 $symbol = 128;
             }
         }
@@ -61,62 +61,38 @@ class PasswordStrength implements PasswordStrengthInterface
         };
     }
 
-    public function hasControlChar(int $charCode): bool
+    public function isControlChar(int $charCode): bool
     {
-        if ($charCode < 32 || 127 === $charCode) {
-            return true;
-        }
-
-        return false;
+        return $charCode < 32 || 127 === $charCode;
     }
 
-    public function hasDigit(int $charCode): bool
+    public function isDigit(int $charCode): bool
     {
-        if (48 <= $charCode && $charCode <= 57) {
-            return true;
-        }
-
-        return false;
+        return 48 <= $charCode && $charCode <= 57;
     }
 
-    public function hasUpperCase(int $charCode): bool
+    public function isUpperCase(int $charCode): bool
     {
-        if (65 <= $charCode && $charCode <= 90) {
-            return true;
-        }
-
-        return false;
+        return 65 <= $charCode && $charCode <= 90;
     }
 
-    public function hasLowerCase(int $charCode): bool
+    public function isLowerCase(int $charCode): bool
     {
-        if (97 <= $charCode && $charCode <= 122) {
-            return true;
-        }
-
-        return false;
+        return 97 <= $charCode && $charCode <= 122;
     }
 
-    public function hasSpecialChar(int $charCode): bool
+    public function isSpecialChar(int $charCode): bool
     {
-        if (
+        return (
             ($charCode >= 32 && $charCode <= 47) or
             ($charCode >= 58 && $charCode <= 64) or
             ($charCode >= 91 && $charCode <= 96) or
             ($charCode >= 123 && $charCode <= 126)
-        ) {
-            return true;
-        }
-
-        return false;
+        );
     }
 
-    public function hasOtherChar(int $charCode): bool
+    public function isOtherChar(int $charCode): bool
     {
-        if ($charCode >= 128) {
-            return true;
-        }
-
-        return false;
+        return $charCode >= 128;
     }
 }

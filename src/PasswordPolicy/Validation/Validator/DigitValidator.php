@@ -16,8 +16,8 @@ use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordStrength
 class DigitValidator implements PasswordValidatorInterface
 {
     public function __construct(
-        private ModuleSettingInterface $moduleSetting,
-        private PasswordStrengthInterface $passwordStrength
+        private readonly ModuleSettingInterface $moduleSetting,
+        private readonly PasswordStrengthInterface $passwordStrength
     ) {
     }
 
@@ -33,7 +33,7 @@ class DigitValidator implements PasswordValidatorInterface
 
         $digit = 0;
         foreach ($passwordChars as $charCode) {
-            if ($this->passwordStrength->hasDigit($charCode)) {
+            if ($this->passwordStrength->isDigit($charCode)) {
                 $digit++;
             }
         }

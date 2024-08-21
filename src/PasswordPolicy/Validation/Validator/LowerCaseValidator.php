@@ -16,8 +16,8 @@ use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordStrength
 class LowerCaseValidator implements PasswordValidatorInterface
 {
     public function __construct(
-        private ModuleSettingInterface $moduleSetting,
-        private PasswordStrengthInterface $passwordStrength
+        private readonly ModuleSettingInterface $moduleSetting,
+        private readonly PasswordStrengthInterface $passwordStrength
     ) {
     }
 
@@ -33,7 +33,7 @@ class LowerCaseValidator implements PasswordValidatorInterface
 
         $upper = 0;
         foreach ($passwordChars as $charCode) {
-            if ($this->passwordStrength->hasLowerCase($charCode)) {
+            if ($this->passwordStrength->isLowerCase($charCode)) {
                 $upper++;
             }
         }

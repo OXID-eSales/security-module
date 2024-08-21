@@ -16,8 +16,8 @@ use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordStrength
 class UpperCaseValidator implements PasswordValidatorInterface
 {
     public function __construct(
-        private ModuleSettingInterface $moduleSetting,
-        private PasswordStrengthInterface $passwordStrength
+        private readonly ModuleSettingInterface $moduleSetting,
+        private readonly PasswordStrengthInterface $passwordStrength
     ) {
     }
 
@@ -33,7 +33,7 @@ class UpperCaseValidator implements PasswordValidatorInterface
 
         $upper = 0;
         foreach ($passwordChars as $charCode) {
-            if ($this->passwordStrength->hasUpperCase($charCode)) {
+            if ($this->passwordStrength->isUpperCase($charCode)) {
                 $upper++;
             }
         }
