@@ -43,19 +43,19 @@ $aModule = [
             'group' => 'password',
             'name'  => ModuleSetting::PASSWORD_MINIMUM_LENGTH,
             'type'  => 'num',
-            'value' => '8'
+            'value' => 8
         ],
         [
             'group' => 'password',
             'name'  => ModuleSetting::PASSWORD_ACCEPTABLE_LENGTH,
             'type'  => 'num',
-            'value' => '12'
+            'value' => 12
         ],
         [
             'group' => 'password',
             'name'  => ModuleSetting::PASSWORD_PERFECT_LENGTH,
             'type'  => 'num',
-            'value' => '20'
+            'value' => 20
         ],
 
         //Password symbols requirements
@@ -63,25 +63,25 @@ $aModule = [
             'group' => 'password',
             'name'  => ModuleSetting::PASSWORD_UPPERCASE,
             'type'  => 'bool',
-            'value' => '1'
+            'value' => true
         ],
         [
             'group' => 'password',
             'name'  => ModuleSetting::PASSWORD_LOWERCASE,
             'type'  => 'bool',
-            'value' => '1'
+            'value' => true
         ],
         [
             'group' => 'password',
             'name'  => ModuleSetting::PASSWORD_DIGIT,
             'type'  => 'bool',
-            'value' => '1'
+            'value' => true
         ],
         [
             'group' => 'password',
             'name'  => ModuleSetting::PASSWORD_SPECIAL_CHAR,
             'type'  => 'bool',
-            'value' => '1'
+            'value' => true
         ],
     ],
 ];
