@@ -6,3 +6,8 @@
  */
 
 declare(strict_types=1);
+
+class_alias(
+    \OxidEsales\Eshop\Core\InputValidator::class,
+    \OxidEsales\SecurityModule\PasswordPolicy\Shop\Core\InputValidator_parent::class
+);

@@ -27,7 +27,7 @@ class MinimumLengthValidator implements PasswordValidatorInterface
         }
 
         if (strlen($password) < $minimumLength) {
-            throw new PasswordValidate();
+            throw new PasswordValidate('ERROR_PASSWORD_MIN_LENGTH');
         }
     }
 }

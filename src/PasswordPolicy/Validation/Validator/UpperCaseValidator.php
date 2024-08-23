@@ -39,7 +39,7 @@ class UpperCaseValidator implements PasswordValidatorInterface
         }
 
         if ($upper == 0) {
-            throw new PasswordValidate();
+            throw new PasswordValidate('ERROR_PASSWORD_MISSING_UPPER_CASE');
         }
     }
 }

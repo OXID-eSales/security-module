@@ -39,7 +39,7 @@ class DigitValidator implements PasswordValidatorInterface
         }
 
         if ($digit == 0) {
-            throw new PasswordValidate();
+            throw new PasswordValidate('ERROR_PASSWORD_MISSING_DIGIT');
         }
     }
 }

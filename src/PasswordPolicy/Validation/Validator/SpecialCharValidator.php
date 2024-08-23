@@ -42,7 +42,7 @@ class SpecialCharValidator implements PasswordValidatorInterface
         }
 
         if ($symbol == 0) {
-            throw new PasswordValidate();
+            throw new PasswordValidate('ERROR_PASSWORD_MISSING_SPECIAL_CHARACTER');
         }
     }
 }
