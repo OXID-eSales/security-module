@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\PasswordPolicy\Tests\Unit\PasswordPolicy\Validator\Validation;
 
 use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingInterface;
-use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordValidate;
+use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordDigitException;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordStrength;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Validator\DigitValidator;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -21,7 +21,7 @@ class DigitValidatorTest extends TestCase
     #[DataProvider('dataProviderDigitPasswordThrowException')]
     public function testValidationThrowException($password): void
     {
-        $this->expectException(PasswordValidate::class);
+        $this->expectException(PasswordDigitException::class);
 
         $digitValidator = $this->createValidator();
         $digitValidator->validate($password);

@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\PasswordPolicy\Tests\Unit\PasswordPolicy\Validator\Validation;
 
 use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingInterface;
-use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordValidate;
+use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordUpperCaseException;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordStrength;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Validator\UpperCaseValidator;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -21,7 +21,7 @@ class UpperCaseValidatorTest extends TestCase
     #[DataProvider('dataProviderUpperCasePasswordThrowException')]
     public function testValidationThrowException($password): void
     {
-        $this->expectException(PasswordValidate::class);
+        $this->expectException(PasswordUpperCaseException::class);
 
         $upperCaseValidator = $this->createValidator();
         $upperCaseValidator->validate($password);

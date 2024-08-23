@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\PasswordPolicy\Tests\Unit\PasswordPolicy\Validator\Validation;
 
 use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingInterface;
-use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordValidate;
+use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordMinimumLengthException;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Validator\MinimumLengthValidator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -20,7 +20,7 @@ class MinimumLengthValidatorTest extends TestCase
     #[DataProvider('dataProviderMinimumPasswordThrowException')]
     public function testValidationThrowException($password): void
     {
-        $this->expectException(PasswordValidate::class);
+        $this->expectException(PasswordMinimumLengthException::class);
 
         $minimumLengthValidator = $this->createValidator();
         $minimumLengthValidator->validate($password);

@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\PasswordPolicy\Validation\Validator;
 
 use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingInterface;
-use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordValidate;
+use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordDigitException;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordStrengthInterface;
 
 class DigitValidator implements PasswordValidatorInterface
@@ -39,7 +39,7 @@ class DigitValidator implements PasswordValidatorInterface
         }
 
         if ($digit == 0) {
-            throw new PasswordValidate('ERROR_PASSWORD_MISSING_DIGIT');
+            throw new PasswordDigitException();
         }
     }
 }

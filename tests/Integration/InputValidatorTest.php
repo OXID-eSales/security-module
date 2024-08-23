@@ -14,12 +14,17 @@ use OxidEsales\Eshop\Core\Exception\InputException;
 use OxidEsales\Eshop\Core\Exception\UserException;
 use OxidEsales\EshopCommunity\Tests\Integration\IntegrationTestCase;
 use OxidEsales\SecurityModule\PasswordPolicy\Shop\Core\InputValidator;
+use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordDigitException;
+use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordLowerCaseException;
+use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordMinimumLengthException;
+use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordSpecialCharException;
+use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordUpperCaseException;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 class InputValidatorTest extends IntegrationTestCase
 {
     #[DataProvider('dataProviderPasswordError')]
-    public function testInputValidationError($password, $expectedError): void
+    public function testInputValidationError($password, $expectedException): void
     {
         $userModelMock = $this->createMock(User::class);
 
@@ -27,16 +32,19 @@ class InputValidatorTest extends IntegrationTestCase
         $exception = $validator->checkPassword($userModelMock, $password, $password);
 
         $this->assertInstanceOf(InputException::class, $exception);
-        $this->assertSame($expectedError, $exception->getMessage());
+        $this->assertSame(
+            (new $expectedException())->getMessage(),
+            $exception->getMessage()
+        );
     }
 
     public static function dataProviderPasswordError(): iterable
     {
-        yield ['short', 'Password too short'];
-        yield ['12345678', 'Password require at least one special character'];
-        yield ['password!', 'Password require at least one digit'];
-        yield ['passw0rd!', 'Password require at least one upper case'];
-        yield ['PASSW0RD!', 'Password require at least one lower case'];
+        yield ['short', PasswordMinimumLengthException::class];
+        yield ['12345678', PasswordSpecialCharException::class];
+        yield ['password!', PasswordDigitException::class];
+        yield ['passw0rd!', PasswordUpperCaseException::class];
+        yield ['PASSW0RD!', PasswordLowerCaseException::class];
     }
 
     public function testPasswordCheck(): void

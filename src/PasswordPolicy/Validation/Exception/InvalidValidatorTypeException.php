@@ -9,6 +9,6 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception;
 
-class InvalidValidatorType extends \Exception
+class InvalidValidatorTypeException extends \Exception
 {
 }
