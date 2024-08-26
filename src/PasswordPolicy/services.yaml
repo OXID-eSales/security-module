@@ -27,3 +27,6 @@ services:
 
   OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordStrengthInterface:
     class: OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordStrength
+
+  OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\CharacterAnalysisInterface:
+    class: OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\CharacterAnalysis

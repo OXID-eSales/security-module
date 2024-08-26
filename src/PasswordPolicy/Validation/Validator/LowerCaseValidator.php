@@ -11,13 +11,13 @@ namespace OxidEsales\SecurityModule\PasswordPolicy\Validation\Validator;
 
 use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordValidate;
-use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordStrengthInterface;
+use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\CharacterAnalysisInterface;
 
 class LowerCaseValidator implements PasswordValidatorInterface
 {
     public function __construct(
         private readonly ModuleSettingInterface $moduleSetting,
-        private readonly PasswordStrengthInterface $passwordStrength
+        private readonly CharacterAnalysisInterface $passwordStrength
     ) {
     }
 

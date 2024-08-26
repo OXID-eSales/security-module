@@ -11,13 +11,13 @@ namespace OxidEsales\SecurityModule\PasswordPolicy\Validation\Validator;
 
 use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordValidate;
-use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordStrengthInterface;
+use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\CharacterAnalysisInterface;
 
 class SpecialCharValidator implements PasswordValidatorInterface
 {
     public function __construct(
         private readonly ModuleSettingInterface $moduleSetting,
-        private readonly PasswordStrengthInterface $passwordStrength
+        private readonly CharacterAnalysisInterface $characterAnalysis
     ) {
     }
 
@@ -34,8 +34,8 @@ class SpecialCharValidator implements PasswordValidatorInterface
         $symbol = 0;
         foreach ($passwordChars as $charCode) {
             if (
-                $this->passwordStrength->isSpecialChar($charCode) or
-                $this->passwordStrength->isOtherChar($charCode)
+                $this->characterAnalysis->isSpecialChar($charCode) or
+                $this->characterAnalysis->isOtherChar($charCode)
             ) {
                 $symbol++;
             }

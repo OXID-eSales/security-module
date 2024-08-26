@@ -11,7 +11,7 @@ namespace OxidEsales\SecurityModule\PasswordPolicy\Tests\Unit\PasswordPolicy\Val
 
 use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordValidate;
-use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordStrength;
+use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\CharacterAnalysis;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Validator\DigitValidator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -69,7 +69,7 @@ class DigitValidatorTest extends TestCase
 
         return new DigitValidator(
             $settingService,
-            new PasswordStrength()
+            new CharacterAnalysis()
         );
     }
 }
