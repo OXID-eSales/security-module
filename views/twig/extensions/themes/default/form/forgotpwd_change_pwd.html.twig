@@ -1,0 +1,10 @@
+{% extends 'form/forgotpwd_change_pwd.html.twig' %}
+
+{% block forgotpwd_change_password_new %}
+    {{ parent() }}
+
+    <span class="input-group-text"><i class="far fa-eye-slash" id="togglePassword"></i></span>
+    <div class="progress mb-3" role="progressbar" aria-label="Success example" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
+        <div class="progress-bar" style="width: 55%; background-color: orange"></div>
+    </div>
+{% endblock %}
