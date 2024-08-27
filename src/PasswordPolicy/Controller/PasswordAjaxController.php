@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\PasswordPolicy\Controller;
 
 use OxidEsales\Eshop\Application\Component\Widget\WidgetController;
-use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\SecurityModule\PasswordPolicy\Transput\RequestInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Transput\ResponseInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordStrengthInterface;
 
@@ -18,8 +18,8 @@ class PasswordAjaxController extends WidgetController
 {
     public function passwordStrength(): void
     {
-        $request = Registry::getRequest();
-        $password = $request->getRequestParameter('password');
+        $request = $this->getService(RequestInterface::class);
+        $password = $request->getPassword();
 
         $result = $this->getService(PasswordStrengthInterface::class)
             ->estimateStrength($password);

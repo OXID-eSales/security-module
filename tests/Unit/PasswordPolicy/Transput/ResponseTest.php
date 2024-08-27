@@ -13,9 +13,6 @@ use OxidEsales\Eshop\Core\Utils;
 use OxidEsales\SecurityModule\PasswordPolicy\Transput\Response;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \OxidEsales\SecurityModule\PasswordPolicy\Transput\Response
- */
 class ResponseTest extends TestCase
 {
     public function testRespondAsJson(): void

@@ -21,6 +21,7 @@ class Response implements ResponseInterface
     public function responseAsJson(array $valueArray): void
     {
         $this->utils->setHeader('Content-Type: application/json; charset=UTF-8');
+        /** @phpstan-ignore-next-line */
         $this->utils->showMessageAndExit(json_encode($valueArray));
     }
 }

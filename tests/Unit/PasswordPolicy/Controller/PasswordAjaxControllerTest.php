@@ -9,9 +9,8 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\PasswordPolicy\Tests\Unit\PasswordPolicy\Controller;
 
-use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\Eshop\Core\Request;
 use OxidEsales\SecurityModule\PasswordPolicy\Controller\PasswordAjaxController;
+use OxidEsales\SecurityModule\PasswordPolicy\Transput\RequestInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Transput\ResponseInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordStrength;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordStrengthInterface;
@@ -23,9 +22,8 @@ class PasswordAjaxControllerTest extends TestCase
     {
         $strength = PasswordStrength::STRENGTH_STRONG;
 
-        $this->mockRequest();
-
         $sut = $this->getStub(
+            $this->createMock(RequestInterface::class),
             $passwordStrengthStub = $this->createMock(PasswordStrengthInterface::class),
             $responseStub = $this->createMock(ResponseInterface::class),
         );
@@ -44,11 +42,16 @@ class PasswordAjaxControllerTest extends TestCase
     }
 
     private function getStub(
+        RequestInterface $request = null,
         PasswordStrengthInterface $passwordStrength = null,
         ResponseInterface $response = null,
     ) {
         $sut = $this->createPartialMock(PasswordAjaxController::class, ['getService']);
         $sut->method('getService')->willReturnMap([
+            [
+              RequestInterface::class,
+                $request ?? $this->createMock(RequestInterface::class)
+            ],
             [
                 PasswordStrengthInterface::class,
                 $passwordStrength ?? $this->createStub(PasswordStrengthInterface::class)
@@ -60,21 +63,5 @@ class PasswordAjaxControllerTest extends TestCase
         ]);
 
         return $sut;
-    }
-
-    protected function mockRequest(): void
-    {
-        $request = $this
-            ->getMockBuilder(Request::class)
-            ->onlyMethods(['getRequestParameter'])
-            ->getMock();
-
-        $request
-            ->method('getRequestParameter')
-            ->willReturnMap([
-                ['password', null, uniqid()]
-            ]);
-
-        Registry::set(Request::class, $request);
     }
 }
