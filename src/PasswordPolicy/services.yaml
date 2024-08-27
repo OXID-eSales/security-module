@@ -2,6 +2,8 @@ services:
   _defaults:
     public: false
     autowire: true
+    bind:
+      OxidEsales\Eshop\Core\Utils: '@=service("OxidEsales\\SecurityModule\\Core\\Registry").getUtils()'
 
   OxidEsales\SecurityModule\PasswordPolicy\Validation\Validator\MinimumLengthValidator:
     tags: [ 'security.password.validator' ]
@@ -27,3 +29,8 @@ services:
 
   OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordStrengthInterface:
     class: OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordStrength
+    public: true
+
+  OxidEsales\SecurityModule\PasswordPolicy\Transput\ResponseInterface:
+    class: OxidEsales\SecurityModule\PasswordPolicy\Transput\Response
+    public: true

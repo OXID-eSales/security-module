@@ -9,3 +9,7 @@ services:
   OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingInterface:
     class: OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSetting
     public: true
+
+  OxidEsales\SecurityModule\Core\Registry:
+    class: 'OxidEsales\Eshop\Core\Registry'
+    public: true
