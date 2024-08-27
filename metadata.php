@@ -46,18 +46,6 @@ $aModule = [
             'type'  => 'num',
             'value' => 8
         ],
-        [
-            'group' => 'password',
-            'name'  => ModuleSetting::PASSWORD_ACCEPTABLE_LENGTH,
-            'type'  => 'num',
-            'value' => 12
-        ],
-        [
-            'group' => 'password',
-            'name'  => ModuleSetting::PASSWORD_PERFECT_LENGTH,
-            'type'  => 'num',
-            'value' => 20
-        ],
 
         //Password symbols requirements
         [

@@ -15,9 +15,6 @@ use OxidEsales\SecurityModule\Core\Module;
 class ModuleSetting implements ModuleSettingInterface
 {
     public const PASSWORD_MINIMUM_LENGTH = 'oeSecurityPasswordMinimumLength';
-    public const PASSWORD_ACCEPTABLE_LENGTH = 'oeSecurityPasswordAcceptableLength';
-    public const PASSWORD_PERFECT_LENGTH = 'oeSecurityPasswordPerfectLength';
-
     public const PASSWORD_UPPERCASE = 'oeSecurityPasswordContainUppercase';
     public const PASSWORD_LOWERCASE = 'oeSecurityPasswordContainLowercase';
     public const PASSWORD_DIGIT = 'oeSecurityPasswordContainDigit';
@@ -31,16 +28,6 @@ class ModuleSetting implements ModuleSettingInterface
     public function getPasswordMinimumLength(): int
     {
         return $this->moduleSettingService->getInteger(self::PASSWORD_MINIMUM_LENGTH, Module::MODULE_ID);
-    }
-
-    public function getPasswordAcceptableLength(): int
-    {
-        return $this->moduleSettingService->getInteger(self::PASSWORD_ACCEPTABLE_LENGTH, Module::MODULE_ID);
-    }
-
-    public function getPasswordPerfectLength(): int
-    {
-        return $this->moduleSettingService->getInteger(self::PASSWORD_PERFECT_LENGTH, Module::MODULE_ID);
     }
 
     public function getPasswordUppercase(): bool

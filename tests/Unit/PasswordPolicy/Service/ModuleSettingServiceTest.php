@@ -40,9 +40,6 @@ class ModuleSettingServiceTest extends TestCase
     {
         return [
             self::prepareIntegerSetting('getPasswordMinimumLength', ModuleSetting::PASSWORD_MINIMUM_LENGTH),
-            self::prepareIntegerSetting('getPasswordAcceptableLength', ModuleSetting::PASSWORD_ACCEPTABLE_LENGTH),
-            self::prepareIntegerSetting('getPasswordPerfectLength', ModuleSetting::PASSWORD_PERFECT_LENGTH),
-
             self::prepareBooleanSetting('getPasswordUppercase', ModuleSetting::PASSWORD_UPPERCASE, true),
             self::prepareBooleanSetting('getPasswordUppercase', ModuleSetting::PASSWORD_UPPERCASE, false),
             self::prepareBooleanSetting('getPasswordLowercase', ModuleSetting::PASSWORD_LOWERCASE, true),

@@ -13,10 +13,6 @@ interface ModuleSettingInterface
 {
     public function getPasswordMinimumLength(): int;
 
-    public function getPasswordAcceptableLength(): int;
-
-    public function getPasswordPerfectLength(): int;
-
     public function getPasswordUppercase(): bool;
 
     public function getPasswordLowercase(): bool;
