@@ -11,13 +11,13 @@ namespace OxidEsales\SecurityModule\PasswordPolicy\Validation\Validator;
 
 use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordValidate;
-use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordStrengthInterface;
+use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\CharacterAnalysisInterface;
 
 class DigitValidator implements PasswordValidatorInterface
 {
     public function __construct(
         private readonly ModuleSettingInterface $moduleSetting,
-        private readonly PasswordStrengthInterface $passwordStrength
+        private readonly CharacterAnalysisInterface $characterAnalysis
     ) {
     }
 
@@ -33,7 +33,7 @@ class DigitValidator implements PasswordValidatorInterface
 
         $digit = 0;
         foreach ($passwordChars as $charCode) {
-            if ($this->passwordStrength->isDigit($charCode)) {
+            if ($this->characterAnalysis->isDigit($charCode)) {
                 $digit++;
             }
         }

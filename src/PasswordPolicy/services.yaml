@@ -39,3 +39,6 @@ services:
   OxidEsales\SecurityModule\PasswordPolicy\Transput\ResponseInterface:
     class: OxidEsales\SecurityModule\PasswordPolicy\Transput\Response
     public: true
+
+  OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\CharacterAnalysisInterface:
+    class: OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\CharacterAnalysis
