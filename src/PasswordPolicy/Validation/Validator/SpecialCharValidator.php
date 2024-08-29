@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\PasswordPolicy\Validation\Validator;
 
 use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingInterface;
-use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordValidate;
+use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordSpecialCharException;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\CharacterAnalysisInterface;
 
 class SpecialCharValidator implements PasswordValidatorInterface
@@ -42,7 +42,7 @@ class SpecialCharValidator implements PasswordValidatorInterface
         }
 
         if ($symbol == 0) {
-            throw new PasswordValidate();
+            throw new PasswordSpecialCharException();
         }
     }
 }

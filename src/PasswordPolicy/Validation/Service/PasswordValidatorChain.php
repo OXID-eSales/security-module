@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\PasswordPolicy\Validation\Service;
 
-use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\InvalidValidatorType;
+use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\InvalidValidatorTypeException;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Validator\PasswordValidatorInterface;
 
 class PasswordValidatorChain implements PasswordValidatorChainInterface
@@ -22,7 +22,7 @@ class PasswordValidatorChain implements PasswordValidatorChainInterface
     ) {
         foreach ($this->validators as $validator) {
             if (!$validator instanceof PasswordValidatorInterface) {
-                throw new InvalidValidatorType();
+                throw new InvalidValidatorTypeException();
             }
         }
     }
