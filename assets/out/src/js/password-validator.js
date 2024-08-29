@@ -3,15 +3,22 @@
  * See LICENSE file for license details.
  */
 
+const registerPassword = document.querySelector("input[id='userPassword']");
+if(registerPassword) {
+    registerPassword.addEventListener("keyup", ajaxRequest);
+}
 
-//userPassword?
-//passwordNew?
-//forgotPassword?
+const passwordNew =  document.querySelector("input[id='passwordNew']");
+if(passwordNew) {
+    passwordNew.addEventListener("keyup", ajaxRequest);
+}
 
-const input = document.querySelector("input[id='userPassword']");
+const forgotPassword =  document.querySelector("input[id='forgotPassword']");
+if(forgotPassword) {
+    forgotPassword.addEventListener("keyup", ajaxRequest);
+}
 
-input.addEventListener("keyup", ajaxRequest);
-
+//TODO: kill previous ajax call
 function ajaxRequest() {
     var xhr = new XMLHttpRequest();
 
@@ -21,7 +28,9 @@ function ajaxRequest() {
 
             var progressBar = document.querySelector('.progress-bar');
             progressBar.classList.remove('bg-danger', 'bg-warning', 'bg-success');
-            document.querySelector('.progress-bar').style.width = (jsonResponse.strength * 25) + "%";
+            progressBar.style.width = (jsonResponse.strength * 25) + "%";
+            progressBar.parentNode.setAttribute('aria-valuenow', (jsonResponse.strength * 25));
+
             switch (jsonResponse.strength) {
                 case 0:
                     progressBar.classList.add('bg-danger')
@@ -44,6 +53,7 @@ function ajaxRequest() {
         }
     };
 
+    //TODO: remove hardcode url
     xhr.open("POST", "http://localhost.local/?cl=password&fnc=passwordStrength", true);
     xhr.send();
 }

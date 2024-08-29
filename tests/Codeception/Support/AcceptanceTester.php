@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Tests\Codeception\Support;
 
+use OxidEsales\Codeception\Page\Home;
+
 /**
  * Inherited Methods
  *
@@ -28,4 +30,15 @@ namespace OxidEsales\SecurityModule\Tests\Codeception\Support;
 final class AcceptanceTester extends \Codeception\Actor
 {
     use _generated\AcceptanceTesterActions;
+
+    /**
+     * Open shop first page.
+     */
+    public function openShop()
+    {
+        $I = $this;
+        $homePage = new Home($I);
+        $I->amOnPage($homePage->URL);
+        return $homePage;
+    }
 }
