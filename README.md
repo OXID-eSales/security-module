@@ -58,22 +58,16 @@ $ composer static
 $ bin/oe-console oe:database:reset --db-host=db-host --db-port=db-port --db-name=db-name --db-user=db-user --db-password=db-password --force
 ```
 
-- Run Unit + Integration tests
+- Run all the tests
+
 ```bash
-$ composer phpunit
+$ composer tests-all
 ```
 
-- Run Unit tests
-```bash
-$ ./vendor/bin/phpunit -c vendor/oxid-esales/security-module/tests/phpunit.xml
-```
+- Or the desired suite
 
-- Run Integration tests
 ```bash
-$ ./vendor/bin/phpunit --bootstrap=./source/bootstrap.php -c vendor/oxid-esales/security-module/tests/phpintegration.xml
-```
-
-- run Acceptance tests
-```bash
-$ composer codeception
+$ composer tests-unit
+$ composer tests-integration
+$ composer tests-codeception
 ```
