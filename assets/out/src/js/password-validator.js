@@ -27,33 +27,38 @@ function ajaxRequest(password) {
             let jsonResponse = JSON.parse(xhr.responseText);
             let progressBar = document.querySelector('.progress-bar');
 
-            progressBar.classList.remove('bg-danger', 'bg-warning', 'bg-success');
+            progressBar.classList.remove('very-weak', 'very-strong', 'weak', 'strong', 'medium');
 
             switch (jsonResponse.strength) {
                 case 0:
                     progressBar.style.width = "15%";
                     progressBar.parentNode.setAttribute('aria-valuenow', '15');
-                    progressBar.classList.add('bg-danger')
+                    progressBar.classList.add('very-weak');
+                    progressBar.innerText = 'Very weak';
                     break
                 case 1:
                     progressBar.style.width = "35%";
                     progressBar.parentNode.setAttribute('aria-valuenow', '35');
-                    progressBar.classList.add('bg-danger')
+                    progressBar.classList.add('weak');
+                    progressBar.innerText = 'Weak';
                     break
                 case 2:
                     progressBar.style.width = "50%";
                     progressBar.parentNode.setAttribute('aria-valuenow', '50');
-                    progressBar.classList.add('bg-warning')
+                    progressBar.classList.add('medium');
+                    progressBar.innerText = 'Medium';
                     break
                 case 3:
                     progressBar.style.width = "75%";
                     progressBar.parentNode.setAttribute('aria-valuenow', '75');
-                    progressBar.classList.add('bg-success')
+                    progressBar.classList.add('strong');
+                    progressBar.innerText = 'Strong';
                     break
                 case 4:
                     progressBar.style.width = "100%";
                     progressBar.parentNode.setAttribute('aria-valuenow', '100');
-                    progressBar.classList.add('bg-success')
+                    progressBar.classList.add('very-strong');
+                    progressBar.innerText = 'Very strong';
                     break
                 default:
                     break
