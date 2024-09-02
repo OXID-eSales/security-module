@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Tests\Codeception\Acceptance;
 
 use Codeception\Example;
+use Codeception\TestInterface;
 use Codeception\Util\Fixtures;
 use OxidEsales\SecurityModule\Tests\Codeception\Support\AcceptanceTester;
 
@@ -19,8 +20,25 @@ use OxidEsales\SecurityModule\Tests\Codeception\Support\AcceptanceTester;
  */
 class PasswordStrengthCest
 {
-    private $progressBarStrength1 = "//div[contains(@class, 'progress-bar')][contains(@style,'width: 15%')]";
-    private $progressBarStrength = "//div[contains(@class, 'progress-bar')]";
+    private string $progressBarStrength = "//div[contains(@class, 'progress-bar')]";
+
+    /**
+     * @param TestInterface $test
+     */
+    public function _before(AcceptanceTester $I): void
+    {
+        $userData = $this->getExistingUserData();
+        $I->updateInDatabase(
+            'oxuser',
+            [
+                'oxupdatekey' => 'test_update_key',
+                'oxupdateexp' => time() + 60,
+            ],
+            [
+                'oxusername' => $userData['userLoginName'],
+            ]
+        );
+    }
 
     /**
      * @dataProvider passwordDataProvider
@@ -60,10 +78,20 @@ class PasswordStrengthCest
         $I->seeElement($example['class']);
     }
 
-//    public function testUserForgotPassword(AcceptanceTester $I): void
-//    {
-//        $homePage = $I->openShop();
-//    }
+    /**
+     * @dataProvider passwordDataProvider
+     */
+    public function testUserForgotPassword(AcceptanceTester $I, Example $example): void
+    {
+        $userData = $this->getExistingUserData();
+        $uid = md5($userData['userId'] . '1' . 'test_update_key');
+        $I->amOnPage('?cl=forgotpwd&uid=' . $uid . '&lang=1&shp=1');
+
+        $I->pressKey('#password_new', $example['password']);
+
+        $I->waitForText($example['text'], 10, $this->progressBarStrength);
+        $I->seeElement($example['class']);
+    }
 
     protected function passwordDataProvider(): array
     {
