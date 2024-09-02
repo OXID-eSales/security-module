@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Tests\Codeception\Acceptance;
 
+use Codeception\Example;
 use Codeception\Util\Fixtures;
 use OxidEsales\SecurityModule\Tests\Codeception\Support\AcceptanceTester;
 
@@ -18,19 +19,27 @@ use OxidEsales\SecurityModule\Tests\Codeception\Support\AcceptanceTester;
  */
 class PasswordStrengthCest
 {
-    private $progressBarStrength = "//div[contains(@class, 'progress-bar')][contains(@style,'width: 50%')]";
+    private $progressBarStrength1 = "//div[contains(@class, 'progress-bar')][contains(@style,'width: 15%')]";
+    private $progressBarStrength = "//div[contains(@class, 'progress-bar')]";
 
-    public function testUserRegistrationPassword(AcceptanceTester $I): void
+    /**
+     * @dataProvider passwordDataProvider
+     */
+    public function testUserRegistrationPassword(AcceptanceTester $I, Example $example): void
     {
         $homePage = $I->openShop();
         $homePage->openUserRegistrationPage();
 
-        $I->pressKey('#userPassword', ['a', 'b']);
-        $I->wait(1); //Wait for animation
-        $I->seeElement($this->progressBarStrength);
+        $I->pressKey('#userPassword', $example['password']);
+
+        $I->waitForText($example['text'], 10, $this->progressBarStrength);
+        $I->seeElement($example['class']);
     }
 
-    public function testUserChangePassword(AcceptanceTester $I): void
+    /**
+     * @dataProvider passwordDataProvider
+     */
+    public function testUserChangePassword(AcceptanceTester $I, Example $example): void
     {
         $userData = $this->getExistingUserData();
         $userName = $userData['userLoginName'];
@@ -45,15 +54,47 @@ class PasswordStrengthCest
             ->seeUserAccount($userData)
             ->openChangePasswordPage();
 
-        $I->pressKey('#passwordNew', ['a', 'b']);
-        $I->wait(1); //Wait for animation
-        $I->seeElement($this->progressBarStrength);
+        $I->pressKey('#passwordNew', $example['password']);
+
+        $I->waitForText($example['text'], 10, $this->progressBarStrength);
+        $I->seeElement($example['class']);
     }
 
 //    public function testUserForgotPassword(AcceptanceTester $I): void
 //    {
 //        $homePage = $I->openShop();
 //    }
+
+    protected function passwordDataProvider(): array
+    {
+        return [
+            [
+                'password' => ['a', 'b'],
+                'text' => 'Very weak',
+                'class' => '.very-weak'
+            ],
+            [
+                'password' => ['a', 'b', 'c', 'd', 'e', 'f', '1', '2', '3', '!'],
+                'text' => 'Weak',
+                'class' => '.weak'
+            ],
+            [
+                'password' => ['a', 'b', 'c', 'd', 'e', 'f', '1', '2', '3', '!', 'G', 'H', '/'],
+                'text' => 'Medium',
+                'class' => '.medium'
+            ],
+            [
+                'password' => ['a', 'b', 'c', 'd', 'e', 'f', '1', '2', '3', '!', 'G', 'H', '/', '4', 'i', '5'],
+                'text' => 'Strong',
+                'class' => '.strong'
+            ],
+            [
+                'password' => ['a', 'b', 'c', 'd', 'e', 'f', '1', '2', '3', '!', 'G', 'H', '/', '4', 'i', '5', ';', 'j', 'K'],
+                'text' => 'Very strong',
+                'class' => '.very-strong'
+            ],
+        ];
+    }
 
     private function getExistingUserData()
     {
