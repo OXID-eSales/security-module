@@ -7,16 +7,17 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\SecurityModule\PasswordPolicy\Tests\Unit\PasswordPolicy\Controller;
+namespace OxidEsales\SecurityModule\PasswordPolicy\Tests\Integration\PasswordPolicy\Controller;
 
+use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\EshopCommunity\Tests\Integration\IntegrationTestCase;
 use OxidEsales\SecurityModule\PasswordPolicy\Controller\PasswordAjaxController;
 use OxidEsales\SecurityModule\PasswordPolicy\Transput\RequestInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Transput\ResponseInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordStrength;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordStrengthInterface;
-use PHPUnit\Framework\TestCase;
 
-class PasswordAjaxControllerTest extends TestCase
+class PasswordAjaxControllerTest extends IntegrationTestCase
 {
     public function testPasswordStrength(): void
     {
@@ -35,7 +36,8 @@ class PasswordAjaxControllerTest extends TestCase
         $responseStub->expects($this->once())
             ->method('responseAsJson')
             ->with([
-                'strength' => $strength
+                'strength' => $strength,
+                'message'  => Registry::getLang()->translateString('ERROR_PASSWORD_STRENGTH_3'),
             ]);
 
         $sut->passwordStrength();
