@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\PasswordPolicy\Controller;
 
 use OxidEsales\Eshop\Application\Component\Widget\WidgetController;
+use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\SecurityModule\PasswordPolicy\Transput\RequestInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Transput\ResponseInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordStrengthInterface;
@@ -27,6 +28,7 @@ class PasswordAjaxController extends WidgetController
         $responseService = $this->getService(ResponseInterface::class);
         $responseService->responseAsJson([
             'strength' => $result,
+            'message' => Registry::getLang()->translateString('ERROR_PASSWORD_STRENGTH_' . $result),
         ]);
     }
 }
