@@ -30,6 +30,10 @@ class PasswordValidatorChain implements PasswordValidatorChainInterface
     public function validatePassword(#[\SensitiveParameter] string $password): void
     {
         foreach ($this->validators as $validator) {
+            if (!$validator->isEnabled()) {
+                continue;
+            }
+
             $validator->validate($password);
         }
     }

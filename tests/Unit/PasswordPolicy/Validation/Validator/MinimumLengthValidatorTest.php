@@ -45,10 +45,10 @@ class MinimumLengthValidatorTest extends TestCase
 
     public function testValidationWithDisabledSetting(): void
     {
-        $digitValidator = $this->createValidator(0);
-        $digitValidator->validate('noDigitPassword');
+        $minimumLengthValidator = $this->createValidator(0);
+        $validatorEnabled = $minimumLengthValidator->isEnabled();
 
-        $this->addToAssertionCount(1);
+        $this->assertFalse($validatorEnabled);
     }
 
     private function createValidator(

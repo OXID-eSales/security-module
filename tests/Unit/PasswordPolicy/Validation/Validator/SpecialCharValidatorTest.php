@@ -72,10 +72,10 @@ class SpecialCharValidatorTest extends TestCase
 
     public function testValidationWithDisabledSetting(): void
     {
-        $digitValidator = $this->createValidator(false);
-        $digitValidator->validate('noSpecialCharPassword');
+        $specialCharValidator = $this->createValidator(false);
+        $validatorEnabled = $specialCharValidator->isEnabled();
 
-        $this->addToAssertionCount(1);
+        $this->assertFalse($validatorEnabled);
     }
 
     private function createValidator(

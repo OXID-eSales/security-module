@@ -37,6 +37,7 @@ class PasswordValidatorChainTest extends TestCase
     public function testValidatorWillThrowException(): void
     {
         $validator = $this->createStub(PasswordValidatorInterface::class);
+        $validator->method('isEnabled')->willReturn(true);
         $validator->method('validate')->willThrowException(new PasswordSpecialCharException());
 
         $this->expectException(PasswordSpecialCharException::class);

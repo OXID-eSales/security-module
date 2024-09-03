@@ -59,10 +59,10 @@ class LowerCaseValidatorTest extends TestCase
 
     public function testValidationWithDisabledSetting(): void
     {
-        $digitValidator = $this->createValidator(false);
-        $digitValidator->validate('NO_LOWER_CASE_PASSWORD');
+        $lowerCaseValidator = $this->createValidator(false);
+        $validatorEnabled = $lowerCaseValidator->isEnabled();
 
-        $this->addToAssertionCount(1);
+        $this->assertFalse($validatorEnabled);
     }
 
     private function createValidator(

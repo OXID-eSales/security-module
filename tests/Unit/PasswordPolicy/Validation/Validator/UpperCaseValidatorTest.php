@@ -48,10 +48,10 @@ class UpperCaseValidatorTest extends TestCase
 
     public function testValidationWithDisabledSetting(): void
     {
-        $digitValidator = $this->createValidator(false);
-        $digitValidator->validate('no_upper_case_password');
+        $upperCaseValidator = $this->createValidator(false);
+        $validatorEnabled = $upperCaseValidator->isEnabled();
 
-        $this->addToAssertionCount(1);
+        $this->assertFalse($validatorEnabled);
     }
 
     public static function dataProviderUpperCasePassword(): array

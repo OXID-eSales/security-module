@@ -21,12 +21,17 @@ class LowerCaseValidator implements PasswordValidatorInterface
     ) {
     }
 
-    public function validate(#[\SensitiveParameter] string $password): void
+    public function isEnabled(): bool
     {
-        if (!$this->moduleSetting->getPasswordLowercase()) {
-            return;
+        if ($this->moduleSetting->getPasswordLowercase()) {
+            return true;
         }
 
+        return false;
+    }
+
+    public function validate(#[\SensitiveParameter] string $password): void
+    {
         /** @var array $passwordChars */
         $passwordChars = count_chars($password, 1);
         $passwordChars = array_keys($passwordChars);

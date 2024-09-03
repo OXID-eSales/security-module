@@ -97,27 +97,37 @@ class PasswordStrengthCest
     {
         return [
             [
-                'password' => ['a', 'b'],
+                'password' => [
+                    'a', 'b'
+                ],
                 'text' => 'Very weak',
                 'class' => '.very-weak'
             ],
             [
-                'password' => ['a', 'b', 'c', 'd', 'e', 'f', '1', '2', '3', '!'],
+                'password' => [
+                    'a', 'b', 'c', 'd', 'e', 'f', '1', '2', '3', '!'
+                ],
                 'text' => 'Weak',
                 'class' => '.weak'
             ],
             [
-                'password' => ['a', 'b', 'c', 'd', 'e', 'f', '1', '2', '3', '!', 'G', 'H', '/'],
+                'password' => [
+                    'a', 'b', 'c', 'd', 'e', 'f', '1', '2', '3', '!', 'G', 'H', '/'
+                ],
                 'text' => 'Medium',
                 'class' => '.medium'
             ],
             [
-                'password' => ['a', 'b', 'c', 'd', 'e', 'f', '1', '2', '3', '!', 'G', 'H', '/', '4', 'i', '5'],
+                'password' => [
+                    'a', 'b', 'c', 'd', 'e', 'f', '1', '2', '3', '!', 'G', 'H', '/', '4', 'i', '5'
+                ],
                 'text' => 'Strong',
                 'class' => '.strong'
             ],
             [
-                'password' => ['a', 'b', 'c', 'd', 'e', 'f', '1', '2', '3', '!', 'G', 'H', '/', '4', 'i', '5', ';', 'j', 'K'],
+                'password' => [
+                    'a', 'b', 'c', 'd', 'e', 'f', '1', '2', '3', '!', 'G', 'H', '/', '4', 'i', '5', ';', 'j', 'K'
+                ],
                 'text' => 'Very strong',
                 'class' => '.very-strong'
             ],

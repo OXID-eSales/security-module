@@ -11,5 +11,7 @@ namespace OxidEsales\SecurityModule\PasswordPolicy\Validation\Validator;
 
 interface PasswordValidatorInterface
 {
+    public function isEnabled(): bool;
+
     public function validate(#[\SensitiveParameter] string $password): void;
 }
