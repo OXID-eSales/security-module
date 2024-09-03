@@ -49,25 +49,25 @@ $aModule = [
 
         //Password symbols requirements
         [
-            'group' => 'password',
+            'group' => 'passwordpolicy_requirements',
             'name'  => ModuleSetting::PASSWORD_UPPERCASE,
             'type'  => 'bool',
             'value' => true
         ],
         [
-            'group' => 'password',
+            'group' => 'passwordpolicy_requirements',
             'name'  => ModuleSetting::PASSWORD_LOWERCASE,
             'type'  => 'bool',
             'value' => true
         ],
         [
-            'group' => 'password',
+            'group' => 'passwordpolicy_requirements',
             'name'  => ModuleSetting::PASSWORD_DIGIT,
             'type'  => 'bool',
             'value' => true
         ],
         [
-            'group' => 'password',
+            'group' => 'passwordpolicy_requirements',
             'name'  => ModuleSetting::PASSWORD_SPECIAL_CHAR,
             'type'  => 'bool',
             'value' => true

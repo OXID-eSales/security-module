@@ -37,6 +37,12 @@ export class PasswordStrength {
 
     ajaxRequest(password) {
         let self = this;
+
+        if (password.length < 1) {
+            self.setProgressBar(0, '', '');
+            return;
+        }
+
         let xhr = new XMLHttpRequest();
 
         xhr.onreadystatechange = function() {
@@ -80,7 +86,10 @@ export class PasswordStrength {
         progressBar.classList.remove('very-weak', 'very-strong', 'weak', 'strong', 'medium');
 
         progressBar.parentNode.setAttribute('aria-valuenow', value);
-        progressBar.classList.add(css);
+
+        if (css) {
+            progressBar.classList.add(css);
+        }
         progressBar.innerText = text;
     }
 }
