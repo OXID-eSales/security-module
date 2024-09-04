@@ -1,3 +1,9 @@
 import { PasswordStrength } from "./module/password-validator.js";
 
-new PasswordStrength();
+document.querySelectorAll("div[data-type='passwordStrength']").forEach((el) => {
+    new PasswordStrength({
+        url: el.getAttribute('data-url'),
+        fieldTarget: document.getElementById(el.getAttribute('data-target')),
+        progressBar: document.querySelector(".progress-bar")
+    })
+});

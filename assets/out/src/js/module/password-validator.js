@@ -3,8 +3,10 @@
  * See LICENSE file for license details.
  */
 export class PasswordStrength {
-    constructor() {
-        this.delayInMilliseconds = 1000;
+    constructor(options) {
+        this.url = options.url;
+        this.fieldTarget = options.fieldTarget;
+        this.progressBar = options.progressBar;
 
         this.registerEvents();
     }
@@ -13,26 +15,16 @@ export class PasswordStrength {
         let self = this;
         let requestDelayTimeoutId;
 
-        document.querySelectorAll("div[data-type='passwordStrength']").forEach((el) => {
-            let url = el.getAttribute('data-url');
-            this.setRequestUrl(url);
+        this.fieldTarget.addEventListener("keyup", function (e) {
+            let password = this.value;
+            if (requestDelayTimeoutId !== undefined) {
+                clearTimeout(requestDelayTimeoutId);
+            }
 
-            let fieldTarget = el.getAttribute('data-target');
-            document.getElementById(fieldTarget).addEventListener("keyup", function (e) {
-                let password = this.value;
-                if (requestDelayTimeoutId !== undefined) {
-                    clearTimeout(requestDelayTimeoutId);
-                }
-
-                requestDelayTimeoutId = setTimeout(function () {
-                    self.ajaxRequest(password);
-                }, self.delayInMilliseconds);
-            });
+            requestDelayTimeoutId = setTimeout(function () {
+                self.ajaxRequest(password);
+            }, self.delayInMilliseconds);
         });
-    }
-
-    setRequestUrl(url) {
-        this.url = url;
     }
 
     ajaxRequest(password) {
@@ -82,7 +74,7 @@ export class PasswordStrength {
     }
 
     setProgressBar(value, css, text) {
-        let progressBar = document.querySelector('.progress-bar');
+        let progressBar = this.progressBar;
         progressBar.classList.remove('very-weak', 'very-strong', 'weak', 'strong', 'medium');
 
         progressBar.parentNode.setAttribute('aria-valuenow', value);

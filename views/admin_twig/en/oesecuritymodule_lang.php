@@ -10,7 +10,7 @@ $sLangName = 'English';
 $aLang = [
     'SHOP_MODULE_GROUP_password'                       => 'Password settings',
     'SHOP_MODULE_oeSecurityPasswordMinimumLength'      => 'Minimum length',
-    'HELP_SHOP_MODULE_oeSecurityPasswordMinimumLength' => 'Min passwort length. Should be greater then 8.',
+    'HELP_SHOP_MODULE_oeSecurityPasswordMinimumLength' => 'Min. passwort length. Should be greater then 8.',
 
     'SHOP_MODULE_GROUP_passwordpolicy_requirements'         => 'Required symbols',
     'SHOP_MODULE_oeSecurityPasswordContainUppercase'        => 'Password must contain uppercase',

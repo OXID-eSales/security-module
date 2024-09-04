@@ -20,6 +20,9 @@ use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordValidato
  */
 class InputValidator extends InputValidator_parent
 {
+    /**
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
+     */
     public function checkPassword($user, $newPassword, $confirmationPassword, $checkPasswordLength = false)
     {
         $passwordValidator = $this->getService(PasswordValidatorChainInterface::class);
