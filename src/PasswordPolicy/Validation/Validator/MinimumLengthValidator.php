@@ -21,12 +21,7 @@ class MinimumLengthValidator implements PasswordValidatorInterface
 
     public function isEnabled(): bool
     {
-        $minimumLength = $this->moduleSetting->getPasswordMinimumLength();
-        if ($minimumLength > 0) {
-            return true;
-        }
-
-        return false;
+        return $this->moduleSetting->getPasswordMinimumLength() > 0;
     }
 
     public function validate(#[\SensitiveParameter] string $password): void

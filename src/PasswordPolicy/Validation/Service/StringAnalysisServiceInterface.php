@@ -8,5 +8,7 @@ interface StringAnalysisServiceInterface
 
     public function hasLowerCaseCharacter(string $origin): bool;
 
+    public function hasSpecialCharacter(string $origin): bool;
+
     public function hasDigitCharacter(string $origin): bool;
 }

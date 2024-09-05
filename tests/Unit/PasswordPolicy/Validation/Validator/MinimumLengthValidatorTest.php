@@ -20,9 +20,13 @@ class MinimumLengthValidatorTest extends TestCase
     #[DataProvider('dataProviderMinimumPasswordThrowException')]
     public function testValidationThrowException($password): void
     {
-        $this->expectException(PasswordMinimumLengthException::class);
+        $minimumLengthValidator = $this->getSut(
+            moduleSetting: $this->createConfiguredStub(ModuleSettingInterface::class, [
+                'getPasswordMinimumLength' => 8
+            ])
+        );
 
-        $minimumLengthValidator = $this->createValidator();
+        $this->expectException(PasswordMinimumLengthException::class);
         $minimumLengthValidator->validate($password);
     }
 
@@ -37,28 +41,45 @@ class MinimumLengthValidatorTest extends TestCase
 
     public function testValidation(): void
     {
-        $minimumLengthValidator = $this->createValidator();
-        $minimumLengthValidator->validate('someLongPassword');
+        $minimumLengthValidator = $this->getSut();
 
+        $minimumLengthValidator->validate('someLongPassword');
         $this->addToAssertionCount(1);
     }
 
-    public function testValidationWithDisabledSetting(): void
+    /** @dataProvider boolDataProvider */
+    public function testValidationWithDisabledSetting(int $settingValue, bool $expectedValue): void
     {
-        $minimumLengthValidator = $this->createValidator(0);
-        $validatorEnabled = $minimumLengthValidator->isEnabled();
+        $sut = $this->getSut(
+            moduleSetting: $this->createConfiguredStub(ModuleSettingInterface::class, [
+                'getPasswordMinimumLength' => $settingValue
+            ])
+        );
 
-        $this->assertFalse($validatorEnabled);
+        $this->assertSame($expectedValue, $sut->isEnabled());
     }
 
-    private function createValidator(
-        int $minimumLength = 8,
-    ) {
-        $settingService = $this->createMock(ModuleSettingInterface::class);
-        $settingService->method('getPasswordMinimumLength')->willReturn($minimumLength);
 
+    public static function boolDataProvider(): \Generator
+    {
+        yield 'setting enabled' => [
+            'settingValue' => 8,
+            'expectedValue' => true,
+        ];
+
+        yield 'setting disabled' => [
+            'settingValue' => 0,
+            'expectedValue' => false,
+        ];
+    }
+
+    private function getSut(
+        ModuleSettingInterface $moduleSetting = null,
+    ): MinimumLengthValidator {
         return new MinimumLengthValidator(
-            $settingService
+            moduleSetting: $moduleSetting ?? $this->createConfiguredStub(ModuleSettingInterface::class, [
+            'getPasswordMinimumLength' => 8
+        ])
         );
     }
 }

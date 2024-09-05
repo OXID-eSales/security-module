@@ -11,82 +11,70 @@ namespace OxidEsales\SecurityModule\PasswordPolicy\Tests\Unit\PasswordPolicy\Val
 
 use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordSpecialCharException;
-use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\CharacterAnalysis;
+use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\StringAnalysisServiceInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Validator\SpecialCharValidator;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class SpecialCharValidatorTest extends TestCase
 {
-    #[DataProvider('dataProviderSpecialCharPasswordThrowException')]
-    public function testValidationThrowException($password): void
+    public function testValidationThrowsExceptionOnWrongStrings(): void
     {
+        $sut = $this->getSut(
+            stringAnalysisService: $stringAnalysisMock = $this->createMock(StringAnalysisServiceInterface::class),
+        );
+
+        $password = uniqid();
+        $stringAnalysisMock->method('hasSpecialCharacter')->with($password)->willReturn(false);
+
         $this->expectException(PasswordSpecialCharException::class);
-
-        $specialCharValidator = $this->createValidator();
-        $specialCharValidator->validate($password);
+        $sut->validate($password);
     }
 
-    public static function dataProviderSpecialCharPasswordThrowException(): array
+    public function testValidationThrowsExceptionOnCorrectStrings(): void
     {
-        return [
-            [''],
-            ['123456789'],
-            ['SomeLongPassword'],
-            ['SomeLongPassword1'],
-        ];
-    }
+        $sut = $this->getSut(
+            stringAnalysisService: $stringAnalysisMock = $this->createMock(StringAnalysisServiceInterface::class),
+        );
 
-    #[DataProvider('dataProviderSpecialCharPassword')]
-    public function testValidation($password): void
-    {
-        $specialCharValidator = $this->createValidator();
-        $specialCharValidator->validate($password);
+        $password = uniqid();
+        $stringAnalysisMock->method('hasSpecialCharacter')->with($password)->willReturn(true);
 
+        $sut->validate($password);
         $this->addToAssertionCount(1);
     }
 
-    public static function dataProviderSpecialCharPassword(): array
+    /** @dataProvider boolDataProvider */
+    public function testValidationWithDisabledSetting(bool $settingValue, bool $expectedValue): void
     {
-        return [
-            //special chars ASCII between 32 and 47
-            ['#specialChar'],
-            ['special!Char'],
-            ['special&longPassword'],
+        $sut = $this->getSut(
+            moduleSetting: $this->createConfiguredStub(ModuleSettingInterface::class, [
+                'getPasswordSpecialChar' => $settingValue
+            ])
+        );
 
-            //special chars ASCII between 58 and 64
-            ['<specialChar'],
-            ['special@Char'],
-            ['specialLongPassword>'],
+        $this->assertSame($expectedValue, $sut->isEnabled());
+    }
 
-            //special chars ASCII between 91 and 96
-            ['[specialChar'],
-            ['special[]Char'],
-            ['specialLongPassword]'],
+    public static function boolDataProvider(): \Generator
+    {
+        yield 'setting enabled' => [
+            'settingValue' => true,
+            'expectedValue' => true,
+        ];
 
-            //special chars ASCII above 128
-            ['äöü'],
-            ['{}'],
+        yield 'setting disabled' => [
+            'settingValue' => false,
+            'expectedValue' => false,
         ];
     }
 
-    public function testValidationWithDisabledSetting(): void
-    {
-        $specialCharValidator = $this->createValidator(false);
-        $validatorEnabled = $specialCharValidator->isEnabled();
-
-        $this->assertFalse($validatorEnabled);
-    }
-
-    private function createValidator(
-        bool $settingValue = true
-    ) {
-        $settingService = $this->createMock(ModuleSettingInterface::class);
-        $settingService->method('getPasswordSpecialChar')->willReturn($settingValue);
-
+    private function getSut(
+        ModuleSettingInterface $moduleSetting = null,
+        StringAnalysisServiceInterface $stringAnalysisService = null,
+    ): SpecialCharValidator {
         return new SpecialCharValidator(
-            $settingService,
-            new CharacterAnalysis()
+            moduleSetting: $moduleSetting ?? $this->createStub(ModuleSettingInterface::class),
+            stringAnalysisService: $stringAnalysisService ?? $this->createStub(StringAnalysisServiceInterface::class),
         );
     }
 }

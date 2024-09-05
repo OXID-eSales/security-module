@@ -42,6 +42,22 @@ class StringAnalysisService implements StringAnalysisServiceInterface
         return false;
     }
 
+    public function hasSpecialCharacter(string $origin): bool
+    {
+        $passwordChars = $this->getPasswordChars($origin);
+
+        foreach ($passwordChars as $charCode) {
+            if (
+                $this->characterAnalysisService->isSpecialChar($charCode) or
+                $this->characterAnalysisService->isOtherChar($charCode)
+            ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function hasDigitCharacter(string $origin): bool
     {
         $passwordChars = $this->getPasswordChars($origin);
