@@ -23,7 +23,7 @@ class InputValidator extends InputValidator_parent
     /**
      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
-    public function checkPassword($user, $newPassword, $confirmationPassword, $checkPasswordLength = false)
+    public function checkPassword($user, $newPassword, $confirmationPassword, $shouldCheckPasswordLength = false)
     {
         $passwordValidator = $this->getService(PasswordValidatorChainInterface::class);
 
@@ -36,6 +36,6 @@ class InputValidator extends InputValidator_parent
             return $this->addValidationError("oxuser__oxpassword", $exception);
         }
 
-        return parent::checkPassword($user, $newPassword, $confirmationPassword, $checkPasswordLength);
+        return parent::checkPassword($user, $newPassword, $confirmationPassword, $shouldCheckPasswordLength);
     }
 }
