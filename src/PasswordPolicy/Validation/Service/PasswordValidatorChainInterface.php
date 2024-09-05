@@ -9,7 +9,16 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\PasswordPolicy\Validation\Service;
 
+use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\InvalidValidatorTypeException;
+use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordValidateExceptionInterface;
+
+/**
+ * @throws InvalidValidatorTypeException
+ */
 interface PasswordValidatorChainInterface
 {
+    /**
+     * @throws PasswordValidateExceptionInterface
+     */
     public function validatePassword(#[\SensitiveParameter] string $password): void;
 }
