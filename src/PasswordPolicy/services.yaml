@@ -6,6 +6,10 @@ services:
       OxidEsales\Eshop\Core\Request: '@=service("OxidEsales\\SecurityModule\\Core\\Registry").getRequest()'
       OxidEsales\Eshop\Core\Utils: '@=service("OxidEsales\\SecurityModule\\Core\\Registry").getUtils()'
 
+  OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingInterface:
+    class: OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSetting
+    public: true
+
   OxidEsales\SecurityModule\PasswordPolicy\Validation\Validator\MinimumLengthValidator:
     tags: [ 'security.password.validator' ]
 

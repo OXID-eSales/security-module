@@ -1,6 +1,14 @@
 # security-module
 A collection of security features for OXID eShop
 
+[![Development](https://github.com/OXID-eSales/security-module/actions/workflows/trigger.yaml/badge.svg?branch=b-7.2.x)](https://github.com/OXID-eSales/security-module/actions/workflows/trigger.yaml)
+[![Latest Version](https://img.shields.io/packagist/v/OXID-eSales/security-module?logo=composer&label=latest&include_prereleases&color=orange)](https://packagist.org/packages/oxid-esales/security-module)
+[![PHP Version](https://img.shields.io/packagist/php-v/oxid-esales/security-module)](https://github.com/oxid-esales/security-module)
+
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=OXID-eSales_security-module&metric=alert_status)](https://sonarcloud.io/dashboard?id=OXID-eSales_security-module)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=OXID-eSales_security-module&metric=coverage)](https://sonarcloud.io/dashboard?id=OXID-eSales_security-module)
+[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=OXID-eSales_security-module&metric=sqale_index)](https://sonarcloud.io/dashboard?id=OXID-eSales_security-module)
+
 ## Compatibility
 
 This module assumes you have OXID eShop CE version 7.2.0 or higher installed.
