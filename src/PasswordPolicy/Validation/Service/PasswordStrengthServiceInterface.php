@@ -2,7 +2,7 @@
 
 namespace OxidEsales\SecurityModule\PasswordPolicy\Validation\Service;
 
-interface PasswordStrengthInterface
+interface PasswordStrengthServiceInterface
 {
     public function estimateStrength(string $password): int;
 }

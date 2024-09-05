@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\PasswordPolicy\Service;
 
-interface ModuleSettingInterface
+interface ModuleSettingsServiceInterface
 {
     public function getPasswordMinimumLength(): int;
 

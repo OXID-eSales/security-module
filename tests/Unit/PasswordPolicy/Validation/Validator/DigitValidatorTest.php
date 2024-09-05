@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Tests\Unit\PasswordPolicy\Validator\Validation;
 
-use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingInterface;
+use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsServiceInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordDigitException;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\StringAnalysisServiceInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Validator\DigitValidator;
@@ -47,7 +47,7 @@ class DigitValidatorTest extends TestCase
     public function testValidationWithDisabledSetting(bool $settingValue, bool $expectedValue): void
     {
         $sut = $this->getSut(
-            moduleSetting: $this->createConfiguredStub(ModuleSettingInterface::class, [
+            moduleSetting: $this->createConfiguredStub(ModuleSettingsServiceInterface::class, [
                 'getPasswordDigit' => $settingValue
             ])
         );
@@ -69,11 +69,11 @@ class DigitValidatorTest extends TestCase
     }
 
     private function getSut(
-        ModuleSettingInterface $moduleSetting = null,
+        ModuleSettingsServiceInterface $moduleSetting = null,
         StringAnalysisServiceInterface $stringAnalysisService = null,
     ): DigitValidator {
         return new DigitValidator(
-            moduleSetting: $moduleSetting ?? $this->createStub(ModuleSettingInterface::class),
+            moduleSetting: $moduleSetting ?? $this->createStub(ModuleSettingsServiceInterface::class),
             stringAnalysisService: $stringAnalysisService ?? $this->createStub(StringAnalysisServiceInterface::class),
         );
     }

@@ -12,7 +12,7 @@ namespace OxidEsales\SecurityModule\PasswordPolicy\Validation\Service;
 class StringAnalysisService implements StringAnalysisServiceInterface
 {
     public function __construct(
-        private readonly CharacterAnalysisInterface $characterAnalysisService
+        private readonly CharacterAnalysisServiceInterface $characterAnalysisService
     ) {
     }
 

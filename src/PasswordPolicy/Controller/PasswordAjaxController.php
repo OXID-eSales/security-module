@@ -13,7 +13,7 @@ use OxidEsales\Eshop\Application\Component\Widget\WidgetController;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\SecurityModule\PasswordPolicy\Transput\RequestInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Transput\ResponseInterface;
-use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordStrengthInterface;
+use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordStrengthServiceInterface;
 
 class PasswordAjaxController extends WidgetController
 {
@@ -22,7 +22,7 @@ class PasswordAjaxController extends WidgetController
         $request = $this->getService(RequestInterface::class);
         $password = $request->getPassword();
 
-        $passwordStrength = $this->getService(PasswordStrengthInterface::class)
+        $passwordStrength = $this->getService(PasswordStrengthServiceInterface::class)
             ->estimateStrength($password);
 
         $responseService = $this->getService(ResponseInterface::class);

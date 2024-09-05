@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\PasswordPolicy\Validation\Service;
 
-class CharacterAnalysis implements CharacterAnalysisInterface
+class CharacterAnalysisService implements CharacterAnalysisServiceInterface
 {
     public function isControlChar(int $charCode): bool
     {

@@ -9,15 +9,15 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\PasswordPolicy\Validation\Validator;
 
-use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingInterface;
+use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsServiceInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordUpperCaseException;
-use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\CharacterAnalysisInterface;
+use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\CharacterAnalysisServiceInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\StringAnalysisServiceInterface;
 
 class UpperCaseValidator implements PasswordValidatorInterface
 {
     public function __construct(
-        private readonly ModuleSettingInterface $moduleSetting,
+        private readonly ModuleSettingsServiceInterface $moduleSetting,
         private readonly StringAnalysisServiceInterface $stringAnalysisService,
     ) {
     }

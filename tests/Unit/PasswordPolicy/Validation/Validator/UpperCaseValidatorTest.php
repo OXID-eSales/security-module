@@ -7,9 +7,9 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\SecurityModule\PasswordPolicy\Tests\Unit\PasswordPolicy\Validator\Validation;
+namespace OxidEsales\SecurityModule\Tests\Unit\PasswordPolicy\Validator\Validation;
 
-use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingInterface;
+use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsServiceInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordUpperCaseException;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\StringAnalysisServiceInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Validator\UpperCaseValidator;
@@ -47,7 +47,7 @@ class UpperCaseValidatorTest extends TestCase
     public function testIsValidatorEnabled(bool $settingValue, bool $expectedValue): void
     {
         $sut = $this->getSut(
-            moduleSetting: $this->createConfiguredStub(ModuleSettingInterface::class, [
+            moduleSetting: $this->createConfiguredStub(ModuleSettingsServiceInterface::class, [
                 'getPasswordUppercase' => $settingValue
             ])
         );
@@ -69,11 +69,11 @@ class UpperCaseValidatorTest extends TestCase
     }
 
     private function getSut(
-        ModuleSettingInterface $moduleSetting = null,
+        ModuleSettingsServiceInterface $moduleSetting = null,
         StringAnalysisServiceInterface $stringAnalysisService = null,
     ): UpperCaseValidator {
         return new UpperCaseValidator(
-            moduleSetting: $moduleSetting ?? $this->createStub(ModuleSettingInterface::class),
+            moduleSetting: $moduleSetting ?? $this->createStub(ModuleSettingsServiceInterface::class),
             stringAnalysisService: $stringAnalysisService ?? $this->createStub(StringAnalysisServiceInterface::class),
         );
     }

@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Tests\Integration\PasswordPolicy\Validation\Service;
 
 use OxidEsales\EshopCommunity\Tests\Integration\IntegrationTestCase;
-use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\CharacterAnalysisInterface;
+use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\CharacterAnalysisServiceInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\StringAnalysisService;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\StringAnalysisServiceInterface;
 
@@ -142,7 +142,7 @@ class StringAnalysisServiceTest extends IntegrationTestCase
 
         yield 'multi char string without correct special char' => [
             'origin' => 'sdAf',
-            'expectedValue' => False,
+            'expectedValue' => false,
         ];
     }
 
@@ -150,7 +150,7 @@ class StringAnalysisServiceTest extends IntegrationTestCase
     public function getSut(): StringAnalysisServiceInterface
     {
         return new StringAnalysisService(
-            characterAnalysisService: $this->get(CharacterAnalysisInterface::class)
+            characterAnalysisService: $this->get(CharacterAnalysisServiceInterface::class)
         );
     }
 }

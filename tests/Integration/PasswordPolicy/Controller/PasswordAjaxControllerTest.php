@@ -7,25 +7,25 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\SecurityModule\PasswordPolicy\Tests\Integration\PasswordPolicy\Controller;
+namespace OxidEsales\SecurityModule\Tests\Integration\PasswordPolicy\Controller;
 
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Tests\Integration\IntegrationTestCase;
 use OxidEsales\SecurityModule\PasswordPolicy\Controller\PasswordAjaxController;
 use OxidEsales\SecurityModule\PasswordPolicy\Transput\RequestInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Transput\ResponseInterface;
-use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordStrength;
-use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordStrengthInterface;
+use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordStrengthService;
+use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordStrengthServiceInterface;
 
 class PasswordAjaxControllerTest extends IntegrationTestCase
 {
     public function testPasswordStrength(): void
     {
-        $strength = PasswordStrength::STRENGTH_STRONG;
+        $strength = PasswordStrengthService::STRENGTH_STRONG;
 
         $sut = $this->getStub(
             $this->createMock(RequestInterface::class),
-            $passwordStrengthStub = $this->createMock(PasswordStrengthInterface::class),
+            $passwordStrengthStub = $this->createMock(PasswordStrengthServiceInterface::class),
             $responseStub = $this->createMock(ResponseInterface::class),
         );
 
@@ -45,7 +45,7 @@ class PasswordAjaxControllerTest extends IntegrationTestCase
 
     private function getStub(
         RequestInterface $request = null,
-        PasswordStrengthInterface $passwordStrength = null,
+        PasswordStrengthServiceInterface $passwordStrength = null,
         ResponseInterface $response = null,
     ) {
         $sut = $this->createPartialMock(PasswordAjaxController::class, ['getService']);
@@ -55,8 +55,8 @@ class PasswordAjaxControllerTest extends IntegrationTestCase
                 $request ?? $this->createMock(RequestInterface::class)
             ],
             [
-                PasswordStrengthInterface::class,
-                $passwordStrength ?? $this->createStub(PasswordStrengthInterface::class)
+                PasswordStrengthServiceInterface::class,
+                $passwordStrength ?? $this->createStub(PasswordStrengthServiceInterface::class)
             ],
             [
                 ResponseInterface::class,

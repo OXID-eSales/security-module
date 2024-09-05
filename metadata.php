@@ -9,7 +9,7 @@
  * Metadata version
  */
 
-use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSetting;
+use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsService;
 use OxidEsales\SecurityModule\Core\Module;
 
 $sMetadataVersion = '2.1';
@@ -42,7 +42,7 @@ $aModule = [
         //Password length requirements
         [
             'group' => 'password',
-            'name'  => ModuleSetting::PASSWORD_MINIMUM_LENGTH,
+            'name'  => ModuleSettingsService::PASSWORD_MINIMUM_LENGTH,
             'type'  => 'num',
             'value' => 8
         ],
@@ -50,25 +50,25 @@ $aModule = [
         //Password symbols requirements
         [
             'group' => 'passwordpolicy_requirements',
-            'name'  => ModuleSetting::PASSWORD_UPPERCASE,
+            'name'  => ModuleSettingsService::PASSWORD_UPPERCASE,
             'type'  => 'bool',
             'value' => true
         ],
         [
             'group' => 'passwordpolicy_requirements',
-            'name'  => ModuleSetting::PASSWORD_LOWERCASE,
+            'name'  => ModuleSettingsService::PASSWORD_LOWERCASE,
             'type'  => 'bool',
             'value' => true
         ],
         [
             'group' => 'passwordpolicy_requirements',
-            'name'  => ModuleSetting::PASSWORD_DIGIT,
+            'name'  => ModuleSettingsService::PASSWORD_DIGIT,
             'type'  => 'bool',
             'value' => true
         ],
         [
             'group' => 'passwordpolicy_requirements',
-            'name'  => ModuleSetting::PASSWORD_SPECIAL_CHAR,
+            'name'  => ModuleSettingsService::PASSWORD_SPECIAL_CHAR,
             'type'  => 'bool',
             'value' => true
         ],

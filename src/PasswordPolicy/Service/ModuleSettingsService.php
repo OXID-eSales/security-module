@@ -12,7 +12,7 @@ namespace OxidEsales\SecurityModule\PasswordPolicy\Service;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Facade\ModuleSettingServiceInterface;
 use OxidEsales\SecurityModule\Core\Module;
 
-class ModuleSetting implements ModuleSettingInterface
+class ModuleSettingsService implements ModuleSettingsServiceInterface
 {
     public const PASSWORD_MINIMUM_LENGTH = 'oeSecurityPasswordMinimumLength';
     public const PASSWORD_UPPERCASE = 'oeSecurityPasswordContainUppercase';

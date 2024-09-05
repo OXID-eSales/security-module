@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\SecurityModule\PasswordPolicy\Tests\PasswordPolicy\Transput\Unit;
+namespace OxidEsales\SecurityModule\Tests\Unit\PasswordPolicy\Transput;
 
 use OxidEsales\Eshop\Core\Request as ShopRequest;
 use OxidEsales\SecurityModule\PasswordPolicy\Transput\Request;
