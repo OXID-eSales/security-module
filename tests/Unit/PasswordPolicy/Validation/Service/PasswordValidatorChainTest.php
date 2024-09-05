@@ -53,7 +53,8 @@ class PasswordValidatorChainTest extends TestCase
         $validator2Mock = $this->createMock(PasswordValidatorInterface::class);
         $validator2Mock->method('isEnabled')->willReturn(true);
 
-        $expectedException = new class extends \Exception implements PasswordValidateExceptionInterface {};
+        $expectedException = new class extends \Exception implements PasswordValidateExceptionInterface {
+        };
         $validator2Mock->method('validate')->willThrowException($expectedException);
 
         $validator3Mock = $this->createMock(PasswordValidatorInterface::class);
