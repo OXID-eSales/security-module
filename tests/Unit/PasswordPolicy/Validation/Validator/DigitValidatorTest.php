@@ -7,69 +7,74 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\SecurityModule\PasswordPolicy\Tests\Unit\PasswordPolicy\Validator\Validation;
+namespace OxidEsales\SecurityModule\Tests\Unit\PasswordPolicy\Validator\Validation;
 
 use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordDigitException;
-use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\CharacterAnalysis;
+use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\StringAnalysisServiceInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Validator\DigitValidator;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class DigitValidatorTest extends TestCase
 {
-    #[DataProvider('dataProviderDigitPasswordThrowException')]
-    public function testValidationThrowException($password): void
+    public function testValidationThrowsExceptionOnWrongStrings(): void
     {
+        $sut = $this->getSut(
+            stringAnalysisService: $stringAnalysisMock = $this->createMock(StringAnalysisServiceInterface::class),
+        );
+
+        $password = uniqid();
+        $stringAnalysisMock->method('hasUpperCaseCharacter')->with($password)->willReturn(false);
+
         $this->expectException(PasswordDigitException::class);
-
-        $digitValidator = $this->createValidator();
-        $digitValidator->validate($password);
+        $sut->validate($password);
     }
 
-    public static function dataProviderDigitPasswordThrowException(): array
+    public function testValidationThrowsExceptionOnCorrectStrings(): void
     {
-        return [
-            [''],
-            ['SomeLongPassword'],
-        ];
-    }
+        $sut = $this->getSut(
+            stringAnalysisService: $stringAnalysisMock = $this->createMock(StringAnalysisServiceInterface::class),
+        );
 
-    #[DataProvider('dataProviderDigitPassword')]
-    public function testValidation($password): void
-    {
-        $digitValidator = $this->createValidator();
-        $digitValidator->validate($password);
+        $password = uniqid();
+        $stringAnalysisMock->method('hasDigitCharacter')->with($password)->willReturn(true);
 
+        $sut->validate($password);
         $this->addToAssertionCount(1);
     }
 
-    public static function dataProviderDigitPassword(): array
+    /** @dataProvider boolDataProvider */
+    public function testValidationWithDisabledSetting(bool $settingValue, bool $expectedValue): void
     {
-        return [
-            ['1password'],
-            ['passw0rd'],
-            ['password_9'],
+        $sut = $this->getSut(
+            moduleSetting: $this->createConfiguredStub(ModuleSettingInterface::class, [
+                'getPasswordDigit' => $settingValue
+            ])
+        );
+
+        $this->assertSame($expectedValue, $sut->isEnabled());
+    }
+
+    public static function boolDataProvider(): \Generator
+    {
+        yield 'setting enabled' => [
+            'settingValue' => true,
+            'expectedValue' => true,
+        ];
+
+        yield 'setting disabled' => [
+            'settingValue' => false,
+            'expectedValue' => false,
         ];
     }
 
-    public function testValidationWithDisabledSetting(): void
-    {
-        $digitValidator = $this->createValidator(false);
-        $validatorEnabled = $digitValidator->isEnabled();
-
-        $this->assertFalse($validatorEnabled);
-    }
-
-    private function createValidator(
-        bool $settingValue = true
-    ) {
-        $settingService = $this->createMock(ModuleSettingInterface::class);
-        $settingService->method('getPasswordDigit')->willReturn($settingValue);
-
+    private function getSut(
+        ModuleSettingInterface $moduleSetting = null,
+        StringAnalysisServiceInterface $stringAnalysisService = null,
+    ): DigitValidator {
         return new DigitValidator(
-            $settingService,
-            new CharacterAnalysis()
+            moduleSetting: $moduleSetting ?? $this->createStub(ModuleSettingInterface::class),
+            stringAnalysisService: $stringAnalysisService ?? $this->createStub(StringAnalysisServiceInterface::class),
         );
     }
 }

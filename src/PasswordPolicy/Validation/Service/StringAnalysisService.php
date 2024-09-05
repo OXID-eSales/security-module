@@ -12,15 +12,13 @@ namespace OxidEsales\SecurityModule\PasswordPolicy\Validation\Service;
 class StringAnalysisService implements StringAnalysisServiceInterface
 {
     public function __construct(
-        private CharacterAnalysisInterface $characterAnalysisService
-    ){
+        private readonly CharacterAnalysisInterface $characterAnalysisService
+    ) {
     }
 
     public function hasUpperCaseCharacter(string $origin): bool
     {
-        /** @var array $passwordChars */
-        $passwordChars = count_chars($origin, 1);
-        $passwordChars = array_keys($passwordChars);
+        $passwordChars = $this->getPasswordChars($origin);
 
         foreach ($passwordChars as $charCode) {
             if ($this->characterAnalysisService->isUpperCase($charCode)) {
@@ -29,5 +27,38 @@ class StringAnalysisService implements StringAnalysisServiceInterface
         }
 
         return false;
+    }
+
+    public function hasLowerCaseCharacter(string $origin): bool
+    {
+        $passwordChars = $this->getPasswordChars($origin);
+
+        foreach ($passwordChars as $charCode) {
+            if ($this->characterAnalysisService->isLowerCase($charCode)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function hasDigitCharacter(string $origin): bool
+    {
+        $passwordChars = $this->getPasswordChars($origin);
+
+        foreach ($passwordChars as $charCode) {
+            if ($this->characterAnalysisService->isDigit($charCode)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function getPasswordChars(string $origin): array
+    {
+        /** @var array $passwordChars */
+        $passwordChars = count_chars($origin, 1);
+        return array_keys($passwordChars);
     }
 }

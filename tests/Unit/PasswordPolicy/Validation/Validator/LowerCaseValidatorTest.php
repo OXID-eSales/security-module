@@ -7,73 +7,74 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\SecurityModule\PasswordPolicy\Tests\Unit\PasswordPolicy\Validator\Validation;
+namespace OxidEsales\SecurityModule\Tests\Unit\PasswordPolicy\Validator\Validation;
 
 use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordLowerCaseException;
-use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\CharacterAnalysis;
+use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\StringAnalysisServiceInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Validator\LowerCaseValidator;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class LowerCaseValidatorTest extends TestCase
 {
-    #[DataProvider('dataProviderLowerCasePasswordThrowException')]
-    public function testValidationThrowException($password): void
+    public function testValidationThrowsExceptionOnWrongStrings(): void
     {
+        $sut = $this->getSut(
+            stringAnalysisService: $stringAnalysisMock = $this->createMock(StringAnalysisServiceInterface::class),
+        );
+
+        $password = uniqid();
+        $stringAnalysisMock->method('hasLowerCaseCharacter')->with($password)->willReturn(false);
+
         $this->expectException(PasswordLowerCaseException::class);
-
-        $lowerCaseValidator = $this->createValidator();
-        $lowerCaseValidator->validate($password);
+        $sut->validate($password);
     }
 
-    public static function dataProviderLowerCasePasswordThrowException(): array
+    public function testValidationThrowsExceptionOnCorrectStrings(): void
     {
-        return [
-            [''],
-            ['123456789'],
-            ['PASSWORD'],
-            ['SOME_LONG_PASSWORD'],
-            ['SOME_LONG_PASSWORD_1'],
-        ];
-    }
+        $sut = $this->getSut(
+            stringAnalysisService: $stringAnalysisMock = $this->createMock(StringAnalysisServiceInterface::class),
+        );
 
-    #[DataProvider('dataProviderLowerCasePassword')]
-    public function testValidation($password): void
-    {
-        $lowerCaseValidator = $this->createValidator();
-        $lowerCaseValidator->validate($password);
+        $password = uniqid();
+        $stringAnalysisMock->method('hasLowerCaseCharacter')->with($password)->willReturn(true);
 
+        $sut->validate($password);
         $this->addToAssertionCount(1);
     }
 
-    public static function dataProviderLowerCasePassword(): array
+    /** @dataProvider boolDataProvider */
+    public function testValidationWithDisabledSetting(bool $settingValue, bool $expectedValue): void
     {
-        return [
-            ['SOME_LONG_pASSWORD'],
-            ['SOME_lONG_PASSWORD'],
-            ['sOME_LONG_PASSWORD'],
-            ['sOME_lONG_pASSWORD'],
+        $sut = $this->getSut(
+            moduleSetting: $this->createConfiguredStub(ModuleSettingInterface::class, [
+                'getPasswordLowercase' => $settingValue
+            ])
+        );
+
+        $this->assertSame($expectedValue, $sut->isEnabled());
+    }
+
+    public static function boolDataProvider(): \Generator
+    {
+        yield 'setting enabled' => [
+            'settingValue' => true,
+            'expectedValue' => true,
+        ];
+
+        yield 'setting disabled' => [
+            'settingValue' => false,
+            'expectedValue' => false,
         ];
     }
 
-    public function testValidationWithDisabledSetting(): void
-    {
-        $lowerCaseValidator = $this->createValidator(false);
-        $validatorEnabled = $lowerCaseValidator->isEnabled();
-
-        $this->assertFalse($validatorEnabled);
-    }
-
-    private function createValidator(
-        bool $settingValue = true
-    ) {
-        $settingService = $this->createMock(ModuleSettingInterface::class);
-        $settingService->method('getPasswordLowercase')->willReturn($settingValue);
-
+    private function getSut(
+        ModuleSettingInterface $moduleSetting = null,
+        StringAnalysisServiceInterface $stringAnalysisService = null,
+    ): LowerCaseValidator {
         return new LowerCaseValidator(
-            $settingService,
-            new CharacterAnalysis()
+            moduleSetting: $moduleSetting ?? $this->createStub(ModuleSettingInterface::class),
+            stringAnalysisService: $stringAnalysisService ?? $this->createStub(StringAnalysisServiceInterface::class),
         );
     }
 }
