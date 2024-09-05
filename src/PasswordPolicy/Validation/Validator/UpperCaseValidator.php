@@ -12,38 +12,24 @@ namespace OxidEsales\SecurityModule\PasswordPolicy\Validation\Validator;
 use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordUpperCaseException;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\CharacterAnalysisInterface;
+use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\StringAnalysisServiceInterface;
 
 class UpperCaseValidator implements PasswordValidatorInterface
 {
     public function __construct(
         private readonly ModuleSettingInterface $moduleSetting,
-        private readonly CharacterAnalysisInterface $characterAnalysis
+        private readonly StringAnalysisServiceInterface $stringAnalysisService,
     ) {
     }
 
     public function isEnabled(): bool
     {
-        if ($this->moduleSetting->getPasswordUppercase()) {
-            return true;
-        }
-
-        return false;
+        return $this->moduleSetting->getPasswordUppercase();
     }
 
     public function validate(#[\SensitiveParameter] string $password): void
     {
-        /** @var array $passwordChars */
-        $passwordChars = count_chars($password, 1);
-        $passwordChars = array_keys($passwordChars);
-
-        $upper = 0;
-        foreach ($passwordChars as $charCode) {
-            if ($this->characterAnalysis->isUpperCase($charCode)) {
-                $upper++;
-            }
-        }
-
-        if ($upper == 0) {
+        if (!$this->stringAnalysisService->hasUpperCaseCharacter($password)) {
             throw new PasswordUpperCaseException();
         }
     }

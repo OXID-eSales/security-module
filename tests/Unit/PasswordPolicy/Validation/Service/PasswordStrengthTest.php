@@ -7,8 +7,9 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\SecurityModule\PasswordPolicy\Validation\Service;
+namespace OxidEsales\SecurityModule\Tests\Unit\PasswordPolicy\Validation\Service;
 
+use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\CharacterAnalysis;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordStrength;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;

@@ -29,7 +29,8 @@
         "codeception/module-filesystem": "*",
         "codeception/module-webdriver": "*",
         "oxid-esales/codeception-modules": "dev-b-7.2.x",
-        "oxid-esales/codeception-page-objects": "dev-b-7.2.x"
+        "oxid-esales/codeception-page-objects": "dev-b-7.2.x",
+        "mikey179/vfsstream": "^1.6"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
