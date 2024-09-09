@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\PasswordPolicy\Shop\Core;
 
-use OxidEsales\Eshop\Core\Exception\InputException;
+use OxidEsales\SecurityModule\PasswordPolicy\Intrastructure\ExceptionFactoryInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordValidateExceptionInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordValidatorChainInterface;
 
@@ -31,10 +31,12 @@ class InputValidator extends InputValidator_parent
         try {
             $passwordValidator->validatePassword($newPassword);
         } catch (PasswordValidateExceptionInterface $e) {
-            $exception = oxNew(InputException::class);
-            $exception->setMessage($e->getMessage());
+            $exceptionFactory = $this->getService(ExceptionFactoryInterface::class);
 
-            return $this->addValidationError("oxuser__oxpassword", $exception);
+            return $this->addValidationError(
+                "oxuser__oxpassword",
+                $exceptionFactory->create($e->getMessage())
+            );
         }
 
         return parent::checkPassword($user, $newPassword, $confirmationPassword, $shouldCheckPasswordLength);

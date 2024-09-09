@@ -25,6 +25,9 @@ services:
   OxidEsales\SecurityModule\PasswordPolicy\Validation\Validator\LowerCaseValidator:
     tags: [ 'security.password.validator' ]
 
+  OxidEsales\SecurityModule\PasswordPolicy\Intrastructure\ExceptionFactoryInterface:
+    class: OxidEsales\SecurityModule\PasswordPolicy\Intrastructure\ExceptionFactory
+    public: true
 
   OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordValidatorChainInterface:
     class: OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordValidatorChain
