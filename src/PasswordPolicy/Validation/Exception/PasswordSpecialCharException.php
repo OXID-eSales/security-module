@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception;
 
-class PasswordSpecialCharException extends \Exception implements PasswordValidateExceptionInterface
+class PasswordSpecialCharException extends PasswordValidateException
 {
     public function __construct()
     {

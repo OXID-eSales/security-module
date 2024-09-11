@@ -5,6 +5,7 @@ services:
     bind:
       OxidEsales\Eshop\Core\Request: '@=service("OxidEsales\\SecurityModule\\Core\\Registry").getRequest()'
       OxidEsales\Eshop\Core\Utils: '@=service("OxidEsales\\SecurityModule\\Core\\Registry").getUtils()'
+      OxidEsales\Eshop\Core\Language: '@=service("OxidEsales\\SecurityModule\\Core\\Registry").getLang()'
 
   OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsServiceInterface:
     class: OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsService

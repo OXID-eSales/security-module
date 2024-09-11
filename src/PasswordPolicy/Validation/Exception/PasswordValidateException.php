@@ -9,6 +9,12 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception;
 
-interface PasswordValidateExceptionInterface extends \Throwable
+class PasswordValidateException extends \Exception
 {
+    protected array $translationParameters = [];
+
+    public function getTranslationParameters(): array
+    {
+        return $this->translationParameters;
+    }
 }

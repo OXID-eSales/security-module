@@ -5,7 +5,7 @@ $sLangName = 'English';
 $aLang = [
     'charset' => 'UTF-8',
 
-    'ERROR_PASSWORD_MIN_LENGTH'                => 'The password is too short.',
+    'ERROR_PASSWORD_MIN_LENGTH'                => 'The password must be at least %d characters long.',
     'ERROR_PASSWORD_MISSING_DIGIT'             => 'Please enter at least one number.',
     'ERROR_PASSWORD_MISSING_LOWER_CASE'        => 'Please enter at least one lower case letter.',
     'ERROR_PASSWORD_MISSING_UPPER_CASE'        => 'Please enter at least one capital letter.',

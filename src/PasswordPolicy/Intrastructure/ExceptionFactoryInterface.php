@@ -10,8 +10,9 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\PasswordPolicy\Intrastructure;
 
 use OxidEsales\EshopCommunity\Core\Exception\InputException;
+use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordValidateException;
 
 interface ExceptionFactoryInterface
 {
-    public function create(string $message): InputException;
+    public function create(PasswordValidateException $exception): InputException;
 }

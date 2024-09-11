@@ -11,6 +11,7 @@ namespace OxidEsales\SecurityModule\PasswordPolicy\Validation\Validator;
 
 use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsServiceInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordMinimumLengthException;
+use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordValidateException;
 
 class MinimumLengthValidator implements PasswordValidatorInterface
 {
@@ -26,8 +27,9 @@ class MinimumLengthValidator implements PasswordValidatorInterface
 
     public function validate(#[\SensitiveParameter] string $password): void
     {
-        if (strlen($password) < $this->moduleSetting->getPasswordMinimumLength()) {
-            throw new PasswordMinimumLengthException();
+        $minimumLength = $this->moduleSetting->getPasswordMinimumLength();
+        if (strlen($password) < $minimumLength) {
+            throw new PasswordMinimumLengthException($minimumLength);
         }
     }
 }

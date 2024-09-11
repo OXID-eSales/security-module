@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception;
 
-class PasswordUpperCaseException extends \Exception implements PasswordValidateExceptionInterface
+class PasswordUpperCaseException extends PasswordValidateException
 {
     public function __construct()
     {

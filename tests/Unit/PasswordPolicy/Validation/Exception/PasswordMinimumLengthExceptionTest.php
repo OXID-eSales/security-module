@@ -16,7 +16,7 @@ class PasswordMinimumLengthExceptionTest extends TestCase
 {
     public function testException()
     {
-        $exception = new PasswordMinimumLengthException();
+        $exception = new PasswordMinimumLengthException(8);
 
         $this->assertInstanceOf(PasswordMinimumLengthException::class, $exception);
         $this->assertSame('ERROR_PASSWORD_MIN_LENGTH', $exception->getMessage());

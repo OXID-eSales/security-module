@@ -11,7 +11,7 @@ namespace OxidEsales\SecurityModule\Tests\Unit\PasswordPolicy\Validation\Service
 
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\InvalidValidatorTypeException;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordSpecialCharException;
-use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordValidateExceptionInterface;
+use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordValidateException;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordValidatorChain;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Validator\PasswordValidatorInterface;
 use PHPUnit\Framework\TestCase;
@@ -53,8 +53,7 @@ class PasswordValidatorChainTest extends TestCase
         $validator2Mock = $this->createMock(PasswordValidatorInterface::class);
         $validator2Mock->method('isEnabled')->willReturn(true);
 
-        $expectedException = new class extends \Exception implements PasswordValidateExceptionInterface {
-        };
+        $expectedException = new PasswordValidateException();
         $validator2Mock->method('validate')->willThrowException($expectedException);
 
         $validator3Mock = $this->createMock(PasswordValidatorInterface::class);
