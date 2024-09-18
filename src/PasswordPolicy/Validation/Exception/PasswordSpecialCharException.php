@@ -13,6 +13,6 @@ class PasswordSpecialCharException extends \Exception implements PasswordValidat
 {
     public function __construct()
     {
-        parent::__construct('ERROR_PASSWORD_MISSING_UPPER_CASE');
+        parent::__construct('ERROR_PASSWORD_MISSING_SPECIAL_CHARACTER');
     }
 }
