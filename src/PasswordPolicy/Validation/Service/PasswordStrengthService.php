@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\PasswordPolicy\Validation\Service;
 
-class PasswordStrength implements PasswordStrengthInterface
+class PasswordStrengthService implements PasswordStrengthServiceInterface
 {
     public const STRENGTH_VERY_WEAK = 0;
     public const STRENGTH_WEAK = 1;
@@ -18,7 +18,7 @@ class PasswordStrength implements PasswordStrengthInterface
     public const STRENGTH_VERY_STRONG = 4;
 
     public function __construct(
-        private readonly CharacterAnalysisInterface $characterAnalysis
+        private readonly CharacterAnalysisServiceInterface $characterAnalysis
     ) {
     }
 

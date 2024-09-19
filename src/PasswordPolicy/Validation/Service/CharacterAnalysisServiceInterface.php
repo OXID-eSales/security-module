@@ -2,7 +2,7 @@
 
 namespace OxidEsales\SecurityModule\PasswordPolicy\Validation\Service;
 
-interface CharacterAnalysisInterface
+interface CharacterAnalysisServiceInterface
 {
     public function isControlChar(int $charCode): bool;
 

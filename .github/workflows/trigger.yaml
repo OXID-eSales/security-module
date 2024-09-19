@@ -1,6 +1,7 @@
 name: Auto trigger on Push to 7.2.x*
 
 on:
+  pull_request: {}
   push:
     branches:
       - 'b-7.2.x**'

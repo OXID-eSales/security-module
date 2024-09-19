@@ -7,14 +7,14 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\SecurityModule\PasswordPolicy\Tests\PasswordPolicy\Service\Unit;
+namespace OxidEsales\SecurityModule\Tests\Unit\PasswordPolicy\Service;
 
 use OxidEsales\SecurityModule\Core\Module;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Facade\ModuleSettingServiceInterface;
-use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSetting;
-use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingInterface;
+use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsService;
+use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsServiceInterface;
 
 class ModuleSettingServiceTest extends TestCase
 {
@@ -39,15 +39,15 @@ class ModuleSettingServiceTest extends TestCase
     public static function gettersDataProvider(): array
     {
         return [
-            self::prepareIntegerSetting('getPasswordMinimumLength', ModuleSetting::PASSWORD_MINIMUM_LENGTH),
-            self::prepareBooleanSetting('getPasswordUppercase', ModuleSetting::PASSWORD_UPPERCASE, true),
-            self::prepareBooleanSetting('getPasswordUppercase', ModuleSetting::PASSWORD_UPPERCASE, false),
-            self::prepareBooleanSetting('getPasswordLowercase', ModuleSetting::PASSWORD_LOWERCASE, true),
-            self::prepareBooleanSetting('getPasswordLowercase', ModuleSetting::PASSWORD_LOWERCASE, false),
-            self::prepareBooleanSetting('getPasswordDigit', ModuleSetting::PASSWORD_DIGIT, true),
-            self::prepareBooleanSetting('getPasswordDigit', ModuleSetting::PASSWORD_DIGIT, false),
-            self::prepareBooleanSetting('getPasswordSpecialChar', ModuleSetting::PASSWORD_SPECIAL_CHAR, true),
-            self::prepareBooleanSetting('getPasswordSpecialChar', ModuleSetting::PASSWORD_SPECIAL_CHAR, false),
+            self::prepareIntegerSetting('getPasswordMinimumLength', ModuleSettingsService::PASSWORD_MINIMUM_LENGTH),
+            self::prepareBooleanSetting('getPasswordUppercase', ModuleSettingsService::PASSWORD_UPPERCASE, true),
+            self::prepareBooleanSetting('getPasswordUppercase', ModuleSettingsService::PASSWORD_UPPERCASE, false),
+            self::prepareBooleanSetting('getPasswordLowercase', ModuleSettingsService::PASSWORD_LOWERCASE, true),
+            self::prepareBooleanSetting('getPasswordLowercase', ModuleSettingsService::PASSWORD_LOWERCASE, false),
+            self::prepareBooleanSetting('getPasswordDigit', ModuleSettingsService::PASSWORD_DIGIT, true),
+            self::prepareBooleanSetting('getPasswordDigit', ModuleSettingsService::PASSWORD_DIGIT, false),
+            self::prepareBooleanSetting('getPasswordSpecialChar', ModuleSettingsService::PASSWORD_SPECIAL_CHAR, true),
+            self::prepareBooleanSetting('getPasswordSpecialChar', ModuleSettingsService::PASSWORD_SPECIAL_CHAR, false),
         ];
     }
 
@@ -77,9 +77,9 @@ class ModuleSettingServiceTest extends TestCase
 
     public function getSut(
         ModuleSettingServiceInterface $moduleSettingService = null
-    ): ModuleSettingInterface {
-        return new ModuleSetting(
-            moduleSettingService: $moduleSettingService ?? $this->createStub(ModuleSettingInterface::class),
+    ): ModuleSettingsServiceInterface {
+        return new ModuleSettingsService(
+            moduleSettingService: $moduleSettingService ?? $this->createStub(ModuleSettingsServiceInterface::class),
         );
     }
 }

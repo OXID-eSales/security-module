@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\SecurityModule\PasswordPolicy\Tests\Integration;
+namespace OxidEsales\SecurityModule\Tests\Integration;
 
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Exception\InputException;
@@ -32,19 +32,16 @@ class InputValidatorTest extends IntegrationTestCase
         $exception = $validator->checkPassword($userModelMock, $password, $password);
 
         $this->assertInstanceOf(InputException::class, $exception);
-        $this->assertSame(
-            (new $expectedException())->getMessage(),
-            $exception->getMessage()
-        );
+        $this->assertSame($expectedException, $exception->getMessage());
     }
 
     public static function dataProviderPasswordError(): iterable
     {
-        yield ['short', PasswordMinimumLengthException::class];
-        yield ['12345678', PasswordSpecialCharException::class];
-        yield ['password!', PasswordDigitException::class];
-        yield ['passw0rd!', PasswordUpperCaseException::class];
-        yield ['PASSW0RD!', PasswordLowerCaseException::class];
+        yield ['short', 'Das Passwort muss mindestens 8 Zeichen lang sein.'];
+        yield ['12345678', 'Das Passwort enthält keine Sonderzeichen.'];
+        yield ['password!', 'Das Passwort enthält keine Ziffer.'];
+        yield ['passw0rd!', 'Das Passwort enthält keine Großbuchstaben.'];
+        yield ['PASSW0RD!', 'Das Passwort enthält keine Kleinbuchstaben.'];
     }
 
     public function testPasswordCheck(): void

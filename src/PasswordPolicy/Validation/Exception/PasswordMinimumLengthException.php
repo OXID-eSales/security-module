@@ -9,10 +9,12 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception;
 
-class PasswordMinimumLengthException extends \Exception implements PasswordValidateExceptionInterface
+class PasswordMinimumLengthException extends PasswordValidateException
 {
-    public function __construct()
+    public function __construct(int $minimumLength)
     {
+        $this->translationParameters = [$minimumLength];
+
         parent::__construct('ERROR_PASSWORD_MIN_LENGTH');
     }
 }

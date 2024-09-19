@@ -9,8 +9,8 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\PasswordPolicy\Shop\Core;
 
-use OxidEsales\Eshop\Core\Exception\InputException;
-use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordValidateExceptionInterface;
+use OxidEsales\SecurityModule\PasswordPolicy\Intrastructure\ExceptionFactoryInterface;
+use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordValidateException;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordValidatorChainInterface;
 
 /**
@@ -22,20 +22,23 @@ class InputValidator extends InputValidator_parent
 {
     /**
      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
+     * @SuppressWarnings(PHPMD.LongVariable)
      */
-    public function checkPassword($user, $newPassword, $confirmationPassword, $checkPasswordLength = false)
+    public function checkPassword($user, $newPassword, $confirmationPassword, $shouldCheckPasswordLength = false)
     {
         $passwordValidator = $this->getService(PasswordValidatorChainInterface::class);
 
         try {
             $passwordValidator->validatePassword($newPassword);
-        } catch (PasswordValidateExceptionInterface $e) {
-            $exception = oxNew(InputException::class);
-            $exception->setMessage($e->getMessage());
+        } catch (PasswordValidateException $e) {
+            $exceptionFactory = $this->getService(ExceptionFactoryInterface::class);
 
-            return $this->addValidationError("oxuser__oxpassword", $exception);
+            return $this->addValidationError(
+                "oxuser__oxpassword",
+                $exceptionFactory->create($e)
+            );
         }
 
-        return parent::checkPassword($user, $newPassword, $confirmationPassword, $checkPasswordLength);
+        return parent::checkPassword($user, $newPassword, $confirmationPassword, $shouldCheckPasswordLength);
     }
 }

@@ -7,17 +7,18 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\SecurityModule\PasswordPolicy\Validation\Service;
+namespace OxidEsales\SecurityModule\Tests\Unit\PasswordPolicy\Validation\Service;
 
+use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\CharacterAnalysisService;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-class CharacterAnalysisTest extends TestCase
+class CharacterAnalysisServiceTest extends TestCase
 {
     #[DataProvider('dataProviderPasswordContainsChar')]
     public function testCheckers($method, $value, $expected): void
     {
-        $characterAnalysis = new CharacterAnalysis();
+        $characterAnalysis = new CharacterAnalysisService();
 
         $passwordChar = ord($value);
         $this->assertEquals($expected, $characterAnalysis->$method($passwordChar));

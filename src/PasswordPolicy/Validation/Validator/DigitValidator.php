@@ -9,41 +9,26 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\PasswordPolicy\Validation\Validator;
 
-use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingInterface;
+use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsServiceInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordDigitException;
-use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\CharacterAnalysisInterface;
+use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\StringAnalysisServiceInterface;
 
 class DigitValidator implements PasswordValidatorInterface
 {
     public function __construct(
-        private readonly ModuleSettingInterface $moduleSetting,
-        private readonly CharacterAnalysisInterface $characterAnalysis
+        private readonly ModuleSettingsServiceInterface $moduleSetting,
+        private readonly StringAnalysisServiceInterface $stringAnalysisService
     ) {
     }
 
     public function isEnabled(): bool
     {
-        if ($this->moduleSetting->getPasswordDigit()) {
-            return true;
-        }
-
-        return false;
+        return $this->moduleSetting->getPasswordDigit();
     }
 
     public function validate(#[\SensitiveParameter] string $password): void
     {
-        /** @var array $passwordChars */
-        $passwordChars = count_chars($password, 1);
-        $passwordChars = array_keys($passwordChars);
-
-        $digit = 0;
-        foreach ($passwordChars as $charCode) {
-            if ($this->characterAnalysis->isDigit($charCode)) {
-                $digit++;
-            }
-        }
-
-        if ($digit == 0) {
+        if (!$this->stringAnalysisService->hasDigitCharacter($password)) {
             throw new PasswordDigitException();
         }
     }

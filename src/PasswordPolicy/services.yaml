@@ -5,6 +5,11 @@ services:
     bind:
       OxidEsales\Eshop\Core\Request: '@=service("OxidEsales\\SecurityModule\\Core\\Registry").getRequest()'
       OxidEsales\Eshop\Core\Utils: '@=service("OxidEsales\\SecurityModule\\Core\\Registry").getUtils()'
+      OxidEsales\Eshop\Core\Language: '@=service("OxidEsales\\SecurityModule\\Core\\Registry").getLang()'
+
+  OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsServiceInterface:
+    class: OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsService
+    public: true
 
   OxidEsales\SecurityModule\PasswordPolicy\Validation\Validator\MinimumLengthValidator:
     tags: [ 'security.password.validator' ]
@@ -21,6 +26,9 @@ services:
   OxidEsales\SecurityModule\PasswordPolicy\Validation\Validator\LowerCaseValidator:
     tags: [ 'security.password.validator' ]
 
+  OxidEsales\SecurityModule\PasswordPolicy\Intrastructure\ExceptionFactoryInterface:
+    class: OxidEsales\SecurityModule\PasswordPolicy\Intrastructure\ExceptionFactory
+    public: true
 
   OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordValidatorChainInterface:
     class: OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordValidatorChain
@@ -28,9 +36,12 @@ services:
     arguments:
       $validators: !tagged 'security.password.validator'
 
-  OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordStrengthInterface:
-    class: OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordStrength
+  OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordStrengthServiceInterface:
+    class: OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordStrengthService
     public: true
+
+  OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\StringAnalysisServiceInterface:
+    class: OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\StringAnalysisService
 
   OxidEsales\SecurityModule\PasswordPolicy\Transput\RequestInterface:
     class: OxidEsales\SecurityModule\PasswordPolicy\Transput\Request
@@ -40,5 +51,5 @@ services:
     class: OxidEsales\SecurityModule\PasswordPolicy\Transput\Response
     public: true
 
-  OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\CharacterAnalysisInterface:
-    class: OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\CharacterAnalysis
+  OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\CharacterAnalysisServiceInterface:
+    class: OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\CharacterAnalysisService

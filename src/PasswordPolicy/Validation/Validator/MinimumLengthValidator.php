@@ -9,30 +9,27 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\PasswordPolicy\Validation\Validator;
 
-use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingInterface;
+use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsServiceInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordMinimumLengthException;
+use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordValidateException;
 
 class MinimumLengthValidator implements PasswordValidatorInterface
 {
     public function __construct(
-        private readonly ModuleSettingInterface $moduleSetting
+        private readonly ModuleSettingsServiceInterface $moduleSetting
     ) {
     }
 
     public function isEnabled(): bool
     {
-        $minimumLength = $this->moduleSetting->getPasswordMinimumLength();
-        if ($minimumLength > 0) {
-            return true;
-        }
-
-        return false;
+        return $this->moduleSetting->getPasswordMinimumLength() > 0;
     }
 
     public function validate(#[\SensitiveParameter] string $password): void
     {
-        if (strlen($password) < $this->moduleSetting->getPasswordMinimumLength()) {
-            throw new PasswordMinimumLengthException();
+        $minimumLength = $this->moduleSetting->getPasswordMinimumLength();
+        if (strlen($password) < $minimumLength) {
+            throw new PasswordMinimumLengthException($minimumLength);
         }
     }
 }

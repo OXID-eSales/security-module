@@ -9,44 +9,26 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\PasswordPolicy\Validation\Validator;
 
-use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingInterface;
+use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsServiceInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordSpecialCharException;
-use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\CharacterAnalysisInterface;
+use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\StringAnalysisServiceInterface;
 
 class SpecialCharValidator implements PasswordValidatorInterface
 {
     public function __construct(
-        private readonly ModuleSettingInterface $moduleSetting,
-        private readonly CharacterAnalysisInterface $characterAnalysis
+        private readonly ModuleSettingsServiceInterface $moduleSetting,
+        private readonly StringAnalysisServiceInterface $stringAnalysisService
     ) {
     }
 
     public function isEnabled(): bool
     {
-        if ($this->moduleSetting->getPasswordSpecialChar()) {
-            return true;
-        }
-
-        return false;
+        return $this->moduleSetting->getPasswordSpecialChar();
     }
 
     public function validate(#[\SensitiveParameter] string $password): void
     {
-        /** @var array $passwordChars */
-        $passwordChars = count_chars($password, 1);
-        $passwordChars = array_keys($passwordChars);
-
-        $symbol = 0;
-        foreach ($passwordChars as $charCode) {
-            if (
-                $this->characterAnalysis->isSpecialChar($charCode) or
-                $this->characterAnalysis->isOtherChar($charCode)
-            ) {
-                $symbol++;
-            }
-        }
-
-        if ($symbol == 0) {
+        if (!$this->stringAnalysisService->hasSpecialCharacter($password)) {
             throw new PasswordSpecialCharException();
         }
     }

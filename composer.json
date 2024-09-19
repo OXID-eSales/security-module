@@ -29,7 +29,8 @@
         "codeception/module-filesystem": "*",
         "codeception/module-webdriver": "*",
         "oxid-esales/codeception-modules": "dev-b-7.2.x",
-        "oxid-esales/codeception-page-objects": "dev-b-7.2.x"
+        "oxid-esales/codeception-page-objects": "dev-b-7.2.x",
+        "mikey179/vfsstream": "^1.6"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
@@ -57,8 +58,8 @@
             "@phpmd"
         ],
 
-        "tests-unit": "XDEBUG_MODE=coverage vendor/bin/phpunit --config=tests/ --testsuite=Unit --coverage-clover=tests/Reports/coverage_unit_module-template.xml",
-        "tests-integration": "XDEBUG_MODE=coverage vendor/bin/phpunit --bootstrap=/var/www/source/bootstrap.php --config=tests/ --testsuite=Integration --coverage-clover=tests/Reports/coverage_integration_module-template.xml",
+        "tests-unit": "XDEBUG_MODE=coverage vendor/bin/phpunit --config=tests/ --testsuite=Unit --coverage-clover=tests/Reports/coverage_unit_security-module.xml",
+        "tests-integration": "XDEBUG_MODE=coverage vendor/bin/phpunit --bootstrap=/var/www/source/bootstrap.php --config=tests/ --testsuite=Integration --coverage-clover=tests/Reports/coverage_integration_security-module.xml",
         "tests-coverage": "XDEBUG_MODE=coverage vendor/bin/phpunit --coverage-text --bootstrap=/var/www/source/bootstrap.php --config=tests/ --coverage-html=tests/reports/coverage",
 
         "tests-codeception": [
