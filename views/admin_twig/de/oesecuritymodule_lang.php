@@ -8,11 +8,9 @@
 $sLangName = 'Deutsch';
 
 $aLang = [
-    'SHOP_MODULE_GROUP_password'                       => 'Passwort-Einstellungen',
-    'SHOP_MODULE_oeSecurityPasswordMinimumLength'      => 'Minimale Länge',
-    'HELP_SHOP_MODULE_oeSecurityPasswordMinimumLength' => 'Min. erlaubte Passwortlänge. Sollte länger als 8 sein.',
-
-    'SHOP_MODULE_GROUP_passwordpolicy_requirements'         => 'Erforderliche Zeichen',
+    'SHOP_MODULE_GROUP_password_policy'                     => 'Passwort-Einstellungen',
+    'SHOP_MODULE_oeSecurityPasswordMinimumLength'           => 'Minimale Länge',
+    'HELP_SHOP_MODULE_oeSecurityPasswordMinimumLength'      => 'Min. erlaubte Passwortlänge. Sollte länger als 8 sein.',
     'SHOP_MODULE_oeSecurityPasswordContainUppercase'        => 'Das Passwort muss Großbuchstaben enthalten',
     'SHOP_MODULE_oeSecurityPasswordContainLowercase'        => 'Das Passwort muss Kleinbuchstaben enthalten',
     'SHOP_MODULE_oeSecurityPasswordContainDigit'            => 'Das Passwort muss Zahlen enthalten',

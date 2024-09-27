@@ -19,8 +19,8 @@ $sMetadataVersion = '2.1';
  */
 $aModule = [
     'id'          => Module::MODULE_ID,
-    'title'       => 'Security module',
-    'description' => 'Security module',
+    'title'       => 'OXID Security Module',
+    'description' => '',
     'thumbnail'   => 'logo.png',
     'version'     => '1.0.0',
     'author'      => 'OXID eSales AG',
@@ -41,7 +41,7 @@ $aModule = [
     'settings'    => [
         //Password length requirements
         [
-            'group' => 'password',
+            'group' => 'password_policy',
             'name'  => ModuleSettingsService::PASSWORD_MINIMUM_LENGTH,
             'type'  => 'num',
             'value' => 8
@@ -49,25 +49,25 @@ $aModule = [
 
         //Password symbols requirements
         [
-            'group' => 'passwordpolicy_requirements',
+            'group' => 'password_policy',
             'name'  => ModuleSettingsService::PASSWORD_UPPERCASE,
             'type'  => 'bool',
             'value' => true
         ],
         [
-            'group' => 'passwordpolicy_requirements',
+            'group' => 'password_policy',
             'name'  => ModuleSettingsService::PASSWORD_LOWERCASE,
             'type'  => 'bool',
             'value' => true
         ],
         [
-            'group' => 'passwordpolicy_requirements',
+            'group' => 'password_policy',
             'name'  => ModuleSettingsService::PASSWORD_DIGIT,
             'type'  => 'bool',
             'value' => true
         ],
         [
-            'group' => 'passwordpolicy_requirements',
+            'group' => 'password_policy',
             'name'  => ModuleSettingsService::PASSWORD_SPECIAL_CHAR,
             'type'  => 'bool',
             'value' => true

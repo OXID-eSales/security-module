@@ -1,4 +1,4 @@
-# security-module
+# OXID Security Module
 A collection of security features for OXID eShop
 
 [![Development](https://github.com/OXID-eSales/security-module/actions/workflows/trigger.yaml/badge.svg?branch=b-7.2.x)](https://github.com/OXID-eSales/security-module/actions/workflows/trigger.yaml)
@@ -11,7 +11,7 @@ A collection of security features for OXID eShop
 
 ## Compatibility
 
-This module assumes you have OXID eShop CE version 7.2.0 or higher installed.
+This module assumes you have OXID eShop Compilation version 7.2.0 installed.
 
 ## Development installation
 
@@ -37,7 +37,7 @@ $ composer require oxid-esales/security-module
 
 The module provides password strength estimation for any string input.
 It can validate password length and character variety of passwords according
-to configuration and be used for visal indication via Ajax widget. Provided in
+to configuration and be used for visual indication via Ajax widget. Provided in
 the template is a progress bar style indicator of password strength.
 
 ### Configuration
