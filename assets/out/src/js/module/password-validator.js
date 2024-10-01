@@ -7,6 +7,7 @@ export class PasswordStrength {
         this.url = options.url;
         this.fieldTarget = options.fieldTarget;
         this.progressBar = options.progressBar;
+        this.delayInMilliseconds = 500;
 
         this.registerEvents();
     }
@@ -17,6 +18,13 @@ export class PasswordStrength {
 
         this.fieldTarget.addEventListener("keyup", function (e) {
             let password = this.value;
+
+            if (self.signal) {
+                self.controller.abort();
+            }
+
+            self.progressBar.classList.add('loading');
+
             if (requestDelayTimeoutId !== undefined) {
                 clearTimeout(requestDelayTimeoutId);
             }
@@ -29,28 +37,32 @@ export class PasswordStrength {
 
     ajaxRequest(password) {
         let self = this;
+        self.controller = new AbortController();
+        self.signal = self.controller.signal;
 
         if (password.length < 1) {
             self.setProgressBar(0, '', '');
             return;
         }
 
-        let xhr = new XMLHttpRequest();
-
-        xhr.onreadystatechange = function() {
-            if (this.readyState === 4 && this.status === 200) {
-                self.handleResponse(xhr.responseText);
-            }
-        };
-
-        xhr.open("POST", self.url, false);
-        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        xhr.send('password=' + password);
+        self.request = fetch(self.url, {
+            method: "POST",
+            signal: self.signal,
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: 'password=' + password,
+        }).then(function(response) {
+            return response.json();
+        })
+        .then(function(data) {
+            self.handleResponse(data);
+        }).catch(err => {
+        });
     }
 
-    handleResponse(responseText){
+    handleResponse(jsonResponse){
         let self = this;
-        let jsonResponse = JSON.parse(responseText);
 
         switch (jsonResponse.strength) {
             case 0:
@@ -71,6 +83,8 @@ export class PasswordStrength {
             default:
                 break
         }
+
+        this.progressBar.classList.remove('loading');
     }
 
     setProgressBar(value, css, text) {
