@@ -7,6 +7,7 @@ export class PasswordStrength {
         this.url = options.url;
         this.fieldTarget = options.fieldTarget;
         this.progressBar = options.progressBar;
+        this.popover = options.popover;
         this.delayInMilliseconds = 500;
 
         this.registerEvents();
@@ -32,6 +33,13 @@ export class PasswordStrength {
             requestDelayTimeoutId = setTimeout(function () {
                 self.ajaxRequest(password);
             }, self.delayInMilliseconds);
+        });
+
+        this.fieldTarget.addEventListener('focus', function() {
+            self.popover.classList.remove('d-none');
+        });
+        this.fieldTarget.addEventListener('focusout', function() {
+            self.popover.classList.add('d-none');
         });
     }
 

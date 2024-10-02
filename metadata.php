@@ -27,7 +27,8 @@ $aModule = [
     'url'         => 'https://github.com/OXID-eSales/security-module',
     'email'       => 'info@oxid-esales.com',
     'extend'      => [
-        \OxidEsales\Eshop\Core\InputValidator::class => \OxidEsales\SecurityModule\PasswordPolicy\Shop\Core\InputValidator::class
+        \OxidEsales\Eshop\Core\InputValidator::class => \OxidEsales\SecurityModule\PasswordPolicy\Shop\Core\InputValidator::class,
+        \OxidEsales\Eshop\Core\ViewConfig::class     => \OxidEsales\SecurityModule\PasswordPolicy\Shop\Core\ViewConfig::class
     ],
     'controllers' => [
         'password' => \OxidEsales\SecurityModule\PasswordPolicy\Controller\PasswordAjaxController::class

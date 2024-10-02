@@ -16,6 +16,8 @@
         <div class="progress-bar"></div>
     </div>
 
+    {% include '@oe_security_module/form/password_requirements.html.twig' %}
+
     {{ style({ include: oViewConf.getModuleUrl('oe_security_module', 'out/src/css/password-validation.css') }) }}
     <script type="module" src="{{ oViewConf.getModuleUrl('oe_security_module', 'out/src/js/index.js') }}"></script>
 {% endblock %}

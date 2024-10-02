@@ -11,3 +11,8 @@ class_alias(
     \OxidEsales\Eshop\Core\InputValidator::class,
     \OxidEsales\SecurityModule\PasswordPolicy\Shop\Core\InputValidator_parent::class
 );
+
+class_alias(
+    \OxidEsales\Eshop\Core\ViewConfig::class,
+    \OxidEsales\SecurityModule\PasswordPolicy\Shop\Core\ViewConfig_parent::class
+);
