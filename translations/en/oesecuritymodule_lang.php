@@ -11,6 +11,7 @@ $aLang = [
     'ERROR_PASSWORD_MISSING_UPPER_CASE'        => 'Please enter at least one capital letter.',
     'ERROR_PASSWORD_MISSING_SPECIAL_CHARACTER' => 'Please enter at least one special character.',
 
+    'PASSWORD_REQUIREMENTS'              => 'Password requirements',
     'PASSWORD_MIN_LENGTH'                => 'Minimum %d characters.',
     'PASSWORD_CONTAIN_DIGIT'             => 'At least 1 number.',
     'PASSWORD_CONTAIN_LOWER_CASE'        => 'At least 1 lower case letter.',
