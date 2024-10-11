@@ -5,7 +5,7 @@ params:
     - Codeception/Config/params.php
 paths:
     tests: Codeception
-    output: Output
+    output: Codeception/Output
     data: Codeception/Support/Data
     support: Codeception/Support
     envs: Codeception/_envs
