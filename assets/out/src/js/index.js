@@ -23,3 +23,10 @@ document.querySelectorAll("div[data-type='passwordStrength']").forEach((el) => {
         });
     });
 });
+
+document.querySelectorAll('.password-toggle').forEach((el) => {
+    el.addEventListener('click', function() {
+        let passwordField = document.getElementById(this.getAttribute('data-target'));
+        passwordField.type = (passwordField.type === "password" ? "text" : "password")
+    });
+});

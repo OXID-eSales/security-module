@@ -3,6 +3,8 @@
 {% block forgotpwd_change_password_new %}
     {{ parent() }}
 
+    {% include '@oe_security_module/form/password_toggle.html.twig' with { target: 'password_new' } %}
+
     <div class="progress"
          role="progressbar"
          aria-label="Password strength"

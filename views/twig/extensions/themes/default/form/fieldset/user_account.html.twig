@@ -3,6 +3,8 @@
 {% block user_account_password %}
     {{ parent() }}
 
+    {% include '@oe_security_module/form/password_toggle.html.twig' with { target: 'userPassword' } %}
+
     <div class="progress"
          role="progressbar"
          aria-label="Password strength"
