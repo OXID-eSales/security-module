@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Tests\Unit\PasswordPolicy\Validator\Validation;
 
+use OxidEsales\Eshop\Core\InputValidator;
 use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsServiceInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordMinimumLengthException;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Validator\MinimumLengthValidator;
@@ -59,6 +60,17 @@ class MinimumLengthValidatorTest extends TestCase
         $this->assertSame($expectedValue, $sut->isEnabled());
     }
 
+    public function testValidationUseShopMinimumLength(): void
+    {
+        $minimumLengthValidator = $this->getSut(
+            moduleSetting: $this->createConfiguredStub(ModuleSettingsServiceInterface::class, [
+                'getPasswordMinimumLength' => 0
+            ])
+        );
+
+        $this->expectException(PasswordMinimumLengthException::class);
+        $minimumLengthValidator->validate('short');
+    }
 
     public static function boolDataProvider(): \Generator
     {
@@ -79,6 +91,9 @@ class MinimumLengthValidatorTest extends TestCase
         return new MinimumLengthValidator(
             moduleSetting: $moduleSetting ?? $this->createConfiguredStub(ModuleSettingsServiceInterface::class, [
                 'getPasswordMinimumLength' => 8
+            ]),
+            inputValidator: $this->createConfiguredStub(InputValidator::class, [
+                'getPasswordLength' => 6
             ])
         );
     }

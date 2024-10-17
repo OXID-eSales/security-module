@@ -6,6 +6,7 @@ services:
       OxidEsales\Eshop\Core\Request: '@=service("OxidEsales\\SecurityModule\\Core\\Registry").getRequest()'
       OxidEsales\Eshop\Core\Utils: '@=service("OxidEsales\\SecurityModule\\Core\\Registry").getUtils()'
       OxidEsales\Eshop\Core\Language: '@=service("OxidEsales\\SecurityModule\\Core\\Registry").getLang()'
+      OxidEsales\EshopCommunity\Core\InputValidator: '@=service("OxidEsales\\SecurityModule\\Core\\Registry").getInputValidator()'
 
   OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsServiceInterface:
     class: OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsService
