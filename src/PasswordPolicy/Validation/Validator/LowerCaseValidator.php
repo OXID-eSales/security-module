@@ -17,7 +17,7 @@ class LowerCaseValidator implements PasswordValidatorInterface
 {
     public function __construct(
         private readonly ModuleSettingsServiceInterface $moduleSetting,
-        private readonly StringAnalysisServiceInterface $stringAnalysisService
+        private readonly StringAnalysisServiceInterface $strAnalysisService
     ) {
     }
 
@@ -28,7 +28,7 @@ class LowerCaseValidator implements PasswordValidatorInterface
 
     public function validate(#[\SensitiveParameter] string $password): void
     {
-        if (!$this->stringAnalysisService->hasLowerCaseCharacter($password)) {
+        if (!$this->strAnalysisService->hasLowerCaseCharacter($password)) {
             throw new PasswordLowerCaseException();
         }
     }

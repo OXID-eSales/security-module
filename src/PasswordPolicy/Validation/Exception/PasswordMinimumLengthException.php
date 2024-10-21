@@ -13,7 +13,7 @@ class PasswordMinimumLengthException extends PasswordValidateException
 {
     public function __construct(int $minimumLength)
     {
-        $this->translationParameters = [$minimumLength];
+        $this->translationParams = [$minimumLength];
 
         parent::__construct('ERROR_PASSWORD_MIN_LENGTH');
     }

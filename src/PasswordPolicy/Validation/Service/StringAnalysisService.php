@@ -12,7 +12,7 @@ namespace OxidEsales\SecurityModule\PasswordPolicy\Validation\Service;
 class StringAnalysisService implements StringAnalysisServiceInterface
 {
     public function __construct(
-        private readonly CharacterAnalysisServiceInterface $characterAnalysisService
+        private readonly CharacterAnalysisServiceInterface $charAnalysisService
     ) {
     }
 
@@ -21,7 +21,7 @@ class StringAnalysisService implements StringAnalysisServiceInterface
         $passwordChars = $this->getPasswordChars($origin);
 
         foreach ($passwordChars as $charCode) {
-            if ($this->characterAnalysisService->isUpperCase($charCode)) {
+            if ($this->charAnalysisService->isUpperCase($charCode)) {
                 return true;
             }
         }
@@ -34,7 +34,7 @@ class StringAnalysisService implements StringAnalysisServiceInterface
         $passwordChars = $this->getPasswordChars($origin);
 
         foreach ($passwordChars as $charCode) {
-            if ($this->characterAnalysisService->isLowerCase($charCode)) {
+            if ($this->charAnalysisService->isLowerCase($charCode)) {
                 return true;
             }
         }
@@ -48,8 +48,8 @@ class StringAnalysisService implements StringAnalysisServiceInterface
 
         foreach ($passwordChars as $charCode) {
             if (
-                $this->characterAnalysisService->isSpecialChar($charCode) or
-                $this->characterAnalysisService->isOtherChar($charCode)
+                $this->charAnalysisService->isSpecialChar($charCode) or
+                $this->charAnalysisService->isOtherChar($charCode)
             ) {
                 return true;
             }
@@ -63,7 +63,7 @@ class StringAnalysisService implements StringAnalysisServiceInterface
         $passwordChars = $this->getPasswordChars($origin);
 
         foreach ($passwordChars as $charCode) {
-            if ($this->characterAnalysisService->isDigit($charCode)) {
+            if ($this->charAnalysisService->isDigit($charCode)) {
                 return true;
             }
         }

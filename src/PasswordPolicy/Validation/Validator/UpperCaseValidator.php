@@ -18,7 +18,7 @@ class UpperCaseValidator implements PasswordValidatorInterface
 {
     public function __construct(
         private readonly ModuleSettingsServiceInterface $moduleSetting,
-        private readonly StringAnalysisServiceInterface $stringAnalysisService,
+        private readonly StringAnalysisServiceInterface $strAnalysisService,
     ) {
     }
 
@@ -29,7 +29,7 @@ class UpperCaseValidator implements PasswordValidatorInterface
 
     public function validate(#[\SensitiveParameter] string $password): void
     {
-        if (!$this->stringAnalysisService->hasUpperCaseCharacter($password)) {
+        if (!$this->strAnalysisService->hasUpperCaseCharacter($password)) {
             throw new PasswordUpperCaseException();
         }
     }

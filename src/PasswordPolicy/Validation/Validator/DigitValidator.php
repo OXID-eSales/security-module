@@ -17,7 +17,7 @@ class DigitValidator implements PasswordValidatorInterface
 {
     public function __construct(
         private readonly ModuleSettingsServiceInterface $moduleSetting,
-        private readonly StringAnalysisServiceInterface $stringAnalysisService
+        private readonly StringAnalysisServiceInterface $strAnalysisService
     ) {
     }
 
@@ -28,7 +28,7 @@ class DigitValidator implements PasswordValidatorInterface
 
     public function validate(#[\SensitiveParameter] string $password): void
     {
-        if (!$this->stringAnalysisService->hasDigitCharacter($password)) {
+        if (!$this->strAnalysisService->hasDigitCharacter($password)) {
             throw new PasswordDigitException();
         }
     }

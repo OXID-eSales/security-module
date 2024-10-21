@@ -17,7 +17,7 @@ class SpecialCharValidator implements PasswordValidatorInterface
 {
     public function __construct(
         private readonly ModuleSettingsServiceInterface $moduleSetting,
-        private readonly StringAnalysisServiceInterface $stringAnalysisService
+        private readonly StringAnalysisServiceInterface $strAnalysisService
     ) {
     }
 
@@ -28,7 +28,7 @@ class SpecialCharValidator implements PasswordValidatorInterface
 
     public function validate(#[\SensitiveParameter] string $password): void
     {
-        if (!$this->stringAnalysisService->hasSpecialCharacter($password)) {
+        if (!$this->strAnalysisService->hasSpecialCharacter($password)) {
             throw new PasswordSpecialCharException();
         }
     }

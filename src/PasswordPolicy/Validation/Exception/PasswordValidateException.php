@@ -11,10 +11,10 @@ namespace OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception;
 
 class PasswordValidateException extends \Exception
 {
-    protected array $translationParameters = [];
+    protected array $translationParams = [];
 
     public function getTranslationParameters(): array
     {
-        return $this->translationParameters;
+        return $this->translationParams;
     }
 }
