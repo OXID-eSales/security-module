@@ -74,7 +74,7 @@ class LowerCaseValidatorTest extends TestCase
     ): LowerCaseValidator {
         return new LowerCaseValidator(
             moduleSetting: $moduleSetting ?? $this->createStub(ModuleSettingsServiceInterface::class),
-            stringAnalysisService: $stringAnalysisService ?? $this->createStub(StringAnalysisServiceInterface::class),
+            strAnalysisService: $stringAnalysisService ?? $this->createStub(StringAnalysisServiceInterface::class),
         );
     }
 }

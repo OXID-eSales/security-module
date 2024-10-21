@@ -74,7 +74,7 @@ class SpecialCharValidatorTest extends TestCase
     ): SpecialCharValidator {
         return new SpecialCharValidator(
             moduleSetting: $moduleSetting ?? $this->createStub(ModuleSettingsServiceInterface::class),
-            stringAnalysisService: $stringAnalysisService ?? $this->createStub(StringAnalysisServiceInterface::class),
+            strAnalysisService: $stringAnalysisService ?? $this->createStub(StringAnalysisServiceInterface::class),
         );
     }
 }

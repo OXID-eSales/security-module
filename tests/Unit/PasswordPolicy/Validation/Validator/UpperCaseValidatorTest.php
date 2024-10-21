@@ -74,7 +74,7 @@ class UpperCaseValidatorTest extends TestCase
     ): UpperCaseValidator {
         return new UpperCaseValidator(
             moduleSetting: $moduleSetting ?? $this->createStub(ModuleSettingsServiceInterface::class),
-            stringAnalysisService: $stringAnalysisService ?? $this->createStub(StringAnalysisServiceInterface::class),
+            strAnalysisService: $stringAnalysisService ?? $this->createStub(StringAnalysisServiceInterface::class),
         );
     }
 }

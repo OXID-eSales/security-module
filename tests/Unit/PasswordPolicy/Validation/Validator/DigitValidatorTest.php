@@ -74,7 +74,7 @@ class DigitValidatorTest extends TestCase
     ): DigitValidator {
         return new DigitValidator(
             moduleSetting: $moduleSetting ?? $this->createStub(ModuleSettingsServiceInterface::class),
-            stringAnalysisService: $stringAnalysisService ?? $this->createStub(StringAnalysisServiceInterface::class),
+            strAnalysisService: $stringAnalysisService ?? $this->createStub(StringAnalysisServiceInterface::class),
         );
     }
 }

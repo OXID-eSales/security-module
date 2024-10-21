@@ -150,7 +150,7 @@ class StringAnalysisServiceTest extends IntegrationTestCase
     public function getSut(): StringAnalysisServiceInterface
     {
         return new StringAnalysisService(
-            characterAnalysisService: $this->get(CharacterAnalysisServiceInterface::class)
+            charAnalysisService: $this->get(CharacterAnalysisServiceInterface::class)
         );
     }
 }
