@@ -37,9 +37,9 @@ export class PasswordGenerator {
         password += numbers.charAt(Math.floor(Math.random() * numbers.length));
         password += specialChars.charAt(Math.floor(Math.random() * specialChars.length));
 
-        // Fill the rest of the password with random characters until it reaches 20 characters or more
+        // Fill the rest of the password with random characters until it reaches 21 characters
         const allChars = uppercase + lowercase + numbers + specialChars;
-        for (let i = password.length; i < 20; i++) {
+        for (let i = password.length; i < 21; i++) {
             password += allChars.charAt(Math.floor(Math.random() * allChars.length));
         }
 
