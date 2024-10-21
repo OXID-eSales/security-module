@@ -38,8 +38,11 @@ export class PasswordStrength {
         this.fieldTarget.addEventListener('focus', function() {
             self.popover.classList.remove('d-none');
         });
-        this.fieldTarget.addEventListener('focusout', function() {
-            self.popover.classList.add('d-none');
+
+        this.fieldTarget.addEventListener('focusout', function(e) {
+            if (!self.popover.contains(e.relatedTarget)) {
+                self.popover.classList.add('d-none');
+            }
         });
     }
 
@@ -59,7 +62,7 @@ export class PasswordStrength {
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
             },
-            body: 'password=' + password,
+            body: 'password=' + encodeURIComponent(password),
         }).then(function(response) {
             return response.json();
         })
