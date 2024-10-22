@@ -23,4 +23,6 @@ $aLang = [
     'ERROR_PASSWORD_STRENGTH_2' => "Medium",
     'ERROR_PASSWORD_STRENGTH_3' => "Strong",
     'ERROR_PASSWORD_STRENGTH_4' => "Very strong",
+
+    'GENERATE_STRONG_PASSWORD' => 'Generate Strong Password'
 ];

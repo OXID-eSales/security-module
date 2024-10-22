@@ -9,9 +9,8 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Tests\Codeception\Acceptance;
 
-use Codeception\Example;
-use Codeception\TestInterface;
 use Codeception\Util\Fixtures;
+use OxidEsales\Codeception\Module\Translation\Translator;
 use OxidEsales\SecurityModule\Tests\Codeception\Support\AcceptanceTester;
 
 /**
@@ -24,9 +23,6 @@ class PasswordGeneratorCest
 
     private string $generatePasswordButton = "#generate_password";
 
-    /**
-     * @param TestInterface $test
-     */
     public function _before(AcceptanceTester $I): void
     {
         $userData = $this->getExistingUserData();
@@ -53,7 +49,7 @@ class PasswordGeneratorCest
         $I->assertFalse(empty($I->grabValueFrom('#userPassword')));
         $I->assertFalse(empty($I->grabValueFrom('#userPasswordConfirm')));
 
-        $I->waitForText('Very strong', 10, $this->progressBarStrength);
+        $I->waitForText(Translator::translate('ERROR_PASSWORD_STRENGTH_4'), 10, $this->progressBarStrength);
         $I->seeElement('.very-strong');
     }
 
@@ -78,7 +74,7 @@ class PasswordGeneratorCest
         $I->assertFalse(empty($I->grabValueFrom('#passwordNew')));
         $I->assertFalse(empty($I->grabValueFrom('#passwordNewConfirm')));
 
-        $I->waitForText('Very strong', 10, $this->progressBarStrength);
+        $I->waitForText(Translator::translate('ERROR_PASSWORD_STRENGTH_4'), 10, $this->progressBarStrength);
         $I->seeElement('.very-strong');
     }
 
@@ -94,7 +90,7 @@ class PasswordGeneratorCest
         $I->assertFalse(empty($I->grabValueFrom('#password_new')));
         $I->assertFalse(empty($I->grabValueFrom('#password_new_confirm')));
 
-        $I->waitForText('Very strong', 10, $this->progressBarStrength);
+        $I->waitForText(Translator::translate('ERROR_PASSWORD_STRENGTH_4'), 10, $this->progressBarStrength);
         $I->seeElement('.very-strong');
     }
 

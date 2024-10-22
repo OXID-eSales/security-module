@@ -46,7 +46,8 @@ modules:
         shop_path: '%SHOP_SOURCE_PATH%'
         paths:
           - 'Application/views/%THEME_ID%'
-          - Application/views/admin_twig
+          - 'Application/views/admin_twig'
+          - '../vendor/oxid-esales/security-module/translations'
     - \OxidEsales\Codeception\Module\OxideshopModules
 step_decorators:
     - \Codeception\Step\Retry
