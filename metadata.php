@@ -20,7 +20,10 @@ $sMetadataVersion = '2.1';
 $aModule = [
     'id'          => Module::MODULE_ID,
     'title'       => 'OXID Security Module',
-    'description' => '',
+    'description' => [
+        'en' => 'Tools to protect your shop and safeguard customer accounts.',
+        'de' => 'Werkzeuge zum Schutz Ihres Shops und zur Sicherung von Kundenkonten.'
+    ],
     'thumbnail'   => 'logo.png',
     'version'     => '1.0.0',
     'author'      => 'OXID eSales AG',
