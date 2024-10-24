@@ -10,4 +10,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Password strength validators for length, uppercase, lowercase, digit and special characters
 - Ajax widget for password strength visual indicator
 - Frontend progress bar style indication for password strength
-- Add button for generating strong password
+- Button for generating strong password
+- Button for show/hide password in password fields
