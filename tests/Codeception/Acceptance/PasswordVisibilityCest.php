@@ -19,7 +19,13 @@ use OxidEsales\SecurityModule\Tests\Codeception\Support\AcceptanceTester;
  */
 class PasswordVisibilityCest
 {
-    private string $eyeIcon = "//div[contains(@class, 'password-toggle')]";
+    private string $registerPwdFieldId = "userPassword";
+    private string $registerConfirmFieldId = "userPasswordConfirm";
+    private string $changePwdFieldId = "passwordNew";
+    private string $changeOldFieldId = "passwordOld";
+    private string $changeConfirmFieldId = "passwordNewConfirm";
+    private string $forgotPwdFieldId = "password_new";
+    private string $forgotConfirmFieldId = "password_new_confirm";
 
     public function _before(AcceptanceTester $I): void
     {
@@ -41,12 +47,8 @@ class PasswordVisibilityCest
         $homePage = $I->openShop();
         $homePage->openUserRegistrationPage();
 
-        $I->seeElement('//input[@id="userPassword"][@type="password"]');
-
-        // Click on the eye icon to reveal the password
-        $I->click($this->eyeIcon);
-
-        $I->seeElement('//input[@id="userPassword"][@type="text"]');
+        $this->toggleAndCheckVisibility($I, $this->registerPwdFieldId);
+        $this->toggleAndCheckVisibility($I, $this->registerConfirmFieldId);
     }
 
     public function testGenerateUserChangePassword(AcceptanceTester $I): void
@@ -64,12 +66,9 @@ class PasswordVisibilityCest
             ->seeUserAccount($userData)
             ->openChangePasswordPage();
 
-        $I->seeElement('//input[@id="passwordNew"][@type="password"]');
-
-        // Click on the eye icon to reveal the password
-        $I->click($this->eyeIcon);
-
-        $I->seeElement('//input[@id="passwordNew"][@type="text"]');
+        $this->toggleAndCheckVisibility($I, $this->changeOldFieldId);
+        $this->toggleAndCheckVisibility($I, $this->changePwdFieldId);
+        $this->toggleAndCheckVisibility($I, $this->changeConfirmFieldId);
     }
 
     public function testGenerateUserForgotPassword(AcceptanceTester $I): void
@@ -78,12 +77,18 @@ class PasswordVisibilityCest
         $uid = md5($userData['userId'] . '1' . 'test_update_key');
         $I->amOnPage('?cl=forgotpwd&uid=' . $uid . '&lang=1&shp=1');
 
-        $I->seeElement('//input[@id="password_new"][@type="password"]');
+        $this->toggleAndCheckVisibility($I, $this->forgotPwdFieldId);
+        $this->toggleAndCheckVisibility($I, $this->forgotConfirmFieldId);
+    }
+
+    private function toggleAndCheckVisibility(AcceptanceTester $I, string $inputElementId)
+    {
+        $I->seeElement("//input[@id='$inputElementId'][@type='password']");
 
         // Click on the eye icon to reveal the password
-        $I->click($this->eyeIcon);
+        $I->click("//div[contains(@class, 'password-toggle')and @data-target='$inputElementId']");
 
-        $I->seeElement('//input[@id="password_new"][@type="text"]');
+        $I->seeElement("//input[@id='$inputElementId'][@type='text']");
     }
 
     private function getExistingUserData()

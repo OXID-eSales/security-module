@@ -24,3 +24,9 @@
     {{ style({ include: oViewConf.getModuleUrl('oe_security_module', 'out/src/css/password-validation.css') }) }}
     <script type="module" src="{{ oViewConf.getModuleUrl('oe_security_module', 'out/src/js/index.js') }}"></script>
 {% endblock %}
+
+{% block forgotpwd_change_password_confirm %}
+    {{ parent() }}
+
+    {% include '@oe_security_module/form/password_toggle.html.twig' with { target: 'password_new_confirm' } %}
+{% endblock %}
