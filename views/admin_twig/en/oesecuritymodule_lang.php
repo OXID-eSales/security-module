@@ -13,8 +13,8 @@ $aLang = [
     'HELP_SHOP_MODULE_oeSecurityPasswordMinimumLength'      => 'Min. password length. Should be greater than 8. ' .
         'In case the number is less than in shop settings, ' .
         'then the shop default minimum password length will override this value.',
-    'SHOP_MODULE_oeSecurityPasswordContainUppercase'        => 'Password must contain uppercase',
-    'SHOP_MODULE_oeSecurityPasswordContainLowercase'        => 'Password must contain lowercase',
-    'SHOP_MODULE_oeSecurityPasswordContainDigit'            => 'Password must contain digit',
-    'SHOP_MODULE_oeSecurityPasswordContainSpecialCharacter' => 'Password must contain special char',
+    'SHOP_MODULE_oeSecurityPasswordContainUppercase'       => 'Password must contain at least one uppercase letter',
+    'SHOP_MODULE_oeSecurityPasswordContainLowercase'        => 'Password must contain at least one lowercase letter',
+    'SHOP_MODULE_oeSecurityPasswordContainDigit'            => 'Password must contain at least one digit',
+    'SHOP_MODULE_oeSecurityPasswordContainSpecialCharacter' => 'Password must contain at least one special char',
 ];
