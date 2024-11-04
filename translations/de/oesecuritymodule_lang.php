@@ -18,10 +18,10 @@ $aLang = [
 
     'PASSWORD_REQUIREMENTS'              => 'Passwort-Anforderungen',
     'PASSWORD_MIN_LENGTH'                => 'Mindestens %d Zeichen.',
-    'PASSWORD_CONTAIN_DIGIT'             => 'Mindestens 1 Zahl.',
-    'PASSWORD_CONTAIN_LOWER_CASE'        => 'Mindestens 1 Kleinbuchstabe.',
-    'PASSWORD_CONTAIN_UPPER_CASE'        => 'Mindestens 1 Großbuchstabe.',
-    'PASSWORD_CONTAIN_SPECIAL_CHARACTER' => 'Mindestens 1 Sonderzeichen.',
+    'PASSWORD_CONTAIN_DIGIT'             => 'Mindestens eine Zahl.',
+    'PASSWORD_CONTAIN_LOWER_CASE'        => 'Mindestens einen Kleinbuchstaben.',
+    'PASSWORD_CONTAIN_UPPER_CASE'        => 'Mindestens einen Großbuchstaben.',
+    'PASSWORD_CONTAIN_SPECIAL_CHARACTER' => 'Mindestens ein Sonderzeichen.',
 
     'ERROR_PASSWORD_STRENGTH_0' => "Sehr schwach",
     'ERROR_PASSWORD_STRENGTH_1' => "Schwach",
