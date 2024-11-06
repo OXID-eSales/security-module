@@ -15,7 +15,7 @@
         "php": "^8.2"
     },
     "conflict": {
-        "oxid-esales/oxideshop-ce": "<7.1"
+        "oxid-esales/oxideshop-ce": "<7.2"
     },
     "require-dev": {
         "phpunit/phpunit": "^10.4",
