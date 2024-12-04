@@ -34,6 +34,7 @@ $aModule = [
         \OxidEsales\Eshop\Core\ViewConfig::class     => \OxidEsales\SecurityModule\PasswordPolicy\Shop\Core\ViewConfig::class
     ],
     'controllers' => [
+        'captcha' => \OxidEsales\SecurityModule\Captcha\Controller\CaptchaController::class,
         'password' => \OxidEsales\SecurityModule\PasswordPolicy\Controller\PasswordAjaxController::class
     ],
     'templates'   => [
