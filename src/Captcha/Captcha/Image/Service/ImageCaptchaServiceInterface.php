@@ -7,6 +7,8 @@
 
 namespace OxidEsales\SecurityModule\Captcha\Captcha\Image\Service;
 
-interface ImageCaptchaServiceInterface
+use OxidEsales\SecurityModule\Captcha\Captcha\CaptchaInterface;
+
+interface ImageCaptchaServiceInterface extends CaptchaInterface
 {
 }

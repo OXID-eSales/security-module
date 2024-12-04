@@ -5,9 +5,9 @@
  * See LICENSE file for license details.
  */
 
-namespace OxidEsales\SecurityModule\Captcha\Service;
+namespace OxidEsales\SecurityModule\Captcha\Captcha;
 
-interface CaptchaServiceInterface
+interface CaptchaInterface
 {
     public function validate(string $captcha): bool;
     public function generate(): string;

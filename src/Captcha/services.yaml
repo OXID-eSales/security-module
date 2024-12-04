@@ -3,6 +3,11 @@ services:
     public: false
     autowire: true
 
+  OxidEsales\SecurityModule\Captcha\Captcha\Image\Service\ImageCaptchaServiceInterface:
+    class: OxidEsales\SecurityModule\Captcha\Captcha\Image\Service\ImageCaptchaService
+
   OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface:
     class: OxidEsales\SecurityModule\Captcha\Service\CaptchaService
     public: true
+    arguments:
+      - '@OxidEsales\SecurityModule\Captcha\Captcha\Image\Service\ImageCaptchaServiceInterface'
