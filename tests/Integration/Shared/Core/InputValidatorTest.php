@@ -7,13 +7,13 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\SecurityModule\Tests\Integration;
+namespace OxidEsales\SecurityModule\Tests\Integration\Shared\Core;
 
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Exception\InputException;
 use OxidEsales\Eshop\Core\Exception\UserException;
 use OxidEsales\EshopCommunity\Tests\Integration\IntegrationTestCase;
-use OxidEsales\SecurityModule\PasswordPolicy\Shop\Core\InputValidator;
+use OxidEsales\SecurityModule\Shared\Core\InputValidator;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 class InputValidatorTest extends IntegrationTestCase

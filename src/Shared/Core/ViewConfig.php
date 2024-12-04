@@ -5,7 +5,7 @@
  * See LICENSE file for license details.
  */
 
-namespace OxidEsales\SecurityModule\PasswordPolicy\Shop\Core;
+namespace OxidEsales\SecurityModule\Shared\Core;
 
 use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsServiceInterface;
 use OxidEsales\Eshop\Core\Registry;
