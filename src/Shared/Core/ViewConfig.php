@@ -7,6 +7,7 @@
 
 namespace OxidEsales\SecurityModule\Shared\Core;
 
+use OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsServiceInterface;
 use OxidEsales\Eshop\Core\Registry;
 
@@ -32,5 +33,12 @@ class ViewConfig extends ViewConfig_parent
         }
 
         return $passwordLength;
+    }
+
+    public function getImage(): string
+    {
+        $image = $this->getService(CaptchaServiceInterface::class)->generate();
+
+        return 'data:image/jpeg;base64,' . base64_encode($image);
     }
 }

@@ -9,17 +9,28 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Captcha\Captcha\Image\Service;
 
+use OxidEsales\SecurityModule\Captcha\Captcha\Image\Builder\ImageCaptchaBuilderInterface;
+
 class ImageCaptchaService implements ImageCaptchaServiceInterface
 {
+    public function __construct(
+        private readonly ImageCaptchaBuilderInterface $captchaBuilder
+    ) {
+    }
+
     public function validate(string $captcha): bool
     {
-        //todo: to be implemented
+        if ($captcha !== $this->captchaBuilder->getContent()) {
+            return false;
+        }
+
         return true;
     }
 
     public function generate(): string
     {
-        //todo: to be implemented
-        return '';
+        $_SESSION['captcha'] = $this->captchaBuilder->getContent();
+
+        return $this->captchaBuilder->build();
     }
 }

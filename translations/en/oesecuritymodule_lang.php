@@ -10,11 +10,14 @@ $sLangName = 'English';
 $aLang = [
     'charset' => 'UTF-8',
 
-    'ERROR_PASSWORD_MIN_LENGTH'                => 'The password must be at least %d characters long.',    
+    'ERROR_PASSWORD_MIN_LENGTH'                => 'The password must be at least %d characters long.',
     'ERROR_PASSWORD_MISSING_DIGIT'             => 'The password does not contain a number.',
     'ERROR_PASSWORD_MISSING_LOWER_CASE'        => 'The password does not contain a lower case letter.',
     'ERROR_PASSWORD_MISSING_UPPER_CASE'        => 'The password does not contain a capital letter.',
     'ERROR_PASSWORD_MISSING_SPECIAL_CHARACTER' => 'The password does not contain a special character.',
+    'ERROR_GD_METHODS_MISSING'                 => 'Required GD functions are not available.',
+    'ERROR_GD_LIBRARY_MISSING'                 => 'GD extension is not enabled. Please enable GD in your PHP configuration.',
+    'ERROR_CAPTCHA_GENERATION_FAILED'          => 'Failed to generate CAPTCHA image.',
 
     'PASSWORD_REQUIREMENTS'              => 'Password requirements',
     'PASSWORD_MIN_LENGTH'                => 'Minimum %d characters.',
