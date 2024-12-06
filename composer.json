@@ -12,7 +12,8 @@
         "proprietary"
     ],
     "require": {
-        "php": "^8.2"
+        "php": "^8.2",
+        "gregwar/captcha": "^1.2"
     },
     "conflict": {
         "oxid-esales/oxideshop-ce": "<7.3"
