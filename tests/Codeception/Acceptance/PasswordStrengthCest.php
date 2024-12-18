@@ -18,7 +18,7 @@ use OxidEsales\SecurityModule\Tests\Codeception\Support\AcceptanceTester;
  * @group oe_security_module
  * @group oe_security_module_password_strength
  */
-class PasswordStrengthCest
+class PasswordStrengthCest extends BaseCest
 {
     private string $progressBarStrength = "//div[contains(@class, 'progress-bar')]";
 
@@ -63,8 +63,7 @@ class PasswordStrengthCest
         $userName = $userData['userLoginName'];
         $userPassword = $userData['userPassword'];
 
-        $homePage = $I->openShop();
-        $homePage->loginUser($userName, $userPassword);
+        $homePage = $this->loginWithCaptcha($I, $userName, $userPassword);
 
         $homePage
             ->openAccountPage()
@@ -132,10 +131,5 @@ class PasswordStrengthCest
                 'class' => '.very-strong'
             ],
         ];
-    }
-
-    private function getExistingUserData()
-    {
-        return Fixtures::get('existingUser');
     }
 }

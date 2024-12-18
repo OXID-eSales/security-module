@@ -18,6 +18,10 @@ $aLang = [
     'ERROR_GD_METHODS_MISSING'                 => 'Required GD functions are not available.',
     'ERROR_GD_LIBRARY_MISSING'                 => 'GD extension is not enabled. Please enable GD in your PHP configuration.',
     'ERROR_CAPTCHA_GENERATION_FAILED'          => 'Failed to generate CAPTCHA image.',
+    'CAPTCHA_INPUT_LABEL'                      => 'Geben Sie den Text des Bildes ein',
+    'CAPTCHA_IMAGE_ALT_TEXT'                   => 'Bild mit CAPTCHA-Code',
+    'CAPTCHA_RELOAD'                           => 'Aktualisiere Captcha',
+    'CAPTCHA_PLAY_AUDIO'                       => 'Captcha-Audio abspielen',
 
     'PASSWORD_REQUIREMENTS'              => 'Passwort-Anforderungen',
     'PASSWORD_MIN_LENGTH'                => 'Mindestens %d Zeichen.',

@@ -5,6 +5,7 @@
 
 import { PasswordStrength } from "./module/password-validator.js";
 import { PasswordGenerator } from "./module/password-generator.js";
+import { CaptchaValidator } from "./module/captcha-validator.js";
 
 document.querySelectorAll("div[data-type='passwordStrength']").forEach((el) => {
     new PasswordStrength({
@@ -29,4 +30,12 @@ document.querySelectorAll('.password-toggle').forEach((el) => {
         let passwordField = document.getElementById(this.getAttribute('data-target'));
         passwordField.type = (passwordField.type === "password" ? "text" : "password")
     });
+});
+
+document.querySelectorAll('.image-captcha').forEach((captcha) => {
+    const formWithCaptcha = captcha.closest('form');
+    new CaptchaValidator({
+        form: formWithCaptcha,
+        fieldTarget: formWithCaptcha.querySelector('input[name="captcha"]'),
+    })
 });

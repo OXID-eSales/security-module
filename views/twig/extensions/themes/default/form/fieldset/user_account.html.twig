@@ -18,8 +18,7 @@
     >
         <div class="progress-bar"></div>
     </div>
-    {# todo: img added for test purpose only and should be removed after captcha templates are implemented #}
-    <img src="{{ oViewConf.getImage() }}" />
+
     {% include '@oe_security_module/form/password_requirements.html.twig' %}
 
     {{ style({ include: oViewConf.getModuleUrl('oe_security_module', 'out/src/css/password-validation.css') }) }}
@@ -30,4 +29,10 @@
     {{ parent() }}
 
     {% include '@oe_security_module/form/password_toggle.html.twig' with { target: 'userPasswordConfirm' } %}
+{% endblock %}
+
+{% block user_account_form_fields %}
+    {{ parent() }}
+
+    {% include '@oe_security_module/form/image_captcha.html.twig'%}
 {% endblock %}

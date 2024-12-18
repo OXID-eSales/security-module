@@ -1,0 +1,45 @@
+.btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    padding: 8px;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+}
+
+.btn-icon:hover {
+    background-color: #e9ecef;
+}
+
+.btn-icon svg {
+    width: 25px;
+    height: 25px;
+    color: #495057;
+}
+.image-captcha {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.image-captcha .col-md-6 {
+    flex: 1;
+}
+
+/* For small forms (less than 300px) */
+form[style*="width: 270px"] .image-captcha {
+    flex-direction: column-reverse;
+    align-items: center;
+}
+
+form[style*="width: 270px"] .image-captcha .col-md-6 {
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+form[style*="width: 270px"] .image-captcha img {
+    margin-bottom: 0.5rem;
+}
+

@@ -1,0 +1,5 @@
+{% extends 'widget/header/loginbox.html.twig' %}
+
+{% block loginbox_form_captcha %}
+    {% include '@oe_security_module/form/image_captcha.html.twig'%}
+{% endblock %}
