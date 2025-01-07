@@ -8,6 +8,7 @@
                 class="form-control{% if aErrors.captcha %} is-invalid{% endif %}"
                 placeholder=" "
                 maxlength="64"
+                data-url="{{ seo_url({ ident: oViewConf.getSelfLink()|cat("cl=captcha&fnc=reload") }) }}"
                 required
             >
             <label for="captcha" class="req">{{ translate({ ident: "CAPTCHA_INPUT_LABEL" }) }}</label>
@@ -18,15 +19,15 @@
         <img
             src="{{ oViewConf.getImage() }}"
             alt="{{ translate({ ident: 'CAPTCHA_IMAGE_ALT_TEXT' }) }}"
-            class="img-fluid border"
+            class="captcha-img img-fluid border"
         />
-        <button type="button" class="btn btn-icon" title="{{ translate({ ident: 'CAPTCHA_RELOAD' }) }}">
+        <button type="button" class="btn btn-icon captcha-reload" title="{{ translate({ ident: 'CAPTCHA_RELOAD' }) }}">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-repeat" viewBox="0 0 16 16">
                 <path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41m-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9"/>
                 <path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5 5 0 0 0 8 3M3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9z"/>
             </svg>
         </button>
-        <button type="button" class="btn btn-icon" title="{{ translate({ ident: 'CAPTCHA_PLAY_AUDIO' }) }}">
+        <button type="button" class="btn btn-icon captcha-play" title="{{ translate({ ident: 'CAPTCHA_PLAY_AUDIO' }) }}">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-volume-up" viewBox="0 0 16 16">
                 <path d="M11.536 14.01A8.47 8.47 0 0 0 14.026 8a8.47 8.47 0 0 0-2.49-6.01l-.708.707A7.48 7.48 0 0 1 13.025 8c0 2.071-.84 3.946-2.197 5.303z"/>
                 <path d="M10.121 12.596A6.48 6.48 0 0 0 12.025 8a6.48 6.48 0 0 0-1.904-4.596l-.707.707A5.48 5.48 0 0 1 11.025 8a5.48 5.48 0 0 1-1.61 3.89z"/>
