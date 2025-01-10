@@ -2,6 +2,8 @@ services:
   _defaults:
     public: false
     autowire: true
+    bind:
+      OxidEsales\Eshop\Core\Utils: '@=service("OxidEsales\\SecurityModule\\Core\\Registry").getUtils()'
 
   OxidEsales\SecurityModule\Captcha\Captcha\Image\Service\ImageCaptchaServiceInterface:
     class: OxidEsales\SecurityModule\Captcha\Captcha\Image\Service\ImageCaptchaService
@@ -14,3 +16,7 @@ services:
 
   OxidEsales\SecurityModule\Captcha\Captcha\Image\Builder\ImageCaptchaBuilderInterface:
     class: OxidEsales\SecurityModule\Captcha\Captcha\Image\Builder\ImageCaptchaBuilder
+
+  OxidEsales\SecurityModule\Captcha\Transput\ResponseInterface:
+    class: OxidEsales\SecurityModule\Captcha\Transput\Response
+    public: true
