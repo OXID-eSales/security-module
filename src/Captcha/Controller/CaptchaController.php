@@ -24,7 +24,7 @@ class CaptchaController extends WidgetController
         $responseService->responseAsImage(base64_encode($image));
     }
 
-    public function play()
+    public function play(): void
     {
         $audioFile = $this->getService(CaptchaAudioServiceInterface::class)->generate();
 

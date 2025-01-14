@@ -24,7 +24,7 @@ export class CaptchaAudio {
     }
 
     handleResponse(captchaResponse) {
-        let blob = new Blob([captchaResponse], { type: "audio/wav" });
+        let blob = new Blob([captchaResponse], { type: "audio/mp3" });
         let blobUrl = URL.createObjectURL(blob);
 
         let audio = new Audio();
