@@ -11,8 +11,4 @@ namespace OxidEsales\SecurityModule\Captcha\Captcha\Image\Exception;
 
 class CaptchaGenerateException extends \Exception
 {
-    public function __construct()
-    {
-        parent::__construct('ERROR_CAPTCHA_GENERATION_FAILED');
-    }
 }

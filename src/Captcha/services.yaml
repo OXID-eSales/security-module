@@ -29,3 +29,6 @@ services:
   OxidEsales\SecurityModule\Captcha\Transput\ResponseInterface:
     class: OxidEsales\SecurityModule\Captcha\Transput\Response
     public: true
+
+  OxidEsales\SecurityModule\Captcha\Captcha\Image\Validator\ImageCaptchaValidatorInterface:
+    class: OxidEsales\SecurityModule\Captcha\Captcha\Image\Validator\ImageCaptchaValidator

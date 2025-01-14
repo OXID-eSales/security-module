@@ -9,6 +9,6 @@ namespace OxidEsales\SecurityModule\Captcha\Captcha;
 
 interface CaptchaInterface
 {
-    public function validate(string $captcha): bool;
+    public function validate(string $captcha): void;
     public function generate(): string;
 }

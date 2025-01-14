@@ -18,6 +18,9 @@ $aLang = [
     'ERROR_GD_METHODS_MISSING'                 => 'Required GD functions are not available.',
     'ERROR_GD_LIBRARY_MISSING'                 => 'GD extension is not enabled. Please enable GD in your PHP configuration.',
     'ERROR_CAPTCHA_GENERATION_FAILED'          => 'Failed to generate CAPTCHA image.',
+    'ERROR_INVALID_CAPTCHA'                    => 'CAPTCHA text is invalid.',
+    'ERROR_EMPTY_CAPTCHA'                      => 'CAPTCHA field is empty. Please, enter the text from the image.',
+
     'CAPTCHA_INPUT_LABEL'                      => 'Enter the text from the image',
     'CAPTCHA_IMAGE_ALT_TEXT'                   => 'Image containing CAPTCHA code',
     'CAPTCHA_RELOAD'                           => 'Reload Captcha',

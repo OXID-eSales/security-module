@@ -9,10 +9,6 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Captcha\Captcha\Image\Exception;
 
-class GDMethodsException extends \Exception
+class GDMethodsMissingException extends \Exception
 {
-    public function __construct()
-    {
-        parent::__construct('ERROR_GD_METHODS_MISSING');
-    }
 }

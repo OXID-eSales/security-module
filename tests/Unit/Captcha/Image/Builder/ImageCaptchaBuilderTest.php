@@ -11,7 +11,7 @@ namespace OxidEsales\SecurityModule\Tests\Unit\Captcha\Image\Builder;
 
 use OxidEsales\SecurityModule\Captcha\Captcha\Image\Builder\ImageCaptchaBuilder;
 use OxidEsales\SecurityModule\Captcha\Captcha\Image\Builder\ImageCaptchaBuilderInterface;
-use OxidEsales\SecurityModule\Captcha\Captcha\Image\Exception\GDMethodsException;
+use OxidEsales\SecurityModule\Captcha\Captcha\Image\Exception\GDMethodsMissingException;
 use PHPUnit\Framework\TestCase;
 
 class ImageCaptchaBuilderTest extends TestCase
@@ -46,9 +46,9 @@ class ImageCaptchaBuilderTest extends TestCase
             ->onlyMethods(['createImage'])
             ->getMock();
 
-        $builder->method('createImage')->will($this->throwException(new GDMethodsException()));
+        $builder->method('createImage')->will($this->throwException(new GDMethodsMissingException()));
 
-        $this->expectException(GDMethodsException::class);
+        $this->expectException(GDMethodsMissingException::class);
         $builder->build();
     }
 

@@ -9,6 +9,11 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Shared\Core;
 
+use OxidEsales\Eshop\Core\Exception\InputException;
+use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\EshopCommunity\Core\Exception\StandardException;
+use OxidEsales\SecurityModule\Captcha\Captcha\Image\Exception\CaptchaValidateException;
+use OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Intrastructure\ExceptionFactoryInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordValidateException;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordValidatorChainInterface;
@@ -40,5 +45,16 @@ class InputValidator extends InputValidator_parent
         }
 
         return parent::checkPassword($user, $newPassword, $confirmationPassword, $shouldCheckPasswordLength);
+    }
+
+    public function validateCaptchaField()
+    {
+        $captchaValidator = $this->getService(CaptchaServiceInterface::class);
+        $captcha = Registry::getRequest()->getRequestParameter('captcha');
+//        try {
+            $captchaValidator->validate($captcha);
+//        } catch (CaptchaValidateException $e) {
+//            Registry::getUtilsView()->addErrorToDisplay($e);
+//        }
     }
 }

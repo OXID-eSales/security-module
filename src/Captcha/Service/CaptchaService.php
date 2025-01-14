@@ -25,9 +25,9 @@ class CaptchaService implements CaptchaServiceInterface
         return $this->session->getVariable('captcha');
     }
 
-    public function validate(string $captcha): bool
+    public function validate(string $captcha): void
     {
-        return $this->captchaService->validate($captcha);
+        $this->captchaService->validate($captcha);
     }
 
     public function generate(): string

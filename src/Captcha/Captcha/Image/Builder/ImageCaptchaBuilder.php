@@ -11,8 +11,8 @@ namespace OxidEsales\SecurityModule\Captcha\Captcha\Image\Builder;
 
 use GdImage;
 use OxidEsales\SecurityModule\Captcha\Captcha\Image\Exception\CaptchaGenerateException;
-use OxidEsales\SecurityModule\Captcha\Captcha\Image\Exception\GDLibraryException;
-use OxidEsales\SecurityModule\Captcha\Captcha\Image\Exception\GDMethodsException;
+use OxidEsales\SecurityModule\Captcha\Captcha\Image\Exception\GDLibraryMissingException;
+use OxidEsales\SecurityModule\Captcha\Captcha\Image\Exception\GDMethodsMissingException;
 
 class ImageCaptchaBuilder implements ImageCaptchaBuilderInterface
 {
@@ -45,13 +45,13 @@ class ImageCaptchaBuilder implements ImageCaptchaBuilderInterface
     /**
      * @return string
      * @throws CaptchaGenerateException
-     * @throws GDLibraryException
-     * @throws GDMethodsException
+     * @throws GDLibraryMissingException
+     * @throws GDMethodsMissingException
      */
     public function build(): string
     {
         if (!extension_loaded('gd')) {
-            throw new GDLibraryException();
+            throw new GDLibraryMissingException();
         }
 
         $image = $this->createImage();
@@ -68,12 +68,12 @@ class ImageCaptchaBuilder implements ImageCaptchaBuilderInterface
 
     /**
      * @return GdImage|false
-     * @throws GDMethodsException
+     * @throws GDMethodsMissingException
      */
     protected function createImage(): GdImage|false
     {
         if (!function_exists('imagecreatetruecolor') || !function_exists('imagejpeg')) {
-            throw new GDMethodsException();
+            throw new GDMethodsMissingException();
         }
 
         $image = imagecreatetruecolor($this->imageWidth, $this->imageHeight);

@@ -9,4 +9,5 @@ namespace OxidEsales\SecurityModule\Captcha\Captcha\Image\Validator;
 
 interface ImageCaptchaValidatorInterface
 {
+    public function validate(string $userCaptcha): void;
 }
