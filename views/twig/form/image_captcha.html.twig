@@ -9,6 +9,7 @@
                 placeholder=" "
                 maxlength="64"
                 data-url="{{ seo_url({ ident: oViewConf.getSelfLink()|cat("cl=captcha&fnc=reload") }) }}"
+                data-url-audio="{{ seo_url({ ident: oViewConf.getSelfLink()|cat("cl=captcha&fnc=play") }) }}"
                 required
             >
             <label for="captcha" class="req">{{ translate({ ident: "CAPTCHA_INPUT_LABEL" }) }}</label>

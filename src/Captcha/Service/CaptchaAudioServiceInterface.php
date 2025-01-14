@@ -7,9 +7,7 @@
 
 namespace OxidEsales\SecurityModule\Captcha\Service;
 
-interface CaptchaServiceInterface
+interface CaptchaAudioServiceInterface
 {
-    public function getCaptcha(): string;
-    public function validate(string $captcha): bool;
     public function generate(): string;
 }

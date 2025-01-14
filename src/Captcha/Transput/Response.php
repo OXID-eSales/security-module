@@ -23,4 +23,10 @@ class Response implements ResponseInterface
         $this->utils->setHeader('Content-Type: text/html; charset=UTF-8');
         $this->utils->showMessageAndExit('data:image/jpeg;base64,' . $value);
     }
+
+    public function responseAsAudio(string $audio): void
+    {
+        $this->utils->setHeader('Content-Type: audio/mp3');
+        $this->utils->showMessageAndExit($audio);
+    }
 }

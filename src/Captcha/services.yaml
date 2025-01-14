@@ -4,9 +4,14 @@ services:
     autowire: true
     bind:
       OxidEsales\Eshop\Core\Utils: '@=service("OxidEsales\\SecurityModule\\Core\\Registry").getUtils()'
+      OxidEsales\Eshop\Core\Session: '@=service("OxidEsales\\SecurityModule\\Core\\Registry").getSession()'
 
   OxidEsales\SecurityModule\Captcha\Captcha\Image\Service\ImageCaptchaServiceInterface:
     class: OxidEsales\SecurityModule\Captcha\Captcha\Image\Service\ImageCaptchaService
+
+  OxidEsales\SecurityModule\Captcha\Service\CaptchaAudioServiceInterface:
+    class: OxidEsales\SecurityModule\Captcha\Service\CaptchaAudioService
+    public: true
 
   OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface:
     class: OxidEsales\SecurityModule\Captcha\Service\CaptchaService

@@ -7,6 +7,7 @@ import { PasswordStrength } from "./module/password-validator.js";
 import { PasswordGenerator } from "./module/password-generator.js";
 import { CaptchaValidator } from "./module/captcha-validator.js";
 import { CaptchaRefresh } from "./module/captcha-refresh.js";
+import { CaptchaAudio } from "./module/captcha-audio.js";
 
 document.querySelectorAll("div[data-type='passwordStrength']").forEach((el) => {
     new PasswordStrength({
@@ -45,6 +46,14 @@ document.querySelectorAll('.captcha-reload').forEach((el) => {
     el.addEventListener('click', function() {
         new CaptchaRefresh({
             url: document.getElementById('captcha').getAttribute('data-url')
+        })
+    });
+});
+
+document.querySelectorAll('.captcha-play').forEach((el) => {
+    el.addEventListener('click', function() {
+        new CaptchaAudio({
+            url: document.getElementById('captcha').getAttribute('data-url-audio')
         })
     });
 });

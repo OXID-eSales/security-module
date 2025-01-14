@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Tests\Unit\Captcha\Service;
 
+use OxidEsales\Eshop\Core\Session;
 use OxidEsales\SecurityModule\Captcha\Captcha\Image\Service\ImageCaptchaServiceInterface;
 use OxidEsales\SecurityModule\Captcha\Service\CaptchaService;
 use OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface;
@@ -41,6 +42,23 @@ class CaptchaServiceTest extends TestCase
         ];
     }
 
+    public function testCaptchaGetter(): void
+    {
+        $captcha = uniqid();
+
+        $imageCaptchaService = $this->createStub(ImageCaptchaServiceInterface::class);
+        $session = $this->createStub(Session::class);
+        $session->method('getVariable')->willReturn($captcha);
+
+        $captchaService = $this->getSut(
+            $imageCaptchaService,
+            $session
+        );
+
+        $this->assertSame($captcha, $captchaService->getCaptcha());
+    }
+
+
     public function testCaptchaGenerate(): void
     {
         $image = uniqid();
@@ -53,10 +71,12 @@ class CaptchaServiceTest extends TestCase
     }
 
     public function getSut(
-        ImageCaptchaServiceInterface $captchaService = null
+        ImageCaptchaServiceInterface $captchaService = null,
+        Session $session = null
     ): CaptchaServiceInterface {
         return new CaptchaService(
             captchaService: $captchaService ?? $this->createStub(ImageCaptchaServiceInterface::class),
+            session: $session ?? $this->createStub(Session::class)
         );
     }
 }
