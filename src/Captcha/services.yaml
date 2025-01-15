@@ -32,3 +32,13 @@ services:
 
   OxidEsales\SecurityModule\Captcha\Captcha\Image\Validator\ImageCaptchaValidatorInterface:
     class: OxidEsales\SecurityModule\Captcha\Captcha\Image\Validator\ImageCaptchaValidator
+
+  OxidEsales\SecurityModule\Shared\Form\ContactFormCaptchaValidator:
+    class: OxidEsales\SecurityModule\Shared\Form\ContactFormCaptchaValidator
+
+  OxidEsales\SecurityModule\Shared\Factory\ContactFormDecorator:
+    decorates: OxidEsales\EshopCommunity\Internal\Domain\Contact\Form\ContactFormBridgeInterface
+    decoration_on_invalid: ignore
+    arguments:
+      - '@.inner'
+      - '@OxidEsales\SecurityModule\Shared\Form\ContactFormCaptchaValidator'

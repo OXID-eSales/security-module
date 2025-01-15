@@ -9,28 +9,30 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Shared\Factory;
 
-use OxidEsales\EshopCommunity\Internal\Framework\Form\FormFactoryInterface;
-use OxidEsales\EshopCommunity\Internal\Framework\Form\FormInterface;
-use OxidEsales\EshopCommunity\Internal\Framework\Form\FormValidatorInterface;
+use OxidEsales\EshopCommunity\Internal\Domain\Contact\Form\ContactFormBridgeInterface;
+use OxidEsales\SecurityModule\Shared\Form\ContactFormCaptchaValidator;
 
-class ContactFormDecorator implements FormFactoryInterface
+class ContactFormDecorator
 {
     public function __construct(
-        private FormFactoryInterface $contactFormFactory,
-        private FormValidatorInterface $contactFormCaptchaValidator
+        private ContactFormBridgeInterface $contactFormBridge,
+        private ContactFormCaptchaValidator $contactFormCaptchaValidator
     ) {
     }
 
-    /**
-     * @return FormInterface
-     */
-    public function getForm()
+    public function getContactForm()
     {
-        var_dump(46456);
-        $form = $this->contactFormFactory->getForm();
+        $contactForm = $this->contactFormBridge->getContactForm();
 
-        $form->addValidator($this->contactFormCaptchaValidator);
+        $contactForm->addValidator($this->contactFormCaptchaValidator);
 
-        return $form;
+        return $contactForm;
+    }
+
+    public function getContactFormMessage()
+    {
+        $contactForm = $this->contactFormBridge->getContactForm();
+
+        return $this->contactFormBridge->getContactFormMessage($contactForm);
     }
 }
