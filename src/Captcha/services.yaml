@@ -4,6 +4,7 @@ services:
     autowire: true
     bind:
       OxidEsales\Eshop\Core\Utils: '@=service("OxidEsales\\SecurityModule\\Core\\Registry").getUtils()'
+      OxidEsales\Eshop\Core\Request: '@=service("OxidEsales\\SecurityModule\\Core\\Registry").getRequest()'
       OxidEsales\Eshop\Core\Session: '@=service("OxidEsales\\SecurityModule\\Core\\Registry").getSession()'
 
   OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface:
@@ -33,12 +34,12 @@ services:
   OxidEsales\SecurityModule\Captcha\Captcha\Image\Validator\ImageCaptchaValidatorInterface:
     class: OxidEsales\SecurityModule\Captcha\Captcha\Image\Validator\ImageCaptchaValidator
 
-  OxidEsales\SecurityModule\Shared\Form\ContactFormCaptchaValidator:
-    class: OxidEsales\SecurityModule\Shared\Form\ContactFormCaptchaValidator
+  OxidEsales\SecurityModule\Captcha\Form\ContactFormCaptchaValidator:
+    class: OxidEsales\SecurityModule\Captcha\Form\ContactFormCaptchaValidator
 
-  OxidEsales\SecurityModule\Shared\Factory\ContactFormDecorator:
+  OxidEsales\SecurityModule\Captcha\Form\ContactFormDecorator:
     decorates: OxidEsales\EshopCommunity\Internal\Domain\Contact\Form\ContactFormBridgeInterface
     decoration_on_invalid: ignore
     arguments:
       - '@.inner'
-      - '@OxidEsales\SecurityModule\Shared\Form\ContactFormCaptchaValidator'
+      - '@OxidEsales\SecurityModule\Captcha\Form\ContactFormCaptchaValidator'

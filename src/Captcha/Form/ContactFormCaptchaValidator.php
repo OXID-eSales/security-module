@@ -7,10 +7,10 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\SecurityModule\Shared\Form;
+namespace OxidEsales\SecurityModule\Captcha\Form;
 
 use OxidEsales\Eshop\Core\Exception\StandardException;
-use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Request;
 use OxidEsales\EshopCommunity\Internal\Framework\Form\FormInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Form\FormValidatorInterface;
 use OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface;
@@ -20,10 +20,12 @@ class ContactFormCaptchaValidator implements FormValidatorInterface
     /**
      * @var array
      */
-    private $errors;
+    private array $errors;
 
-    public function __construct(private CaptchaServiceInterface $captchaService)
-    {
+    public function __construct(
+        private CaptchaServiceInterface $captchaService,
+        protected Request $request
+    ) {
     }
 
     /**
@@ -32,7 +34,7 @@ class ContactFormCaptchaValidator implements FormValidatorInterface
      */
     public function isValid(FormInterface $form)
     {
-        $captcha = Registry::getRequest()->getRequestParameter('captcha');
+        $captcha = $this->request->getRequestParameter('captcha');
 
         try {
             $this->captchaService->validate($captcha);

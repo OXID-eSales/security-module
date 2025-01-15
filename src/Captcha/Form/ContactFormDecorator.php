@@ -7,10 +7,11 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\SecurityModule\Shared\Factory;
+namespace OxidEsales\SecurityModule\Captcha\Form;
 
 use OxidEsales\EshopCommunity\Internal\Domain\Contact\Form\ContactFormBridgeInterface;
-use OxidEsales\SecurityModule\Shared\Form\ContactFormCaptchaValidator;
+use OxidEsales\EshopCommunity\Internal\Framework\Form\Form;
+use OxidEsales\EshopCommunity\Internal\Framework\Form\FormInterface;
 
 class ContactFormDecorator
 {
@@ -20,8 +21,9 @@ class ContactFormDecorator
     ) {
     }
 
-    public function getContactForm()
+    public function getContactForm(): FormInterface
     {
+        /** @var Form $contactForm */
         $contactForm = $this->contactFormBridge->getContactForm();
 
         $contactForm->addValidator($this->contactFormCaptchaValidator);
@@ -29,7 +31,7 @@ class ContactFormDecorator
         return $contactForm;
     }
 
-    public function getContactFormMessage()
+    public function getContactFormMessage(): string
     {
         $contactForm = $this->contactFormBridge->getContactForm();
 
