@@ -36,4 +36,22 @@ class ResponseTest extends TestCase
 
         $this->assertTrue($correctHeaderSet);
     }
+
+    public function testRespondAsAudio(): void
+    {
+        $utilsMock = $this->createMock(Utils::class);
+
+        $utilsMock->expects($this->once())
+            ->method('setHeader')
+            ->with($this->equalTo('Content-Type: audio/mp3'));
+
+        $audioData = uniqid();
+        $utilsMock->expects($this->once())
+            ->method('showMessageAndExit')
+            ->with($this->equalTo($audioData));
+
+        $responseService = new Response($utilsMock);
+
+        $responseService->responseAsAudio($audioData);
+    }
 }

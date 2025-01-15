@@ -27,7 +27,9 @@ class CaptchaAudioService implements CaptchaAudioServiceInterface
             $files[] = __DIR__ . '/../../../assets/sounds/silence.wav';
         }
 
-        return $this->joinwavs($files);
+        $audioData = $this->joinwavs($files);
+
+        return $this->addNoiseToAudio($audioData);
     }
 
     private function joinwavs(array $wavs): string
@@ -73,5 +75,41 @@ class CaptchaAudioService implements CaptchaAudioServiceInterface
         }
 
         return $header . pack('V', strlen($data)) . $data;
+    }
+
+    /**
+     * @param string $audio
+     * @param string $noiseFile
+     * @return string
+     */
+    private function addNoiseToAudio(string $audio): string
+    {
+        $header = substr($audio, 0, 44);
+        $audioData = substr($audio, 44);
+
+        $noiseFile = __DIR__ . '/../../../assets/sounds/noise2.wav';
+        $noiseStream = fopen($noiseFile, 'rb');
+        $noiseData = fread($noiseStream, filesize($noiseFile) - 44);
+        fclose($noiseStream);
+
+        $audioSamples = array_values(unpack('v*', $audioData));
+        $noiseSamples = array_values(unpack('v*', $noiseData));
+
+        // add noise to the audio samples
+        $outputSamples = [];
+        $noiseLength = count($noiseSamples);
+        foreach ($audioSamples as $index => $sample) {
+            $noiseSample = $noiseSamples[$index % $noiseLength];
+            $outputSamples[] = $sample + (int)($noiseSample * 0.3);
+        }
+
+        $outputData = pack('v*', ...$outputSamples);
+
+        // update the data chunk size in the header
+        $dataSize = strlen($outputData);
+        $header = substr_replace($header, pack('V', $dataSize), 40, 4); // update Subchunk2Size
+        $header = substr_replace($header, pack('V', 36 + $dataSize), 4, 4); // update ChunkSize
+
+        return $header . $outputData;
     }
 }
