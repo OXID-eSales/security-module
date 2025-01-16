@@ -79,7 +79,6 @@ class CaptchaAudioService implements CaptchaAudioServiceInterface
 
     /**
      * @param string $audio
-     * @param string $noiseFile
      * @return string
      */
     private function addNoiseToAudio(string $audio): string
@@ -87,12 +86,26 @@ class CaptchaAudioService implements CaptchaAudioServiceInterface
         $header = substr($audio, 0, 44);
         $audioData = substr($audio, 44);
 
-        $noiseFile = __DIR__ . '/../../../assets/sounds/noise2.wav';
+        $noiseFile = __DIR__ . '/../../../assets/sounds/noise.wav';
+        if (!file_exists($noiseFile)) {
+            return '';
+        }
+
         $noiseStream = fopen($noiseFile, 'rb');
+        if (!is_resource($noiseStream)) {
+            return '';
+        }
+
+        // @phpstan-ignore-next-line Ignored because of filesize
         $noiseData = fread($noiseStream, filesize($noiseFile) - 44);
+        if (!$noiseData) {
+            return '';
+        }
         fclose($noiseStream);
 
+        // @phpstan-ignore-next-line Ignored since unpack may return false
         $audioSamples = array_values(unpack('v*', $audioData));
+        // @phpstan-ignore-next-line Ignored since unpack may return false
         $noiseSamples = array_values(unpack('v*', $noiseData));
 
         // add noise to the audio samples
@@ -100,7 +113,7 @@ class CaptchaAudioService implements CaptchaAudioServiceInterface
         $noiseLength = count($noiseSamples);
         foreach ($audioSamples as $index => $sample) {
             $noiseSample = $noiseSamples[$index % $noiseLength];
-            $outputSamples[] = $sample + (int)($noiseSample * 0.3);
+            $outputSamples[] = $sample + (int)($noiseSample * 0.15);
         }
 
         $outputData = pack('v*', ...$outputSamples);
