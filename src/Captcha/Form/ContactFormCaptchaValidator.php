@@ -29,7 +29,10 @@ class ContactFormCaptchaValidator implements FormValidatorInterface
     }
 
     /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     *
      * @param FormInterface $form
+     *
      * @return bool
      */
     public function isValid(FormInterface $form)

@@ -21,3 +21,8 @@ class_alias(
     \OxidEsales\Eshop\Application\Model\User::class,
     \OxidEsales\SecurityModule\Shared\Model\User_parent::class
 );
+
+class_alias(
+    \OxidEsales\Eshop\Application\Controller\NewsletterController::class,
+    \OxidEsales\SecurityModule\Captcha\Shop\NewsletterController_parent::class
+);

@@ -17,7 +17,7 @@ class ContactFormDecorator
 {
     public function __construct(
         private ContactFormBridgeInterface $contactFormBridge,
-        private ContactFormCaptchaValidator $contactFormCaptchaValidator
+        private ContactFormCaptchaValidator $formCaptchaValidator
     ) {
     }
 
@@ -26,7 +26,7 @@ class ContactFormDecorator
         /** @var Form $contactForm */
         $contactForm = $this->contactFormBridge->getContactForm();
 
-        $contactForm->addValidator($this->contactFormCaptchaValidator);
+        $contactForm->addValidator($this->formCaptchaValidator);
 
         return $contactForm;
     }

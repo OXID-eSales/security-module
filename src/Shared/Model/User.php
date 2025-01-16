@@ -43,6 +43,9 @@ class User extends User_parent
         parent::checkValues($sLogin, $sPassword, $sPassword2, $aInvAddress, $aDelAddress);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
+     */
     public function login($userName, $password, $setSessionCookie = false): bool
     {
         if (!$this->isAdmin()) {
@@ -57,20 +60,5 @@ class User extends User_parent
         }
 
         return parent::login($userName, $password, $setSessionCookie);
-    }
-
-    public function setNewsSubscription($blSubscribe, $blSendOptIn, $blForceCheckOptIn = false): bool
-    {
-        /** @var InputValidator $oInputValidator */
-        $oInputValidator = Registry::getInputValidator();
-
-        try {
-            $oInputValidator->validateCaptchaField();
-        } catch (CaptchaValidateException $e) {
-            Registry::getUtilsView()->addErrorToDisplay($e->getMessage());
-            return false;
-        }
-
-        return parent::setNewsSubscription($blSubscribe, $blSendOptIn, $blForceCheckOptIn);
     }
 }
