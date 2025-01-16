@@ -13,6 +13,8 @@ use OxidEsales\SecurityModule\Captcha\Captcha\Image\Builder\ImageCaptchaBuilderI
 use OxidEsales\SecurityModule\Captcha\Captcha\Image\Exception\CaptchaValidateException;
 use OxidEsales\SecurityModule\Captcha\Captcha\Image\Service\ImageCaptchaService;
 use OxidEsales\SecurityModule\Captcha\Captcha\Image\Service\ImageCaptchaServiceInterface;
+use OxidEsales\SecurityModule\Captcha\Captcha\Image\Validator\ImageCaptchaValidator;
+use OxidEsales\SecurityModule\Captcha\Captcha\Image\Validator\ImageCaptchaValidatorInterface;
 use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface;
 use PHPUnit\Framework\TestCase;
 
@@ -33,23 +35,26 @@ class ImageCaptchaServiceTest extends TestCase
         $this->assertEquals($imgData, $image);
     }
 
-    public function testValidateReturnsTrueForValidCaptcha()
+    public function testValidateWithValidCaptcha()
     {
         $_SESSION['captcha_expiration'] = time() + 60;//todo: rework after captcha validation refactoring
         $builder = $this->createMock(ImageCaptchaBuilderInterface::class);
         $builder->method('getContent')->willReturn($captchaText = substr(uniqid(), -6));
 
         $service = $this->getSut($builder);
-        $this->assertTrue($service->validate($captchaText));
+        $service->generate();
+        $service->validate($captchaText);
     }
 
-    public function testValidateReturnsFalseForInvalidCaptcha()
+    public function testValidateWithInvalidCaptcha()
     {
         $builder = $this->createMock(ImageCaptchaBuilderInterface::class);
         $builder->method('getContent')->willReturn(substr(uniqid(), -6));
 
-        $service = $this->getSut($builder);
-        $this->assertFalse($service->validate(substr(uniqid(), -6)));
+        $service = $this->getSut($builder, new ImageCaptchaValidator());
+        $service->generate();
+        $this->expectException(CaptchaValidateException::class);
+        $service->validate(substr(uniqid(), -6));
     }
 
     public function testValidExpiredCaptcha(): void
@@ -80,10 +85,12 @@ class ImageCaptchaServiceTest extends TestCase
 
     public function getSut(
         ImageCaptchaBuilderInterface $captchaBuilder = null,
+        ImageCaptchaValidatorInterface $captchaValidator = null,
         ModuleSettingsServiceInterface $settingsService = null
     ): ImageCaptchaServiceInterface {
         return new ImageCaptchaService(
             captchaBuilder: $captchaBuilder ?? $this->createStub(ImageCaptchaServiceInterface::class),
+            captchaValidator: $captchaValidator ?? $this->createStub(ImageCaptchaValidatorInterface::class),            
             settingsService: $settingsService ?? $this->createConfiguredStub(
                 ModuleSettingsServiceInterface::class,
                 ['getCaptchaLifeTime' => '15M']

@@ -13,6 +13,7 @@ use OxidEsales\Eshop\Core\Exception\InputException;
 use OxidEsales\Eshop\Core\Exception\UserException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\SecurityModule\Captcha\Captcha\Image\Exception\CaptchaValidateException;
+use OxidEsales\SecurityModule\Shared\Core\InputValidator;
 
 /**
  * User model extended
@@ -24,6 +25,7 @@ class User extends User_parent
 {
     public function checkValues($sLogin, $sPassword, $sPassword2, $aInvAddress, $aDelAddress): void
     {
+        /** @var InputValidator $oInputValidator */
         $oInputValidator = Registry::getInputValidator();
 
         try {
@@ -33,7 +35,7 @@ class User extends User_parent
                 "captcha",
                 oxNew(
                     InputException::class,
-                    sprintf(Registry::getLang()->translateString($e->getMessage()))
+                    Registry::getLang()->translateString($e->getMessage())
                 )
             );
         }
@@ -44,6 +46,7 @@ class User extends User_parent
     public function login($userName, $password, $setSessionCookie = false): bool
     {
         if (!$this->isAdmin()) {
+            /** @var InputValidator $oInputValidator */
             $oInputValidator = Registry::getInputValidator();
 
             try {
@@ -58,12 +61,12 @@ class User extends User_parent
 
     public function setNewsSubscription($blSubscribe, $blSendOptIn, $blForceCheckOptIn = false): bool
     {
+        /** @var InputValidator $oInputValidator */
         $oInputValidator = Registry::getInputValidator();
 
         try {
             $oInputValidator->validateCaptchaField();
         } catch (CaptchaValidateException $e) {
-//            throw oxNew(UserException::class, $e->getMessage());
             Registry::getUtilsView()->addErrorToDisplay($e->getMessage());
             return false;
         }

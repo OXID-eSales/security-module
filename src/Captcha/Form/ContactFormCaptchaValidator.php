@@ -20,7 +20,7 @@ class ContactFormCaptchaValidator implements FormValidatorInterface
     /**
      * @var array
      */
-    private array $errors;
+    private array $errors = [];
 
     public function __construct(
         private CaptchaServiceInterface $captchaService,

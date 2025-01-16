@@ -27,21 +27,21 @@ class ImageCaptchaValidatorTest extends TestCase
 
     public function testValidateWhenCaptchaIsInvalid(): void
     {
-        $_SESSION['captcha'] = 'ABC123';
+        $_SESSION['captcha'] = substr(uniqid(), -6);
 
         $this->expectException(CaptchaValidateException::class);
         $this->expectExceptionMessage('ERROR_INVALID_CAPTCHA');
 
         $validator = $this->getSut();
-        $validator->validate('WRONG123');
+        $validator->validate(substr(uniqid(), -6));
     }
 
     public function testValidateWhenCaptchaIsValid(): void
     {
-        $_SESSION['captcha'] = 'ABC123';
+        $_SESSION['captcha'] = $captcha = substr(uniqid(), -6);
 
         $validator = $this->getSut();
-        $validator->validate('ABC123');
+        $validator->validate($captcha);
     }
 
     public function testValidateHandlesCaseSensitivity(): void
@@ -57,13 +57,13 @@ class ImageCaptchaValidatorTest extends TestCase
 
     public function testValidateWhenSessionCaptchaIsMissing(): void
     {
-        unset($_SESSION['captcha']);
+        $_SESSION['captcha'] = '';
 
         $this->expectException(CaptchaValidateException::class);
         $this->expectExceptionMessage('ERROR_INVALID_CAPTCHA');
 
         $validator = $this->getSut();
-        $validator->validate('abc123');
+        $validator->validate(substr(uniqid(), -6));
     }
 
     public function getSut(): ImageCaptchaValidatorInterface

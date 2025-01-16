@@ -12,6 +12,7 @@ namespace OxidEsales\SecurityModule\Captcha\Captcha\Image\Service;
 use DateTimeImmutable;
 use DateInterval;
 use OxidEsales\SecurityModule\Captcha\Captcha\Image\Builder\ImageCaptchaBuilderInterface;
+use OxidEsales\SecurityModule\Captcha\Captcha\Image\Validator\ImageCaptchaValidatorInterface;
 use OxidEsales\SecurityModule\Captcha\Captcha\Image\Exception\CaptchaValidateException;
 use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface;
 
@@ -19,25 +20,29 @@ class ImageCaptchaService implements ImageCaptchaServiceInterface
 {
     public function __construct(
         private readonly ImageCaptchaBuilderInterface $captchaBuilder,
+        private readonly ImageCaptchaValidatorInterface $captchaValidator,
         private readonly ModuleSettingsServiceInterface $settingsService
     ) {
     }
 
-    public function validate(string $captcha): bool
+    /**
+     * @param string $captcha
+     * @return void
+     */
+    public function validate(string $captcha): void
     {
-        if ($captcha !== $this->captchaBuilder->getContent()) {
-            return false;
-        }
-
         //todo: move after captcha validation refactoring
         $captchaExpireDate = (string) $_SESSION['captcha_expiration'];
         if (time() > $captchaExpireDate) {
             throw new CaptchaValidateException('ERROR_EXPIRED_CAPTCHA');
         }
 
-        return true;
+        $this->captchaValidator->validate($captcha);
     }
 
+    /**
+     * @return string
+     */
     public function generate(): string
     {
         $_SESSION['captcha'] = $this->captchaBuilder->getContent();

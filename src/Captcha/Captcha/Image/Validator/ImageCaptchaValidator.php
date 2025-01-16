@@ -20,7 +20,7 @@ class ImageCaptchaValidator implements ImageCaptchaValidatorInterface
             throw new CaptchaValidateException('ERROR_EMPTY_CAPTCHA');
         }
 
-        $sessionCaptcha = $_SESSION['captcha'];
+        $sessionCaptcha = (string) $_SESSION['captcha'];
 
         if (!hash_equals($sessionCaptcha, $userCaptcha)) {
             throw new CaptchaValidateException('ERROR_INVALID_CAPTCHA');
