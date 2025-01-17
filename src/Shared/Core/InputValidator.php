@@ -48,10 +48,7 @@ class InputValidator extends InputValidator_parent
     {
         $captchaValidator = $this->getService(CaptchaServiceInterface::class);
         $captcha = Registry::getRequest()->getRequestParameter('captcha');
-//        try {
-            $captchaValidator->validate($captcha);
-//        } catch (CaptchaValidateException $e) {
-//            Registry::getUtilsView()->addErrorToDisplay($e);
-//        }
+
+        $captchaValidator->validate($captcha);
     }
 }

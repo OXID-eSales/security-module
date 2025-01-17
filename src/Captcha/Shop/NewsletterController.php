@@ -11,20 +11,22 @@ namespace OxidEsales\SecurityModule\Captcha\Shop;
 
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\SecurityModule\Captcha\Captcha\Image\Exception\CaptchaValidateException;
+use OxidEsales\SecurityModule\Shared\Core\InputValidator;
 
 class NewsletterController extends NewsletterController_parent
 {
-    public function send(): void
+    public function send(): bool
     {
+        /** @var InputValidator $inputValidator */
         $inputValidator = Registry::getInputValidator();
 
         try {
             $inputValidator->validateCaptchaField();
         } catch (CaptchaValidateException $e) {
             Registry::getUtilsView()->addErrorToDisplay($e->getMessage());
-            return;
+            return false;
         }
 
-        parent::send();
+        return parent::send();
     }
 }

@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Captcha\Captcha\Image\Validator;
 
-use OxidEsales\SecurityModule\Captcha\Captcha\Image\Exception\EmptyCaptchaException;
 use OxidEsales\SecurityModule\Captcha\Captcha\Image\Exception\CaptchaValidateException;
 
 class ImageCaptchaValidator implements ImageCaptchaValidatorInterface
