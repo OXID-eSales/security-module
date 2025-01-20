@@ -27,6 +27,7 @@ class ImageCaptchaServiceTest extends TestCase
         $image = $service->generate();
 
         $this->assertEquals($captchaText, $_SESSION['captcha']);
+        $this->assertGreaterThan(time(), $_SESSION['captcha_expiration']);
         $this->assertEquals($imgData, $image);
     }
 
@@ -46,6 +47,18 @@ class ImageCaptchaServiceTest extends TestCase
 
         $service = $this->getSut($builder);
         $this->assertFalse($service->validate(substr(uniqid(), -6)));
+    }
+
+    public function testValidateWithExpiredCaptcha()
+    {
+        $captchaText = substr(uniqid(), -6);
+
+        $builder = $this->createMock(ImageCaptchaBuilderInterface::class);
+        $builder->method('getContent')->willReturn($captchaText);
+
+        $service = $this->getSut($builder);
+        $service->generate();
+        $service->validate($captchaText);
     }
 
     public function getSut(

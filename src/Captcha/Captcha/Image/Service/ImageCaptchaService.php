@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Captcha\Captcha\Image\Service;
 
+use DateTimeImmutable;
+use DateInterval;
 use OxidEsales\SecurityModule\Captcha\Captcha\Image\Builder\ImageCaptchaBuilderInterface;
 
 class ImageCaptchaService implements ImageCaptchaServiceInterface
@@ -20,11 +22,6 @@ class ImageCaptchaService implements ImageCaptchaServiceInterface
 
     public function validate(string $captcha): bool
     {
-        // todo: will need an alternative option for Codeception tests
-        if (getenv('XDEBUG_MODE') === 'true') {
-            return true;
-        }
-
         if ($captcha !== $this->captchaBuilder->getContent()) {
             return false;
         }
@@ -35,6 +32,10 @@ class ImageCaptchaService implements ImageCaptchaServiceInterface
     public function generate(): string
     {
         $_SESSION['captcha'] = $this->captchaBuilder->getContent();
+
+        $time = new DateTimeImmutable('now');
+        $expireTime = $time->add(new DateInterval('PT30M'));
+        $_SESSION['captcha_expiration'] = $expireTime->getTimestamp();
 
         return $this->captchaBuilder->build();
     }
