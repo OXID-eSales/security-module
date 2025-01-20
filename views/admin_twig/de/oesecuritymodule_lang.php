@@ -17,4 +17,10 @@ $aLang = [
     'SHOP_MODULE_oeSecurityPasswordContainLowercase'        => 'Das Passwort muss mindestens einen Kleinbuchstaben enthalten',
     'SHOP_MODULE_oeSecurityPasswordContainDigit'            => 'Das Passwort muss mindestens eine Zahl enthalten',
     'SHOP_MODULE_oeSecurityPasswordContainSpecialCharacter' => 'Das Passwort muss mindestens ein Sonderzeichen enthalten',
+
+    'SHOP_MODULE_GROUP_captcha'                   => 'Captcha settings',
+    'SHOP_MODULE_oeSecurityCaptchaLifeTime'       => 'Captcha lifetime',
+    'SHOP_MODULE_oeSecurityCaptchaLifeTime_5min'  => '5 min',
+    'SHOP_MODULE_oeSecurityCaptchaLifeTime_15min' => '15 min',
+    'SHOP_MODULE_oeSecurityCaptchaLifeTime_30min' => '30 min',
 ];

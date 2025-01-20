@@ -77,5 +77,14 @@ $aModule = [
             'type'  => 'bool',
             'value' => true
         ],
+
+        //Captcha
+        [
+            'group' => 'captcha',
+            'name'  => ModuleSettingsService::CAPTCHA_LIFETIME,
+            'type'  => 'select',
+            'constraints' => '5min|15min|30min',
+            'value' => '15min'
+        ]
     ],
 ];

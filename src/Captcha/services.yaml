@@ -5,6 +5,10 @@ services:
     bind:
       OxidEsales\Eshop\Core\Utils: '@=service("OxidEsales\\SecurityModule\\Core\\Registry").getUtils()'
 
+  OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsServiceInterface:
+    class: OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsService
+    public: true
+
   OxidEsales\SecurityModule\Captcha\Captcha\Image\Service\ImageCaptchaServiceInterface:
     class: OxidEsales\SecurityModule\Captcha\Captcha\Image\Service\ImageCaptchaService
 
