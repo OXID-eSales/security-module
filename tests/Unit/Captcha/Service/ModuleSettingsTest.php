@@ -11,28 +11,38 @@ namespace OxidEsales\SecurityModule\Tests\Unit\Captcha\Service;
 
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Facade\ModuleSettingServiceInterface;
 use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsService;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\String\UnicodeString;
 
 class ModuleSettingsTest extends TestCase
 {
-    public function testGetTokenLifetimeDefault(): void
+    #[DataProvider('dataProviderValidate')]
+    public function testGetTokenLifetime($value, $expectedValue): void
     {
         $moduleSettingBridgeMock = $this->getMockBuilder(ModuleSettingServiceInterface::class)->getMock();
-        $moduleSettingBridgeMock->method('getString')->willReturn(new UnicodeString('asdf'));
+        $moduleSettingBridgeMock->method('getString')->willReturn(new UnicodeString($value));
 
         $moduleConfiguration = new ModuleSettingsService($moduleSettingBridgeMock);
 
-        $this->assertSame('15M', $moduleConfiguration->getCaptchaLifeTime());
+        $this->assertSame($expectedValue, $moduleConfiguration->getCaptchaLifeTime());
     }
 
-    public function testGetTokenLifetime(): void
+    public static function dataProviderValidate(): \Generator
     {
-        $moduleSettingBridgeMock = $this->getMockBuilder(ModuleSettingServiceInterface::class)->getMock();
-        $moduleSettingBridgeMock->method('getString')->willReturn(new UnicodeString('30min'));
+        yield 'invalid expire time' => [
+            'value' => uniqid(),
+            'expectedValue' => '15M',
+        ];
 
-        $moduleConfiguration = new ModuleSettingsService($moduleSettingBridgeMock);
+        yield 'invalid expire time value' => [
+            'value' => '60min',
+            'expectedValue' => '15M',
+        ];
 
-        $this->assertSame('30M', $moduleConfiguration->getCaptchaLifeTime());
+        yield 'valid expire time value' => [
+            'value' => '15min',
+            'expectedValue' => '15M',
+        ];
     }
 }

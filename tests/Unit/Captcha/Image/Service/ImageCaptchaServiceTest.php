@@ -10,8 +10,10 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Tests\Unit\Captcha\Image\Service;
 
 use OxidEsales\SecurityModule\Captcha\Captcha\Image\Builder\ImageCaptchaBuilderInterface;
+use OxidEsales\SecurityModule\Captcha\Captcha\Image\Exception\CaptchaValidateException;
 use OxidEsales\SecurityModule\Captcha\Captcha\Image\Service\ImageCaptchaService;
 use OxidEsales\SecurityModule\Captcha\Captcha\Image\Service\ImageCaptchaServiceInterface;
+use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface;
 use PHPUnit\Framework\TestCase;
 
 class ImageCaptchaServiceTest extends TestCase
@@ -33,6 +35,7 @@ class ImageCaptchaServiceTest extends TestCase
 
     public function testValidateReturnsTrueForValidCaptcha()
     {
+        $_SESSION['captcha_expiration'] = time() + 60;//todo: rework after captcha validation refactoring
         $builder = $this->createMock(ImageCaptchaBuilderInterface::class);
         $builder->method('getContent')->willReturn($captchaText = substr(uniqid(), -6));
 
@@ -49,6 +52,20 @@ class ImageCaptchaServiceTest extends TestCase
         $this->assertFalse($service->validate(substr(uniqid(), -6)));
     }
 
+    public function testValidExpiredCaptcha(): void
+    {
+        //todo: rework after captcha validation refactoring
+        $captchaText = substr(uniqid(), -6);
+        $_SESSION['captcha_expiration'] = 1;
+        $builder = $this->createMock(ImageCaptchaBuilderInterface::class);
+        $builder->method('getContent')->willReturn($captchaText);
+
+        $this->expectException(CaptchaValidateException::class);
+
+        $service = $this->getSut($builder);
+        $service->validate($captchaText);
+    }
+
     public function testValidateWithExpiredCaptcha()
     {
         $captchaText = substr(uniqid(), -6);
@@ -62,10 +79,15 @@ class ImageCaptchaServiceTest extends TestCase
     }
 
     public function getSut(
-        ImageCaptchaBuilderInterface $captchaBuilder = null
+        ImageCaptchaBuilderInterface $captchaBuilder = null,
+        ModuleSettingsServiceInterface $settingsService = null
     ): ImageCaptchaServiceInterface {
         return new ImageCaptchaService(
             captchaBuilder: $captchaBuilder ?? $this->createStub(ImageCaptchaServiceInterface::class),
+            settingsService: $settingsService ?? $this->createConfiguredStub(
+                ModuleSettingsServiceInterface::class,
+                ['getCaptchaLifeTime' => '15M']
+            )
         );
     }
 }
