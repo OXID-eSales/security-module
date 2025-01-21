@@ -27,7 +27,7 @@ class CaptchaService implements CaptchaServiceInterface
 
     public function validate(string $captcha): void
     {
-        $this->captchaService->validate($captcha);
+        $this->captchaService->validate($captcha, $this->getCaptcha());
     }
 
     public function generate(): string

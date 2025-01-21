@@ -13,13 +13,19 @@ use OxidEsales\SecurityModule\Captcha\Captcha\Image\Exception\CaptchaValidateExc
 
 class ImageCaptchaValidator implements ImageCaptchaValidatorInterface
 {
-    public function validate(string $userCaptcha): void
+    /**
+     * @param string $userCaptcha
+     * @param string $sessionCaptcha
+     * @return void
+     * @throws CaptchaValidateException
+     */
+    public function validate(string $userCaptcha, string $sessionCaptcha): void
     {
         if (!$userCaptcha) {
             throw new CaptchaValidateException('ERROR_EMPTY_CAPTCHA');
         }
 
-        $sessionCaptcha = (string) $_SESSION['captcha'];
+//        $sessionCaptcha = (string) $_SESSION['captcha'];
 
         if (!hash_equals($sessionCaptcha, $userCaptcha)) {
             throw new CaptchaValidateException('ERROR_INVALID_CAPTCHA');

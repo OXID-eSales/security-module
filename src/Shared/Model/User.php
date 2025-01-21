@@ -13,6 +13,7 @@ use OxidEsales\Eshop\Core\Exception\InputException;
 use OxidEsales\Eshop\Core\Exception\UserException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\SecurityModule\Captcha\Captcha\Image\Exception\CaptchaValidateException;
+use OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface;
 use OxidEsales\SecurityModule\Shared\Core\InputValidator;
 
 /**
@@ -27,9 +28,11 @@ class User extends User_parent
     {
         /** @var InputValidator $oInputValidator */
         $oInputValidator = Registry::getInputValidator();
+        $captchaValidator = $this->getService(CaptchaServiceInterface::class);
+        $captcha = Registry::getRequest()->getRequestParameter('captcha');
 
         try {
-            $oInputValidator->validateCaptchaField();
+            $captchaValidator->validate($captcha);
         } catch (CaptchaValidateException $e) {
             $oInputValidator->addValidationError(
                 "captcha",
@@ -49,11 +52,11 @@ class User extends User_parent
     public function login($userName, $password, $setSessionCookie = false): bool
     {
         if (!$this->isAdmin()) {
-            /** @var InputValidator $oInputValidator */
-            $oInputValidator = Registry::getInputValidator();
+            $captchaValidator = $this->getService(CaptchaServiceInterface::class);
+            $captcha = Registry::getRequest()->getRequestParameter('captcha');
 
             try {
-                $oInputValidator->validateCaptchaField();
+                $captchaValidator->validate($captcha);
             } catch (CaptchaValidateException $e) {
                 throw oxNew(UserException::class, $e->getMessage());
             }

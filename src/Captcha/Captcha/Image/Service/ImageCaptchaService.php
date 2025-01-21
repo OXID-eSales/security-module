@@ -26,10 +26,11 @@ class ImageCaptchaService implements ImageCaptchaServiceInterface
     }
 
     /**
-     * @param string $captcha
+     * @param string $userCaptcha
+     * @param string $sessionCaptcha
      * @return void
      */
-    public function validate(string $captcha): void
+    public function validate(string $userCaptcha, string $sessionCaptcha): void
     {
         //todo: move after captcha validation refactoring
         $captchaExpireDate = (string) $_SESSION['captcha_expiration'];
@@ -37,7 +38,7 @@ class ImageCaptchaService implements ImageCaptchaServiceInterface
             throw new CaptchaValidateException('ERROR_EXPIRED_CAPTCHA');
         }
 
-        $this->captchaValidator->validate($captcha);
+        $this->captchaValidator->validate($userCaptcha, $sessionCaptcha);
     }
 
     /**

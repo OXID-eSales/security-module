@@ -13,35 +13,10 @@ use OxidEsales\Eshop\Core\Session;
 use OxidEsales\SecurityModule\Captcha\Captcha\Image\Service\ImageCaptchaServiceInterface;
 use OxidEsales\SecurityModule\Captcha\Service\CaptchaService;
 use OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class CaptchaServiceTest extends TestCase
 {
-//    #[DataProvider('dataProviderValidate')]
-//    public function testCaptchaValidate($value, $expectedValue): void
-//    {
-//        $imageCaptchaService = $this->createStub(ImageCaptchaServiceInterface::class);
-//
-//        $captchaService = $this->getSut($imageCaptchaService);
-//        $imageCaptchaService->method('validate')->willReturn($value);
-//
-//        $this->assertSame($expectedValue, $captchaService->validate(uniqid()));
-//    }
-//
-//    public static function dataProviderValidate(): \Generator
-//    {
-//        yield 'captcha valid' => [
-//            'value' => true,
-//            'expectedValue' => true,
-//        ];
-//
-//        yield 'captcha invalid' => [
-//            'value' => false,
-//            'expectedValue' => false,
-//        ];
-//    }
-
     public function testCaptchaGetter(): void
     {
         $captcha = uniqid();

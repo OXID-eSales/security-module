@@ -22,48 +22,41 @@ class ImageCaptchaValidatorTest extends TestCase
         $this->expectExceptionMessage('ERROR_EMPTY_CAPTCHA');
 
         $validator = $this->getSut();
-        $validator->validate('');
+        $validator->validate('', uniqid());
     }
 
     public function testValidateWhenCaptchaIsInvalid(): void
     {
-        $_SESSION['captcha'] = substr(uniqid(), -6);
-
         $this->expectException(CaptchaValidateException::class);
         $this->expectExceptionMessage('ERROR_INVALID_CAPTCHA');
 
         $validator = $this->getSut();
-        $validator->validate(substr(uniqid(), -6));
+        $validator->validate(uniqid(), uniqid());
     }
 
     public function testValidateWhenCaptchaIsValid(): void
     {
-        $_SESSION['captcha'] = $captcha = substr(uniqid(), -6);
-
+        $sameCaptchaText = uniqid();
         $validator = $this->getSut();
-        $validator->validate($captcha);
+        $validator->validate($sameCaptchaText, $sameCaptchaText);
     }
 
     public function testValidateHandlesCaseSensitivity(): void
     {
-        $_SESSION['captcha'] = 'AbC123';
-
         $this->expectException(CaptchaValidateException::class);
         $this->expectExceptionMessage('ERROR_INVALID_CAPTCHA');
 
         $validator = $this->getSut();
-        $validator->validate('abc123');
+        $validator->validate('abc123', 'AbC123');
     }
 
     public function testValidateWhenSessionCaptchaIsMissing(): void
     {
-        $_SESSION['captcha'] = '';
-
         $this->expectException(CaptchaValidateException::class);
         $this->expectExceptionMessage('ERROR_INVALID_CAPTCHA');
 
         $validator = $this->getSut();
-        $validator->validate(substr(uniqid(), -6));
+        $validator->validate(uniqid(), '');
     }
 
     public function getSut(): ImageCaptchaValidatorInterface

@@ -43,18 +43,31 @@ class ImageCaptchaServiceTest extends TestCase
 
         $service = $this->getSut($builder);
         $service->generate();
-        $service->validate($captchaText);
+        $service->validate($captchaText, $captchaText);
     }
 
     public function testValidateWithInvalidCaptcha()
     {
         $builder = $this->createMock(ImageCaptchaBuilderInterface::class);
-        $builder->method('getContent')->willReturn(substr(uniqid(), -6));
+        $builder->method('getContent')->willReturn($captchaText = substr(uniqid(), -6));
 
         $service = $this->getSut($builder, new ImageCaptchaValidator());
         $service->generate();
         $this->expectException(CaptchaValidateException::class);
-        $service->validate(substr(uniqid(), -6));
+        $this->expectExceptionMessage('ERROR_INVALID_CAPTCHA');
+        $service->validate(substr(uniqid(), -6), $captchaText);
+    }
+
+    public function testValidateWithEmptyCaptcha()
+    {
+        $builder = $this->createMock(ImageCaptchaBuilderInterface::class);
+        $builder->method('getContent')->willReturn($captchaText = substr(uniqid(), -6));
+
+        $service = $this->getSut($builder, new ImageCaptchaValidator());
+        $service->generate();
+        $this->expectException(CaptchaValidateException::class);
+        $this->expectExceptionMessage('ERROR_EMPTY_CAPTCHA');
+        $service->validate('', $captchaText);
     }
 
     public function testValidExpiredCaptcha(): void

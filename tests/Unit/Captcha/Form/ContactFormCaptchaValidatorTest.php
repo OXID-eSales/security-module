@@ -25,12 +25,12 @@ class ContactFormCaptchaValidatorTest extends TestCase
         $requestMock->expects($this->once())
             ->method('getRequestParameter')
             ->with('captcha')
-            ->willReturn('valid_captcha');
+            ->willReturn($captcha = uniqid());
 
         $captchaServiceMock = $this->createMock(CaptchaServiceInterface::class);
         $captchaServiceMock->expects($this->once())
             ->method('validate')
-            ->with('valid_captcha');
+            ->with($captcha);
 
         $formValidator = new ContactFormCaptchaValidator($captchaServiceMock, $requestMock);
         $this->assertTrue($formValidator->isValid($this->createMock(FormInterface::class)));
@@ -39,39 +39,32 @@ class ContactFormCaptchaValidatorTest extends TestCase
 
     public function testIsValidReturnsFalseOnInvalidCaptcha(): void
     {
-        // Mock the request to return an invalid captcha
         $requestMock = $this->createMock(Request::class);
         $requestMock->expects($this->once())
             ->method('getRequestParameter')
             ->with('captcha')
-            ->willReturn('invalid_captcha');
+            ->willReturn($captcha = uniqid());
 
-        // Mock the captcha service to throw an exception for invalid captcha
         $captchaServiceMock = $this->createMock(CaptchaServiceInterface::class);
         $captchaServiceMock->expects($this->once())
             ->method('validate')
-            ->with('invalid_captcha')
+            ->with($captcha)
             ->willThrowException(new CaptchaValidateException('ERROR_EMPTY_CAPTCHA'));
 
-        // Create the FormValidator instance
         $formValidator = new ContactFormCaptchaValidator($captchaServiceMock, $requestMock);
 
-        // Assert that isValid returns false
         $this->assertFalse($formValidator->isValid($this->createMock(FormInterface::class)));
 
-        // Assert that the error message is recorded
         $this->assertEquals(['ERROR_EMPTY_CAPTCHA'], $formValidator->getErrors());
     }
 
     public function testGetErrorsReturnsEmptyArrayInitially(): void
     {
-        // Create the FormValidator with mocks
         $formValidator = new ContactFormCaptchaValidator(
             $this->createMock(CaptchaServiceInterface::class),
             $this->createMock(Request::class)
         );
 
-        // Assert that getErrors returns an empty array
         $this->assertEmpty($formValidator->getErrors());
     }
 }
