@@ -6,6 +6,10 @@ services:
       OxidEsales\Eshop\Core\Utils: '@=service("OxidEsales\\SecurityModule\\Core\\Registry").getUtils()'
       OxidEsales\Eshop\Core\Session: '@=service("OxidEsales\\SecurityModule\\Core\\Registry").getSession()'
 
+  OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface:
+    class: OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsService
+    public: true
+
   OxidEsales\SecurityModule\Captcha\Captcha\Image\Service\ImageCaptchaServiceInterface:
     class: OxidEsales\SecurityModule\Captcha\Captcha\Image\Service\ImageCaptchaService
 

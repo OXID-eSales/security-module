@@ -23,6 +23,9 @@ $aLang = [
     'CAPTCHA_RELOAD'                           => 'Reload Captcha',
     'CAPTCHA_PLAY_AUDIO'                       => 'Play Captcha Audio',
 
+    'ERROR_EXPIRED_CAPTCHA'                    => 'CAPTCHA has expired.',
+
+
     'PASSWORD_REQUIREMENTS'              => 'Password requirements',
     'PASSWORD_MIN_LENGTH'                => 'Minimum %d characters.',
     'PASSWORD_CONTAIN_DIGIT'             => 'At least one number.',

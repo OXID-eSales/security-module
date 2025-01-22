@@ -9,7 +9,8 @@
  * Metadata version
  */
 
-use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsService;
+use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsService as PasswordPolicyModuleSettings;
+use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsService as CaptchaModuleSettings;
 use OxidEsales\SecurityModule\Core\Module;
 
 $sMetadataVersion = '2.1';
@@ -47,7 +48,7 @@ $aModule = [
         //Password length requirements
         [
             'group' => 'password_policy',
-            'name'  => ModuleSettingsService::PASSWORD_MINIMUM_LENGTH,
+            'name'  => PasswordPolicyModuleSettings::PASSWORD_MINIMUM_LENGTH,
             'type'  => 'num',
             'value' => 8
         ],
@@ -55,27 +56,36 @@ $aModule = [
         //Password symbols requirements
         [
             'group' => 'password_policy',
-            'name'  => ModuleSettingsService::PASSWORD_UPPERCASE,
+            'name'  => PasswordPolicyModuleSettings::PASSWORD_UPPERCASE,
             'type'  => 'bool',
             'value' => true
         ],
         [
             'group' => 'password_policy',
-            'name'  => ModuleSettingsService::PASSWORD_LOWERCASE,
+            'name'  => PasswordPolicyModuleSettings::PASSWORD_LOWERCASE,
             'type'  => 'bool',
             'value' => true
         ],
         [
             'group' => 'password_policy',
-            'name'  => ModuleSettingsService::PASSWORD_DIGIT,
+            'name'  => PasswordPolicyModuleSettings::PASSWORD_DIGIT,
             'type'  => 'bool',
             'value' => true
         ],
         [
             'group' => 'password_policy',
-            'name'  => ModuleSettingsService::PASSWORD_SPECIAL_CHAR,
+            'name'  => PasswordPolicyModuleSettings::PASSWORD_SPECIAL_CHAR,
             'type'  => 'bool',
             'value' => true
         ],
+
+        //Captcha
+        [
+            'group' => 'captcha',
+            'name'  => CaptchaModuleSettings::CAPTCHA_LIFETIME,
+            'type'  => 'select',
+            'constraints' => '5min|15min|30min',
+            'value' => '15min'
+        ]
     ],
 ];
