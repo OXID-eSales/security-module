@@ -80,8 +80,8 @@ class ImageCaptchaServiceTest extends TestCase
 
         $this->expectException(CaptchaValidateException::class);
 
-        $service = $this->getSut($builder);
-        $service->validate($captchaText);
+        $service = $this->getSut($builder, new ImageCaptchaValidator());
+        $service->validate($captchaText, $captchaText);
     }
 
     public function testValidateWithExpiredCaptcha()
@@ -91,9 +91,9 @@ class ImageCaptchaServiceTest extends TestCase
         $builder = $this->createMock(ImageCaptchaBuilderInterface::class);
         $builder->method('getContent')->willReturn($captchaText);
 
-        $service = $this->getSut($builder);
+        $service = $this->getSut($builder, new ImageCaptchaValidator());
         $service->generate();
-        $service->validate($captchaText);
+        $service->validate($captchaText, $captchaText);
     }
 
     public function getSut(
@@ -103,7 +103,7 @@ class ImageCaptchaServiceTest extends TestCase
     ): ImageCaptchaServiceInterface {
         return new ImageCaptchaService(
             captchaBuilder: $captchaBuilder ?? $this->createStub(ImageCaptchaServiceInterface::class),
-            captchaValidator: $captchaValidator ?? $this->createStub(ImageCaptchaValidatorInterface::class),            
+            captchaValidator: $captchaValidator ?? $this->createStub(ImageCaptchaValidatorInterface::class),
             settingsService: $settingsService ?? $this->createConfiguredStub(
                 ModuleSettingsServiceInterface::class,
                 ['getCaptchaLifeTime' => '15M']

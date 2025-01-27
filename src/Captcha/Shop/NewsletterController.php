@@ -19,7 +19,7 @@ class NewsletterController extends NewsletterController_parent
     {
         $captchaValidator = $this->getService(CaptchaServiceInterface::class);
         $captcha = (string) Registry::getRequest()->getRequestParameter('captcha');
-//var_dump($captcha);
+
         try {
             $captchaValidator->validate($captcha);
         } catch (CaptchaValidateException $e) {

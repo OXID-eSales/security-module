@@ -32,12 +32,6 @@ class ImageCaptchaService implements ImageCaptchaServiceInterface
      */
     public function validate(string $userCaptcha, string $sessionCaptcha): void
     {
-        //todo: move after captcha validation refactoring
-        $captchaExpireDate = (string) $_SESSION['captcha_expiration'];
-        if (time() > $captchaExpireDate) {
-            throw new CaptchaValidateException('ERROR_EXPIRED_CAPTCHA');
-        }
-
         $this->captchaValidator->validate($userCaptcha, $sessionCaptcha);
     }
 

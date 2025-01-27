@@ -16,6 +16,13 @@ use PHPUnit\Framework\TestCase;
 
 class ImageCaptchaValidatorTest extends TestCase
 {
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $_SESSION['captcha_expiration'] = time() + 60;
+    }
+
     public function testValidateWhenCaptchaIsEmpty(): void
     {
         $this->expectException(CaptchaValidateException::class);
@@ -54,6 +61,16 @@ class ImageCaptchaValidatorTest extends TestCase
     {
         $this->expectException(CaptchaValidateException::class);
         $this->expectExceptionMessage('ERROR_INVALID_CAPTCHA');
+
+        $validator = $this->getSut();
+        $validator->validate(uniqid(), '');
+    }
+
+    public function testValidateWithExpiredCaptcha()
+    {
+        $_SESSION['captcha_expiration'] = 1;
+        $this->expectException(CaptchaValidateException::class);
+        $this->expectExceptionMessage('ERROR_EXPIRED_CAPTCHA');
 
         $validator = $this->getSut();
         $validator->validate(uniqid(), '');

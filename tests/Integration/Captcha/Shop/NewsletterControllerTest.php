@@ -37,6 +37,7 @@ class NewsletterControllerTest extends IntegrationTestCase
         Registry::set(UtilsView::class, $this->utilsViewMock);
         Registry::set(Request::class, $this->requestMock);
         Registry::getSession()->setVariable('captcha', 'valid_captcha');
+        Registry::getSession()->setVariable('captcha_expiration', time() + 60);
     }
 
     public function testSendWithValidCaptcha()

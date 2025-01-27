@@ -25,7 +25,10 @@ class ImageCaptchaValidator implements ImageCaptchaValidatorInterface
             throw new CaptchaValidateException('ERROR_EMPTY_CAPTCHA');
         }
 
-//        $sessionCaptcha = (string) $_SESSION['captcha'];
+        $captchaExpireDate = (string) $_SESSION['captcha_expiration'];
+        if (time() > $captchaExpireDate) {
+            throw new CaptchaValidateException('ERROR_EXPIRED_CAPTCHA');
+        }
 
         if (!hash_equals($sessionCaptcha, $userCaptcha)) {
             throw new CaptchaValidateException('ERROR_INVALID_CAPTCHA');
