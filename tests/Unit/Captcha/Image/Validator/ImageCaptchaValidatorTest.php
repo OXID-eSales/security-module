@@ -16,20 +16,13 @@ use PHPUnit\Framework\TestCase;
 
 class ImageCaptchaValidatorTest extends TestCase
 {
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $_SESSION['captcha_expiration'] = time() + 60;
-    }
-
     public function testValidateWhenCaptchaIsEmpty(): void
     {
         $this->expectException(CaptchaValidateException::class);
         $this->expectExceptionMessage('ERROR_EMPTY_CAPTCHA');
 
         $validator = $this->getSut();
-        $validator->validate('', uniqid());
+        $validator->validate('', uniqid(), time() + 60);
     }
 
     public function testValidateWhenCaptchaIsInvalid(): void
@@ -38,14 +31,14 @@ class ImageCaptchaValidatorTest extends TestCase
         $this->expectExceptionMessage('ERROR_INVALID_CAPTCHA');
 
         $validator = $this->getSut();
-        $validator->validate(uniqid(), uniqid());
+        $validator->validate(uniqid(), uniqid(), time() + 60);
     }
 
     public function testValidateWhenCaptchaIsValid(): void
     {
         $sameCaptchaText = uniqid();
         $validator = $this->getSut();
-        $validator->validate($sameCaptchaText, $sameCaptchaText);
+        $validator->validate($sameCaptchaText, $sameCaptchaText, time() + 60);
     }
 
     public function testValidateHandlesCaseSensitivity(): void
@@ -54,7 +47,7 @@ class ImageCaptchaValidatorTest extends TestCase
         $this->expectExceptionMessage('ERROR_INVALID_CAPTCHA');
 
         $validator = $this->getSut();
-        $validator->validate('abc123', 'AbC123');
+        $validator->validate('abc123', 'AbC123', time() + 60);
     }
 
     public function testValidateWhenSessionCaptchaIsMissing(): void
@@ -63,17 +56,16 @@ class ImageCaptchaValidatorTest extends TestCase
         $this->expectExceptionMessage('ERROR_INVALID_CAPTCHA');
 
         $validator = $this->getSut();
-        $validator->validate(uniqid(), '');
+        $validator->validate(uniqid(), '', time() + 60);
     }
 
     public function testValidateWithExpiredCaptcha()
     {
-        $_SESSION['captcha_expiration'] = 1;
         $this->expectException(CaptchaValidateException::class);
         $this->expectExceptionMessage('ERROR_EXPIRED_CAPTCHA');
 
         $validator = $this->getSut();
-        $validator->validate(uniqid(), '');
+        $validator->validate(uniqid(), '', 1);
     }
 
     public function getSut(): ImageCaptchaValidatorInterface

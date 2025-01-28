@@ -19,13 +19,13 @@ class ImageCaptchaValidator implements ImageCaptchaValidatorInterface
      * @return void
      * @throws CaptchaValidateException
      */
-    public function validate(string $userCaptcha, string $sessionCaptcha): void
+    public function validate(string $userCaptcha, string $sessionCaptcha, int $captchaExpiration): void
     {
         if (!$userCaptcha) {
             throw new CaptchaValidateException('ERROR_EMPTY_CAPTCHA');
         }
 
-        $captchaExpireDate = (string) $_SESSION['captcha_expiration'];
+        $captchaExpireDate = $captchaExpiration;
         if (time() > $captchaExpireDate) {
             throw new CaptchaValidateException('ERROR_EXPIRED_CAPTCHA');
         }

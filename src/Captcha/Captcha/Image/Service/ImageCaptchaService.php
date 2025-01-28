@@ -11,9 +11,9 @@ namespace OxidEsales\SecurityModule\Captcha\Captcha\Image\Service;
 
 use DateTimeImmutable;
 use DateInterval;
+use OxidEsales\Eshop\Core\Session;
 use OxidEsales\SecurityModule\Captcha\Captcha\Image\Builder\ImageCaptchaBuilderInterface;
 use OxidEsales\SecurityModule\Captcha\Captcha\Image\Validator\ImageCaptchaValidatorInterface;
-use OxidEsales\SecurityModule\Captcha\Captcha\Image\Exception\CaptchaValidateException;
 use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface;
 
 class ImageCaptchaService implements ImageCaptchaServiceInterface
@@ -21,8 +21,19 @@ class ImageCaptchaService implements ImageCaptchaServiceInterface
     public function __construct(
         private readonly ImageCaptchaBuilderInterface $captchaBuilder,
         private readonly ImageCaptchaValidatorInterface $captchaValidator,
-        private readonly ModuleSettingsServiceInterface $settingsService
+        private readonly ModuleSettingsServiceInterface $settingsService,
+        private readonly Session $session
     ) {
+    }
+
+    public function getCaptcha(): string
+    {
+        return $this->session->getVariable('captcha');
+    }
+
+    public function getCaptchaExpiration(): int
+    {
+        return $this->session->getVariable('captcha_expiration');
     }
 
     /**
@@ -32,7 +43,11 @@ class ImageCaptchaService implements ImageCaptchaServiceInterface
      */
     public function validate(string $userCaptcha, string $sessionCaptcha): void
     {
-        $this->captchaValidator->validate($userCaptcha, $sessionCaptcha);
+        $this->captchaValidator->validate(
+            $userCaptcha,
+            $sessionCaptcha,
+            $this->getCaptchaExpiration()
+        );
     }
 
     /**
@@ -40,13 +55,13 @@ class ImageCaptchaService implements ImageCaptchaServiceInterface
      */
     public function generate(): string
     {
-        $_SESSION['captcha'] = $this->captchaBuilder->getContent();
+        $this->session->setVariable('captcha', $this->captchaBuilder->getContent());
 
         $time = new DateTimeImmutable('now');
         $expireTime = $time->add(
             new DateInterval('PT' . $this->settingsService->getCaptchaLifeTime())
         );
-        $_SESSION['captcha_expiration'] = $expireTime->getTimestamp();
+        $this->session->setVariable('captcha_expiration', $expireTime->getTimestamp());
 
         return $this->captchaBuilder->build();
     }

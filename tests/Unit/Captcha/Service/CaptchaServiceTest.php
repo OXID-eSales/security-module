@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Tests\Unit\Captcha\Service;
 
-use OxidEsales\Eshop\Core\Session;
 use OxidEsales\SecurityModule\Captcha\Captcha\Image\Service\ImageCaptchaServiceInterface;
 use OxidEsales\SecurityModule\Captcha\Service\CaptchaService;
 use OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface;
@@ -19,39 +18,44 @@ class CaptchaServiceTest extends TestCase
 {
     public function testCaptchaGetter(): void
     {
-        $captcha = uniqid();
+        $captchaText = uniqid();
 
         $imageCaptchaService = $this->createStub(ImageCaptchaServiceInterface::class);
-        $session = $this->createStub(Session::class);
-        $session->method('getVariable')->willReturn($captcha);
+        $imageCaptchaService->method('getCaptcha')->willReturn($captchaText);
 
-        $captchaService = $this->getSut(
-            $imageCaptchaService,
-            $session
-        );
+        $captchaService = $this->getSut($imageCaptchaService);
 
-        $this->assertSame($captcha, $captchaService->getCaptcha());
+        $this->assertSame($captchaText, $captchaService->getCaptcha());
     }
 
+    public function testCaptchaExpirationGetter(): void
+    {
+        $captchaExpiration = time();
+
+        $imageCaptchaService = $this->createStub(ImageCaptchaServiceInterface::class);
+        $imageCaptchaService->method('getCaptchaExpiration')->willReturn($captchaExpiration);
+
+        $captchaService = $this->getSut($imageCaptchaService);
+
+        $this->assertSame($captchaExpiration, $captchaService->getCaptchaExpiration());
+    }
 
     public function testCaptchaGenerate(): void
     {
-        $image = uniqid();
+        $captchaImage = uniqid();
         $imageCaptchaService = $this->createStub(ImageCaptchaServiceInterface::class);
 
         $captchaService = $this->getSut($imageCaptchaService);
-        $imageCaptchaService->method('generate')->willReturn($image);
+        $imageCaptchaService->method('generate')->willReturn($captchaImage);
 
-        $this->assertSame($image, $captchaService->generate());
+        $this->assertSame($captchaImage, $captchaService->generate());
     }
 
     public function getSut(
         ImageCaptchaServiceInterface $captchaService = null,
-        Session $session = null
     ): CaptchaServiceInterface {
         return new CaptchaService(
             captchaService: $captchaService ?? $this->createStub(ImageCaptchaServiceInterface::class),
-            session: $session ?? $this->createStub(Session::class)
         );
     }
 }

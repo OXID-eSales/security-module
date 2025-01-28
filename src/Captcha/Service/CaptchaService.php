@@ -15,14 +15,18 @@ use OxidEsales\SecurityModule\Captcha\Captcha\CaptchaInterface;
 class CaptchaService implements CaptchaServiceInterface
 {
     public function __construct(
-        private readonly CaptchaInterface $captchaService,
-        private readonly Session $session
+        private readonly CaptchaInterface $captchaService
     ) {
     }
 
     public function getCaptcha(): string
     {
-        return $this->session->getVariable('captcha');
+        return $this->captchaService->getCaptcha();
+    }
+
+    public function getCaptchaExpiration(): int
+    {
+        return $this->captchaService->getCaptchaExpiration();
     }
 
     public function validate(string $captcha): void
