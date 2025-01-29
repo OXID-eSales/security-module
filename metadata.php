@@ -47,6 +47,14 @@ $aModule = [
     'blocks'      => [
     ],
     'settings'    => [
+        //Password policy enable
+        [
+            'group' => 'password_policy',
+            'name'  => PasswordPolicyModuleSettings::PASSWORD_POLICY_ENABLE,
+            'type'  => 'bool',
+            'value' => true
+        ],
+
         //Password length requirements
         [
             'group' => 'password_policy',
@@ -82,6 +90,12 @@ $aModule = [
         ],
 
         //Captcha
+        [
+            'group' => 'captcha',
+            'name'  => CaptchaModuleSettings::CAPTCHA_ENABLE,
+            'type'  => 'bool',
+            'value' => true
+        ],
         [
             'group' => 'captcha',
             'name'  => CaptchaModuleSettings::CAPTCHA_LIFETIME,

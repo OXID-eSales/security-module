@@ -1,8 +1,12 @@
 {% extends 'form/login_account.html.twig' %}
 
-{% block account_login_form_captcha %}
-    {% include '@oe_security_module/form/image_captcha.html.twig'%}
+{% set captchaSettings = oViewConf.getSecurityModuleCaptchaSettings() %}
 
-    <script type="module" src="{{ oViewConf.getModuleUrl('oe_security_module', 'out/src/js/index.js') }}"></script>
+{% block account_login_form_captcha %}
+    {% if captchaSettings.isCaptchaEnabled() %}
+        {% include '@oe_security_module/form/image_captcha.html.twig'%}
+
+        <script type="module" src="{{ oViewConf.getModuleUrl('oe_security_module', 'out/src/js/index.js') }}"></script>
+    {% endif %}
 {% endblock %}
 

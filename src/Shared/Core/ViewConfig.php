@@ -10,7 +10,8 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Shared\Core;
 
 use OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface;
-use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsServiceInterface;
+use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsServiceInterface as PasswordSettingsServiceInterface;
+use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface as CaptchaSettingsServiceInterface;
 use OxidEsales\Eshop\Core\Registry;
 
 /**
@@ -20,9 +21,14 @@ use OxidEsales\Eshop\Core\Registry;
  */
 class ViewConfig extends ViewConfig_parent
 {
-    public function getSecurityModuleSettings(): ModuleSettingsServiceInterface
+    public function getSecurityModulePasswordSettings(): PasswordSettingsServiceInterface
     {
-        return $this->getService(ModuleSettingsServiceInterface::class);
+        return $this->getService(PasswordSettingsServiceInterface::class);
+    }
+
+    public function getSecurityModuleCaptchaSettings(): CaptchaSettingsServiceInterface
+    {
+        return $this->getService(CaptchaSettingsServiceInterface::class);
     }
 
     public function getPasswordLength(): int

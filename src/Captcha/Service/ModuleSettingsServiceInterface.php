@@ -11,5 +11,7 @@ namespace OxidEsales\SecurityModule\Captcha\Service;
 
 interface ModuleSettingsServiceInterface
 {
+    public function isCaptchaEnabled(): bool;
+
     public function getCaptchaLifeTime(): string;
 }

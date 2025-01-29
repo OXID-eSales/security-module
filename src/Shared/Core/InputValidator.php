@@ -28,6 +28,7 @@ class InputValidator extends InputValidator_parent
      */
     public function checkPassword($user, $newPassword, $confirmationPassword, $shouldCheckPasswordLength = false)
     {
+
         $passwordValidator = $this->getService(PasswordValidatorChainInterface::class);
 
         try {

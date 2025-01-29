@@ -21,11 +21,18 @@ class ModuleSettingsService implements ModuleSettingsServiceInterface
         '30min' => '30M',
     ];
 
+    public const CAPTCHA_ENABLE = 'oeSecurityCaptchaEnable';
+
     public const CAPTCHA_LIFETIME = 'oeSecurityCaptchaLifeTime';
 
     public function __construct(
         private readonly ModuleSettingServiceInterface $moduleSettingService
     ) {
+    }
+
+    public function isCaptchaEnabled(): bool
+    {
+        return $this->moduleSettingService->getBoolean(self::CAPTCHA_ENABLE, Module::MODULE_ID);
     }
 
     public function getCaptchaLifeTime(): string
