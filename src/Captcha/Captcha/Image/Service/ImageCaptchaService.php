@@ -38,14 +38,13 @@ class ImageCaptchaService implements ImageCaptchaServiceInterface
 
     /**
      * @param string $userCaptcha
-     * @param string $sessionCaptcha
      * @return void
      */
-    public function validate(string $userCaptcha, string $sessionCaptcha): void
+    public function validate(string $userCaptcha): void
     {
         $this->captchaValidator->validate(
             $userCaptcha,
-            $sessionCaptcha,
+            $this->getCaptcha(),
             $this->getCaptchaExpiration()
         );
     }
