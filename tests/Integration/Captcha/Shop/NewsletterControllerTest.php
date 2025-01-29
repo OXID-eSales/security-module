@@ -13,16 +13,22 @@ use OxidEsales\Eshop\Application\Controller\NewsletterController;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
 use OxidEsales\Eshop\Core\UtilsView;
+use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
 use OxidEsales\EshopCommunity\Tests\Integration\IntegrationTestCase;
+use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface;
 
 class NewsletterControllerTest extends IntegrationTestCase
 {
+    protected ModuleSettingsServiceInterface $settingsService;
     protected UtilsView $utilsViewMock;
     protected Request $requestMock;
 
     public function setUp(): void
     {
         parent::setUp();
+
+        $moduleSettings = ContainerFacade::get(ModuleSettingsServiceInterface::class);
+        $moduleSettings->saveIsCaptchaEnabled(true);
 
         $this->utilsViewMock = $this->getMockBuilder(UtilsView::class)
             ->disableOriginalConstructor()

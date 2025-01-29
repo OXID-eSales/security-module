@@ -15,6 +15,7 @@ use OxidEsales\EshopCommunity\Internal\Framework\Form\FormInterface;
 use OxidEsales\SecurityModule\Captcha\Captcha\Image\Exception\CaptchaValidateException;
 use OxidEsales\SecurityModule\Captcha\Form\ContactFormCaptchaValidator;
 use OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface;
+use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface;
 use PHPUnit\Framework\TestCase;
 
 class ContactFormCaptchaValidatorTest extends TestCase
@@ -32,7 +33,12 @@ class ContactFormCaptchaValidatorTest extends TestCase
             ->method('validate')
             ->with($captcha);
 
-        $formValidator = new ContactFormCaptchaValidator($captchaServiceMock, $requestMock);
+        $settingsService = $this->createMock(ModuleSettingsServiceInterface::class);
+        $settingsService
+            ->method('isCaptchaEnabled')
+            ->willReturn(true);
+
+        $formValidator = new ContactFormCaptchaValidator($captchaServiceMock, $settingsService, $requestMock);
         $this->assertTrue($formValidator->isValid($this->createMock(FormInterface::class)));
         $this->assertEmpty($formValidator->getErrors());
     }
@@ -51,7 +57,12 @@ class ContactFormCaptchaValidatorTest extends TestCase
             ->with($captcha)
             ->willThrowException(new CaptchaValidateException('ERROR_EMPTY_CAPTCHA'));
 
-        $formValidator = new ContactFormCaptchaValidator($captchaServiceMock, $requestMock);
+        $settingsService = $this->createMock(ModuleSettingsServiceInterface::class);
+        $settingsService
+            ->method('isCaptchaEnabled')
+            ->willReturn(true);
+
+        $formValidator = new ContactFormCaptchaValidator($captchaServiceMock, $settingsService, $requestMock);
 
         $this->assertFalse($formValidator->isValid($this->createMock(FormInterface::class)));
 
@@ -62,6 +73,7 @@ class ContactFormCaptchaValidatorTest extends TestCase
     {
         $formValidator = new ContactFormCaptchaValidator(
             $this->createMock(CaptchaServiceInterface::class),
+            $this->createMock(ModuleSettingsServiceInterface::class),
             $this->createMock(Request::class)
         );
 

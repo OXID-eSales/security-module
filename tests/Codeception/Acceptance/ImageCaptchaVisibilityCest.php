@@ -12,6 +12,8 @@ namespace OxidEsales\SecurityModule\Tests\Codeception\Acceptance;
 use Codeception\Util\Fixtures;
 use OxidEsales\Codeception\Module\Translation\Translator;
 use OxidEsales\Codeception\Page\Account\UserLogin;
+use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
+use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface;
 use OxidEsales\SecurityModule\Tests\Codeception\Support\AcceptanceTester;
 
 /**
@@ -22,6 +24,11 @@ class ImageCaptchaVisibilityCest
 {
     private string $captchaImage = "//div[contains(@class, 'image-captcha')]//div[2]//img";
     private string $captchaInput = "//div[contains(@class, 'image-captcha')]//div[1]//div//input";
+
+    public function _before(AcceptanceTester $I): void
+    {
+        ContainerFacade::get(ModuleSettingsServiceInterface::class)->saveIsCaptchaEnabled(true);
+    }
 
     public function testCaptchaImageOnRegistrationPage(AcceptanceTester $I): void
     {

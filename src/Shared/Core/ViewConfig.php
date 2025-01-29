@@ -33,7 +33,7 @@ class ViewConfig extends ViewConfig_parent
 
     public function getPasswordLength(): int
     {
-        $passwordLength = $this->getSecurityModuleSettings()->getPasswordMinimumLength();
+        $passwordLength = $this->getSecurityModulePasswordSettings()->getPasswordMinimumLength();
         $shopPasswordLength = Registry::getInputValidator()->getPasswordLength();
 
         if ($passwordLength < $shopPasswordLength) {

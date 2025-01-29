@@ -14,6 +14,7 @@ use OxidEsales\Eshop\Core\Request;
 use OxidEsales\EshopCommunity\Internal\Framework\Form\FormInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Form\FormValidatorInterface;
 use OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface;
+use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface;
 
 class ContactFormCaptchaValidator implements FormValidatorInterface
 {
@@ -24,6 +25,7 @@ class ContactFormCaptchaValidator implements FormValidatorInterface
 
     public function __construct(
         private CaptchaServiceInterface $captchaService,
+        private ModuleSettingsServiceInterface $settingsService,
         protected Request $request
     ) {
     }
@@ -37,6 +39,10 @@ class ContactFormCaptchaValidator implements FormValidatorInterface
      */
     public function isValid(FormInterface $form)
     {
+        if (!$this->settingsService->isCaptchaEnabled()) {
+            return true;
+        }
+
         $captcha = $this->request->getRequestParameter('captcha');
 
         try {

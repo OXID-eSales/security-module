@@ -12,11 +12,18 @@ namespace OxidEsales\SecurityModule\Captcha\Shop;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\SecurityModule\Captcha\Captcha\Image\Exception\CaptchaValidateException;
 use OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface;
+use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface;
 
 class NewsletterController extends NewsletterController_parent
 {
     public function send(): ?bool
     {
+        $settingsService = $this->getService(ModuleSettingsServiceInterface::class);
+        if (!$settingsService->isCaptchaEnabled()) {
+            var_dump(23423);
+            return parent::send();
+        }
+
         $captchaValidator = $this->getService(CaptchaServiceInterface::class);
         $captcha = (string) Registry::getRequest()->getRequestParameter('captcha');
 

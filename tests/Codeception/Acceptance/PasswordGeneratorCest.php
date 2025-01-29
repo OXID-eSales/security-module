@@ -9,8 +9,9 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Tests\Codeception\Acceptance;
 
-use Codeception\Util\Fixtures;
 use OxidEsales\Codeception\Module\Translation\Translator;
+use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
+use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface;
 use OxidEsales\SecurityModule\Tests\Codeception\Support\AcceptanceTester;
 
 /**
@@ -25,6 +26,7 @@ class PasswordGeneratorCest extends BaseCest
 
     public function _before(AcceptanceTester $I): void
     {
+        ContainerFacade::get(ModuleSettingsServiceInterface::class)->saveIsCaptchaEnabled(false);
         $userData = $this->getExistingUserData();
         $I->updateInDatabase(
             'oxuser',
@@ -59,7 +61,8 @@ class PasswordGeneratorCest extends BaseCest
         $userName = $userData['userLoginName'];
         $userPassword = $userData['userPassword'];
 
-        $homePage = $this->loginWithCaptcha($I, $userName, $userPassword);
+        $homePage = $I->openShop();
+        $homePage->loginUser($userName, $userPassword);
 
         $homePage
             ->openAccountPage()

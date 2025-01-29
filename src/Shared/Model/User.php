@@ -14,6 +14,7 @@ use OxidEsales\Eshop\Core\Exception\UserException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\SecurityModule\Captcha\Captcha\Image\Exception\CaptchaValidateException;
 use OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface;
+use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface;
 use OxidEsales\SecurityModule\Shared\Core\InputValidator;
 
 /**
@@ -26,21 +27,24 @@ class User extends User_parent
 {
     public function checkValues($sLogin, $sPassword, $sPassword2, $aInvAddress, $aDelAddress): void
     {
-        /** @var InputValidator $oInputValidator */
-        $oInputValidator = Registry::getInputValidator();
-        $captchaValidator = $this->getService(CaptchaServiceInterface::class);
-        $captcha = Registry::getRequest()->getRequestParameter('captcha');
+        $settingsService = $this->getService(ModuleSettingsServiceInterface::class);
+        if ($settingsService->isCaptchaEnabled()) {
+            /** @var InputValidator $oInputValidator */
+            $oInputValidator = Registry::getInputValidator();
+            $captchaValidator = $this->getService(CaptchaServiceInterface::class);
+            $captcha = Registry::getRequest()->getRequestParameter('captcha');
 
-        try {
-            $captchaValidator->validate($captcha);
-        } catch (CaptchaValidateException $e) {
-            $oInputValidator->addValidationError(
-                "captcha",
-                oxNew(
-                    InputException::class,
-                    Registry::getLang()->translateString($e->getMessage())
-                )
-            );
+            try {
+                $captchaValidator->validate($captcha);
+            } catch (CaptchaValidateException $e) {
+                $oInputValidator->addValidationError(
+                    "captcha",
+                    oxNew(
+                        InputException::class,
+                        Registry::getLang()->translateString($e->getMessage())
+                    )
+                );
+            }
         }
 
         parent::checkValues($sLogin, $sPassword, $sPassword2, $aInvAddress, $aDelAddress);
@@ -51,6 +55,11 @@ class User extends User_parent
      */
     public function login($userName, $password, $setSessionCookie = false): bool
     {
+        $settingsService = $this->getService(ModuleSettingsServiceInterface::class);
+        if (!$settingsService->isCaptchaEnabled()) {
+            return parent::login($userName, $password, $setSessionCookie);
+        }
+
         if (!$this->isAdmin()) {
             $captchaValidator = $this->getService(CaptchaServiceInterface::class);
             $captcha = Registry::getRequest()->getRequestParameter('captcha');
