@@ -3,8 +3,10 @@
 {% set captchaSettings = oViewConf.getSecurityModuleCaptchaSettings() %}
 
 {% block captcha_form %}
-    {% include '@oe_security_module/form/image_captcha.html.twig'%}
+    {% if captchaSettings.isCaptchaEnabled() %}
+        {% include '@oe_security_module/form/image_captcha.html.twig' with { required: true } %}
 
-    <script type="module" src="{{ oViewConf.getModuleUrl('oe_security_module', 'out/src/js/index.js') }}"></script>
+        <script type="module" src="{{ oViewConf.getModuleUrl('oe_security_module', 'out/src/js/index.js') }}"></script>
+    {% endif %}
 {% endblock %}
 

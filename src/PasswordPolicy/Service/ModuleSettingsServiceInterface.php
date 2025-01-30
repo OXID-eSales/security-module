@@ -13,6 +13,8 @@ interface ModuleSettingsServiceInterface
 {
     public function isPasswordPolicyEnabled(): bool;
 
+    public function saveIsPasswordPolicyEnabled(bool $value): void;
+
     public function getPasswordMinimumLength(): int;
 
     public function getPasswordUppercase(): bool;

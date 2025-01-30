@@ -5,7 +5,6 @@
 
 import { PasswordStrength } from "./module/password-validator.js";
 import { PasswordGenerator } from "./module/password-generator.js";
-import { CaptchaValidator } from "./module/captcha-validator.js";
 import { CaptchaRefresh } from "./module/captcha-refresh.js";
 import { CaptchaAudio } from "./module/captcha-audio.js";
 
@@ -32,14 +31,6 @@ document.querySelectorAll('.password-toggle').forEach((el) => {
         let passwordField = document.getElementById(this.getAttribute('data-target'));
         passwordField.type = (passwordField.type === "password" ? "text" : "password")
     });
-});
-
-document.querySelectorAll('.image-captcha').forEach((captcha) => {
-    const formWithCaptcha = captcha.closest('form');
-    new CaptchaValidator({
-        form: formWithCaptcha,
-        fieldTarget: formWithCaptcha.querySelector('input[name="captcha"]'),
-    })
 });
 
 document.querySelectorAll('.captcha-reload').forEach((el) => {

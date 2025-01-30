@@ -19,7 +19,6 @@ use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface;
 
 class NewsletterControllerTest extends IntegrationTestCase
 {
-    protected ModuleSettingsServiceInterface $settingsService;
     protected UtilsView $utilsViewMock;
     protected Request $requestMock;
 

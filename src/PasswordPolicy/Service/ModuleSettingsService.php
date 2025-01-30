@@ -31,6 +31,11 @@ class ModuleSettingsService implements ModuleSettingsServiceInterface
         return $this->moduleSettingService->getBoolean(self::PASSWORD_POLICY_ENABLE, Module::MODULE_ID);
     }
 
+    public function saveIsPasswordPolicyEnabled(bool $value): void
+    {
+        $this->moduleSettingService->saveBoolean(self::PASSWORD_POLICY_ENABLE, $value, Module::MODULE_ID);
+    }
+
     public function getPasswordMinimumLength(): int
     {
         return $this->moduleSettingService->getInteger(self::PASSWORD_MINIMUM_LENGTH, Module::MODULE_ID);

@@ -20,7 +20,6 @@ class NewsletterController extends NewsletterController_parent
     {
         $settingsService = $this->getService(ModuleSettingsServiceInterface::class);
         if (!$settingsService->isCaptchaEnabled()) {
-            var_dump(23423);
             return parent::send();
         }
 

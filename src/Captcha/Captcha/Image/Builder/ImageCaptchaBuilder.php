@@ -89,23 +89,23 @@ class ImageCaptchaBuilder implements ImageCaptchaBuilderInterface
      */
     private function addNoise(GdImage $image): void
     {
-        $noiseColor = (int) imagecolorallocate($image, 100, 100, 100);
+        $noiseColor = (int) imagecolorallocate($image, 120, 120, 120);
 
         // Add random lines
         for ($i = 0; $i < 10; $i++) {
             imageline(
                 $image,
-                rand(0, $this->imageWidth),
-                rand(0, $this->imageHeight),
-                rand(0, $this->imageWidth),
-                rand(0, $this->imageHeight),
+                random_int(0, $this->imageWidth),
+                random_int(0, $this->imageHeight),
+                random_int(0, $this->imageWidth),
+                random_int(0, $this->imageHeight),
                 $noiseColor
             );
         }
 
         // Add random dots
         for ($i = 0; $i < 500; $i++) {
-            imagesetpixel($image, rand(0, $this->imageWidth), rand(0, $this->imageHeight), $noiseColor);
+            imagesetpixel($image, random_int(0, $this->imageWidth), random_int(0, $this->imageHeight), $noiseColor);
         }
     }
 
@@ -123,12 +123,12 @@ class ImageCaptchaBuilder implements ImageCaptchaBuilderInterface
 
         foreach ($characters as $char) {
             // Add random vertical offset for distortion
-            $offsetY = rand($this->imageHeight / 4, $this->imageHeight / 2);
+            $offsetY = random_int($this->imageHeight / 4, $this->imageHeight / 2);
 
             // Draw each character
             imagestring($image, $fontSize, $offsetX, $offsetY, $char, $textColor);
 
-            $offsetX += rand(10, 20); // Add spacing
+            $offsetX += random_int(10, 20); // Add spacing
         }
     }
 

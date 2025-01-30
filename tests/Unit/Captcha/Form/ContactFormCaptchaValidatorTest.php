@@ -69,6 +69,27 @@ class ContactFormCaptchaValidatorTest extends TestCase
         $this->assertEquals(['ERROR_EMPTY_CAPTCHA'], $formValidator->getErrors());
     }
 
+    public function testNotCallValidateWhenCaptchaDisabled(): void
+    {
+        $requestMock = $this->createMock(Request::class);
+        $requestMock->expects($this->never())
+            ->method('getRequestParameter')
+            ->with('captcha');
+
+        $captchaServiceMock = $this->createMock(CaptchaServiceInterface::class);
+        $captchaServiceMock->expects($this->never())
+            ->method('validate');
+
+        $settingsService = $this->createMock(ModuleSettingsServiceInterface::class);
+        $settingsService
+            ->method('isCaptchaEnabled')
+            ->willReturn(false);
+
+        $formValidator = new ContactFormCaptchaValidator($captchaServiceMock, $settingsService, $requestMock);
+
+        $this->assertTrue($formValidator->isValid($this->createMock(FormInterface::class)));
+    }
+
     public function testGetErrorsReturnsEmptyArrayInitially(): void
     {
         $formValidator = new ContactFormCaptchaValidator(

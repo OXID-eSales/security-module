@@ -4,6 +4,6 @@
 
 {% block loginbox_form_captcha %}
     {% if captchaSettings.isCaptchaEnabled() %}
-        {% include '@oe_security_module/form/image_captcha.html.twig'%}
+        {% include '@oe_security_module/form/image_captcha.html.twig' with { required: false } %}
     {% endif %}
 {% endblock %}
