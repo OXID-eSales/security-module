@@ -10,16 +10,13 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Tests\Codeception\Acceptance;
 
 use Codeception\Example;
-use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
-use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface as CaptchaSettingsServiceInterface;
-use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsServiceInterface as PasswordSettingsServiceInterface;
 use OxidEsales\SecurityModule\Tests\Codeception\Support\AcceptanceTester;
 
 /**
  * @group oe_security_module
  * @group oe_security_module_password_disabled
  */
-class PasswordDesabledCest extends BaseCest
+class PasswordDisabledCest extends BaseCest
 {
     private string $registerPwdFieldId = "#userPassword";
     private string $changePwdFieldId = "#passwordNew";
@@ -28,8 +25,9 @@ class PasswordDesabledCest extends BaseCest
 
     public function _before(AcceptanceTester $I): void
     {
-        ContainerFacade::get(CaptchaSettingsServiceInterface::class)->saveIsCaptchaEnabled(false);
-        ContainerFacade::get(PasswordSettingsServiceInterface::class)->saveIsPasswordPolicyEnabled(false);
+        $this->setCaptchaState(false);
+        $this->setPasswordState(false);
+
         $userData = $this->getExistingUserData();
         $I->updateInDatabase(
             'oxuser',
@@ -48,7 +46,8 @@ class PasswordDesabledCest extends BaseCest
      */
     public function testPasswordPolicyDisabledOnRegistrationPage(AcceptanceTester $I, Example $example): void
     {
-        ContainerFacade::get(PasswordSettingsServiceInterface::class)->saveIsPasswordPolicyEnabled($example['enabled']);
+        $this->setPasswordState($example['enabled']);
+
         $homePage = $I->openShop();
         $homePage->openUserRegistrationPage();
 
@@ -61,7 +60,8 @@ class PasswordDesabledCest extends BaseCest
      */
     public function testPasswordPolicyDisabledOnChangePassword(AcceptanceTester $I, Example $example): void
     {
-        ContainerFacade::get(PasswordSettingsServiceInterface::class)->saveIsPasswordPolicyEnabled($example['enabled']);
+        $this->setPasswordState($example['enabled']);
+
         $userData = $this->getExistingUserData();
         $userName = $userData['userLoginName'];
         $userPassword = $userData['userPassword'];
@@ -84,7 +84,8 @@ class PasswordDesabledCest extends BaseCest
      */
     public function testPasswordPolicyDisabledOnForgotPassword(AcceptanceTester $I, Example $example): void
     {
-        ContainerFacade::get(PasswordSettingsServiceInterface::class)->saveIsPasswordPolicyEnabled($example['enabled']);
+        $this->setPasswordState($example['enabled']);
+
         $userData = $this->getExistingUserData();
         $uid = md5($userData['userId'] . '1' . 'test_update_key');
         $I->amOnPage('?cl=forgotpwd&uid=' . $uid . '&lang=1&shp=1');

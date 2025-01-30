@@ -11,8 +11,6 @@ namespace OxidEsales\SecurityModule\Tests\Codeception\Acceptance;
 
 use Codeception\Example;
 use Codeception\TestInterface;
-use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
-use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface;
 use OxidEsales\SecurityModule\Tests\Codeception\Support\AcceptanceTester;
 
 /**
@@ -28,7 +26,8 @@ class PasswordStrengthCest extends BaseCest
      */
     public function _before(AcceptanceTester $I): void
     {
-        ContainerFacade::get(ModuleSettingsServiceInterface::class)->saveIsCaptchaEnabled(false);
+        $this->setCaptchaState(false);
+
         $userData = $this->getExistingUserData();
         $I->updateInDatabase(
             'oxuser',

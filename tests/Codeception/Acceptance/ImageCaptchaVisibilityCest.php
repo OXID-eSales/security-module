@@ -13,15 +13,13 @@ use Codeception\Example;
 use Codeception\Util\Fixtures;
 use OxidEsales\Codeception\Module\Translation\Translator;
 use OxidEsales\Codeception\Page\Account\UserLogin;
-use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
-use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface;
 use OxidEsales\SecurityModule\Tests\Codeception\Support\AcceptanceTester;
 
 /**
  * @group oe_security_module
  * @group oe_security_module_captcha_visibility
  */
-class ImageCaptchaVisibilityCest
+class ImageCaptchaVisibilityCest extends BaseCest
 {
     private string $captchaImage = "//div[contains(@class, 'image-captcha')]//div[2]//img";
     private string $captchaInput = "//div[contains(@class, 'image-captcha')]//div[1]//div//input";
@@ -31,7 +29,8 @@ class ImageCaptchaVisibilityCest
      */
     public function testCaptchaImageOnRegistrationPage(AcceptanceTester $I, Example $example): void
     {
-        ContainerFacade::get(ModuleSettingsServiceInterface::class)->saveIsCaptchaEnabled($example['enabled']);
+        $this->setCaptchaState($example['enabled']);
+
         $homePage = $I->openShop();
         $homePage->openUserRegistrationPage();
 
@@ -43,7 +42,8 @@ class ImageCaptchaVisibilityCest
      */
     public function testCaptchaImageOnLoginPage(AcceptanceTester $I, Example $example): void
     {
-        ContainerFacade::get(ModuleSettingsServiceInterface::class)->saveIsCaptchaEnabled($example['enabled']);
+        $this->setCaptchaState($example['enabled']);
+
         $userLoginPage = new UserLogin($I);
         $I->amOnPage($userLoginPage->URL);
         $I->see(Translator::translate('LOGIN'));
@@ -56,7 +56,8 @@ class ImageCaptchaVisibilityCest
      */
     public function testCaptchaImageOnContactPage(AcceptanceTester $I, Example $example): void
     {
-        ContainerFacade::get(ModuleSettingsServiceInterface::class)->saveIsCaptchaEnabled($example['enabled']);
+        $this->setCaptchaState($example['enabled']);
+
         $homePage = $I->openShop();
         $homePage->openContactPage();
 
@@ -68,7 +69,8 @@ class ImageCaptchaVisibilityCest
      */
     public function testCaptchaImageOnNewsletterPage(AcceptanceTester $I, Example $example): void
     {
-        ContainerFacade::get(ModuleSettingsServiceInterface::class)->saveIsCaptchaEnabled($example['enabled']);
+        $this->setCaptchaState($example['enabled']);
+
         $userData = Fixtures::get('existingUser');
 
         $homePage = $I->openShop();
@@ -82,7 +84,8 @@ class ImageCaptchaVisibilityCest
      */
     public function testCaptchaImageOnLoginBox(AcceptanceTester $I, Example $example): void
     {
-        ContainerFacade::get(ModuleSettingsServiceInterface::class)->saveIsCaptchaEnabled($example['enabled']);
+        $this->setCaptchaState($example['enabled']);
+
         $homePage = $I->openShop();
         $homePage->openAccountMenu();
 
