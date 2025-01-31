@@ -46,6 +46,8 @@ class ContactFormCaptchaValidator implements FormValidatorInterface
         $captcha = $this->request->getRequestParameter('captcha');
 
         try {
+            $this->captchaService->honeyPotValidate($this->request);
+
             $this->captchaService->validate($captcha);
         } catch (StandardException $e) {
             $this->errors[] = $e->getMessage();

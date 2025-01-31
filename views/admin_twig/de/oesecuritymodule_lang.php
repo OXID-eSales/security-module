@@ -21,6 +21,7 @@ $aLang = [
 
     'SHOP_MODULE_GROUP_captcha'                   => 'Captcha settings',
     'SHOP_MODULE_oeSecurityCaptchaEnable'         => 'Enable Captcha Security',
+    'SHOP_MODULE_oeSecurityHoneyPotCaptchaEnable' => 'Enable HoneyPot captcha',
     'SHOP_MODULE_oeSecurityCaptchaLifeTime'       => 'Captcha lifetime',
     'SHOP_MODULE_oeSecurityCaptchaLifeTime_5min'  => '5 min',
     'SHOP_MODULE_oeSecurityCaptchaLifeTime_15min' => '15 min',

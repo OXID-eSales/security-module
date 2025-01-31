@@ -18,11 +18,15 @@ services:
     class: OxidEsales\SecurityModule\Captcha\Service\CaptchaAudioService
     public: true
 
+  OxidEsales\SecurityModule\Captcha\Captcha\HoneyPot\Service\HoneyPotCaptchaServiceInterface:
+    class: OxidEsales\SecurityModule\Captcha\Captcha\HoneyPot\Service\HoneyPotCaptchaService
+
   OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface:
     class: OxidEsales\SecurityModule\Captcha\Service\CaptchaService
     public: true
     arguments:
       - '@OxidEsales\SecurityModule\Captcha\Captcha\Image\Service\ImageCaptchaServiceInterface'
+      - '@OxidEsales\SecurityModule\Captcha\Captcha\HoneyPot\Service\HoneyPotCaptchaServiceInterface'
 
   OxidEsales\SecurityModule\Captcha\Captcha\Image\Builder\ImageCaptchaBuilderInterface:
     class: OxidEsales\SecurityModule\Captcha\Captcha\Image\Builder\ImageCaptchaBuilder

@@ -42,6 +42,14 @@
     {{ parent() }}
 
     {% if captchaSettings.isCaptchaEnabled() %}
-        {% include '@oe_security_module/form/image_captcha.html.twig' with { required: true } %}
+        {% block image_captcha %}
+            {% include '@oe_security_module/form/image_captcha.html.twig' with { required: true } %}
+        {% endblock %}
     {% endif %}
+
+    {% block honeypot_captcha %}
+        {% if captchaSettings.isHoneyPotCaptchaEnabled() %}
+            {% include '@oe_security_module/form/honeypot_captcha.html.twig' %}
+        {% endif %}
+    {% endblock %}
 {% endblock %}

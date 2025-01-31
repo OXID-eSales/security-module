@@ -11,6 +11,8 @@ interface ModuleSettingsServiceInterface
 {
     public function isCaptchaEnabled(): bool;
 
+    public function isHoneyPotCaptchaEnabled(): bool;
+
     public function saveIsCaptchaEnabled(bool $value): void;
 
     public function getCaptchaLifeTime(): string;

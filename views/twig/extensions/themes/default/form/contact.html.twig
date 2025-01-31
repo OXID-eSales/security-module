@@ -4,7 +4,15 @@
 
 {% block captcha_form %}
     {% if captchaSettings.isCaptchaEnabled() %}
-        {% include '@oe_security_module/form/image_captcha.html.twig' with { required: true } %}
+        {% block image_captcha %}
+            {% include '@oe_security_module/form/image_captcha.html.twig' with { required: true } %}
+        {% endblock %}
+
+        {% block honeypot_captcha %}
+            {% if captchaSettings.isHoneyPotCaptchaEnabled() %}
+                {% include '@oe_security_module/form/honeypot_captcha.html.twig' %}
+            {% endif %}
+        {% endblock %}
 
         <script type="module" src="{{ oViewConf.getModuleUrl('oe_security_module', 'out/src/js/index.js') }}"></script>
     {% endif %}

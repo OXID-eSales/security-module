@@ -27,15 +27,19 @@ class User extends User_parent
 {
     public function checkValues($sLogin, $sPassword, $sPassword2, $aInvAddress, $aDelAddress): void
     {
+        $request = Registry::getRequest();
+
         $settingsService = $this->getService(ModuleSettingsServiceInterface::class);
         if ($settingsService->isCaptchaEnabled()) {
             /** @var InputValidator $oInputValidator */
             $oInputValidator = Registry::getInputValidator();
-            $captchaValidator = $this->getService(CaptchaServiceInterface::class);
-            $captcha = Registry::getRequest()->getRequestParameter('captcha');
+            $captchaService = $this->getService(CaptchaServiceInterface::class);
+            $captcha = $request->getRequestParameter('captcha');
 
             try {
-                $captchaValidator->validate($captcha);
+                $captchaService->honeyPotValidate($request);
+
+                $captchaService->validate($captcha);
             } catch (CaptchaValidateException $e) {
                 $oInputValidator->addValidationError(
                     "captcha",
@@ -61,11 +65,11 @@ class User extends User_parent
         }
 
         if (!$this->isAdmin()) {
-            $captchaValidator = $this->getService(CaptchaServiceInterface::class);
+            $captchaService = $this->getService(CaptchaServiceInterface::class);
             $captcha = Registry::getRequest()->getRequestParameter('captcha');
 
             try {
-                $captchaValidator->validate($captcha);
+                $captchaService->validate($captcha);
             } catch (CaptchaValidateException $e) {
                 throw oxNew(UserException::class, $e->getMessage());
             }

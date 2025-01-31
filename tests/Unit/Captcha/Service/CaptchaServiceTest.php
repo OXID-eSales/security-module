@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Tests\Unit\Captcha\Service;
 
+use OxidEsales\SecurityModule\Captcha\Captcha\HoneyPot\Service\HoneyPotCaptchaService;
+use OxidEsales\SecurityModule\Captcha\Captcha\HoneyPot\Service\HoneyPotCaptchaServiceInterface;
 use OxidEsales\SecurityModule\Captcha\Captcha\Image\Service\ImageCaptchaServiceInterface;
 use OxidEsales\SecurityModule\Captcha\Service\CaptchaService;
 use OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface;
@@ -53,9 +55,11 @@ class CaptchaServiceTest extends TestCase
 
     public function getSut(
         ImageCaptchaServiceInterface $captchaService = null,
+        HoneyPotCaptchaServiceInterface $honeyPotService = null,
     ): CaptchaServiceInterface {
         return new CaptchaService(
             captchaService: $captchaService ?? $this->createStub(ImageCaptchaServiceInterface::class),
+            honeyPotService: $honeyPotService ?? $this->createStub(HoneyPotCaptchaServiceInterface::class),
         );
     }
 }

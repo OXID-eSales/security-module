@@ -98,6 +98,12 @@ $aModule = [
         ],
         [
             'group' => 'captcha',
+            'name'  => CaptchaModuleSettings::HONEYPOT_CAPTCHA_ENABLE,
+            'type'  => 'bool',
+            'value' => true
+        ],
+        [
+            'group' => 'captcha',
             'name'  => CaptchaModuleSettings::CAPTCHA_LIFETIME,
             'type'  => 'select',
             'constraints' => '5min|15min|30min',
