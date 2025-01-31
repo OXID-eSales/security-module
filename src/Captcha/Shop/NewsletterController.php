@@ -18,20 +18,17 @@ class NewsletterController extends NewsletterController_parent
 {
     public function send(): ?bool
     {
-        $request = Registry::getRequest();
-
         $settingsService = $this->getService(ModuleSettingsServiceInterface::class);
         if (!$settingsService->isCaptchaEnabled()) {
             return parent::send();
         }
 
         $captchaService = $this->getService(CaptchaServiceInterface::class);
-        $captcha = (string) $request->getRequestParameter('captcha');
 
         try {
-            $captchaService->honeyPotValidate($request);
-
-            $captchaService->validate($captcha);
+            $captchaService->validate(
+                Registry::getRequest()
+            );
         } catch (CaptchaValidateException $e) {
             Registry::getUtilsView()->addErrorToDisplay($e->getMessage());
             return false;

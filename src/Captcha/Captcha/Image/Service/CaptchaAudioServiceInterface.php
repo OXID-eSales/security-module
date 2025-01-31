@@ -5,7 +5,7 @@
  * See LICENSE file for license details.
  */
 
-namespace OxidEsales\SecurityModule\Captcha\Service;
+namespace OxidEsales\SecurityModule\Captcha\Captcha\Image\Service;
 
 interface CaptchaAudioServiceInterface
 {

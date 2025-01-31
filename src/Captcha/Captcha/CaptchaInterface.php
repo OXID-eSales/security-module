@@ -7,11 +7,13 @@
 
 namespace OxidEsales\SecurityModule\Captcha\Captcha;
 
+use OxidEsales\Eshop\Core\Request;
+
 interface CaptchaInterface
 {
-    public function getCaptcha(): string;
-    public function getCaptchaExpiration(): int;
+    public function getName(): string;
+    public function isEnabled(): bool;
 
-    public function validate(string $userCaptcha): void;
+    public function validate(Request $request): void;
     public function generate(): string;
 }

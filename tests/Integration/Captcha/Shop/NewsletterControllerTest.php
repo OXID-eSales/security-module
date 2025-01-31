@@ -53,6 +53,9 @@ class NewsletterControllerTest extends IntegrationTestCase
                 if ($param === 'captcha') {
                     return 'valid_captcha';
                 }
+                if ($param === 'lastname_confirm') {
+                    return '';
+                }
                 return ['oxuser__oxusername' => '']; //suppress warnings from shop
             });
 

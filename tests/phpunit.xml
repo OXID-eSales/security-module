@@ -18,7 +18,7 @@
          colors="true">
     <testsuites>
         <testsuite name="Unit">
-            <directory>Unit/</directory>
+            <directory>Unit</directory>
         </testsuite>
         <testsuite name="Integration">
             <directory>Integration</directory>

@@ -9,7 +9,8 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Captcha\Controller;
 
-use OxidEsales\SecurityModule\Captcha\Service\CaptchaAudioServiceInterface;
+use OxidEsales\SecurityModule\Captcha\Captcha\Image\Service\CaptchaAudioServiceInterface;
+use OxidEsales\SecurityModule\Captcha\Captcha\Image\Service\ImageCaptchaService;
 use OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface;
 use OxidEsales\SecurityModule\Captcha\Transput\ResponseInterface;
 use PHPUnit\Framework\TestCase;
@@ -21,7 +22,9 @@ class CaptchaControllerTest extends TestCase
         $captchaServiceMock = $this->createMock(CaptchaServiceInterface::class);
         $captchaServiceMock->expects($this->once())
             ->method('generate')
-            ->willReturn($imageData = uniqid());
+            ->willReturn([
+                ImageCaptchaService::CAPTCHA_NAME => $imageData = uniqid()
+            ]);
 
         $responseServiceMock = $this->createMock(ResponseInterface::class);
         $responseServiceMock->expects($this->once())

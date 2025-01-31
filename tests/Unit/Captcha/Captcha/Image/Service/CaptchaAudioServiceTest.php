@@ -7,15 +7,19 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\SecurityModule\Captcha\Service;
+namespace OxidEsales\SecurityModule\Tests\Unit\Captcha\Captcha\Image\Service;
 
+use OxidEsales\SecurityModule\Captcha\Captcha\Image\Service\CaptchaAudioService;
+use OxidEsales\SecurityModule\Captcha\Captcha\Image\Service\CaptchaAudioServiceInterface;
+use OxidEsales\SecurityModule\Captcha\Captcha\Image\Service\ImageCaptchaServiceInterface;
+use OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface;
 use PHPUnit\Framework\TestCase;
 
 class CaptchaAudioServiceTest extends TestCase
 {
     public function testGenerateAudio()
     {
-        $captchaServiceMock = $this->createMock(CaptchaServiceInterface::class);
+        $captchaServiceMock = $this->createMock(ImageCaptchaServiceInterface::class);
         $captchaServiceMock->method('getCaptcha')->willReturn('1234');
 
         $captchaAudioService = $this->getSut($captchaServiceMock);
@@ -28,7 +32,7 @@ class CaptchaAudioServiceTest extends TestCase
 
     public function testGenerateAudioNoCaptcha()
     {
-        $captchaServiceMock = $this->createMock(CaptchaServiceInterface::class);
+        $captchaServiceMock = $this->createMock(ImageCaptchaServiceInterface::class);
         $captchaServiceMock->method('getCaptcha')->willReturn('');
 
         $captchaAudioService = $this->getSut($captchaServiceMock);
@@ -40,10 +44,10 @@ class CaptchaAudioServiceTest extends TestCase
     }
 
     public function getSut(
-        CaptchaServiceInterface $captchaService = null
+        ImageCaptchaServiceInterface $imageCaptchaService = null
     ): CaptchaAudioServiceInterface {
         return new CaptchaAudioService(
-            captchaService: $captchaService ?? $this->createStub(CaptchaServiceInterface::class),
+            imageCaptchaService: $imageCaptchaService ?? $this->createStub(ImageCaptchaServiceInterface::class),
         );
     }
 }

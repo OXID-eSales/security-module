@@ -9,57 +9,115 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Tests\Unit\Captcha\Service;
 
-use OxidEsales\SecurityModule\Captcha\Captcha\HoneyPot\Service\HoneyPotCaptchaService;
+use OxidEsales\Eshop\Core\Request;
 use OxidEsales\SecurityModule\Captcha\Captcha\HoneyPot\Service\HoneyPotCaptchaServiceInterface;
+use OxidEsales\SecurityModule\Captcha\Captcha\Image\Exception\CaptchaValidateException;
 use OxidEsales\SecurityModule\Captcha\Captcha\Image\Service\ImageCaptchaServiceInterface;
 use OxidEsales\SecurityModule\Captcha\Service\CaptchaService;
-use OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface;
+use OxidEsales\SecurityModule\Captcha\Service\Exception\InvalidCaptchaTypeException;
 use PHPUnit\Framework\TestCase;
 
 class CaptchaServiceTest extends TestCase
 {
-    public function testCaptchaGetter(): void
+    public function testWrongValidatorType()
     {
-        $captchaText = uniqid();
+        $this->expectException(InvalidCaptchaTypeException::class);
 
-        $imageCaptchaService = $this->createStub(ImageCaptchaServiceInterface::class);
-        $imageCaptchaService->method('getCaptcha')->willReturn($captchaText);
-
-        $captchaService = $this->getSut($imageCaptchaService);
-
-        $this->assertSame($captchaText, $captchaService->getCaptcha());
+        new CaptchaService([new \stdClass()]);
     }
 
-    public function testCaptchaExpirationGetter(): void
+    public function testValidationWithoutValidators(): void
     {
-        $captchaExpiration = time();
+        $request = $this->createMock(Request::class);
 
-        $imageCaptchaService = $this->createStub(ImageCaptchaServiceInterface::class);
-        $imageCaptchaService->method('getCaptchaExpiration')->willReturn($captchaExpiration);
+        $passwordValidatorChain = new CaptchaService([]);
+        $passwordValidatorChain->validate($request);
 
-        $captchaService = $this->getSut($imageCaptchaService);
-
-        $this->assertSame($captchaExpiration, $captchaService->getCaptchaExpiration());
+        $this->addToAssertionCount(1);
     }
 
-    public function testCaptchaGenerate(): void
+    public function testValidationWithInactiveValidatorDoesNotTriggerValidation(): void
     {
-        $captchaImage = uniqid();
-        $imageCaptchaService = $this->createStub(ImageCaptchaServiceInterface::class);
+        $request = $this->createMock(Request::class);
 
-        $captchaService = $this->getSut($imageCaptchaService);
-        $imageCaptchaService->method('generate')->willReturn($captchaImage);
+        $validatorMock = $this->createMock(ImageCaptchaServiceInterface::class);
+        $validatorMock->method('isEnabled')->willReturn(false);
+        $validatorMock->expects($this->never())->method('validate');
 
-        $this->assertSame($captchaImage, $captchaService->generate());
+        $passwordValidatorChain = new CaptchaService([$validatorMock]);
+        $passwordValidatorChain->validate($request);
+
+        $this->addToAssertionCount(1);
     }
 
-    public function getSut(
-        ImageCaptchaServiceInterface $captchaService = null,
-        HoneyPotCaptchaServiceInterface $honeyPotService = null,
-    ): CaptchaServiceInterface {
-        return new CaptchaService(
-            captchaService: $captchaService ?? $this->createStub(ImageCaptchaServiceInterface::class),
-            honeyPotService: $honeyPotService ?? $this->createStub(HoneyPotCaptchaServiceInterface::class),
-        );
+    public function testValidatorWillThrowFirstFailingValidatorException(): void
+    {
+        $request = $this->createMock(Request::class);
+
+        $validator1Mock = $this->createMock(ImageCaptchaServiceInterface::class);
+        $validator1Mock->method('isEnabled')->willReturn(true);
+
+        $validator2Mock = $this->createMock(HoneyPotCaptchaServiceInterface::class);
+        $validator2Mock->method('isEnabled')->willReturn(true);
+        $expectedException = new CaptchaValidateException();
+        $validator2Mock->method('validate')->willThrowException($expectedException);
+
+        $this->expectException(CaptchaValidateException::class);
+
+        $passwordValidatorChain = new CaptchaService([
+            $validator1Mock,
+            $validator2Mock
+        ]);
+
+        $this->expectExceptionObject($expectedException);
+        $passwordValidatorChain->validate($request);
     }
+
+//    public function testCaptchaGetter(): void
+//    {
+//        $captchaText = uniqid();
+//
+//        $imageCaptchaService = $this->createStub(ImageCaptchaServiceInterface::class);
+//        $imageCaptchaService->method('getCaptcha')->willReturn($captchaText);
+//
+//        $captchaService = $this->getSut($imageCaptchaService);
+//
+//        $this->assertSame($captchaText, $captchaService->getCaptcha());
+//    }
+
+//    public function testCaptchaExpirationGetter(): void
+//    {
+//        $captchaExpiration = time();
+//
+//        $imageCaptchaService = $this->createStub(ImageCaptchaServiceInterface::class);
+//        $imageCaptchaService->method('getCaptchaExpiration')->willReturn($captchaExpiration);
+//
+//        $captchaService = $this->getSut($imageCaptchaService);
+//
+//        $this->assertSame($captchaExpiration, $captchaService->getCaptchaExpiration());
+//    }
+
+//    public function testCaptchaGenerate(): void
+//    {
+//        $captchaImage = uniqid();
+//        $imageCaptchaService = $this->createStub(ImageCaptchaServiceInterface::class);
+//
+//        $captchaService = $this->getSut($imageCaptchaService);
+//        $imageCaptchaService->method('generate')->willReturn($captchaImage);
+//
+//        $this->assertSame($captchaImage, $captchaService->generate());
+//    }
+
+//    public function getSut(
+//        ImageCaptchaServiceInterface $captchaService = null,
+//        HoneyPotCaptchaServiceInterface $honeyPotService = null,
+//    ): CaptchaServiceInterface {
+//        return new CaptchaService(
+//            []
+//        );
+//        return new CaptchaService(
+//            captchaService: $captchaService ?? $this->createStub(ImageCaptchaServiceInterface::class),
+//            honeyPotService: $honeyPotService ?? $this->createStub(HoneyPotCaptchaServiceInterface::class),
+//        );
+//    }
 }

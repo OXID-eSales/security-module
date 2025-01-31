@@ -7,8 +7,9 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\SecurityModule\Tests\Unit\Captcha\Image\Service;
+namespace OxidEsales\SecurityModule\Tests\Unit\Captcha\Captcha\Image\Service;
 
+use OxidEsales\Eshop\Core\Request;
 use OxidEsales\Eshop\Core\Session;
 use OxidEsales\SecurityModule\Captcha\Captcha\Image\Builder\ImageCaptchaBuilderInterface;
 use OxidEsales\SecurityModule\Captcha\Captcha\Image\Exception\CaptchaValidateException;
@@ -35,6 +36,7 @@ class ImageCaptchaServiceTest extends TestCase
     public function testValidateWithValidCaptcha(): void
     {
         $captchaText = substr(uniqid(), -6);
+        $requestMock = $this->mockRequest('captcha', $captchaText);
 
         $session = $this->createMock(Session::class);
         $session->method('getVariable')->willReturnMap([
@@ -45,12 +47,13 @@ class ImageCaptchaServiceTest extends TestCase
         $service = $this->getSut(
             session: $session
         );
-        $service->validate($captchaText);
+        $service->validate($requestMock);
     }
 
     public function testValidateWithInvalidCaptcha(): void
     {
         $captchaText = substr(uniqid(), -6);
+        $requestMock = $this->mockRequest('captcha', substr(uniqid(), -6));
 
         $session = $this->createMock(Session::class);
         $session->method('getVariable')->willReturnMap([
@@ -64,12 +67,13 @@ class ImageCaptchaServiceTest extends TestCase
         );
         $this->expectException(CaptchaValidateException::class);
         $this->expectExceptionMessage('ERROR_INVALID_CAPTCHA');
-        $service->validate(substr(uniqid(), -6));
+        $service->validate($requestMock);
     }
 
     public function testValidateWithEmptyCaptcha(): void
     {
         $captchaText = substr(uniqid(), -6);
+        $requestMock = $this->mockRequest('captcha', '');
 
         $session = $this->createMock(Session::class);
         $session->method('getVariable')->willReturnMap([
@@ -83,12 +87,13 @@ class ImageCaptchaServiceTest extends TestCase
         );
         $this->expectException(CaptchaValidateException::class);
         $this->expectExceptionMessage('ERROR_EMPTY_CAPTCHA');
-        $service->validate('');
+        $service->validate($requestMock);
     }
 
     public function testValidExpiredCaptcha(): void
     {
         $captchaText = substr(uniqid(), -6);
+        $requestMock = $this->mockRequest('captcha', $captchaText);
 
         $session = $this->createMock(Session::class);
         $session->method('getVariable')->willReturnMap([
@@ -102,12 +107,13 @@ class ImageCaptchaServiceTest extends TestCase
             captchaValidator: new ImageCaptchaValidator(),
             session: $session
         );
-        $service->validate($captchaText);
+        $service->validate($requestMock);
     }
 
     public function testValidateWithExpiredCaptcha(): void
     {
         $captchaText = substr(uniqid(), -6);
+        $requestMock = $this->mockRequest('captcha', $captchaText);
 
         $session = $this->createMock(Session::class);
         $session->method('getVariable')->willReturnMap([
@@ -121,7 +127,7 @@ class ImageCaptchaServiceTest extends TestCase
         );
         $this->expectException(CaptchaValidateException::class);
         $this->expectExceptionMessage('ERROR_EXPIRED_CAPTCHA');
-        $service->validate($captchaText);
+        $service->validate($requestMock);
     }
 
     public function testGetCaptcha(): void
@@ -162,5 +168,16 @@ class ImageCaptchaServiceTest extends TestCase
             ),
             session: $session ?? $this->createStub(Session::class),
         );
+    }
+
+    protected function mockRequest(string $paramenter, string $value)
+    {
+        $requestMock = $this->createMock(Request::class);
+        $requestMock->expects($this->once())
+            ->method('getRequestParameter')
+            ->with($paramenter)
+            ->willReturn($value);
+
+        return $requestMock;
     }
 }

@@ -11,4 +11,6 @@ use OxidEsales\SecurityModule\Captcha\Captcha\CaptchaInterface;
 
 interface ImageCaptchaServiceInterface extends CaptchaInterface
 {
+    public function getCaptcha(): string;
+    public function getCaptchaExpiration(): int;
 }

@@ -2,9 +2,8 @@
 
 namespace OxidEsales\SecurityModule\Captcha\Captcha\HoneyPot\Service;
 
-use OxidEsales\Eshop\Core\Request;
+use OxidEsales\SecurityModule\Captcha\Captcha\CaptchaInterface;
 
-interface HoneyPotCaptchaServiceInterface
+interface HoneyPotCaptchaServiceInterface extends CaptchaInterface
 {
-    public function validate(Request $request): void;
 }

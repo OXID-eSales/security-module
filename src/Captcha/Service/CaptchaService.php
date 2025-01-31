@@ -11,38 +11,42 @@ namespace OxidEsales\SecurityModule\Captcha\Service;
 
 use OxidEsales\Eshop\Core\Request;
 use OxidEsales\SecurityModule\Captcha\Captcha\CaptchaInterface;
-use OxidEsales\SecurityModule\Captcha\Captcha\HoneyPot\Service\HoneyPotCaptchaServiceInterface;
+use OxidEsales\SecurityModule\Captcha\Service\Exception\InvalidCaptchaTypeException;
 
 class CaptchaService implements CaptchaServiceInterface
 {
     public function __construct(
-        private readonly CaptchaInterface $captchaService,
-        private readonly HoneyPotCaptchaServiceInterface $honeyPotService,
+        private iterable $captchas,
     ) {
+        foreach ($this->captchas as $captcha) {
+            if (!$captcha instanceof CaptchaInterface) {
+                throw new InvalidCaptchaTypeException();
+            }
+        }
     }
 
-    public function getCaptcha(): string
+    public function validate(Request $request): void
     {
-        return $this->captchaService->getCaptcha();
+        foreach ($this->captchas as $captcha) {
+            if (!$captcha->isEnabled()) {
+                continue;
+            }
+
+            $captcha->validate($request);
+        }
     }
 
-    public function getCaptchaExpiration(): int
+    public function generate(): array
     {
-        return $this->captchaService->getCaptchaExpiration();
-    }
+        $captchas = [];
+        foreach ($this->captchas as $captcha) {
+            if (!$captcha->isEnabled()) {
+                continue;
+            }
 
-    public function validate(string $captcha): void
-    {
-        $this->captchaService->validate($captcha);
-    }
+            $captchas[$captcha->getName()] = $captcha->generate();
+        }
 
-    public function honeyPotValidate(Request $request): void
-    {
-        $this->honeyPotService->validate($request);
-    }
-
-    public function generate(): string
-    {
-        return $this->captchaService->generate();
+        return $captchas;
     }
 }

@@ -15,11 +15,18 @@ use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface;
 
 class HoneyPotCaptchaService implements HoneyPotCaptchaServiceInterface
 {
+    final public const CAPTCHA_NAME = 'honey_pot';
+
     final public const CAPTCHA_REQUEST_PARAMETER = 'lastname_confirm';
 
     public function __construct(
         private readonly ModuleSettingsServiceInterface $moduleSetting,
     ) {
+    }
+
+    public function getName(): string
+    {
+        return self::CAPTCHA_NAME;
     }
 
     public function isEnabled(): bool
@@ -37,5 +44,10 @@ class HoneyPotCaptchaService implements HoneyPotCaptchaServiceInterface
         if (strlen($value) > 1) {
             throw new CaptchaValidateException('FORM_VALIDATION_FAILED');
         }
+    }
+
+    public function generate(): string
+    {
+        return '';
     }
 }

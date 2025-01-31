@@ -7,12 +7,14 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\SecurityModule\Captcha\Service;
+namespace OxidEsales\SecurityModule\Captcha\Captcha\Image\Service;
 
 class CaptchaAudioService implements CaptchaAudioServiceInterface
 {
+    private const SOUNDS_PATH = __DIR__ . '/../../../../../assets/sounds';
+
     public function __construct(
-        private readonly CaptchaServiceInterface $captchaService
+        private readonly ImageCaptchaServiceInterface $imageCaptchaService
     ) {
     }
 
@@ -20,11 +22,11 @@ class CaptchaAudioService implements CaptchaAudioServiceInterface
     {
         $files = [];
 
-        $captcha = str_split($this->captchaService->getCaptcha());
+        $captcha = str_split($this->imageCaptchaService->getCaptcha());
 
         foreach ($captcha as $value) {
-            $files[] = __DIR__ . '/../../../assets/sounds/' . $value . '.wav';
-            $files[] = __DIR__ . '/../../../assets/sounds/silence.wav';
+            $files[] = self::SOUNDS_PATH . '/' . $value . '.wav';
+            $files[] = self::SOUNDS_PATH . '/silence.wav';
         }
 
         $audioData = $this->joinwavs($files);
@@ -86,7 +88,7 @@ class CaptchaAudioService implements CaptchaAudioServiceInterface
         $header = substr($audio, 0, 44);
         $audioData = substr($audio, 44);
 
-        $noiseFile = __DIR__ . '/../../../assets/sounds/noise.wav';
+        $noiseFile = self::SOUNDS_PATH . '/noise.wav';
         if (!file_exists($noiseFile)) {
             return '';
         }

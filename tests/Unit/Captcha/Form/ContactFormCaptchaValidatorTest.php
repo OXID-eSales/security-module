@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Tests\Unit\Captcha\Form;
 
-use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Request;
 use OxidEsales\EshopCommunity\Internal\Framework\Form\FormInterface;
 use OxidEsales\SecurityModule\Captcha\Captcha\Image\Exception\CaptchaValidateException;
@@ -23,15 +22,15 @@ class ContactFormCaptchaValidatorTest extends TestCase
     public function testIsValidReturnsTrueOnValidCaptcha(): void
     {
         $requestMock = $this->createMock(Request::class);
-        $requestMock->expects($this->once())
+        $requestMock
             ->method('getRequestParameter')
             ->with('captcha')
-            ->willReturn($captcha = uniqid());
+            ->willReturn(uniqid());
 
         $captchaServiceMock = $this->createMock(CaptchaServiceInterface::class);
         $captchaServiceMock->expects($this->once())
             ->method('validate')
-            ->with($captcha);
+            ->with($requestMock);
 
         $settingsService = $this->createMock(ModuleSettingsServiceInterface::class);
         $settingsService
@@ -39,22 +38,23 @@ class ContactFormCaptchaValidatorTest extends TestCase
             ->willReturn(true);
 
         $formValidator = new ContactFormCaptchaValidator($captchaServiceMock, $settingsService, $requestMock);
-        $this->assertTrue($formValidator->isValid($this->createMock(FormInterface::class)));
+        $formMock = $this->createMock(FormInterface::class);
+        $this->assertTrue($formValidator->isValid($formMock));
         $this->assertEmpty($formValidator->getErrors());
     }
 
     public function testIsValidReturnsFalseOnInvalidCaptcha(): void
     {
         $requestMock = $this->createMock(Request::class);
-        $requestMock->expects($this->once())
+        $requestMock
             ->method('getRequestParameter')
             ->with('captcha')
-            ->willReturn($captcha = uniqid());
+            ->willReturn(uniqid());
 
         $captchaServiceMock = $this->createMock(CaptchaServiceInterface::class);
         $captchaServiceMock->expects($this->once())
             ->method('validate')
-            ->with($captcha)
+            ->with($requestMock)
             ->willThrowException(new CaptchaValidateException('ERROR_EMPTY_CAPTCHA'));
 
         $settingsService = $this->createMock(ModuleSettingsServiceInterface::class);
