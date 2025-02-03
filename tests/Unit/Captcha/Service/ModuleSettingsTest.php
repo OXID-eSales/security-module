@@ -11,6 +11,8 @@ namespace OxidEsales\SecurityModule\Tests\Unit\Captcha\Service;
 
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Facade\ModuleSettingServiceInterface;
 use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsService;
+use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface;
+use OxidEsales\SecurityModule\Core\Module;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\String\UnicodeString;
@@ -44,5 +46,57 @@ class ModuleSettingsTest extends TestCase
             'value' => '15min',
             'expectedValue' => '15M',
         ];
+    }
+
+    #[DataProvider('gettersDataProvider')]
+    public function testGetters($method, $systemMethod, $key, $mockValue, $expectedValue): void
+    {
+        $sut = $this->getSut(
+            moduleSettingService: $settingService = $this->createMock(ModuleSettingServiceInterface::class)
+        );
+
+        $settingService->method($systemMethod)
+            ->with(
+                $key,
+                Module::MODULE_ID
+            )
+            ->willReturn($mockValue);
+
+        $this->assertEquals($expectedValue, $sut->$method());
+    }
+
+    public static function gettersDataProvider(): array
+    {
+        return [
+            self::prepareBooleanSetting(
+                'isHoneyPotCaptchaEnabled',
+                ModuleSettingsService::HONEYPOT_CAPTCHA_ENABLE,
+                false
+            ),
+            self::prepareBooleanSetting(
+                'isCaptchaEnabled',
+                ModuleSettingsService::CAPTCHA_ENABLE,
+                false
+            ),
+        ];
+    }
+
+    private static function prepareBooleanSetting(string $method, string $key, bool $value): array
+    {
+        return [
+            'method'        => $method,
+            'systemMethod'  => 'getBoolean',
+            'key'           => $key,
+            'mockValue'     => $value,
+            'expectedValue' => $value
+        ];
+    }
+
+    public function getSut(
+        ModuleSettingServiceInterface $moduleSettingService = null
+    ): ModuleSettingsServiceInterface {
+        return new ModuleSettingsService(
+            moduleSettingService: $moduleSettingService ?? $this->createStub(ModuleSettingsServiceInterface::class),
+        );
     }
 }

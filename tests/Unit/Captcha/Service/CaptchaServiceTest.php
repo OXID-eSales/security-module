@@ -73,51 +73,47 @@ class CaptchaServiceTest extends TestCase
         $passwordValidatorChain->validate($request);
     }
 
-//    public function testCaptchaGetter(): void
-//    {
-//        $captchaText = uniqid();
-//
-//        $imageCaptchaService = $this->createStub(ImageCaptchaServiceInterface::class);
-//        $imageCaptchaService->method('getCaptcha')->willReturn($captchaText);
-//
-//        $captchaService = $this->getSut($imageCaptchaService);
-//
-//        $this->assertSame($captchaText, $captchaService->getCaptcha());
-//    }
+    public function testCaptchaGenerate(): void
+    {
+        $captcha1Mock = $this->createMock(ImageCaptchaServiceInterface::class);
+        $captcha1Mock->method('isEnabled')->willReturn(true);
+        $captcha1Mock->method('getName')->willReturn($name = uniqid());
+        $captcha1Mock->method('generate')->willReturn($content = uniqid());
 
-//    public function testCaptchaExpirationGetter(): void
-//    {
-//        $captchaExpiration = time();
-//
-//        $imageCaptchaService = $this->createStub(ImageCaptchaServiceInterface::class);
-//        $imageCaptchaService->method('getCaptchaExpiration')->willReturn($captchaExpiration);
-//
-//        $captchaService = $this->getSut($imageCaptchaService);
-//
-//        $this->assertSame($captchaExpiration, $captchaService->getCaptchaExpiration());
-//    }
+        $passwordValidatorChain = new CaptchaService([
+            $captcha1Mock
+        ]);
 
-//    public function testCaptchaGenerate(): void
-//    {
-//        $captchaImage = uniqid();
-//        $imageCaptchaService = $this->createStub(ImageCaptchaServiceInterface::class);
-//
-//        $captchaService = $this->getSut($imageCaptchaService);
-//        $imageCaptchaService->method('generate')->willReturn($captchaImage);
-//
-//        $this->assertSame($captchaImage, $captchaService->generate());
-//    }
+        $generators = $passwordValidatorChain->generate();
+        $this->assertSame(
+            [
+                $name => $content
+            ],
+            $generators
+        );
+    }
 
-//    public function getSut(
-//        ImageCaptchaServiceInterface $captchaService = null,
-//        HoneyPotCaptchaServiceInterface $honeyPotService = null,
-//    ): CaptchaServiceInterface {
-//        return new CaptchaService(
-//            []
-//        );
-//        return new CaptchaService(
-//            captchaService: $captchaService ?? $this->createStub(ImageCaptchaServiceInterface::class),
-//            honeyPotService: $honeyPotService ?? $this->createStub(HoneyPotCaptchaServiceInterface::class),
-//        );
-//    }
+    public function testCaptchaGenerateWithInactiveCaptcha(): void
+    {
+        $captcha1Mock = $this->createMock(ImageCaptchaServiceInterface::class);
+        $captcha1Mock->method('isEnabled')->willReturn(true);
+        $captcha1Mock->method('getName')->willReturn($name = uniqid());
+        $captcha1Mock->method('generate')->willReturn($content = uniqid());
+
+        $captcha2Mock = $this->createMock(HoneyPotCaptchaServiceInterface::class);
+        $captcha2Mock->method('isEnabled')->willReturn(false);
+
+        $passwordValidatorChain = new CaptchaService([
+            $captcha1Mock,
+            $captcha2Mock
+        ]);
+
+        $generators = $passwordValidatorChain->generate();
+        $this->assertSame(
+            [
+                $name => $content
+            ],
+            $generators
+        );
+    }
 }

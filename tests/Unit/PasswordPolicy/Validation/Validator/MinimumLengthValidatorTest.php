@@ -48,7 +48,7 @@ class MinimumLengthValidatorTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    /** @dataProvider boolDataProvider */
+    #[DataProvider('boolDataProvider')]
     public function testValidationWithDisabledSetting(int $settingValue, bool $expectedValue): void
     {
         $sut = $this->getSut(

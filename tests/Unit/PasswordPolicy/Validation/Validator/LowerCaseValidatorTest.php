@@ -13,6 +13,7 @@ use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsServiceInterf
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordLowerCaseException;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\StringAnalysisServiceInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Validator\LowerCaseValidator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class LowerCaseValidatorTest extends TestCase
@@ -43,7 +44,7 @@ class LowerCaseValidatorTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    /** @dataProvider boolDataProvider */
+    #[DataProvider('boolDataProvider')]
     public function testValidationWithDisabledSetting(bool $settingValue, bool $expectedValue): void
     {
         $sut = $this->getSut(

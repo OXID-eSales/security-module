@@ -13,6 +13,7 @@ use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsServiceInterf
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordUpperCaseException;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\StringAnalysisServiceInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Validator\UpperCaseValidator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class UpperCaseValidatorTest extends TestCase
@@ -43,7 +44,7 @@ class UpperCaseValidatorTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    /** @dataProvider boolDataProvider */
+    #[DataProvider('boolDataProvider')]
     public function testIsValidatorEnabled(bool $settingValue, bool $expectedValue): void
     {
         $sut = $this->getSut(
