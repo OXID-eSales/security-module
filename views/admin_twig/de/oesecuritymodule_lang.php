@@ -9,7 +9,7 @@ $sLangName = 'Deutsch';
 
 $aLang = [
     'SHOP_MODULE_GROUP_password_policy'                     => 'Passwort-Einstellungen',
-    'SHOP_MODULE_oeSecurityPasswordEnable'                  => 'Enable Password Policy',
+    'SHOP_MODULE_oeSecurityPasswordEnable'                  => 'Passwort-Richtlinien aktivieren',
     'SHOP_MODULE_oeSecurityPasswordMinimumLength'           => 'Minimale Länge',
     'HELP_SHOP_MODULE_oeSecurityPasswordMinimumLength'      => 'Mininmal erlaubte Passwortlänge. Sollte länger als 8 sein. ' .
         'Sollte die in den Moduleinstellungen gewählte Länge die der Shopeinstellung für minimale Passwortlänge unterschreiten, ' .
@@ -19,10 +19,10 @@ $aLang = [
     'SHOP_MODULE_oeSecurityPasswordContainDigit'            => 'Das Passwort muss mindestens eine Zahl enthalten',
     'SHOP_MODULE_oeSecurityPasswordContainSpecialCharacter' => 'Das Passwort muss mindestens ein Sonderzeichen enthalten',
 
-    'SHOP_MODULE_GROUP_captcha'                   => 'Captcha settings',
-    'SHOP_MODULE_oeSecurityCaptchaEnable'         => 'Enable Captcha Security',
-    'SHOP_MODULE_oeSecurityHoneyPotCaptchaEnable' => 'Enable HoneyPot captcha',
-    'SHOP_MODULE_oeSecurityCaptchaLifeTime'       => 'Captcha lifetime',
+    'SHOP_MODULE_GROUP_captcha'                   => 'Captcha Einstellungen',
+    'SHOP_MODULE_oeSecurityCaptchaEnable'         => 'Captcha Security aktivieren',
+    'SHOP_MODULE_oeSecurityHoneyPotCaptchaEnable' => 'HoneyPot Captcha aktivieren',
+    'SHOP_MODULE_oeSecurityCaptchaLifeTime'       => 'Captcha Lebensdauer',
     'SHOP_MODULE_oeSecurityCaptchaLifeTime_5min'  => '5 min',
     'SHOP_MODULE_oeSecurityCaptchaLifeTime_15min' => '15 min',
     'SHOP_MODULE_oeSecurityCaptchaLifeTime_30min' => '30 min',
