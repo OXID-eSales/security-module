@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [undecided] - unreleased
+
+### Added
+- Image Captcha Protection to prevent automated bot submissions.
+- Audio Captcha Support for accessibility, allowing users to hear the captcha text.
+- Honeypot Captcha to detect and block bots without disrupting user experience.
+
 ## [1.0.0] - 2024-11-27
 This is the stable release of v1.0.0. No changes have been made since v1.0.0-rc.1.
 

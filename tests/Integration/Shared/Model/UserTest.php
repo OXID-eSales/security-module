@@ -46,7 +46,8 @@ class UserTest extends IntegrationTestCase
             });
 
         $this->expectException(InputException::class);
-        $this->expectExceptionMessage("ERROR_INVALID_CAPTCHA");
+        $message = Registry::getLang()->translateString("ERROR_INVALID_CAPTCHA");
+        $this->expectExceptionMessage($message);
 
         $subject = oxNew(User::class);
         $subject->checkValues('', '', '', [], []);
@@ -64,7 +65,8 @@ class UserTest extends IntegrationTestCase
             });
 
         $this->expectException(InputException::class);
-        $this->expectExceptionMessage("ERROR_EMPTY_CAPTCHA");
+        $message = Registry::getLang()->translateString("ERROR_EMPTY_CAPTCHA");
+        $this->expectExceptionMessage($message);
 
         $subject = oxNew(User::class);
         $subject->checkValues('', '', '', [], []);
