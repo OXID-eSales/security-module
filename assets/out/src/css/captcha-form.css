@@ -38,8 +38,3 @@ form[style*="width: 270px"] .image-captcha .col-md-6 {
     width: 100%;
     margin-bottom: 1rem;
 }
-
-form[style*="width: 270px"] .image-captcha img {
-    margin-bottom: 0.5rem;
-}
-

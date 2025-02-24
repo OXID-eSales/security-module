@@ -5,5 +5,7 @@
 {% block loginbox_form_captcha %}
     {% if captchaSettings.isCaptchaEnabled() %}
         {% include '@oe_security_module/form/image_captcha.html.twig' with { required: false } %}
+
+        <script type="module" src="{{ oViewConf.getModuleUrl('oe_security_module', 'out/src/js/index.js') }}"></script>
     {% endif %}
 {% endblock %}
