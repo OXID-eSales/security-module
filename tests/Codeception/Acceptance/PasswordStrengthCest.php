@@ -11,14 +11,13 @@ namespace OxidEsales\SecurityModule\Tests\Codeception\Acceptance;
 
 use Codeception\Example;
 use Codeception\TestInterface;
-use Codeception\Util\Fixtures;
 use OxidEsales\SecurityModule\Tests\Codeception\Support\AcceptanceTester;
 
 /**
  * @group oe_security_module
  * @group oe_security_module_password_strength
  */
-class PasswordStrengthCest
+class PasswordStrengthCest extends BaseCest
 {
     private string $progressBarStrength = "//div[contains(@class, 'progress-bar')]";
 
@@ -27,6 +26,8 @@ class PasswordStrengthCest
      */
     public function _before(AcceptanceTester $I): void
     {
+        $this->setCaptchaState(false);
+
         $userData = $this->getExistingUserData();
         $I->updateInDatabase(
             'oxuser',
@@ -132,10 +133,5 @@ class PasswordStrengthCest
                 'class' => '.very-strong'
             ],
         ];
-    }
-
-    private function getExistingUserData()
-    {
-        return Fixtures::get('existingUser');
     }
 }

@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Tests\Codeception\Support\Helper;
 
+use OxidEsales\Codeception\Module\Context;
+use OxidEsales\Codeception\Module\Translation\Translator;
 use OxidEsales\Facts\Facts;
 
 // here you can define custom actions

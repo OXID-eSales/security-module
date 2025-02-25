@@ -13,6 +13,7 @@ use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsServiceInterf
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordSpecialCharException;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\StringAnalysisServiceInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Validator\SpecialCharValidator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class SpecialCharValidatorTest extends TestCase
@@ -43,7 +44,7 @@ class SpecialCharValidatorTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    /** @dataProvider boolDataProvider */
+    #[DataProvider('boolDataProvider')]
     public function testValidationWithDisabledSetting(bool $settingValue, bool $expectedValue): void
     {
         $sut = $this->getSut(

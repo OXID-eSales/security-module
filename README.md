@@ -33,21 +33,33 @@ Ensure you're in the shop root directory (the file `composer.json` and the direc
 $ composer require oxid-esales/security-module
 ```
 
-## Password strength
+## Password strength and Captcha protection
 
-The module provides password strength estimation for any string input.
-It can validate password length and character variety of passwords according
-to configuration and be used for visual indication via Ajax widget. Provided in
-the template is a progress bar style indicator of password strength.
+This module provides password strength estimation for any string input.
+It can validate password length and character variety based on configurable settings.
+It also includes a visual password strength indicator with a progress bar for real-time feedback via an Ajax widget.
+
+Additionally, the module features Image Captcha protection to prevent automated bot submissions.
+Users must enter the text displayed in the captcha image, with an audio captcha option available for accessibility.
+A honeypot captcha is also implemented as a hidden field to detect and block bots without affecting the user experience.
 
 ### Configuration
 
+The module configurations provide an option to Enable/Disable any of the features -
+Password strength estimation, Image Captcha protection, Honeypot Captcha protection.
+
 Configurable options for password strength estimation are:
+- Enable/Disable password strength estimation
 - Minimum password length
 - Uppercase character requirement
 - Lowercase character requirement
 - Digit requirement
 - Special character requirement
+
+Configurable options for Captcha protection are:
+- Enable/Disable Image Captcha protection
+- Enable/Disable Honeypot Captcha protection
+- Image Captcha lifetime
 
 ## Testing
 ### Linting, syntax check, static analysis

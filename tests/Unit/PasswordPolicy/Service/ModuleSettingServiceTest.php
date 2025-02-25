@@ -35,7 +35,6 @@ class ModuleSettingServiceTest extends TestCase
         $this->assertEquals($expectedValue, $sut->$method());
     }
 
-
     public static function gettersDataProvider(): array
     {
         return [

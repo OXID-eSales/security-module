@@ -5,6 +5,8 @@
 
 import { PasswordStrength } from "./module/password-validator.js";
 import { PasswordGenerator } from "./module/password-generator.js";
+import { CaptchaRefresh } from "./module/captcha-refresh.js";
+import { CaptchaAudio } from "./module/captcha-audio.js";
 
 document.querySelectorAll("div[data-type='passwordStrength']").forEach((el) => {
     new PasswordStrength({
@@ -28,5 +30,21 @@ document.querySelectorAll('.password-toggle').forEach((el) => {
     el.addEventListener('click', function() {
         let passwordField = document.getElementById(this.getAttribute('data-target'));
         passwordField.type = (passwordField.type === "password" ? "text" : "password")
+    });
+});
+
+document.querySelectorAll('.captcha-reload').forEach((el) => {
+    el.addEventListener('click', function() {
+        new CaptchaRefresh({
+            url: document.getElementById('captcha').getAttribute('data-url')
+        })
+    });
+});
+
+document.querySelectorAll('.captcha-play').forEach((el) => {
+    el.addEventListener('click', function() {
+        new CaptchaAudio({
+            url: document.getElementById('captcha').getAttribute('data-url-audio')
+        })
     });
 });

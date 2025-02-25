@@ -10,11 +10,19 @@ $sLangName = 'English';
 $aLang = [
     'charset' => 'UTF-8',
 
-    'ERROR_PASSWORD_MIN_LENGTH'                => 'The password must be at least %d characters long.',    
+    'ERROR_PASSWORD_MIN_LENGTH'                => 'The password must be at least %d characters long.',
     'ERROR_PASSWORD_MISSING_DIGIT'             => 'The password does not contain a number.',
     'ERROR_PASSWORD_MISSING_LOWER_CASE'        => 'The password does not contain a lower case letter.',
     'ERROR_PASSWORD_MISSING_UPPER_CASE'        => 'The password does not contain a capital letter.',
     'ERROR_PASSWORD_MISSING_SPECIAL_CHARACTER' => 'The password does not contain a special character.',
+
+    'CAPTCHA_INPUT_LABEL'                      => 'Enter the text from the image',
+    'CAPTCHA_IMAGE_ALT_TEXT'                   => 'Image containing CAPTCHA code',
+    'CAPTCHA_RELOAD'                           => 'Reload Captcha',
+    'CAPTCHA_PLAY_AUDIO'                       => 'Play Captcha Audio',
+    'ERROR_EXPIRED_CAPTCHA'                    => 'CAPTCHA has expired.',
+    'ERROR_INVALID_CAPTCHA'                    => 'CAPTCHA text is invalid.',
+    'ERROR_EMPTY_CAPTCHA'                      => 'CAPTCHA field is empty. Please, enter the text from the image.',
 
     'PASSWORD_REQUIREMENTS'              => 'Password requirements',
     'PASSWORD_MIN_LENGTH'                => 'Minimum %d characters.',

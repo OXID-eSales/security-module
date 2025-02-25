@@ -9,15 +9,13 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Tests\Codeception\Acceptance;
 
-use Codeception\Util\Fixtures;
-use OxidEsales\Codeception\Module\Translation\Translator;
 use OxidEsales\SecurityModule\Tests\Codeception\Support\AcceptanceTester;
 
 /**
  * @group oe_security_module
  * @group oe_security_module_password_visibility
  */
-class PasswordVisibilityCest
+class PasswordVisibilityCest extends BaseCest
 {
     private string $registerPwdFieldId = "userPassword";
     private string $registerConfirmFieldId = "userPasswordConfirm";
@@ -29,6 +27,8 @@ class PasswordVisibilityCest
 
     public function _before(AcceptanceTester $I): void
     {
+        $this->setCaptchaState(false);
+
         $userData = $this->getExistingUserData();
         $I->updateInDatabase(
             'oxuser',
@@ -89,10 +89,5 @@ class PasswordVisibilityCest
         $I->click("//div[contains(@class, 'password-toggle')and @data-target='$inputElementId']");
 
         $I->seeElement("//input[@id='$inputElementId'][@type='text']");
-    }
-
-    private function getExistingUserData()
-    {
-        return Fixtures::get('existingUser');
     }
 }

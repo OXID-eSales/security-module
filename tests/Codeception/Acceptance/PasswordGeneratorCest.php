@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Tests\Codeception\Acceptance;
 
-use Codeception\Util\Fixtures;
 use OxidEsales\Codeception\Module\Translation\Translator;
 use OxidEsales\SecurityModule\Tests\Codeception\Support\AcceptanceTester;
 
@@ -17,7 +16,7 @@ use OxidEsales\SecurityModule\Tests\Codeception\Support\AcceptanceTester;
  * @group oe_security_module
  * @group oe_security_module_password_generator
  */
-class PasswordGeneratorCest
+class PasswordGeneratorCest extends BaseCest
 {
     private string $progressBarStrength = "//div[contains(@class, 'progress-bar')]";
 
@@ -25,6 +24,8 @@ class PasswordGeneratorCest
 
     public function _before(AcceptanceTester $I): void
     {
+        $this->setCaptchaState(false);
+
         $userData = $this->getExistingUserData();
         $I->updateInDatabase(
             'oxuser',
@@ -92,10 +93,5 @@ class PasswordGeneratorCest
 
         $I->waitForText(Translator::translate('ERROR_PASSWORD_STRENGTH_4'), 10, $this->progressBarStrength);
         $I->seeElement('.very-strong');
-    }
-
-    private function getExistingUserData()
-    {
-        return Fixtures::get('existingUser');
     }
 }

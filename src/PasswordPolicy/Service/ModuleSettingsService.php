@@ -14,6 +14,7 @@ use OxidEsales\SecurityModule\Core\Module;
 
 class ModuleSettingsService implements ModuleSettingsServiceInterface
 {
+    public const PASSWORD_POLICY_ENABLE = 'oeSecurityPasswordEnable';
     public const PASSWORD_MINIMUM_LENGTH = 'oeSecurityPasswordMinimumLength';
     public const PASSWORD_UPPERCASE = 'oeSecurityPasswordContainUppercase';
     public const PASSWORD_LOWERCASE = 'oeSecurityPasswordContainLowercase';
@@ -23,6 +24,16 @@ class ModuleSettingsService implements ModuleSettingsServiceInterface
     public function __construct(
         private readonly ModuleSettingServiceInterface $moduleSettingService
     ) {
+    }
+
+    public function isPasswordPolicyEnabled(): bool
+    {
+        return $this->moduleSettingService->getBoolean(self::PASSWORD_POLICY_ENABLE, Module::MODULE_ID);
+    }
+
+    public function saveIsPasswordPolicyEnabled(bool $value): void
+    {
+        $this->moduleSettingService->saveBoolean(self::PASSWORD_POLICY_ENABLE, $value, Module::MODULE_ID);
     }
 
     public function getPasswordMinimumLength(): int

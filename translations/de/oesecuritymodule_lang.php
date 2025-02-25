@@ -16,6 +16,14 @@ $aLang = [
     'ERROR_PASSWORD_MISSING_UPPER_CASE'        => 'Das Passwort enthält keine Großbuchstaben.',
     'ERROR_PASSWORD_MISSING_SPECIAL_CHARACTER' => 'Das Passwort enthält keine Sonderzeichen.',
 
+    'CAPTCHA_INPUT_LABEL'                      => 'Geben Sie den Text des Bildes ein',
+    'CAPTCHA_IMAGE_ALT_TEXT'                   => 'Bild mit CAPTCHA-Code',
+    'CAPTCHA_RELOAD'                           => 'Aktualisiere Captcha',
+    'CAPTCHA_PLAY_AUDIO'                       => 'Captcha-Audio abspielen',
+    'ERROR_EXPIRED_CAPTCHA'                    => 'CAPTCHA ist abgelaufen.',
+    'ERROR_INVALID_CAPTCHA'                    => 'CAPTCHA Texteingabe ist nicht korrekt.',
+    'ERROR_EMPTY_CAPTCHA'                      => 'CAPTCHA Eingabefeld bitte mit dem Bildtext füllen.',
+
     'PASSWORD_REQUIREMENTS'              => 'Passwort-Anforderungen',
     'PASSWORD_MIN_LENGTH'                => 'Mindestens %d Zeichen.',
     'PASSWORD_CONTAIN_DIGIT'             => 'Mindestens eine Zahl.',

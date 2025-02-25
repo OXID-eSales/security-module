@@ -9,7 +9,8 @@
  * Metadata version
  */
 
-use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsService;
+use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsService as PasswordPolicyModuleSettings;
+use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsService as CaptchaModuleSettings;
 use OxidEsales\SecurityModule\Core\Module;
 
 $sMetadataVersion = '2.1';
@@ -30,10 +31,13 @@ $aModule = [
     'url'         => 'https://github.com/OXID-eSales/security-module',
     'email'       => 'info@oxid-esales.com',
     'extend'      => [
-        \OxidEsales\Eshop\Core\InputValidator::class => \OxidEsales\SecurityModule\PasswordPolicy\Shop\Core\InputValidator::class,
-        \OxidEsales\Eshop\Core\ViewConfig::class     => \OxidEsales\SecurityModule\PasswordPolicy\Shop\Core\ViewConfig::class
+        \OxidEsales\Eshop\Application\Controller\NewsletterController::class => \OxidEsales\SecurityModule\Captcha\Shop\NewsletterController::class,
+        \OxidEsales\Eshop\Application\Model\User::class => \OxidEsales\SecurityModule\Shared\Model\User::class,
+        \OxidEsales\Eshop\Core\InputValidator::class    => \OxidEsales\SecurityModule\Shared\Core\InputValidator::class,
+        \OxidEsales\Eshop\Core\ViewConfig::class        => \OxidEsales\SecurityModule\Shared\Core\ViewConfig::class
     ],
     'controllers' => [
+        'captcha' => \OxidEsales\SecurityModule\Captcha\Controller\CaptchaController::class,
         'password' => \OxidEsales\SecurityModule\PasswordPolicy\Controller\PasswordAjaxController::class
     ],
     'templates'   => [
@@ -43,10 +47,18 @@ $aModule = [
     'blocks'      => [
     ],
     'settings'    => [
+        //Password policy enable
+        [
+            'group' => 'password_policy',
+            'name'  => PasswordPolicyModuleSettings::PASSWORD_POLICY_ENABLE,
+            'type'  => 'bool',
+            'value' => true
+        ],
+
         //Password length requirements
         [
             'group' => 'password_policy',
-            'name'  => ModuleSettingsService::PASSWORD_MINIMUM_LENGTH,
+            'name'  => PasswordPolicyModuleSettings::PASSWORD_MINIMUM_LENGTH,
             'type'  => 'num',
             'value' => 8
         ],
@@ -54,27 +66,48 @@ $aModule = [
         //Password symbols requirements
         [
             'group' => 'password_policy',
-            'name'  => ModuleSettingsService::PASSWORD_UPPERCASE,
+            'name'  => PasswordPolicyModuleSettings::PASSWORD_UPPERCASE,
             'type'  => 'bool',
             'value' => true
         ],
         [
             'group' => 'password_policy',
-            'name'  => ModuleSettingsService::PASSWORD_LOWERCASE,
+            'name'  => PasswordPolicyModuleSettings::PASSWORD_LOWERCASE,
             'type'  => 'bool',
             'value' => true
         ],
         [
             'group' => 'password_policy',
-            'name'  => ModuleSettingsService::PASSWORD_DIGIT,
+            'name'  => PasswordPolicyModuleSettings::PASSWORD_DIGIT,
             'type'  => 'bool',
             'value' => true
         ],
         [
             'group' => 'password_policy',
-            'name'  => ModuleSettingsService::PASSWORD_SPECIAL_CHAR,
+            'name'  => PasswordPolicyModuleSettings::PASSWORD_SPECIAL_CHAR,
             'type'  => 'bool',
             'value' => true
         ],
+
+        //Captcha
+        [
+            'group' => 'captcha',
+            'name'  => CaptchaModuleSettings::CAPTCHA_ENABLE,
+            'type'  => 'bool',
+            'value' => true
+        ],
+        [
+            'group' => 'captcha',
+            'name'  => CaptchaModuleSettings::HONEYPOT_CAPTCHA_ENABLE,
+            'type'  => 'bool',
+            'value' => true
+        ],
+        [
+            'group' => 'captcha',
+            'name'  => CaptchaModuleSettings::CAPTCHA_LIFETIME,
+            'type'  => 'select',
+            'constraints' => '5min|15min|30min',
+            'value' => '15min'
+        ]
     ],
 ];
