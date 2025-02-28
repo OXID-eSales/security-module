@@ -1,46 +1,57 @@
-install_shop_with_modules:
+# {{ $ids := "oe_security_module" }}ids: {{ $ids }}
+# {{ $org := "oxid-esales" }}organisation: {{ $org }}
+# {{ $name := "security-module" }}name: {{ $name }}
+# {{ $repo := "OXID-eSales/security-module" }}repo: {{ $repo }}
+
+install:
   cache:
     prepared_shop: false
-  composer:
-    transform: |
-      {
-          "require": {
-              "oxid-esales/oxideshop-ce": "{{ .Data.global.composer.dev_ref }}",
-              "oxid-esales/oxideshop-pe": "{{ .Data.global.composer.dev_ref }}",
-              "oxid-esales/twig-component": "{{ .Data.global.composer.dev_ref }}",
-              "oxid-esales/twig-component-pe": "{{ .Data.global.composer.dev_ref }}",
-              "oxid-esales/twig-admin-theme": "{{ .Data.global.composer.dev_ref }}",
-              "oxid-esales/apex-theme": "{{ .Data.global.composer.dev_ref }}",
-              "oxid-esales/developer-tools": "{{ .Data.global.composer.dev_ref }}",
-              "oxid-esales/security-module": "dev-{{ .Github.RefName }}"
-          },
-          "repositories": {
-            "oxid-esales/security-module": {
-              "type": "git",
-              "url": "https://github.com/OXID-eSales/security-module.git"
+  git:
+    repository: '{{ $repo }}'
+    ref: &ref '{{ .Github.RefName }}'
+    shop_url: 'https://github.com/OXID-eSales/security-module.git'
+    shop_ref: *ref
+    composer:
+      root_url: ''
+      transform: |
+        {
+            "require-dev": {
+                "oxid-esales/oxideshop-ce": "{{ .Data.global.composer.dev_ref }}",
+                "oxid-esales/oxideshop-pe": "{{ .Data.global.composer.dev_ref }}",
+                "oxid-esales/twig-component": "{{ .Data.global.composer.dev_ref }}",
+                "oxid-esales/twig-component-pe": "{{ .Data.global.composer.dev_ref }}",
+                "oxid-esales/twig-admin-theme": "{{ .Data.global.composer.dev_ref }}",
+                "oxid-esales/apex-theme": "{{ .Data.global.composer.dev_ref }}",
+                "oxid-esales/developer-tools": "{{ .Data.global.composer.dev_ref }}"
             },
-            "oxid-esales/oxideshop-ee": {
-              "type": "git",
-              "url": "https://github.com/OXID-eSales/oxideshop_ee.git"
+            "repositories": {
+              "oxid-esales/oxideshop-pe": {
+                "type": "git",
+                "url": "https://github.com/OXID-eSales/oxideshop_pe.git"
+              },
+              "oxid-esales/twig-component-ee": {
+                "type": "git",
+                "url": "https://github.com/OXID-eSales/twig-component-ee.git"
+              }
             },
-            "oxid-esales/oxideshop-pe": {
-              "type": "git",
-              "url": "https://github.com/OXID-eSales/oxideshop_pe.git"
-            },
-            "oxid-esales/twig-component-pe": {
-              "type": "git",
-              "url": "https://github.com/OXID-eSales/twig-component-pe.git"
-            },
-            "oxid-esales/twig-component-ee": {
-              "type": "git",
-              "url": "https://github.com/OXID-eSales/twig-component-ee.git"
+            "config": {
+              "allow-plugins": {
+                  "oxid-esales/oxideshop-composer-plugin": true,
+                  "oxid-esales/oxideshop-unified-namespace-generator": true
+              }
             }
-          }
-      }
+        }
   custom_script_container: |
     vendor/bin/oe-console oe:database:reset --db-host=mysql --db-port=3306 --db-name=example --db-user=root --db-password=root --force
+    vendor/bin/oe-console oe:module:install ./
+    vendor/bin/oe-eshop-doctrine_migration migrations:migrate
+    vendor/bin/oe-eshop-db_views_generate
     vendor/bin/oe-console oe:module:activate oe_security_module
     vendor/bin/oe-console oe:theme:activate apex
+
+install_shop_with_modules:
+  composer:
+    root_url: ''
 
 runscript: &runscript
   matrix:
@@ -53,7 +64,7 @@ runscript: &runscript
   composer:
     early: true
   security_module:
-    path: 'vendor/oxid-esales/security-module'
+    path: ''
 
 runslim:
   <<: *runscript
