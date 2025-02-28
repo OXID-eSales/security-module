@@ -25,7 +25,7 @@ class CaptchaAudioService implements CaptchaAudioServiceInterface
         $captcha = str_split($this->imageCaptchaService->getCaptcha());
 
         foreach ($captcha as $value) {
-            $files[] = self::SOUNDS_PATH . '/' . $value . '.wav';
+            $files[] = self::SOUNDS_PATH . '/' . $this->charFolder($value) . '/' . strtolower($value) . '.wav';
             $files[] = self::SOUNDS_PATH . '/silence.wav';
         }
 
@@ -126,5 +126,18 @@ class CaptchaAudioService implements CaptchaAudioServiceInterface
         $header = substr_replace($header, pack('V', 36 + $dataSize), 4, 4); // update ChunkSize
 
         return $header . $outputData;
+    }
+
+    private function charFolder(string $char): string
+    {
+        if (ctype_digit($char)) {
+            return 'number';
+        } elseif (ctype_upper($char)) {
+            return 'upper';
+        } elseif (ctype_lower($char)) {
+            return 'lower';
+        }
+
+        return '';
     }
 }
