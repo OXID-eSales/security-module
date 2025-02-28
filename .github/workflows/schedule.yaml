@@ -8,7 +8,7 @@ jobs:
   schedule_matrix:
     uses: oxid-eSales/github-actions/.github/workflows/universal_workflow_light.yaml@v4
     with:
-      testplan: '~/defaults/7.3.x.yaml,~/module-security.yaml'
+      testplan: '~/defaults/7.3.x.yaml,~/module-security-ee.yaml'
       runs_on: '["self-hosted", "x64"]'
       defaults: 'v4'
       plan_folder: '.github/oxid-esales'
