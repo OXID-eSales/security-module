@@ -23,6 +23,12 @@
     flex-direction: row;
     align-items: center;
 }
+.captcha-img {
+    transition: transform .2s;
+}
+.captcha-img:hover {
+    transform: scale(2);
+}
 
 .image-captcha .col-md-6 {
     flex: 1;

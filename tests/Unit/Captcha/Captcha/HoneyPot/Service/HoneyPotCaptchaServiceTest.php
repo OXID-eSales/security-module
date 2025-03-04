@@ -10,11 +10,13 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Tests\Unit\Captcha\Captcha\HoneyPot\Service;
 
 use OxidEsales\Eshop\Core\Request;
+use OxidEsales\EshopCommunity\Internal\Framework\Logger\Factory\LoggerFactoryInterface;
 use OxidEsales\SecurityModule\Captcha\Captcha\HoneyPot\Exception\CaptchaValidateException;
 use OxidEsales\SecurityModule\Captcha\Captcha\HoneyPot\Service\HoneyPotCaptchaService;
 use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 
 class HoneyPotCaptchaServiceTest extends TestCase
 {
@@ -56,9 +58,15 @@ class HoneyPotCaptchaServiceTest extends TestCase
             ->with(HoneyPotCaptchaService::CAPTCHA_REQUEST_PARAMETER)
             ->willReturn($value);
 
-        $sut = $this->getSut();
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger
+            ->expects($this->once())
+            ->method('debug');
 
-        $this->expectException(CaptchaValidateException::class);
+        $sut = $this->getSut(
+            logger: $logger
+        );
+
         $sut->validate($request);
     }
 
@@ -74,7 +82,14 @@ class HoneyPotCaptchaServiceTest extends TestCase
             ->with(HoneyPotCaptchaService::CAPTCHA_REQUEST_PARAMETER)
             ->willReturn($requestValue);
 
-        $sut = $this->getSut();
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger
+            ->expects($this->never())
+            ->method('debug');
+
+        $sut = $this->getSut(
+            logger: $logger
+        );
 
         $sut->validate($request);
     }
@@ -95,10 +110,12 @@ class HoneyPotCaptchaServiceTest extends TestCase
     }
 
     private function getSut(
-        ModuleSettingsServiceInterface $moduleSetting = null
+        ModuleSettingsServiceInterface $moduleSetting = null,
+        LoggerInterface $logger = null
     ): HoneyPotCaptchaService {
         return new HoneyPotCaptchaService(
-            moduleSetting: $moduleSetting ?? $this->createStub(ModuleSettingsServiceInterface::class)
+            moduleSetting: $moduleSetting ?? $this->createStub(ModuleSettingsServiceInterface::class),
+            logger: $logger ?? $this->createStub(LoggerInterface::class)
         );
     }
 }

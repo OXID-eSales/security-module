@@ -44,12 +44,12 @@ class ImageCaptchaService implements ImageCaptchaServiceInterface
 
     public function getCaptcha(): string
     {
-        return $this->session->getVariable(self::CAPTCHA_SESSION_PARAMETER);
+        return $this->session->getVariable(self::CAPTCHA_SESSION_PARAMETER) ?: '';
     }
 
     public function getCaptchaExpiration(): int
     {
-        return $this->session->getVariable(self::CAPTCHA_LIFETIME_SESSION_PARAMETER);
+        return $this->session->getVariable(self::CAPTCHA_LIFETIME_SESSION_PARAMETER) ?: 0;
     }
 
     /**
@@ -59,7 +59,7 @@ class ImageCaptchaService implements ImageCaptchaServiceInterface
     public function validate(Request $request): void
     {
         $this->captchaValidator->validate(
-            $request->getRequestParameter(self::CAPTCHA_REQUEST_PARAMETER),
+            $request->getRequestParameter(self::CAPTCHA_REQUEST_PARAMETER, ''),
             $this->getCaptcha(),
             $this->getCaptchaExpiration()
         );

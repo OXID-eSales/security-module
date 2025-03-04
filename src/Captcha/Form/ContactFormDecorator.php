@@ -17,7 +17,7 @@ class ContactFormDecorator
 {
     public function __construct(
         private ContactFormBridgeInterface $contactFormBridge,
-        private ContactFormCaptchaValidator $formCaptchaValidator
+        private ContactFormCaptchaValidatorInterface $formCaptchaValidator
     ) {
     }
 

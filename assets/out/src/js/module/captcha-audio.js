@@ -6,8 +6,23 @@
 export class CaptchaAudio {
     constructor(options) {
         this.url = options.url;
+        this.fieldTarget = options.fieldTarget;
+        this.delayInMilliseconds = 1000;
 
-        this.ajaxRequest();
+        this.registerEvents();
+    }
+
+    registerEvents() {
+        let self = this;
+        let requestDelayTimeout;
+
+        this.fieldTarget.addEventListener('click', function() {
+            if (typeof requestDelayTimeout === 'undefined' || requestDelayTimeout < Date.now()) {
+                self.ajaxRequest();
+
+                requestDelayTimeout = Date.now() + self.delayInMilliseconds;
+            }
+        });
     }
 
     ajaxRequest() {

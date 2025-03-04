@@ -41,7 +41,7 @@ services:
   OxidEsales\SecurityModule\Captcha\Captcha\Image\Validator\ImageCaptchaValidatorInterface:
     class: OxidEsales\SecurityModule\Captcha\Captcha\Image\Validator\ImageCaptchaValidator
 
-  OxidEsales\SecurityModule\Captcha\Form\ContactFormCaptchaValidator:
+  OxidEsales\SecurityModule\Captcha\Form\ContactFormCaptchaValidatorInterface:
     class: OxidEsales\SecurityModule\Captcha\Form\ContactFormCaptchaValidator
 
   OxidEsales\SecurityModule\Captcha\Form\ContactFormDecorator:
@@ -49,4 +49,4 @@ services:
     decoration_on_invalid: ignore
     arguments:
       - '@.inner'
-      - '@OxidEsales\SecurityModule\Captcha\Form\ContactFormCaptchaValidator'
+      - '@OxidEsales\SecurityModule\Captcha\Form\ContactFormCaptchaValidatorInterface'

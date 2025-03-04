@@ -1,0 +1,13 @@
+{% extends 'form/forgotpwd_email.html.twig' %}
+
+{% set captchaSettings = oViewConf.getSecurityModuleCaptchaSettings() %}
+
+{% block forgotpwd_email_field %}
+    {{ parent() }}
+
+    {% if captchaSettings.isCaptchaEnabled() %}
+        {% include '@oe_security_module/form/image_captcha.html.twig' with { required: true } %}
+
+        <script type="module" src="{{ oViewConf.getModuleUrl('oe_security_module', 'out/src/js/index.js') }}"></script>
+    {% endif %}
+{% endblock %}
