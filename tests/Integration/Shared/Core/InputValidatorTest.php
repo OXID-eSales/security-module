@@ -12,6 +12,7 @@ namespace OxidEsales\SecurityModule\Tests\Integration\Shared\Core;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Exception\InputException;
 use OxidEsales\Eshop\Core\Exception\UserException;
+use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\EshopCommunity\Tests\Integration\IntegrationTestCase;
 use OxidEsales\SecurityModule\Shared\Core\InputValidator;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -32,11 +33,30 @@ class InputValidatorTest extends IntegrationTestCase
 
     public static function dataProviderPasswordError(): iterable
     {
-        yield ['short', 'Das Passwort muss mindestens 8 Zeichen lang sein.'];
-        yield ['12345678', 'Das Passwort enthält keine Sonderzeichen.'];
-        yield ['password!', 'Das Passwort enthält keine Ziffer.'];
-        yield ['passw0rd!', 'Das Passwort enthält keine Großbuchstaben.'];
-        yield ['PASSW0RD!', 'Das Passwort enthält keine Kleinbuchstaben.'];
+        yield [
+            'short',
+            sprintf(Registry::getLang()->translateString('ERROR_PASSWORD_MIN_LENGTH'), 8)
+        ];
+
+        yield [
+            '12345678',
+            Registry::getLang()->translateString('ERROR_PASSWORD_MISSING_SPECIAL_CHARACTER')
+        ];
+
+        yield [
+            'password!',
+            Registry::getLang()->translateString('ERROR_PASSWORD_MISSING_DIGIT')
+        ];
+
+        yield [
+            'passw0rd!',
+            Registry::getLang()->translateString('ERROR_PASSWORD_MISSING_UPPER_CASE')
+        ];
+
+        yield [
+            'PASSW0RD!',
+            Registry::getLang()->translateString('ERROR_PASSWORD_MISSING_LOWER_CASE')
+        ];
     }
 
     public function testPasswordCheck(): void
@@ -61,6 +81,9 @@ class InputValidatorTest extends IntegrationTestCase
         $exception = $validator->checkPassword($userModelMock, $password, $password . rand());
 
         $this->assertInstanceOf(UserException::class, $exception);
-        $this->assertSame('Fehler: Die Passwörter stimmen nicht überein.', $exception->getMessage());
+        $this->assertSame(
+            Registry::getLang()->translateString('ERROR_MESSAGE_PASSWORD_DO_NOT_MATCH'),
+            $exception->getMessage()
+        );
     }
 }
