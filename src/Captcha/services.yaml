@@ -6,6 +6,10 @@ services:
       OxidEsales\Eshop\Core\Utils: '@=service("OxidEsales\\SecurityModule\\Core\\Registry").getUtils()'
       OxidEsales\Eshop\Core\Request: '@=service("OxidEsales\\SecurityModule\\Core\\Registry").getRequest()'
       OxidEsales\Eshop\Core\Session: '@=service("OxidEsales\\SecurityModule\\Core\\Registry").getSession()'
+      OxidEsales\Eshop\Core\Language: '@=service("OxidEsales\\SecurityModule\\Core\\Registry").getLang()'
+
+  OxidEsales\SecurityModule\Captcha\Infrastructure\LanguageWrapperInterface:
+    class: OxidEsales\SecurityModule\Captcha\Infrastructure\LanguageWrapper
 
   OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface:
     class: OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsService
