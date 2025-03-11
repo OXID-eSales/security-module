@@ -34,17 +34,15 @@ document.querySelectorAll('.password-toggle').forEach((el) => {
 });
 
 document.querySelectorAll('.captcha-reload').forEach((el) => {
-    el.addEventListener('click', function() {
-        new CaptchaRefresh({
-            url: document.getElementById('captcha').getAttribute('data-url')
-        })
-    });
+    new CaptchaRefresh({
+        url: document.getElementById('captcha').getAttribute('data-url'),
+        fieldTarget: el
+    })
 });
 
 document.querySelectorAll('.captcha-play').forEach((el) => {
-    el.addEventListener('click', function() {
-        new CaptchaAudio({
-            url: document.getElementById('captcha').getAttribute('data-url-audio')
-        })
-    });
+    new CaptchaAudio({
+        url: document.getElementById('captcha').getAttribute('data-url-audio'),
+        fieldTarget: el
+    })
 });

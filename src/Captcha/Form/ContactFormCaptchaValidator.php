@@ -12,11 +12,10 @@ namespace OxidEsales\SecurityModule\Captcha\Form;
 use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Request;
 use OxidEsales\EshopCommunity\Internal\Framework\Form\FormInterface;
-use OxidEsales\EshopCommunity\Internal\Framework\Form\FormValidatorInterface;
 use OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface;
 use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface;
 
-class ContactFormCaptchaValidator implements FormValidatorInterface
+class ContactFormCaptchaValidator implements ContactFormCaptchaValidatorInterface
 {
     /**
      * @var array

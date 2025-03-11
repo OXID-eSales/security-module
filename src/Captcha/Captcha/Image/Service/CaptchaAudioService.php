@@ -9,12 +9,15 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Captcha\Captcha\Image\Service;
 
+use OxidEsales\SecurityModule\Captcha\Infrastructure\LanguageWrapperInterface;
+
 class CaptchaAudioService implements CaptchaAudioServiceInterface
 {
     private const SOUNDS_PATH = __DIR__ . '/../../../../../assets/sounds';
 
     public function __construct(
-        private readonly ImageCaptchaServiceInterface $imageCaptchaService
+        private readonly ImageCaptchaServiceInterface $imageCaptchaService,
+        private readonly LanguageWrapperInterface $language
     ) {
     }
 
@@ -23,10 +26,22 @@ class CaptchaAudioService implements CaptchaAudioServiceInterface
         $files = [];
 
         $captcha = str_split($this->imageCaptchaService->getCaptcha());
+        $languageAbbr = $this->language->getCurrentLanguageAbbr();
+        $defaultLanguage = 'en';
+        $languagePath = realpath(self::SOUNDS_PATH . "/$languageAbbr");
+        if (!$languagePath || !is_dir($languagePath) || !$languageAbbr) {
+            $languageAbbr = $defaultLanguage;
+        }
 
         foreach ($captcha as $value) {
-            $files[] = self::SOUNDS_PATH . '/' . $this->charFolder($value) . '/' . strtolower($value) . '.wav';
-            $files[] = self::SOUNDS_PATH . '/silence.wav';
+            $files[] = self::SOUNDS_PATH .
+                '/' . $languageAbbr .
+                '/' . $this->charFolder($value) .
+                '/' . strtolower($value) .
+                '.wav';
+            $files[] = self::SOUNDS_PATH .
+                '/' . $languageAbbr .
+                '/silence.wav';
         }
 
         $audioData = $this->joinwavs($files);
@@ -65,18 +80,28 @@ class CaptchaAudioService implements CaptchaAudioServiceInterface
                 $header .= fread($audioStream, max(1, (int)$info['Subchunk1Size'] - 16));
             }
 
-            // read SubChunk2ID
-            $header .= fread($audioStream, 4);
+            while (!feof($audioStream)) {
+                $chunkHeader = fread($audioStream, 8);
+                // @phpstan-ignore-next-line Ignored since fread may return false
+                if (strlen($chunkHeader) < 8) {
+                    break;
+                }
 
-            // read Subchunk2Size
-            $size = unpack('vsize', fread($audioStream, 4) ?: '') ?: [];
-            $size = $size['size'];
+                // @phpstan-ignore-next-line Ignored since fread may return false
+                $chunk = unpack('A4ChunkID/VChunkSize', $chunkHeader);
 
-            // read data
-            $data .= fread($audioStream, $size);
+                // @phpstan-ignore-next-line Ignored since unpack may return false
+                if ($chunk['ChunkID'] === 'data') {
+                    // When we find the 'data' chunk, we read the audio data
+                    $data .= fread($audioStream, $chunk['ChunkSize']);
+                    break;
+                }
+
+                fread($audioStream, $chunk['ChunkSize']);
+            }
         }
 
-        return $header . pack('V', strlen($data)) . $data;
+        return $header . "data" . pack('V', strlen($data)) . $data;
     }
 
     /**
