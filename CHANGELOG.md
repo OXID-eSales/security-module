@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Image Captcha Protection to prevent automated bot submissions.
 - Audio Captcha Support for accessibility, allowing users to hear the captcha text.
 - Honeypot Captcha to detect and block bots without disrupting user experience.
+- Support of PHP 8.4
 
 ## [1.0.0] - 2024-11-27
 This is the stable release of v1.0.0. No changes have been made since v1.0.0-rc.1.
