@@ -11,6 +11,7 @@ namespace OxidEsales\SecurityModule\Shared\Core;
 
 use OxidEsales\SecurityModule\Captcha\Captcha\Image\Service\ImageCaptchaService;
 use OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface;
+use OxidEsales\SecurityModule\OAuth\Service\ProviderCollectorInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsServiceInterface as PasswordSettingsServiceInterface;
 use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface as CaptchaSettingsServiceInterface;
 use OxidEsales\Eshop\Core\Registry;
@@ -49,5 +50,10 @@ class ViewConfig extends ViewConfig_parent
         $images = $this->getService(CaptchaServiceInterface::class)->generate();
 
         return 'data:image/jpeg;base64,' . base64_encode($images[ImageCaptchaService::CAPTCHA_NAME]);
+    }
+
+    public function getProviders(): iterable
+    {
+        return $this->getService(ProviderCollectorInterface::class)->getProviders();
     }
 }

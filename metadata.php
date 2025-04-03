@@ -42,7 +42,8 @@ $aModule = [
         'captcha' => \OxidEsales\SecurityModule\Captcha\Controller\CaptchaController::class,
         'password' => \OxidEsales\SecurityModule\PasswordPolicy\Controller\PasswordAjaxController::class,
         '2fa' => \OxidEsales\SecurityModule\TwoFA\Controller\TwoFactorAuthController::class,
-        '2faregister' => \OxidEsales\SecurityModule\TwoFA\Controller\TwoFactorAuthRegisterController::class
+        '2faregister' => \OxidEsales\SecurityModule\TwoFA\Controller\TwoFactorAuthRegisterController::class,
+        'oauth' => \OxidEsales\SecurityModule\OAuth\Controller\OAuthController::class,
     ],
     'templates'   => [
     ],

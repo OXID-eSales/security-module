@@ -32,7 +32,9 @@
         "oxid-esales/codeception-page-objects": "dev-b-7.3.x",
         "mikey179/vfsstream": "^1.6",
         "pragmarx/google2fa": "^v8.0.3",
-        "bacon/bacon-qr-code": "v3.0.1"
+        "bacon/bacon-qr-code": "v3.0.1",
+        "league/oauth2-google": "4.0.1",
+        "league/oauth2-facebook": "2.2.0"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
