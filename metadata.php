@@ -34,11 +34,15 @@ $aModule = [
         \OxidEsales\Eshop\Application\Controller\NewsletterController::class => \OxidEsales\SecurityModule\Captcha\Shop\NewsletterController::class,
         \OxidEsales\Eshop\Application\Model\User::class => \OxidEsales\SecurityModule\Shared\Model\User::class,
         \OxidEsales\Eshop\Core\InputValidator::class    => \OxidEsales\SecurityModule\Shared\Core\InputValidator::class,
-        \OxidEsales\Eshop\Core\ViewConfig::class        => \OxidEsales\SecurityModule\Shared\Core\ViewConfig::class
+        \OxidEsales\Eshop\Core\ViewConfig::class        => \OxidEsales\SecurityModule\Shared\Core\ViewConfig::class,
+
+        \OxidEsales\Eshop\Application\Component\UserComponent::class => \OxidEsales\SecurityModule\TwoFA\Component\UserComponent::class,
     ],
     'controllers' => [
         'captcha' => \OxidEsales\SecurityModule\Captcha\Controller\CaptchaController::class,
-        'password' => \OxidEsales\SecurityModule\PasswordPolicy\Controller\PasswordAjaxController::class
+        'password' => \OxidEsales\SecurityModule\PasswordPolicy\Controller\PasswordAjaxController::class,
+        '2fa' => \OxidEsales\SecurityModule\TwoFA\Controller\TwoFactorAuthController::class,
+        '2faregister' => \OxidEsales\SecurityModule\TwoFA\Controller\TwoFactorAuthRegisterController::class
     ],
     'templates'   => [
     ],

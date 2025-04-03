@@ -1,0 +1,8 @@
+services:
+  _defaults:
+    public: false
+    autowire: true
+
+  OxidEsales\SecurityModule\TwoFA\Service\TwoFactorAuthInterface:
+    class: OxidEsales\SecurityModule\TwoFA\Service\TwoFactorAuth
+    public: true

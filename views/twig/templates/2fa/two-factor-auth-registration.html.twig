@@ -1,0 +1,11 @@
+{% capture append = "oxidBlock_content" %}
+
+    Scan your QR code and add to authentication app:
+
+    <br />    <br />
+
+    {{ qrcode|raw }}
+
+{% endcapture %}
+
+{% include "layout/page.html.twig" %}

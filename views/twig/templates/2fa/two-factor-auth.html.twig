@@ -1,0 +1,20 @@
+{% capture append = "oxidBlock_content" %}
+
+    <form method="post" action="">
+        {{ oViewConf.getHiddenSid()|raw }}
+        {{ oViewConf.getNavFormParams()|raw }}
+
+        <input type="hidden" name="cl" value="2fa">
+        <input type="hidden" name="fnc" value="">
+        <input type="hidden" name="setsessioncookie" value="{{ setsessioncookie }}">
+        Please enter 2FA code:
+        <br />
+        <input type="text" name="code" value="" />
+        <br />
+        <button type="submit">Verify</button>
+    </form>
+
+
+{% endcapture %}
+
+{% include "layout/page.html.twig" %}

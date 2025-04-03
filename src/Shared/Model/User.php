@@ -56,9 +56,20 @@ class User extends User_parent
      */
     public function login($userName, $password, $setSessionCookie = false): bool
     {
+        //todo: checks if 2FA is enabled at all or for user
+        $login = parent::login($userName, $password, $setSessionCookie);
+
+        if ($this->isAdmin()) {
+            return $login;
+        }
+
+        Registry::getUtils()->redirect(
+            Registry::getConfig()->getShopHomeUrl() . 'cl=2fa&setsessioncookie=' . $setSessionCookie
+        );
+
         $settingsService = $this->getService(ModuleSettingsServiceInterface::class);
         if (!$settingsService->isCaptchaEnabled()) {
-            return parent::login($userName, $password, $setSessionCookie);
+            return $login;
         }
 
         if (!$this->isAdmin()) {
@@ -73,6 +84,6 @@ class User extends User_parent
             }
         }
 
-        return parent::login($userName, $password, $setSessionCookie);
+        return $login;
     }
 }
