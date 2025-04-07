@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Password validators are no longer used when password policy is disabled
+- Error in shop core settings forms
 
 ## [1.0.0] - 2024-11-27
 This is the stable release of v1.0.0. No changes have been made since v1.0.0-rc.1.

@@ -12,6 +12,7 @@ namespace OxidEsales\SecurityModule\Captcha\Form;
 use OxidEsales\EshopCommunity\Internal\Domain\Contact\Form\ContactFormBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Form\Form;
 use OxidEsales\EshopCommunity\Internal\Framework\Form\FormInterface;
+use OxidEsales\EshopCommunity\Internal\Framework\FormConfiguration\FormConfigurationInterface;
 
 class ContactFormDecorator
 {
@@ -36,5 +37,10 @@ class ContactFormDecorator
         $contactForm = $this->contactFormBridge->getContactForm();
 
         return $this->contactFormBridge->getContactFormMessage($contactForm);
+    }
+
+    public function getContactFormConfiguration(): FormConfigurationInterface
+    {
+        return $this->contactFormBridge->getContactFormConfiguration();
     }
 }
