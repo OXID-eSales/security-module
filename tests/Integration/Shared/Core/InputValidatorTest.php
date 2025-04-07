@@ -13,7 +13,9 @@ use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Exception\InputException;
 use OxidEsales\Eshop\Core\Exception\UserException;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\EshopCommunity\Tests\Integration\IntegrationTestCase;
+use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsServiceInterface;
 use OxidEsales\SecurityModule\Shared\Core\InputValidator;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -22,6 +24,8 @@ class InputValidatorTest extends IntegrationTestCase
     #[DataProvider('dataProviderPasswordError')]
     public function testInputValidationError($password, $expectedException): void
     {
+        $this->setPasswordState(true);
+
         $userModelMock = $this->createMock(User::class);
 
         $validator = oxNew(InputValidator::class);
@@ -85,5 +89,27 @@ class InputValidatorTest extends IntegrationTestCase
             Registry::getLang()->translateString('ERROR_MESSAGE_PASSWORD_DO_NOT_MATCH'),
             $exception->getMessage()
         );
+    }
+
+    public function testInputValidatorPasswordConstrainsAreSkipped(): void
+    {
+        $this->setPasswordState();
+
+        $userModelMock = $this->createMock(User::class);
+
+        $password = '12345678';
+
+        $validator = oxNew(InputValidator::class);
+        $result = $validator->checkPassword($userModelMock, $password, $password);
+
+        $this->assertNull($result);
+    }
+
+    private function setPasswordState(bool $state = false)
+    {
+        return ContainerFactory::getInstance()
+            ->getContainer()
+            ->get(ModuleSettingsServiceInterface::class)
+            ->saveIsPasswordPolicyEnabled($state);
     }
 }

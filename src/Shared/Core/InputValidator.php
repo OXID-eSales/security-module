@@ -29,7 +29,7 @@ class InputValidator extends InputValidator_parent
     {
         $settingsService = $this->getService(ModuleSettingsServiceInterface::class);
         if (!$settingsService->isPasswordPolicyEnabled()) {
-            parent::checkPassword($user, $newPassword, $confirmationPassword, $shouldCheckPasswordLength);
+            return parent::checkPassword($user, $newPassword, $confirmationPassword, $shouldCheckPasswordLength);
         }
 
         $passwordValidator = $this->getService(PasswordValidatorChainInterface::class);
