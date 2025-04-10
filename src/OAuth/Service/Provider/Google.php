@@ -25,9 +25,9 @@ class Google implements ProviderInterface
     public function authenticate(): void
     {
         $provider = new GoogleProvider([
-            'clientId'          => '{google-app-id}',
-            'clientSecret'      => '{google-app-secret}',
-            'redirectUri'  => 'http://127.0.0.1/?cl=captcha&fnc=access'
+            'clientId'     => '29518356239-stt1somdnqn4hkoojuneerotqbdetq5u.apps.googleusercontent.com',
+            'clientSecret' => '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',
+            'redirectUri'  => 'http://localhost.local/?cl=oauth&fnc=register'
         ]);
 
         if (!empty($_GET['error'])) {

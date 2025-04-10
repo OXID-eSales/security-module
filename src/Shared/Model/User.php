@@ -63,6 +63,10 @@ class User extends User_parent
             return $login;
         }
 
+        Registry::getSession()->setVariable(
+            'usr',
+            $this->getUser()->getId()
+        );
         Registry::getUtils()->redirect(
             Registry::getConfig()->getShopHomeUrl() . 'cl=2fa&setsessioncookie=' . $setSessionCookie
         );

@@ -8,11 +8,12 @@
 namespace OxidEsales\SecurityModule\TwoFA\Controller;
 
 use OxidEsales\Eshop\Application\Controller\FrontendController;
+use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\SecurityModule\TwoFA\Service\TwoFactorAuthInterface;
 
 class TwoFactorAuthRegisterController extends FrontendController
 {
-    protected $_sThisTemplate = '@oe_security_module/templates/2fa/two-factor-auth-registration';
+    protected $template = '@oe_security_module/templates/2fa/two-factor-auth-registration';
 
     public function render()
     {
@@ -20,6 +21,11 @@ class TwoFactorAuthRegisterController extends FrontendController
         $template = parent::render();
 
         $user = $this->getUser();
+        if (!$user) {
+            Registry::getUtils()->redirect(
+                Registry::getConfig()->getShopHomeUrl()
+            );
+        }
 
         $this->addTplParam(
             'qrcode',

@@ -25,7 +25,7 @@ class TwoFactorAuth implements TwoFactorAuthInterface
         return $secret;
     }
 
-    public function QrUrlGenerate(string $username): string
+    public function QRUrlGenerate(string $username): string
     {
         $secret = $this->secretGenerate();
 
@@ -38,11 +38,6 @@ class TwoFactorAuth implements TwoFactorAuthInterface
         );
     }
 
-    public function codeVerify(): bool
-    {
-        return true;
-    }
-
     public function QRCodeGenerate(string $username): string
     {
         $writer = new Writer(
@@ -53,9 +48,14 @@ class TwoFactorAuth implements TwoFactorAuthInterface
         );
 
         return $writer->writeString(
-            $this->QrUrlGenerate(
+            $this->QRUrlGenerate(
                 $username
             )
         );
+    }
+
+    public function generateOTPCode(): int
+    {
+        return rand(100000, 999999);
     }
 }

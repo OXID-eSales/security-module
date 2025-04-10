@@ -24,6 +24,5 @@ class OAuthController extends FrontendController
                 $provider->authenticate();
             }
         }
-
     }
 }

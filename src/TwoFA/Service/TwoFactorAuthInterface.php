@@ -5,12 +5,11 @@
  * See LICENSE file for license details.
  */
 
-
 namespace OxidEsales\SecurityModule\TwoFA\Service;
 
 interface TwoFactorAuthInterface
 {
-    public function codeVerify(): bool;
-
     public function QRCodeGenerate(string $username): string;
+
+    public function generateOTPCode(): int;
 }
