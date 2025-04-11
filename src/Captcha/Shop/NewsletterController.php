@@ -9,8 +9,8 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Captcha\Shop;
 
+use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\SecurityModule\Captcha\Captcha\Image\Exception\CaptchaValidateException;
 use OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface;
 use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface;
 
@@ -19,7 +19,7 @@ class NewsletterController extends NewsletterController_parent
     public function send(): ?bool
     {
         $settingsService = $this->getService(ModuleSettingsServiceInterface::class);
-        if (!$settingsService->isCaptchaEnabled()) {
+        if (!$settingsService->isCaptchaEnabled() && !$settingsService->isHoneyPotCaptchaEnabled()) {
             return parent::send();
         }
 
@@ -29,7 +29,7 @@ class NewsletterController extends NewsletterController_parent
             $captchaService->validate(
                 Registry::getRequest()
             );
-        } catch (CaptchaValidateException $e) {
+        } catch (StandardException $e) {
             Registry::getUtilsView()->addErrorToDisplay($e->getMessage());
             return false;
         }

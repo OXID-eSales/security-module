@@ -67,6 +67,7 @@ class HoneyPotCaptchaServiceTest extends TestCase
             logger: $logger
         );
 
+        $this->expectException(CaptchaValidateException::class);
         $sut->validate($request);
     }
 

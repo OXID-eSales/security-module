@@ -12,7 +12,8 @@ namespace OxidEsales\SecurityModule\Shared\Model;
 use OxidEsales\Eshop\Core\Exception\InputException;
 use OxidEsales\Eshop\Core\Exception\UserException;
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\SecurityModule\Captcha\Captcha\Image\Exception\CaptchaValidateException;
+use OxidEsales\SecurityModule\Captcha\Captcha\Image\Exception\CaptchaValidateException as ImageCaptchaException;
+use OxidEsales\SecurityModule\Captcha\Captcha\HoneyPot\Exception\CaptchaValidateException as HoneyPotCaptchaException;
 use OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface;
 use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface;
 use OxidEsales\SecurityModule\Shared\Core\InputValidator;
@@ -28,7 +29,7 @@ class User extends User_parent
     public function checkValues($sLogin, $sPassword, $sPassword2, $aInvAddress, $aDelAddress): void
     {
         $settingsService = $this->getService(ModuleSettingsServiceInterface::class);
-        if ($settingsService->isCaptchaEnabled()) {
+        if ($settingsService->isCaptchaEnabled() || $settingsService->isHoneyPotCaptchaEnabled()) {
             /** @var InputValidator $oInputValidator */
             $oInputValidator = Registry::getInputValidator();
             $captchaService = $this->getService(CaptchaServiceInterface::class);
@@ -37,7 +38,7 @@ class User extends User_parent
                 $captchaService->validate(
                     Registry::getRequest()
                 );
-            } catch (CaptchaValidateException $e) {
+            } catch (ImageCaptchaException $e) {
                 $oInputValidator->addValidationError(
                     "captcha",
                     oxNew(
@@ -45,6 +46,8 @@ class User extends User_parent
                         Registry::getLang()->translateString($e->getMessage())
                     )
                 );
+            } catch (HoneyPotCaptchaException $e) {
+                throw $e;
             }
         }
 
@@ -68,7 +71,7 @@ class User extends User_parent
                 $captchaService->validate(
                     Registry::getRequest()
                 );
-            } catch (CaptchaValidateException $e) {
+            } catch (ImageCaptchaException $e) {
                 throw oxNew(UserException::class, $e->getMessage());
             }
         }

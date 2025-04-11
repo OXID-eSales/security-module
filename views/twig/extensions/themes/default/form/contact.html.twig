@@ -3,18 +3,18 @@
 {% set captchaSettings = oViewConf.getSecurityModuleCaptchaSettings() %}
 
 {% block captcha_form %}
-    {% if captchaSettings.isCaptchaEnabled() %}
-        {% block image_captcha %}
+    {% block image_captcha %}
+        {% if captchaSettings.isCaptchaEnabled() %}
             {% include '@oe_security_module/form/image_captcha.html.twig' with { required: true } %}
-        {% endblock %}
+        {% endif %}
+    {% endblock %}
 
-        {% block honeypot_captcha %}
-            {% if captchaSettings.isHoneyPotCaptchaEnabled() %}
-                {% include '@oe_security_module/form/honeypot_captcha.html.twig' %}
-            {% endif %}
-        {% endblock %}
+    {% block honeypot_captcha %}
+        {% if captchaSettings.isHoneyPotCaptchaEnabled() %}
+            {% include '@oe_security_module/form/honeypot_captcha.html.twig' %}
+        {% endif %}
+    {% endblock %}
 
-        <script type="module" src="{{ oViewConf.getModuleUrl('oe_security_module', 'out/src/js/index.js') }}"></script>
-    {% endif %}
+    <script type="module" src="{{ oViewConf.getModuleUrl('oe_security_module', 'out/src/js/index.js') }}"></script>
 {% endblock %}
 

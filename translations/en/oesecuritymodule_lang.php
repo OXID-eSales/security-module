@@ -23,6 +23,7 @@ $aLang = [
     'ERROR_EXPIRED_CAPTCHA'                    => 'CAPTCHA has expired.',
     'ERROR_INVALID_CAPTCHA'                    => 'CAPTCHA text is invalid.',
     'ERROR_EMPTY_CAPTCHA'                      => 'CAPTCHA field is empty. Please, enter the text from the image.',
+    'FORM_VALIDATION_FAILED'                   => 'Unexpected error occurred. Please refresh and try again.',
 
     'PASSWORD_REQUIREMENTS'              => 'Password requirements',
     'PASSWORD_MIN_LENGTH'                => 'Minimum %d characters.',

@@ -9,8 +9,8 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Captcha\Captcha\HoneyPot\Exception;
 
-use OxidEsales\Eshop\Core\Exception\StandardException;
+use OxidEsales\Eshop\Core\Exception\InputException;
 
-class CaptchaValidateException extends StandardException
+class CaptchaValidateException extends InputException
 {
 }

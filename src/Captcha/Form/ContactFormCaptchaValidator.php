@@ -38,7 +38,7 @@ class ContactFormCaptchaValidator implements ContactFormCaptchaValidatorInterfac
      */
     public function isValid(FormInterface $form)
     {
-        if (!$this->settingsService->isCaptchaEnabled()) {
+        if (!$this->settingsService->isCaptchaEnabled() && !$this->settingsService->isHoneyPotCaptchaEnabled()) {
             return true;
         }
 

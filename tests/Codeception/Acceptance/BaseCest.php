@@ -21,6 +21,11 @@ abstract class BaseCest
         return Fixtures::get('existingUser');
     }
 
+    protected function getNewUserData()
+    {
+        return Fixtures::get('newUser');
+    }
+
     protected function setPasswordState(bool $state)
     {
         ContainerFacade::get(PasswordSettingsServiceInterface::class)->saveIsPasswordPolicyEnabled($state);

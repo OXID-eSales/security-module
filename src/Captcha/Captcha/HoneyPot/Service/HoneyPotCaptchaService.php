@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Captcha\Captcha\HoneyPot\Service;
 
 use OxidEsales\Eshop\Core\Request;
+use OxidEsales\SecurityModule\Captcha\Captcha\HoneyPot\Exception\CaptchaValidateException;
 use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface;
 use Psr\Log\LoggerInterface;
 
@@ -43,7 +44,8 @@ class HoneyPotCaptchaService implements HoneyPotCaptchaServiceInterface
         }
 
         if (strlen($value) > 1) {
-            $this->logger->debug('FORM_VALIDATION_FAILED');
+            $this->logger->debug('HONEYPOT_VALIDATION_FAILED');
+            throw new CaptchaValidateException('FORM_VALIDATION_FAILED');
         }
     }
 
