@@ -8,4 +8,10 @@
 
         <script type="module" src="{{ oViewConf.getModuleUrl('oe_security_module', 'out/src/js/index.js') }}"></script>
     {% endif %}
+
+    {% block honeypot_captcha %}
+        {% if captchaSettings.isHoneyPotCaptchaEnabled() %}
+            {% include '@oe_security_module/form/honeypot_captcha.html.twig' %}
+        {% endif %}
+    {% endblock %}
 {% endblock %}

@@ -32,6 +32,7 @@ $aModule = [
     'email'       => 'info@oxid-esales.com',
     'extend'      => [
         \OxidEsales\Eshop\Application\Controller\NewsletterController::class => \OxidEsales\SecurityModule\Captcha\Shop\NewsletterController::class,
+        \OxidEsales\Eshop\Application\Controller\ForgotPasswordController::class => \OxidEsales\SecurityModule\Captcha\Shop\ForgotPasswordController::class,
         \OxidEsales\Eshop\Application\Model\User::class => \OxidEsales\SecurityModule\Shared\Model\User::class,
         \OxidEsales\Eshop\Core\InputValidator::class    => \OxidEsales\SecurityModule\Shared\Core\InputValidator::class,
         \OxidEsales\Eshop\Core\ViewConfig::class        => \OxidEsales\SecurityModule\Shared\Core\ViewConfig::class

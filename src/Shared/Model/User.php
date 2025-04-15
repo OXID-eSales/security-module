@@ -60,7 +60,7 @@ class User extends User_parent
     public function login($userName, $password, $setSessionCookie = false): bool
     {
         $settingsService = $this->getService(ModuleSettingsServiceInterface::class);
-        if (!$settingsService->isCaptchaEnabled()) {
+        if (!$settingsService->isCaptchaEnabled() && !$settingsService->isHoneyPotCaptchaEnabled()) {
             return parent::login($userName, $password, $setSessionCookie);
         }
 
@@ -71,7 +71,7 @@ class User extends User_parent
                 $captchaService->validate(
                     Registry::getRequest()
                 );
-            } catch (ImageCaptchaException $e) {
+            } catch (ImageCaptchaException | HoneyPotCaptchaException $e) {
                 throw oxNew(UserException::class, $e->getMessage());
             }
         }
