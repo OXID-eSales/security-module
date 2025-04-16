@@ -26,3 +26,8 @@ class_alias(
     \OxidEsales\Eshop\Application\Controller\NewsletterController::class,
     \OxidEsales\SecurityModule\Captcha\Shop\NewsletterController_parent::class
 );
+
+class_alias(
+    \OxidEsales\Eshop\Application\Controller\ForgotPasswordController::class,
+    \OxidEsales\SecurityModule\Captcha\Shop\ForgotPasswordController_parent::class
+);

@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Tests\Integration\Captcha\Shop;
 
-use OxidEsales\Eshop\Application\Controller\NewsletterController;
+use OxidEsales\Eshop\Application\Controller\ForgotPasswordController;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
 use OxidEsales\Eshop\Core\UtilsView;
@@ -17,7 +17,7 @@ use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
 use OxidEsales\EshopCommunity\Tests\Integration\IntegrationTestCase;
 use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface;
 
-class NewsletterControllerTest extends IntegrationTestCase
+class ForgotPasswordControllerTest extends IntegrationTestCase
 {
     protected UtilsView $utilsViewMock;
     protected Request $requestMock;
@@ -45,7 +45,7 @@ class NewsletterControllerTest extends IntegrationTestCase
         Registry::getSession()->setVariable('captcha_expiration', time() + 60);
     }
 
-    public function testSendWithValidCaptcha()
+    public function testForgotPasswordWithValidCaptcha()
     {
         $this->requestMock
             ->method('getRequestParameter')
@@ -53,10 +53,7 @@ class NewsletterControllerTest extends IntegrationTestCase
                 if ($param === 'captcha') {
                     return 'valid_captcha';
                 }
-                if ($param === 'lastname_confirm') {
-                    return '';
-                }
-                return ['oxuser__oxusername' => '']; //suppress warnings from shop
+                return '';
             });
 
         $this->utilsViewMock
@@ -66,11 +63,11 @@ class NewsletterControllerTest extends IntegrationTestCase
                 $this->assertNotEquals('ERROR_INVALID_CAPTCHA', $message);
             });
 
-        $subject = oxNew(NewsletterController::class);
-        $subject->send();
+        $subject = oxNew(ForgotPasswordController::class);
+        $subject->forgotPassword();
     }
 
-    public function testSendWithInvalidCaptcha()
+    public function testForgotPasswordWithInvalidCaptcha()
     {
         $this->requestMock
             ->method('getRequestParameter')
@@ -82,27 +79,11 @@ class NewsletterControllerTest extends IntegrationTestCase
             ->method('addErrorToDisplay')
             ->with('ERROR_INVALID_CAPTCHA');
 
-        $subject = oxNew(NewsletterController::class);
-        $subject->send();
+        $subject = oxNew(ForgotPasswordController::class);
+        $subject->forgotPassword();
     }
 
-    public function testSendWithEmptyCaptcha()
-    {
-        $this->requestMock
-            ->method('getRequestParameter')
-            ->with('captcha')
-            ->willReturn('');
-
-        $this->utilsViewMock
-            ->expects($this->once())
-            ->method('addErrorToDisplay')
-            ->with('ERROR_EMPTY_CAPTCHA');
-
-        $subject = oxNew(NewsletterController::class);
-        $subject->send();
-    }
-
-    public function testSendWithInvalidHoneyPotCaptcha()
+    public function testForgotPasswordWithInvalidHoneyPotCaptcha()
     {
         $this->requestMock
             ->method('getRequestParameter')
@@ -121,7 +102,23 @@ class NewsletterControllerTest extends IntegrationTestCase
             ->method('addErrorToDisplay')
             ->with('FORM_VALIDATION_FAILED');
 
-        $subject = oxNew(NewsletterController::class);
-        $subject->send();
+        $subject = oxNew(ForgotPasswordController::class);
+        $subject->forgotPassword();
+    }
+
+    public function testForgotPasswordWithEmptyCaptcha()
+    {
+        $this->requestMock
+            ->method('getRequestParameter')
+            ->with('captcha')
+            ->willReturn('');
+
+        $this->utilsViewMock
+            ->expects($this->once())
+            ->method('addErrorToDisplay')
+            ->with('ERROR_EMPTY_CAPTCHA');
+
+        $subject = oxNew(ForgotPasswordController::class);
+        $subject->forgotPassword();
     }
 }

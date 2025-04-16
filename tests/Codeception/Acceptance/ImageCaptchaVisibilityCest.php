@@ -13,6 +13,7 @@ use Codeception\Example;
 use Codeception\Util\Fixtures;
 use OxidEsales\Codeception\Module\Translation\Translator;
 use OxidEsales\Codeception\Page\Account\UserLogin;
+use OxidEsales\Codeception\Page\Account\UserPasswordReminder;
 use OxidEsales\SecurityModule\Tests\Codeception\Support\AcceptanceTester;
 
 /**
@@ -88,6 +89,19 @@ class ImageCaptchaVisibilityCest extends BaseCest
 
         $homePage = $I->openShop();
         $homePage->openAccountMenu();
+
+        $this->checkVisibility($I, $example['visibility']);
+    }
+
+    /**
+     * @dataProvider captchaDataProvider
+     */
+    public function testCaptchaImageOnForgotPasswordPage(AcceptanceTester $I, Example $example): void
+    {
+        $this->setCaptchaState($example['enabled']);
+
+        $forgotPwdPage = new UserPasswordReminder($I);
+        $I->amOnPage($forgotPwdPage->URL);
 
         $this->checkVisibility($I, $example['visibility']);
     }

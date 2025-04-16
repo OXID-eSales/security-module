@@ -11,6 +11,8 @@ namespace OxidEsales\SecurityModule\Tests\Codeception\Acceptance;
 
 use Codeception\Util\Fixtures;
 use OxidEsales\Codeception\Module\Translation\Translator;
+use OxidEsales\Codeception\Page\Account\UserLogin;
+use OxidEsales\Codeception\Page\Account\UserPasswordReminder;
 use OxidEsales\Codeception\Page\DataObject\ContactData;
 use OxidEsales\SecurityModule\Tests\Codeception\Support\AcceptanceTester;
 
@@ -20,7 +22,13 @@ use OxidEsales\SecurityModule\Tests\Codeception\Support\AcceptanceTester;
  */
 class HoneyPotCaptchaCest extends BaseCest
 {
-    private string $honeyPotInput = "lastname_confirm";
+    private string $honeyPotInput = 'lastname_confirm';
+    private string $loginForm = 'main.content form[name="login"]';
+    private string $loginBoxForm = 'header form[name="login"]';
+    private string $newsletterForm = 'main.content form.needs-validation';
+    private string $contactForm = 'main.content form.needs-validation';
+    private string $registerForm = 'main.content form[name="order"]';
+    private string $forgotPwdForm = 'main.content form[name="forgotpwd"]';
 
     public function _before(AcceptanceTester $I): void
     {
@@ -34,7 +42,9 @@ class HoneyPotCaptchaCest extends BaseCest
         $registrationPage = $homePage->openUserRegistrationPage();
         $userData = $this->getNewUserData();
         $this->fillRegistrationForm($I, $userData);
-        $I->executeJS("document.querySelector('input[name=\"$this->honeyPotInput\"]').value = 'some value';");
+        $I->executeJS(
+            "document.querySelector('$this->registerForm input[name=\"$this->honeyPotInput\"]').value = 'some value';"
+        );
         $I->retryClick($registrationPage->saveFormButton);
 
         $I->see(Translator::translate('FORM_VALIDATION_FAILED'));
@@ -49,7 +59,9 @@ class HoneyPotCaptchaCest extends BaseCest
         $contactData = new ContactData();
         $contactData->setEmail($userData['userLoginName']);
         $contactPage->fillInContactData($contactData);
-        $I->executeJS("document.querySelector('input[name=\"$this->honeyPotInput\"]').value = 'some value';");
+        $I->executeJS(
+            "document.querySelector('$this->contactForm input[name=\"$this->honeyPotInput\"]').value = 'some value';"
+        );
         $contactPage->sendContactData();
 
         $I->see(Translator::translate('FORM_VALIDATION_FAILED'));
@@ -62,8 +74,61 @@ class HoneyPotCaptchaCest extends BaseCest
 
         $homePage = $I->openShop();
         $newsletterPage = $homePage->subscribeForNewsletter($userData['userLoginName']);
-        $I->executeJS("document.querySelector('input[name=\"$this->honeyPotInput\"]').value = 'some value';");
+        $I->executeJS(
+            "document.querySelector('$this->newsletterForm input[name=\"$this->honeyPotInput\"]').value = 'some value';"
+        );
         $newsletterPage->subscribe();
+
+        $I->see(Translator::translate('FORM_VALIDATION_FAILED'));
+    }
+
+    public function testHoneyPotCaptchaOnLoginPage(AcceptanceTester $I): void
+    {
+        $userData = Fixtures::get('existingUser');
+
+        $userLoginPage = new UserLogin($I);
+        $I->amOnPage($userLoginPage->URL);
+        $I->see(Translator::translate('LOGIN'));
+
+        $I->executeJS(
+            "document.querySelector('$this->loginForm input[name=\"$this->honeyPotInput\"]').value = 'some value';"
+        );
+        $userLoginPage->loginWithError($userData['userLoginName'], $userData['userPassword']);
+
+        $I->see(Translator::translate('FORM_VALIDATION_FAILED'));
+    }
+
+    public function testHoneyPotCaptchaOnLoginBox(AcceptanceTester $I): void
+    {
+
+        $userData = Fixtures::get('existingUser');
+
+        $homePage = $I->openShop();
+        $accountMenu = $homePage->openAccountMenu();
+        $I->waitForText(Translator::translate('FORGOT_PASSWORD'));
+        $I->retryFillField($accountMenu->userLoginName, $userData['userLoginName']);
+        $I->retryFillField($accountMenu->userLoginPassword, $userData['userPassword']);
+        $I->executeJS(
+            "document.querySelector('$this->loginBoxForm input[name=\"$this->honeyPotInput\"]').value = 'some value';"
+        );
+        $I->retryClick($accountMenu->userLoginButton);
+        $I->waitForPageLoad();
+
+        $I->see(Translator::translate('FORM_VALIDATION_FAILED'));
+    }
+
+    public function testHoneyPotCaptchaOnForgotPasswordPage(AcceptanceTester $I): void
+    {
+
+        $userData = Fixtures::get('existingUser');
+
+        $forgotPwdPage = new UserPasswordReminder($I);
+        $I->amOnPage($forgotPwdPage->URL);
+
+        $I->executeJS(
+            "document.querySelector('$this->forgotPwdForm input[name=\"$this->honeyPotInput\"]').value = 'some value';"
+        );
+        $forgotPwdPage->resetPassword($userData['userLoginName']);
 
         $I->see(Translator::translate('FORM_VALIDATION_FAILED'));
     }
