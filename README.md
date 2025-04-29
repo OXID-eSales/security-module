@@ -14,8 +14,8 @@ A collection of security features for OXID eShop
 This module assumes you have OXID eShop Compilation version 7.3.0 installed.
 
 ### Branches
-* 1.1.0.x versions (or b-7.3.x branch) are compatible with OXID eShop compilation 7.3.x. b-7.3.x shop compilation branches
-* 1.0.0.x versions (or b-7.2.x branch) are compatible with OXID eShop compilation 7.2.x. b-7.2.x shop compilation branches
+* 2.0.0.x versions (or b-7.3.x branch) are compatible with OXID eShop compilation 7.3.x.
+* 1.0.0.x versions (or b-7.2.x branch) are compatible with OXID eShop compilation 7.2.x.
 
 # Development installation
 
