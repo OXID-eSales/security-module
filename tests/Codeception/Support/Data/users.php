@@ -16,19 +16,19 @@ return [
         'userLastName'  => 'UserSurnamešÄßüл',
     ],
     'newUser' => [
-        'inputFields' => [
-            'userLoginName'              => 'new_test_user@oxid-esales.dev',
-            'userPassword'               => 'useruser',
-            'userPasswordConfirm'        => 'useruser',
-            'invadr[oxuser__oxfname]'    => 'New',
-            'invadr[oxuser__oxlname]'    => 'User',
-            'invadr[oxuser__oxstreet]'   => 'Street',
-            'invadr[oxuser__oxstreetnr]' => '55',
-            'invadr[oxuser__oxzip]'      => '5555',
-            'invadr[oxuser__oxcity]'     => 'City',
+        'loginData' => [
+            'userLoginNameField' => 'new_test_user@oxid-esales.dev',
+            'userPasswordField'  => 'useruser',
         ],
-        'selectFields' => [
-            'invCountrySelect' => 'a7c40f631fc920687.20179984'
-        ]
+        'address' => [
+            'userSalutation' => 'Mr',
+            'userFirstName'  => 'New',
+            'userLastName'   => 'User',
+            'street'         => 'Street',
+            'streetNr'       => '55',
+            'ZIP'            => '5555',
+            'city'           => 'City',
+            'countryId'      => 'Germany',
+        ],
     ]
 ];

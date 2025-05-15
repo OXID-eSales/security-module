@@ -41,21 +41,10 @@ class CheckoutCest extends BaseCest
         $basket = new Basket($I);
         $userCheckout = $basket->addProductToBasketAndOpenUserCheckout('1000', 1);
         $userCheckout->selectOptionNoRegistration();
-        $userCheckout->enterUserLoginName('test-user@oxid-esales.com');
-        $userCheckout->enterAddressData([
-            'userSalutation' => 'Mrs',
-            'userFirstName' => 'John',
-            'userLastName' => 'Doe',
-            'companyName' => 'XYZ Corp.',
-            'street' => 'Main St',
-            'streetNr' => '10',
-            'ZIP' => '90210',
-            'city' => 'Los Angeles',
-            'additionalInfo' => 'Floor 5, Office 2',
-            'fonNr' => '123-456-7890',
-            'faxNr' => '098-765-4321',
-            'countryId' => 'Germany',
-        ]);
+
+        $userData = $this->getNewUserData();
+        $userCheckout->enterUserLoginName($userData['loginData']['userLoginNameField']);
+        $userCheckout->enterAddressData($userData['address']);
         $userCheckout->goToNextStep();
     }
 

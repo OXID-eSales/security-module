@@ -41,7 +41,8 @@ class HoneyPotCaptchaCest extends BaseCest
         $homePage = $I->openShop();
         $registrationPage = $homePage->openUserRegistrationPage();
         $userData = $this->getNewUserData();
-        $this->fillRegistrationForm($I, $userData);
+        $registrationPage->enterUserLoginData($userData['loginData']);
+        $registrationPage->enterAddressData($userData['address']);
         $I->executeJS(
             "document.querySelector('$this->registerForm input[name=\"$this->honeyPotInput\"]').value = 'some value';"
         );
@@ -131,16 +132,5 @@ class HoneyPotCaptchaCest extends BaseCest
         $forgotPwdPage->resetPassword($userData['userLoginName']);
 
         $I->see(Translator::translate('FORM_VALIDATION_FAILED'));
-    }
-
-    private function fillRegistrationForm(AcceptanceTester $I, array $userData)
-    {
-        foreach ($userData['inputFields'] as $key => $value) {
-            $I->fillField("#$key", $value);
-        }
-
-        foreach ($userData['selectFields'] as $key => $value) {
-            $I->selectOption("select#$key", $value);
-        }
     }
 }
