@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0-rc.2] - unreleased
+
+### Added
+- Image Captcha and Honeypot protection for checkout without registration form
+- Shared/Model/User::shouldValidateCaptcha allowing customization of conditions needed to run checkValues
+
+### Fixed
+- Checkout process is no longer blocked when Image Captcha or Honeypot protection is enabled
+
 ## [2.0.0-rc.1] - 2025-04-29
 
 ### Added

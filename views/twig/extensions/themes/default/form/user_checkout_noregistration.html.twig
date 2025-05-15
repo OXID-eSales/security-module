@@ -1,0 +1,16 @@
+{% extends 'form/user_checkout_noregistration.html.twig' %}
+
+{% set captchaSettings = oViewConf.getSecurityModuleCaptchaSettings() %}
+
+{% block user_checkout_noregistration_form %}
+    {{ parent() }}
+
+    {% if captchaSettings.isCaptchaEnabled() %}
+        {% include '@oe_security_module/form/image_captcha.html.twig' with { required: true } %}
+        <script type="module" src="{{ oViewConf.getModuleUrl('oe_security_module', 'out/src/js/index.js') }}"></script>
+    {% endif %}
+
+    {% if captchaSettings.isHoneyPotCaptchaEnabled() %}
+        {% include '@oe_security_module/form/honeypot_captcha.html.twig' %}
+    {% endif %}
+{% endblock %}

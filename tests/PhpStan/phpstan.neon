@@ -8,3 +8,4 @@ parameters:
     scanFiles:
         - ../../vendor/oxid-esales/oxideshop-ce/source/oxfunctions.php
         - ../../vendor/oxid-esales/oxideshop-ce/source/overridablefunctions.php
+    treatPhpDocTypesAsCertain: false

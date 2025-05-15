@@ -28,8 +28,7 @@ class User extends User_parent
 {
     public function checkValues($sLogin, $sPassword, $sPassword2, $aInvAddress, $aDelAddress): void
     {
-        $settingsService = $this->getService(ModuleSettingsServiceInterface::class);
-        if ($settingsService->isCaptchaEnabled() || $settingsService->isHoneyPotCaptchaEnabled()) {
+        if ($this->isCaptchaEnabled() && $this->shouldValidateCaptcha()) {
             /** @var InputValidator $oInputValidator */
             $oInputValidator = Registry::getInputValidator();
             $captchaService = $this->getService(CaptchaServiceInterface::class);
@@ -59,8 +58,7 @@ class User extends User_parent
      */
     public function login($userName, $password, $setSessionCookie = false): bool
     {
-        $settingsService = $this->getService(ModuleSettingsServiceInterface::class);
-        if (!$settingsService->isCaptchaEnabled() && !$settingsService->isHoneyPotCaptchaEnabled()) {
+        if (!$this->isCaptchaEnabled()) {
             return parent::login($userName, $password, $setSessionCookie);
         }
 
@@ -77,5 +75,16 @@ class User extends User_parent
         }
 
         return parent::login($userName, $password, $setSessionCookie);
+    }
+
+    private function isCaptchaEnabled(): bool
+    {
+        $settingsService = $this->getService(ModuleSettingsServiceInterface::class);
+        return $settingsService->isCaptchaEnabled() || $settingsService->isHoneyPotCaptchaEnabled();
+    }
+
+    protected function shouldValidateCaptcha(): bool
+    {
+        return !$this->getUser();
     }
 }

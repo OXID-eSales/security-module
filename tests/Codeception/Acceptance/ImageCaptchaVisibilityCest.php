@@ -14,6 +14,7 @@ use Codeception\Util\Fixtures;
 use OxidEsales\Codeception\Module\Translation\Translator;
 use OxidEsales\Codeception\Page\Account\UserLogin;
 use OxidEsales\Codeception\Page\Account\UserPasswordReminder;
+use OxidEsales\Codeception\Step\Basket;
 use OxidEsales\SecurityModule\Tests\Codeception\Support\AcceptanceTester;
 
 /**
@@ -102,6 +103,20 @@ class ImageCaptchaVisibilityCest extends BaseCest
 
         $forgotPwdPage = new UserPasswordReminder($I);
         $I->amOnPage($forgotPwdPage->URL);
+
+        $this->checkVisibility($I, $example['visibility']);
+    }
+
+    /**
+     * @dataProvider captchaDataProvider
+     */
+    public function testCaptchaImageOnCheckoutWithoutRegistration(AcceptanceTester $I, Example $example): void
+    {
+        $this->setCaptchaState($example['enabled']);
+
+        $basket = new Basket($I);
+        $userCheckout = $basket->addProductToBasketAndOpenUserCheckout('1000', 1);
+        $userCheckout->selectOptionNoRegistration();
 
         $this->checkVisibility($I, $example['visibility']);
     }
