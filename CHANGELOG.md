@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.0.0-rc.2] - unreleased
+## [2.0.0-rc.2] - 2025-05-22
 
 ### Added
 - Image Captcha and Honeypot protection for checkout without registration form
@@ -37,6 +37,7 @@ This is the stable release of v1.0.0. No changes have been made since v1.0.0-rc.
 - Button for generating strong password
 - Button for show/hide password in password fields
 
+[2.0.0-rc.2]: https://github.com/OXID-eSales/security-module/compare/v2.0.0-rc.1...v2.0.0-rc.2
 [2.0.0-rc.1]: https://github.com/OXID-eSales/security-module/compare/v1.0.0...v2.0.0-rc.1
 [1.0.0]: https://github.com/OXID-eSales/security-module/compare/v1.0.0-rc.1...v1.0.0
 [1.0.0-rc.1]: https://github.com/OXID-eSales/security-module/releases/tag/v1.0.0-rc.1
