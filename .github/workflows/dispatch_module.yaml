@@ -31,7 +31,7 @@ on:
 
 jobs:
   build_testplan:
-    runs-on: ["self-hosted", "x64"]
+    runs-on: ["arc-runner-set"]
     outputs:
       testplan: '${{ steps.build_testplan.outputs.testplan }}'
     steps:
@@ -61,7 +61,7 @@ jobs:
     uses: oxid-eSales/github-actions/.github/workflows/universal_workflow_light.yaml@v4
     with:
       testplan: ${{ needs.build_testplan.outputs.testplan }}
-      runs_on: '["self-hosted", "x64"]'
+      runs_on: '["arc-runner-set"]'
       defaults: 'v4'
       plan_folder: '.github/oxid-esales'
     secrets:
@@ -80,7 +80,7 @@ jobs:
     uses: oxid-eSales/github-actions/.github/workflows/universal_workflow_light.yaml@v0
     with:
       testplan: ${{ needs.build_testplan.outputs.testplan }}
-      runs_on: '["self-hosted", "x64"]'
+      runs_on: '["arc-runner-set"]'
       defaults: 'v0'
       plan_folder: '.github/oxid-esales'
     secrets:
