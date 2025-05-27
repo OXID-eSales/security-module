@@ -32,11 +32,9 @@ class ContactFormDecorator
         return $contactForm;
     }
 
-    public function getContactFormMessage(): string
+    public function getContactFormMessage(FormInterface $form): string
     {
-        $contactForm = $this->contactFormBridge->getContactForm();
-
-        return $this->contactFormBridge->getContactFormMessage($contactForm);
+        return $this->contactFormBridge->getContactFormMessage($form);
     }
 
     public function getContactFormConfiguration(): FormConfigurationInterface

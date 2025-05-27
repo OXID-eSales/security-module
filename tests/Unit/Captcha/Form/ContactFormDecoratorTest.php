@@ -11,7 +11,6 @@ namespace OxidEsales\SecurityModule\Tests\Unit\Captcha\Form;
 
 use OxidEsales\EshopCommunity\Internal\Domain\Contact\Form\ContactFormBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Form\Form;
-use OxidEsales\SecurityModule\Captcha\Form\ContactFormCaptchaValidator;
 use OxidEsales\SecurityModule\Captcha\Form\ContactFormCaptchaValidatorInterface;
 use OxidEsales\SecurityModule\Captcha\Form\ContactFormDecorator;
 use PHPUnit\Framework\TestCase;
@@ -52,11 +51,6 @@ class ContactFormDecoratorTest extends TestCase
         $contactFormBridge = $this->createMock(ContactFormBridgeInterface::class);
         $contactFormBridge
             ->expects($this->once())
-            ->method('getContactForm')
-            ->willReturn($form);
-
-        $contactFormBridge
-            ->expects($this->once())
             ->method('getContactFormMessage')
             ->with($form)
             ->willReturn($expectedMessage);
@@ -66,7 +60,7 @@ class ContactFormDecoratorTest extends TestCase
             $formCaptchaValidator
         );
 
-        $result = $decorator->getContactFormMessage();
+        $result = $decorator->getContactFormMessage($form);
         $this->assertEquals($expectedMessage, $result);
     }
 }
