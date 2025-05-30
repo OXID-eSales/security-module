@@ -23,7 +23,7 @@ $aLang = [
     'ERROR_EXPIRED_CAPTCHA'                    => 'CAPTCHA ist abgelaufen.',
     'ERROR_INVALID_CAPTCHA'                    => 'CAPTCHA Texteingabe ist nicht korrekt.',
     'ERROR_EMPTY_CAPTCHA'                      => 'CAPTCHA Eingabefeld bitte mit dem Bildtext füllen.',
-    'FORM_VALIDATION_FAILED'                   => 'Unexpected error occurred. Please refresh and try again.',
+    'FORM_VALIDATION_FAILED'                   => 'Unerwarteter Fehler aufgetreten. Bitte aktualisieren Sie die Seite und versuchen Sie es erneut.',
 
     'PASSWORD_REQUIREMENTS'              => 'Passwort-Anforderungen',
     'PASSWORD_MIN_LENGTH'                => 'Mindestens %d Zeichen.',
