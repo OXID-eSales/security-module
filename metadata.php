@@ -26,7 +26,7 @@ $aModule = [
         'de' => 'Werkzeuge zum Schutz Ihres Shops und zur Sicherung von Kundenkonten.'
     ],
     'thumbnail'   => 'logo.png',
-    'version'     => '2.0.0-rc.2',
+    'version'     => '2.0.0-rc.3',
     'author'      => 'OXID eSales AG',
     'url'         => 'https://github.com/OXID-eSales/security-module',
     'email'       => 'info@oxid-esales.com',
