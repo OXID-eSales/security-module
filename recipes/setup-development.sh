@@ -38,14 +38,14 @@ docker compose up --build -d php
 
 docker compose exec -T php git config --global --add safe.directory /var/www
 
-$SCRIPT_PATH/parts/shared/require_shop_edition_packages.sh -e"${edition}" -v"dev-b-7.3.x"
-$SCRIPT_PATH/parts/shared/require_twig_components.sh -e"${edition}" -b"b-7.3.x"
-$SCRIPT_PATH/parts/shared/require.sh -n"oxid-esales/developer-tools" -v"dev-b-7.3.x"
-$SCRIPT_PATH/parts/shared/require.sh -n"oxid-esales/oxideshop-doctrine-migration-wrapper" -v"dev-b-7.3.x"
-$SCRIPT_PATH/parts/shared/require_demodata_package.sh -e"${edition}" -b"b-7.3.x"
-$SCRIPT_PATH/parts/shared/require_theme.sh -t"apex" -b"b-7.3.x"
+$SCRIPT_PATH/parts/shared/require_shop_edition_packages.sh -e"${edition}" -v"dev-b-7.4.x"
+$SCRIPT_PATH/parts/shared/require_twig_components.sh -e"${edition}" -b"b-7.4.x"
+$SCRIPT_PATH/parts/shared/require.sh -n"oxid-esales/developer-tools" -v"dev-b-7.4.x"
+$SCRIPT_PATH/parts/shared/require.sh -n"oxid-esales/oxideshop-doctrine-migration-wrapper" -v"dev-b-7.4.x"
+$SCRIPT_PATH/parts/shared/require_demodata_package.sh -e"${edition}" -b"b-7.4.x"
+$SCRIPT_PATH/parts/shared/require_theme.sh -t"apex" -b"b-7.4.x"
 
-docker-compose exec -T -w /var/www php \
+docker compose exec -T -w /var/www php \
        composer config allow-plugins.oxid-esales/oxideshop-composer-plugin true
 
 docker compose exec -T php composer update --no-interaction
