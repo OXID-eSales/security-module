@@ -1,16 +1,16 @@
-name: Auto trigger on Push to 7.3.x*
+name: Auto trigger on Push to 7.4.x*
 
 on:
   pull_request: {}
   push:
     branches:
-      - 'b-7.3.x**'
+      - 'b-7.4.x**'
 
 jobs:
   php82_mysql80:
     uses: oxid-eSales/github-actions/.github/workflows/universal_workflow_light.yaml@v4
     with:
-      testplan: '~/defaults/7.3.x.yaml,~/defaults/php8.3_mysql8.0_only.yaml,~/module-security-ee.yaml'
+      testplan: '~/defaults/7.4.x.yaml,~/defaults/php8.3_mysql8.0_only.yaml,~/module-security-ee.yaml'
       runs_on: '["arc-runner-set"]'
       defaults: 'v4'
       plan_folder: '.github/oxid-esales'
