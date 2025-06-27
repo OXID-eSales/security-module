@@ -1,7 +1,7 @@
 # OXID Security Module
 A collection of security features for OXID eShop
 
-[![Development](https://github.com/OXID-eSales/security-module/actions/workflows/trigger.yaml/badge.svg?branch=b-7.3.x)](https://github.com/OXID-eSales/security-module/actions/workflows/trigger.yaml)
+[![Development](https://github.com/OXID-eSales/security-module/actions/workflows/trigger.yaml/badge.svg?branch=b-7.4.x)](https://github.com/OXID-eSales/security-module/actions/workflows/trigger.yaml)
 [![Latest Version](https://img.shields.io/packagist/v/OXID-eSales/security-module?logo=composer&label=latest&include_prereleases&color=orange)](https://packagist.org/packages/oxid-esales/security-module)
 [![PHP Version](https://img.shields.io/packagist/php-v/oxid-esales/security-module)](https://github.com/oxid-esales/security-module)
 
@@ -11,9 +11,10 @@ A collection of security features for OXID eShop
 
 ## Compatibility
 
-This module assumes you have OXID eShop Compilation version 7.3.0 installed.
+This module assumes you have OXID eShop Compilation version 7.4.0 installed.
 
 ### Branches
+* b-7.4.x branch is compatible with OXID eShop compilation 7.4.x
 * 2.0.0.x versions (or b-7.3.x branch) are compatible with OXID eShop compilation 7.3.x.
 * 1.0.0.x versions (or b-7.2.x branch) are compatible with OXID eShop compilation 7.2.x.
 
@@ -28,7 +29,7 @@ In case of different environment usage, please adjust by your own needs.
 # Development installation on OXID eShop SDK
 
 The installation instructions below are shown for the current [SDK](https://github.com/OXID-eSales/docker-eshop-sdk)
-for shop 7.3. Make sure your system meets the requirements of the SDK.
+for shop 7.4. Make sure your system meets the requirements of the SDK.
 
 0. Ensure all docker containers are down to avoid port conflicts
 
@@ -39,7 +40,7 @@ echo MyProject && git clone https://github.com/OXID-eSales/docker-eshop-sdk.git 
 
 2. Clone the repository to the source directory
 ```shell
-git clone --recurse-submodules https://github.com/OXID-eSales/security-module.git --branch=b-7.3.x ./source
+git clone --recurse-submodules https://github.com/OXID-eSales/security-module.git --branch=b-7.4.x ./source
 ```
 
 3. Run the recipe to setup the development environment
