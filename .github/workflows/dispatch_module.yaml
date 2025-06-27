@@ -3,12 +3,6 @@ name: Manual trigger
 on:
   workflow_dispatch:
     inputs:
-      edition:
-        type: choice
-        options:
-          - 'pe'
-          - 'ee'
-        default: 'ee'
       limit:
         type: choice
         options:
@@ -31,7 +25,7 @@ on:
 
 jobs:
   build_testplan:
-    runs-on: ["arc-runner-set"]
+    runs-on: 'ubuntu-latest'
     outputs:
       testplan: '${{ steps.build_testplan.outputs.testplan }}'
     steps:
@@ -52,7 +46,7 @@ jobs:
           esac
 
           # shellcheck disable=SC2088
-          TESTPLAN="~/defaults/7.4.x.yaml,${LIMIT}~/module-security-${{inputs.edition}}.yaml"
+          TESTPLAN="~/defaults/7.4.x.yaml,${LIMIT}~/module-security-ce.yaml"
           echo "testplan=${TESTPLAN}" | tee -a "${GITHUB_OUTPUT}"
 
   dispatch_stable:
@@ -61,7 +55,7 @@ jobs:
     uses: oxid-eSales/github-actions/.github/workflows/universal_workflow_light.yaml@v4
     with:
       testplan: ${{ needs.build_testplan.outputs.testplan }}
-      runs_on: '["arc-runner-set"]'
+      runs_on: '"ubuntu-latest"'
       defaults: 'v4'
       plan_folder: '.github/oxid-esales'
     secrets:
@@ -80,7 +74,7 @@ jobs:
     uses: oxid-eSales/github-actions/.github/workflows/universal_workflow_light.yaml@v0
     with:
       testplan: ${{ needs.build_testplan.outputs.testplan }}
-      runs_on: '["arc-runner-set"]'
+      runs_on: 'ubuntu-latest'
       defaults: 'v0'
       plan_folder: '.github/oxid-esales'
     secrets:
