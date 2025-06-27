@@ -1,0 +1,13 @@
+{% set captchaSettings = oViewConf.getSecurityModuleCaptchaSettings() %}
+
+{% block image_captcha %}
+    {% if captchaSettings.isCaptchaEnabled() %}
+        {% include '@oe_security_module/form/image_captcha.html.twig' with { required: true } %}
+    {% endif %}
+{% endblock %}
+
+{% block honeypot_captcha %}
+    {% if captchaSettings.isHoneyPotCaptchaEnabled() %}
+        {% include '@oe_security_module/form/honeypot_captcha.html.twig' %}
+    {% endif %}
+{% endblock %}

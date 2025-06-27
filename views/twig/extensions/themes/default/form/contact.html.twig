@@ -1,20 +1,6 @@
 {% extends 'form/contact.html.twig' %}
 
-{% set captchaSettings = oViewConf.getSecurityModuleCaptchaSettings() %}
-
 {% block captcha_form %}
-    {% block image_captcha %}
-        {% if captchaSettings.isCaptchaEnabled() %}
-            {% include '@oe_security_module/form/image_captcha.html.twig' with { required: true } %}
-        {% endif %}
-    {% endblock %}
-
-    {% block honeypot_captcha %}
-        {% if captchaSettings.isHoneyPotCaptchaEnabled() %}
-            {% include '@oe_security_module/form/honeypot_captcha.html.twig' %}
-        {% endif %}
-    {% endblock %}
-
-    <script type="module" src="{{ oViewConf.getModuleUrl('oe_security_module', 'out/src/js/index.js') }}"></script>
+    {% include '@oe_security_module/form/captcha.html.twig' %}
 {% endblock %}
 
