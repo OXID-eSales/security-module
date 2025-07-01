@@ -52,7 +52,14 @@ function getSourceRelativePackagePath(Facts $facts): string
 
 function getCodeceptionSpecificFixtureFilePath(): string
 {
-    return Path::join(__DIR__, '../Support/Data', 'fixtures.sql');
+    $path = 'fixtures.sql';
+
+    $facts = new Facts();
+    if ($facts->getEdition() == 'EE') {
+        $path = 'fixtures_ee.sql';
+    }
+
+    return Path::join(__DIR__, '../Support/Data', $path);
 }
 
 function getMysqlConfigPath(): string
