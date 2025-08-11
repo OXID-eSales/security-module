@@ -8,7 +8,7 @@
 namespace OxidEsales\SecurityModule\PasswordPolicy\Validation\Service;
 
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\InvalidValidatorTypeException;
-use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordValidateException;
+use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordCollectionException;
 
 /**
  * @throws InvalidValidatorTypeException
@@ -16,7 +16,7 @@ use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordValida
 interface PasswordValidatorChainInterface
 {
     /**
-     * @throws PasswordValidateException
+     * @throws PasswordCollectionException
      */
     public function validatePassword(#[\SensitiveParameter] string $password): void;
 }

@@ -10,8 +10,9 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Tests\Unit\PasswordPolicy\Validation\Service;
 
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\InvalidValidatorTypeException;
-use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordSpecialCharException;
-use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordValidateException;
+use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordCollectionException;
+use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordMinimumLengthException;
+use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordUpperCaseException;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordValidatorChain;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Validator\PasswordValidatorInterface;
 use PHPUnit\Framework\TestCase;
@@ -45,30 +46,31 @@ class PasswordValidatorChainTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testValidatorWillThrowFirstFailingValidatorException(): void
+    public function testValidatorWillThrowAllFailingValidatorExceptions(): void
     {
         $validator1Mock = $this->createMock(PasswordValidatorInterface::class);
         $validator1Mock->method('isEnabled')->willReturn(true);
+        $validator1Mock->method('validate')
+            ->willThrowException(new PasswordUpperCaseException());
 
         $validator2Mock = $this->createMock(PasswordValidatorInterface::class);
         $validator2Mock->method('isEnabled')->willReturn(true);
-
-        $expectedException = new PasswordValidateException();
-        $validator2Mock->method('validate')->willThrowException($expectedException);
-
-        $validator3Mock = $this->createMock(PasswordValidatorInterface::class);
-        $validator3Mock->method('isEnabled')->willReturn(true);
-        $validator3Mock->method('validate')->willThrowException(new \Exception());
-
-        $this->expectException(PasswordSpecialCharException::class);
+        $validator2Mock->method('validate')
+            ->willThrowException(new PasswordMinimumLengthException(8));
 
         $passwordValidatorChain = new PasswordValidatorChain([
             $validator1Mock,
             $validator2Mock,
-            $validator3Mock,
         ]);
 
-        $this->expectExceptionObject($expectedException);
-        $passwordValidatorChain->validatePassword(uniqid());
+        try {
+            $passwordValidatorChain->validatePassword(uniqid());
+        } catch (PasswordCollectionException $e) {
+            $exceptions = $e->getValidationExceptions();
+
+            $this->assertCount(2, $exceptions);
+            $this->assertInstanceOf(PasswordUpperCaseException::class, $exceptions[0]);
+            $this->assertInstanceOf(PasswordMinimumLengthException::class, $exceptions[1]);
+        }
     }
 }

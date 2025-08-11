@@ -38,17 +38,17 @@ class InputValidatorTest extends IntegrationTestCase
     public static function dataProviderPasswordError(): iterable
     {
         yield [
-            'short',
+            'Sh0rt.',
             sprintf(Registry::getLang()->translateString('ERROR_PASSWORD_MIN_LENGTH'), 8)
         ];
 
         yield [
-            '12345678',
+            'o1234S678',
             Registry::getLang()->translateString('ERROR_PASSWORD_MISSING_SPECIAL_CHARACTER')
         ];
 
         yield [
-            'password!',
+            'Password!',
             Registry::getLang()->translateString('ERROR_PASSWORD_MISSING_DIGIT')
         ];
 

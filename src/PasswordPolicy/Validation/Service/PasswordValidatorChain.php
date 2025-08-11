@@ -10,6 +10,8 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\PasswordPolicy\Validation\Service;
 
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\InvalidValidatorTypeException;
+use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordCollectionException;
+use OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception\PasswordValidateException;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Validator\PasswordValidatorInterface;
 
 class PasswordValidatorChain implements PasswordValidatorChainInterface
@@ -29,12 +31,21 @@ class PasswordValidatorChain implements PasswordValidatorChainInterface
 
     public function validatePassword(#[\SensitiveParameter] string $password): void
     {
+        $exceptions = [];
         foreach ($this->validators as $validator) {
             if (!$validator->isEnabled()) {
                 continue;
             }
 
-            $validator->validate($password);
+            try {
+                $validator->validate($password);
+            } catch (PasswordValidateException $e) {
+                $exceptions[] = $e;
+            }
+        }
+
+        if (!empty($exceptions)) {
+            throw new PasswordCollectionException($exceptions);
         }
     }
 }
