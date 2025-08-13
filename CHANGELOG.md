@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Extracted reusable Twig code into captcha.html.twig and password.html.twig
 
+### Changed
+- Show multiple errors on invalid password
+
 ## [2.0.0] - 2025-06-11
 This is the stable release of v2.0.0. No changes have been made since v2.0.0-rc.3.
 
