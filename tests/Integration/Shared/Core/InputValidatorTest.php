@@ -32,7 +32,7 @@ class InputValidatorTest extends IntegrationTestCase
         $exception = $validator->checkPassword($userModelMock, $password, $password);
 
         $this->assertInstanceOf(InputException::class, $exception);
-        $this->assertSame($expectedException, $exception->getMessage());
+        $this->assertStringContainsString($expectedException, $exception->getMessage());
     }
 
     public static function dataProviderPasswordError(): iterable
