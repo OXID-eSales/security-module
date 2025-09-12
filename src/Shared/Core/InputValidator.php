@@ -39,16 +39,11 @@ class InputValidator extends InputValidator_parent
             $passwordValidator->validatePassword($newPassword);
         } catch (PasswordCollectionException $e) {
             $exceptionFactory = $this->getService(ExceptionFactoryInterface::class);
-            foreach ($e->getValidationExceptions() as $key => $error) {
-                if ($key === count($e->getValidationExceptions()) - 1) {
-                    return $this->addValidationError(
-                        "oxuser__oxpassword",
-                        $exceptionFactory->create($error)
-                    );
-                }
 
-                Registry::getUtilsView()->addErrorToDisplay($exceptionFactory->create($error));
-            }
+            return $this->addValidationError(
+                "oxuser__oxpassword",
+                $exceptionFactory->create($e)
+            );
         }
 
         return parent::checkPassword($user, $newPassword, $confirmationPassword, $shouldCheckPasswordLength);

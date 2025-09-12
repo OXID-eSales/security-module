@@ -9,9 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\PasswordPolicy\Validation\Exception;
 
-use OxidEsales\Eshop\Core\Exception\InputException;
-
-class PasswordCollectionException extends InputException
+class PasswordCollectionException extends PasswordValidateException
 {
     /**
      * @var PasswordValidateException[]
@@ -20,6 +18,7 @@ class PasswordCollectionException extends InputException
 
     public function __construct(array $exceptions)
     {
+        parent::__construct();
         $this->exceptions = $exceptions;
     }
 
