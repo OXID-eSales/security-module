@@ -6,30 +6,24 @@
 install:
   cache:
     prepared_shop: false
-  git:
-    repository: '{{ $repo }}'
-    ref: &ref '{{ .Github.RefName }}'
-    shop_url: 'https://github.com/OXID-eSales/security-module.git'
-    shop_ref: *ref
-    composer:
-      root_url: ''
-      transform: |
-        {
-            "require-dev": {
-                "oxid-esales/oxideshop-ce": "{{ .Data.global.composer.dev_ref }}",
-                "oxid-esales/twig-component": "{{ .Data.global.composer.dev_ref }}",
-                "oxid-esales/twig-admin-theme": "{{ .Data.global.composer.dev_ref }}",
-                "oxid-esales/apex-theme": "{{ .Data.global.composer.dev_ref }}",
-                "oxid-esales/developer-tools": "{{ .Data.global.composer.dev_ref }}",
-                "oxid-esales/security-module": "dev-{{ .Github.RefName }}"
-            },
-            "config": {
-              "allow-plugins": {
-                  "oxid-esales/oxideshop-composer-plugin": true,
-                  "oxid-esales/oxideshop-unified-namespace-generator": true
-              }
-            }
+  composer:
+    root_url: ''
+    transform: |
+      {
+        "require-dev": {
+          "oxid-esales/oxideshop-ce": "{{ .Data.install.composer.dev_ref }}",
+          "oxid-esales/twig-component": "{{ .Data.install.composer.dev_ref }}",
+          "oxid-esales/twig-admin-theme": "{{ .Data.install.composer.dev_ref }}",
+          "oxid-esales/apex-theme": "{{ .Data.install.composer.dev_ref }}",
+          "oxid-esales/developer-tools": "{{ .Data.install.composer.dev_ref }}"
+        },
+        "config": {
+          "allow-plugins": {
+            "oxid-esales/oxideshop-composer-plugin": true,
+            "oxid-esales/oxideshop-unified-namespace-generator": true
+          }
         }
+      }
   custom_script_container: |
     vendor/bin/oe-console oe:database:reset --db-host=mysql --db-port=3306 --db-name=example --db-user=root --db-password=root --force
     vendor/bin/oe-console oe:module:install ./
@@ -38,31 +32,28 @@ install:
     vendor/bin/oe-console oe:module:activate oe_security_module
     vendor/bin/oe-console oe:theme:activate apex
 
-install_shop_with_modules:
-  composer:
-    root_url: ''
-
 runscript: &runscript
   matrix:
     script: |
       [
-        "security_module:tests-unit",
-        "security_module:tests-integration",
-        "security_module:tests-codeception"
+        "report:tests-unit",
+        "report:tests-integration",
+        "no_report:tests-codeception"
       ]
-  composer:
-    early: true
-  security_module:
+  report:
     path: ''
+  no_report:
+    path: ''
+    coverage_prefix: ''
 
 runslim:
   <<: *runscript
   matrix:
     script: |
       [
-        "security_module:phpcs",
-        "security_module:phpstan",
-        "security_module:phpmd"
+        "no_report:phpcs",
+        "report:phpstan-report",
+        "no_report:phpmd"
       ]
 
 sonarcloud:
@@ -72,12 +63,12 @@ sonarcloud:
   project_key: 'OXID-eSales_security-module'
   project_name: 'oxid-esales/security-module'
   organization: 'oxid-esales'
-  parameters: |
-    -Dsonar.language=php \
-    -Dsonar.scm.provider=git \
-    -Dsonar.sources=src \
-    -Dsonar.tests=tests \
+  parameters: >
+    -Dsonar.language=php
+    -Dsonar.scm.provider=git
+    -Dsonar.sources=src
+    -Dsonar.tests=tests
     -Dsonar.php.phpstan.reportPaths=coverage-reports/phpstan.report.json
 
 finish:
-  slack_title: 'Security module ({{ .Data.global.git.shop_ref }}) by {{ .Github.Actor }}'
+  slack_title: 'Security module ({{ .Data.install.git.ref }}) by {{ .Github.Actor }}'
