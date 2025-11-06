@@ -1,0 +1,17 @@
+services:
+  _defaults:
+    public: false
+    autowire: true
+
+  OxidEsales\SecurityModule\Authentication\OAuth2\Service\ModuleSettingsServiceInterface:
+    class: OxidEsales\SecurityModule\Authentication\OAuth2\Service\ModuleSettingsService
+    public: true
+
+  OxidEsales\SecurityModule\Authentication\OAuth2\Service\ProviderCollectorInterface:
+    class: OxidEsales\SecurityModule\Authentication\OAuth2\Service\ProviderCollector
+    public: true
+    arguments:
+      $providers: !tagged 'security.oauth.tag.provider'
+
+  OxidEsales\SecurityModule\Authentication\OAuth2\Service\Provider\Facebook\Facebook:
+    tags: [ 'security.oauth.tag.provider' ]

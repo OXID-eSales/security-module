@@ -4,6 +4,7 @@ namespace OxidEsales\SecurityModule\Authentication\OAuth2\Service\Provider;
 
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Token\AccessTokenInterface;
+use OxidEsales\SecurityModule\Authentication\OAuth2\DataType\UserDataTypeInterface;
 
 interface ProviderInterface
 {
@@ -33,7 +34,7 @@ interface ProviderInterface
      * Fetch user information (claims) from the provider using the access token.
      * Should return standardized data: id, email, name, avatar, etc.
      */
-    public function getUserInfo(AccessTokenInterface $token): array;
+    public function getUserInfo(AccessTokenInterface $token): UserDataTypeInterface;
 
     /**
      * Validate the provider response.

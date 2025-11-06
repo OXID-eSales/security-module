@@ -9,6 +9,7 @@
  * Metadata version
  */
 
+use OxidEsales\SecurityModule\Authentication\OAuth2\Service\ModuleSettingsService;
 use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsService as PasswordPolicyModuleSettings;
 use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsService as CaptchaModuleSettings;
 use OxidEsales\SecurityModule\Core\Module;
@@ -109,6 +110,32 @@ $aModule = [
             'type'  => 'select',
             'constraints' => '5min|15min|30min',
             'value' => '15min'
-        ]
+        ],
+
+        //OAuth2 settings
+        [
+            'group' => 'oauth',
+            'name'  => ModuleSettingsService::FACEBOOK_ACTIVE,
+            'type'  => 'bool',
+            'value' => false
+        ],
+        [
+            'group' => 'oauth',
+            'name'  => ModuleSettingsService::FACEBOOK_CLIENT_ID,
+            'type'  => 'string',
+            'value' => ''
+        ],
+        [
+            'group' => 'oauth',
+            'name'  => ModuleSettingsService::FACEBOOK_CLIENT_SECRET,
+            'type'  => 'string',
+            'value' => ''
+        ],
+        [
+            'group' => 'oauth',
+            'name'  => ModuleSettingsService::FACEBOOK_REDIRECT_URL,
+            'type'  => 'string',
+            'value' => ''
+        ],
     ],
 ];

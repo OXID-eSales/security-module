@@ -1,0 +1,21 @@
+<?php
+
+/**
+ * Copyright © OXID eSales AG. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
+namespace OxidEsales\SecurityModule\Authentication\OAuth2\Service;
+
+use Symfony\Component\String\UnicodeString;
+
+interface ModuleSettingsServiceInterface
+{
+    public function isFacebookActive(): bool;
+
+    public function getFacebookClientId(): string;
+
+    public function getFacebookClientSecret(): string;
+
+    public function getFacebookRedirectUrl(): string;
+}
