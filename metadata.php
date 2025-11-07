@@ -9,9 +9,9 @@
  * Metadata version
  */
 
-use OxidEsales\SecurityModule\Authentication\OAuth2\Service\ModuleSettingsService;
 use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsService as PasswordPolicyModuleSettings;
 use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsService as CaptchaModuleSettings;
+use OxidEsales\SecurityModule\Authentication\OAuth2\Service\ModuleSettingsService as OAuthModuleSettings;
 use OxidEsales\SecurityModule\Core\Module;
 
 $sMetadataVersion = '2.1';
@@ -41,7 +41,6 @@ $aModule = [
     'controllers' => [
         'captcha' => \OxidEsales\SecurityModule\Captcha\Controller\CaptchaController::class,
         'password' => \OxidEsales\SecurityModule\PasswordPolicy\Controller\PasswordAjaxController::class,
-
         'oauth' => \OxidEsales\SecurityModule\Authentication\OAuth2\Controller\OAuthController::class
     ],
     'templates'   => [
@@ -117,27 +116,51 @@ $aModule = [
         //OAuth2 settings
         [
             'group' => 'oauth',
-            'name'  => ModuleSettingsService::FACEBOOK_ACTIVE,
+            'name'  => OAuthModuleSettings::FACEBOOK_ACTIVE,
             'type'  => 'bool',
             'value' => false
         ],
         [
             'group' => 'oauth',
-            'name'  => ModuleSettingsService::FACEBOOK_CLIENT_ID,
+            'name'  => OAuthModuleSettings::FACEBOOK_CLIENT_ID,
             'type'  => 'str',
             'value' => ''
         ],
         [
             'group' => 'oauth',
-            'name'  => ModuleSettingsService::FACEBOOK_CLIENT_SECRET,
+            'name'  => OAuthModuleSettings::FACEBOOK_CLIENT_SECRET,
             'type'  => 'str',
             'value' => ''
         ],
         [
             'group' => 'oauth',
-            'name'  => ModuleSettingsService::FACEBOOK_REDIRECT_URL,
+            'name'  => OAuthModuleSettings::FACEBOOK_REDIRECT_URL,
             'type'  => 'str',
             'value' => ''
         ],
+        [
+            'group' => 'oauth2',
+            'name'  => OAuthModuleSettings::GOOGLE_ACTIVE,
+            'type'  => 'bool',
+            'value' => true
+        ],
+        [
+            'group' => 'oauth2',
+            'name'  => OAuthModuleSettings::GOOGLE_CLIENT_ID,
+            'type'  => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'oauth2',
+            'name'  => OAuthModuleSettings::GOOGLE_CLIENT_SECRET,
+            'type'  => 'str',
+            'value' => ''
+        ],
+        [
+            'group' => 'oauth2',
+            'name'  => OAuthModuleSettings::GOOGLE_REDIRECT_URL,
+            'type'  => 'str',
+            'value' => ''
+        ]
     ],
 ];

@@ -18,6 +18,10 @@ class ModuleSettingsService implements ModuleSettingsServiceInterface
     public const FACEBOOK_CLIENT_ID = 'oeSecurityFacebookClientId';
     public const FACEBOOK_CLIENT_SECRET = 'oeSecurityFacebookSecret';
     public const FACEBOOK_REDIRECT_URL = 'oeSecurityFacebookRedirectUrl';
+    public const GOOGLE_ACTIVE = 'oeSecurityGoogleEnable';
+    public const GOOGLE_CLIENT_ID = 'oeSecurityGoogleClientId';
+    public const GOOGLE_CLIENT_SECRET = 'oeSecurityGoogleSecret';
+    public const GOOGLE_REDIRECT_URL = 'oeSecurityGoogleRedirectUrl';
 
     public function __construct(
         private readonly ModuleSettingServiceInterface $moduleSettingService
@@ -44,13 +48,33 @@ class ModuleSettingsService implements ModuleSettingsServiceInterface
         return $this->getStringValue(self::FACEBOOK_REDIRECT_URL);
     }
 
+    public function isGoogleActive(): bool
+    {
+        return $this->moduleSettingService->getBoolean(self::GOOGLE_ACTIVE, Module::MODULE_ID);
+    }
+
+    public function getGoogleClientId(): string
+    {
+        return $this->getStringValue(self::GOOGLE_CLIENT_ID);
+    }
+
+    public function getGoogleClientSecret(): string
+    {
+        return $this->getStringValue(self::GOOGLE_CLIENT_SECRET);
+    }
+
+    public function getGoogleRedirectUrl(): string
+    {
+        return $this->getStringValue(self::GOOGLE_REDIRECT_URL);
+    }
+
     private function getStringValue(string $key): string
     {
         return $this->moduleSettingService->getString(
             $key,
             Module::MODULE_ID
         )
-        ->trim()
-        ->toString();
+            ->trim()
+            ->toString();
     }
 }

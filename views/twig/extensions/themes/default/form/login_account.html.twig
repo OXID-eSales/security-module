@@ -4,3 +4,17 @@
     {% include '@oe_security_module/form/captcha.html.twig' %}
 {% endblock %}
 
+{% block checkout_options_loginaccount_submitbutton %}
+    {{ parent() }}
+
+    {% if oViewConf.getProviders() %}
+        {% for provider in oViewConf.getProviders() %}
+            {% if provider.isActive() %}
+                <a href="{{ seo_url({ ident: oViewConf.getSelfLink() ~ "cl=oauth&fnc=redirect&provider=" ~ provider.getName() }) }}">
+                    Continue with {{ provider.getName() }}
+                </a>
+            {% endif %}
+            <br/>
+        {% endfor %}
+    {% endif %}
+{% endblock %}

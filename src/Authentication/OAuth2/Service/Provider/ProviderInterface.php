@@ -19,6 +19,11 @@ interface ProviderInterface
     public function getClient(): AbstractProvider;
 
     /**
+     * Check if the provider is active/enabled.
+     */
+    public function isActive(): bool;
+
+    /**
      * Get the authorization URL to redirect the user for login/consent.
      */
     public function getAuthorizationUrl(array $options = []): string;
