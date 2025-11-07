@@ -5,11 +5,10 @@
  * See LICENSE file for license details.
  */
 
+declare(strict_types=1);
+
 namespace OxidEsales\SecurityModule\Authentication\OAuth2\Service;
 
-interface ProviderCollectorInterface
+class ProviderNotFound extends \Exception
 {
-    public function getProviders(): array;
-
-    public function getProvider(string $name): ProviderInterface;
 }

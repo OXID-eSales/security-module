@@ -16,8 +16,30 @@ class ProviderCollector implements ProviderCollectorInterface
     ) {
     }
 
-    public function getProviders(): iterable
+    /**
+     * @return array<ProviderInterface>
+     */
+    public function getProviders(): array
     {
-        return $this->providers;
+        $result = [];
+
+        foreach ($this->providers as $provider) {
+            $result[$provider->getName()] = $provider;
+        }
+
+        ksort($result);
+
+        return $result;
+    }
+
+    public function getProvider(string $name): ProviderInterface
+    {
+        $providers = $this->getProviders();
+
+        if (!isset($providers[$name])) {
+            throw new ProviderNotFound();
+        }
+
+        return $providers[$name];
     }
 }

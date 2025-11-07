@@ -1,6 +1,6 @@
 <?php
 
-namespace OxidEsales\SecurityModule\Authentication\OAuth2\Service\Provider;
+namespace OxidEsales\SecurityModule\Authentication\OAuth2\Service;
 
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Token\AccessTokenInterface;
@@ -20,10 +20,8 @@ interface ProviderInterface
 
     /**
      * Get the authorization URL to redirect the user for login/consent.
-     *
-     * @param string $state Random CSRF prevention token.
      */
-    public function getAuthorizationUrl(string $state): string;
+    public function getAuthorizationUrl(): string;
 
     /**
      * Exchange the authorization code for an access token.

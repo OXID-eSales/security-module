@@ -9,7 +9,8 @@ declare(strict_types=1);
 
 namespace Authentication\OAuth2\Service;
 
-use OxidEsales\SecurityModule\Authentication\OAuth2\Service\Provider\ProviderInterface;
+use OxidEsales\SecurityModule\Authentication\OAuth2\Service\ProviderInterface;
+use OxidEsales\SecurityModule\Authentication\OAuth2\Service\ProviderNotFound;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Service\ProviderCollector;
 use PHPUnit\Framework\TestCase;
 
@@ -26,10 +27,27 @@ class ProviderCollectorTest extends TestCase
                 'provider 2',
                 'provider 3'
             ],
-            array_map(fn($provider) => $provider->getName(), $result)
+            array_keys($result)
         );
 
         $this->assertContainsOnlyInstancesOf(ProviderInterface::class, $result);
+    }
+
+    public function testGetExistingProvider()
+    {
+        $sut = new ProviderCollector($this->getProviders());
+        $result = $sut->getProvider('provider 2');
+
+        $this->assertInstanceOf(ProviderInterface::class, $result);
+        $this->assertSame('provider 2', $result->getName());
+    }
+
+    public function testGetNotExistingProvider()
+    {
+        $this->expectException(ProviderNotFound::class);
+
+        $sut = new ProviderCollector($this->getProviders());
+        $sut->getProvider('provider 9');
     }
 
     private function getProviders(): array
