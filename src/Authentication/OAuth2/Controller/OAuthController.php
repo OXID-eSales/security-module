@@ -4,71 +4,40 @@ namespace OxidEsales\SecurityModule\Authentication\OAuth2\Controller;
 
 use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Core\Registry;
-use League\OAuth2\Client\Token\AccessTokenInterface;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Service\ProviderCollectorInterface;
+use OxidEsales\SecurityModule\Authentication\OAuth2\Service\UserServiceInterface;
 
 class OAuthController extends FrontendController
 {
+    public function render()
+    {
+        $providerCollector = $this->getService(ProviderCollectorInterface::class);
+
+        $provider = $providerCollector
+            ->getProvider($_GET['provider'])
+            ->getClient();
+
+        Registry::getUtils()->redirect($provider->getAuthorizationUrl(), 302);
+
+        exit;
+    }
+
     public function redirect()
     {
-        $providerName = Registry::getRequest()->getRequestEscapedParameter('provider');
-        $collector = $this->getService(ProviderCollectorInterface::class);
-        $provider = $collector->getProvider($providerName);
+        $provider = $this
+            ->getService(ProviderCollectorInterface::class)
+            ->getProvider('facebook');
 
-        if (!$provider) {
-            Registry::getUtilsView()->addErrorToDisplay("Unknown provider: $providerName");
-            return;
-        }
+        $provider->getClient();
 
-        $state = bin2hex(random_bytes(16));
-        $_SESSION['oauth_state'] = $state;
+        $accessToken = $provider->getAccessToken($_GET['code']);
 
-        $authUrl = $provider->getAuthorizationUrl($state);
-        Registry::getUtils()->redirect($authUrl);
-    }
+        $userDataType = $provider->getUserInfo($accessToken);
 
-    public function callback()
-    {
-        $providerName = Registry::getRequest()->getRequestEscapedParameter('provider');
-        $collector = $this->getService(ProviderCollectorInterface::class);
-        $provider = $collector->getProvider($providerName);
+        $this
+            ->getService(UserServiceInterface::class)
+            ->login($userDataType);
 
-        if (!$provider) {
-            Registry::getUtilsView()->addErrorToDisplay("Unknown provider: $providerName");
-            return;
-        }
-
-        $state = Registry::getRequest()->getRequestEscapedParameter('state');
-        if ($state !== ($_SESSION['oauth_state'] ?? null)) {
-            Registry::getUtilsView()->addErrorToDisplay('Invalid OAuth state');
-            return;
-        }
-
-        try {
-            $code = Registry::getRequest()->getRequestEscapedParameter('code');
-            $token = $provider->getAccessToken($code);
-
-            if (!$provider->validateToken($token)) {
-                throw new \RuntimeException('Token invalid or expired');
-            }
-
-            $userInfo = $provider->getUserInfo($token);
-
-            // Now handle login or registration (customize this part)
-            $this->handleUserLogin($providerName, $userInfo);
-
-            Registry::getUtils()->redirect('index.php?cl=account');
-
-        } catch (\Throwable $e) {
-            Registry::getLogger()->error('OAuth callback error: ' . $e->getMessage());
-            Registry::getUtilsView()->addErrorToDisplay('OAuth login failed. Please try again.');
-            Registry::getUtils()->redirect('index.php?cl=login');
-        }
-    }
-
-    protected function handleUserLogin(string $providerName, array $userInfo): void
-    {
-        // TODO: check if user exists by provider ID or email, then log in or create
-        // Example: $userService->loginOrRegisterViaOAuth($providerName, $userInfo);
+        Registry::getUtils()->redirect('', 302);
     }
 }

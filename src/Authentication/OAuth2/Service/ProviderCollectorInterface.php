@@ -7,6 +7,8 @@
 
 namespace OxidEsales\SecurityModule\Authentication\OAuth2\Service;
 
+use OxidEsales\SecurityModule\Authentication\OAuth2\Service\Provider\ProviderInterface;
+
 interface ProviderCollectorInterface
 {
     public function getProviders(): array;

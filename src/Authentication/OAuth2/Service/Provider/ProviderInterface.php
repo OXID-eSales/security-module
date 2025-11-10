@@ -1,6 +1,6 @@
 <?php
 
-namespace OxidEsales\SecurityModule\Authentication\OAuth2\Service;
+namespace OxidEsales\SecurityModule\Authentication\OAuth2\Service\Provider;
 
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Token\AccessTokenInterface;

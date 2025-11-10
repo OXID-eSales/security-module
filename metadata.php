@@ -40,7 +40,9 @@ $aModule = [
     ],
     'controllers' => [
         'captcha' => \OxidEsales\SecurityModule\Captcha\Controller\CaptchaController::class,
-        'password' => \OxidEsales\SecurityModule\PasswordPolicy\Controller\PasswordAjaxController::class
+        'password' => \OxidEsales\SecurityModule\PasswordPolicy\Controller\PasswordAjaxController::class,
+
+        'oauth' => \OxidEsales\SecurityModule\Authentication\OAuth2\Controller\OAuthController::class
     ],
     'templates'   => [
     ],
@@ -122,19 +124,19 @@ $aModule = [
         [
             'group' => 'oauth',
             'name'  => ModuleSettingsService::FACEBOOK_CLIENT_ID,
-            'type'  => 'string',
+            'type'  => 'str',
             'value' => ''
         ],
         [
             'group' => 'oauth',
             'name'  => ModuleSettingsService::FACEBOOK_CLIENT_SECRET,
-            'type'  => 'string',
+            'type'  => 'str',
             'value' => ''
         ],
         [
             'group' => 'oauth',
             'name'  => ModuleSettingsService::FACEBOOK_REDIRECT_URL,
-            'type'  => 'string',
+            'type'  => 'str',
             'value' => ''
         ],
     ],

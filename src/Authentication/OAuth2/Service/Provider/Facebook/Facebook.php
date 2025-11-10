@@ -43,9 +43,9 @@ class Facebook implements ProviderInterface
         return $this->facebookProvider;
     }
 
-    public function getAuthorizationUrl(string $state): string
+    public function getAuthorizationUrl(): string
     {
-        return $this->facebookProvider->getAuthorizationUrl(['state' => $state]);
+        return $this->facebookProvider->getAuthorizationUrl();
     }
 
     public function getAccessToken(string $code): AccessTokenInterface
@@ -55,7 +55,6 @@ class Facebook implements ProviderInterface
 
     public function getUserInfo(AccessTokenInterface $token): UserDataTypeInterface
     {
-        //todo: move to service
         $user = $this->facebookProvider->getResourceOwner($token);
 
         return new UserDataType(
@@ -67,5 +66,6 @@ class Facebook implements ProviderInterface
 
     public function validateToken(AccessTokenInterface $token): bool
     {
+        return true;
     }
 }

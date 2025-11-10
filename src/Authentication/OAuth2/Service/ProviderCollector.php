@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Authentication\OAuth2\Service;
 
+use OxidEsales\SecurityModule\Authentication\OAuth2\Service\Provider\ProviderInterface;
+
 class ProviderCollector implements ProviderCollectorInterface
 {
     public function __construct(

@@ -26,4 +26,10 @@ $aLang = [
     'SHOP_MODULE_oeSecurityCaptchaLifeTime_5min'  => '5 min',
     'SHOP_MODULE_oeSecurityCaptchaLifeTime_15min' => '15 min',
     'SHOP_MODULE_oeSecurityCaptchaLifeTime_30min' => '30 min',
+
+    'SHOP_MODULE_GROUP_oauth'                   => 'OAuth2',
+    'SHOP_MODULE_oeSecurityFacebookEnable'      => 'Enable OAuth2',
+    'SHOP_MODULE_oeSecurityFacebookClientId'    => 'Facebook client id',
+    'SHOP_MODULE_oeSecurityFacebookSecret'      => 'Facebook secret',
+    'SHOP_MODULE_oeSecurityFacebookRedirectUrl' => 'Facebook redirect url',
 ];
