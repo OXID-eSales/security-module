@@ -1,29 +1,3 @@
-services:
-  _defaults:
-    public: false
-    autowire: true
-
-  OxidEsales\SecurityModule\Authentication\OAuth2\Service\ModuleSettingsServiceInterface:
-    class: OxidEsales\SecurityModule\Authentication\OAuth2\Service\ModuleSettingsService
-    public: true
-
-  OxidEsales\SecurityModule\Authentication\OAuth2\Factory\UserFactoryInterface:
-    class: OxidEsales\SecurityModule\Authentication\OAuth2\Factory\UserFactory
-    public: true
-
-  OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\UserRepositoryInterface:
-    class: OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\UserRepository
-    public: true
-
-  OxidEsales\SecurityModule\Authentication\OAuth2\Service\UserServiceInterface:
-    class: OxidEsales\SecurityModule\Authentication\OAuth2\Service\UserService
-    public: true
-
-  OxidEsales\SecurityModule\Authentication\OAuth2\Service\ProviderCollectorInterface:
-    class: OxidEsales\SecurityModule\Authentication\OAuth2\Service\ProviderCollector
-    public: true
-    arguments:
-      $providers: !tagged 'security.oauth.tag.provider'
-
-  OxidEsales\SecurityModule\Authentication\OAuth2\Service\Provider\Facebook\Facebook:
-    tags: [ 'security.oauth.tag.provider' ]
+imports:
+  - { resource: Service/services.yaml }
+  - { resource: Factory/services.yaml }

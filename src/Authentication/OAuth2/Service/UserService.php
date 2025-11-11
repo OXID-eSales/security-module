@@ -12,43 +12,44 @@ namespace OxidEsales\SecurityModule\Authentication\OAuth2\Service;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\EshopCommunity\Internal\Framework\Session\SessionInterface;
 use OxidEsales\SecurityModule\Authentication\OAuth2\DataType\UserDataTypeInterface;
+use OxidEsales\SecurityModule\Authentication\OAuth2\Exception\UserBlockedException;
+use OxidEsales\SecurityModule\Authentication\OAuth2\Exception\UserNotFoundException;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Factory\UserFactoryInterface;
-use OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\UserRepositoryInterface;
 
 readonly class UserService implements UserServiceInterface
 {
     public function __construct(
         private UserFactoryInterface $userFactory,
         private SessionInterface $session,
-        private UserRepositoryInterface $userRepository,
     ) {
     }
 
     public function login(UserDataTypeInterface $userDataType): void
     {
-        $userModel = $this->getUserByUserId($userDataType->getEmail());
-        if (!$userModel instanceof User) {
+        try {
+            $userModel = $this->getUserByUserEmail($userDataType->getEmail());
+        } catch (UserNotFoundException $e) {
             $userModel = $this->createUser($userDataType);
         }
 
         if ($userModel->inGroup('oxidblocked')) {
-            throw new \Exception('Blocked');
+            throw new UserBlockedException();
         }
 
         $this->session->set('usr', $userModel->getId());
     }
 
-    public function getUserByUserId(string $username): User|bool
+    public function getUserByUserEmail(string $username): User|bool
     {
-        $userId = $this->userRepository->getUserByEmail($username);
-        if ($userId) {
-            $user = $this->userFactory->create();
-            $user->load($userId);
+        $userModel = $this->userFactory->create();
 
-            return $user;
+        $userId = $userModel->getIdByUserName($username);
+        $userLoaded = $userModel->load($userId);
+        if (!$userLoaded) {
+            throw new UserNotFoundException();
         }
 
-        return false;
+        return $userModel;
     }
 
     public function createUser(userDataTypeInterface $userDataType): User

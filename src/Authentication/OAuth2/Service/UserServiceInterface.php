@@ -14,7 +14,7 @@ interface UserServiceInterface
 {
     public function login(UserDataTypeInterface $userDataType): void;
 
-    public function getUserByUserId(string $username): User|bool;
+    public function getUserByUserEmail(string $username): User|bool;
 
     public function createUser(UserDataTypeInterface $userDataType): User;
 }

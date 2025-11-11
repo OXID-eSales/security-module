@@ -1,0 +1,7 @@
+services:
+  _defaults:
+    autowire: true
+    public: false
+
+  OxidEsales\SecurityModule\Authentication\OAuth2\Service\Provider\Facebook\Facebook:
+    tags: [ 'security.oauth.tag.provider' ]

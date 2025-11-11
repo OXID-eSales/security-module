@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Authentication\OAuth2\Service;
 
 use OxidEsales\SecurityModule\Authentication\OAuth2\Service\Provider\ProviderInterface;
-use OxidEsales\SecurityModule\Authentication\OAuth2\Service\ProviderNotFound;
+use OxidEsales\SecurityModule\Authentication\OAuth2\Service\Provider\ProviderNotFound;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Service\ProviderCollector;
 use PHPUnit\Framework\TestCase;
 
