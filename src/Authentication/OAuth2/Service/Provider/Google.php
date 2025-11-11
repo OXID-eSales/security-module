@@ -4,6 +4,8 @@ namespace OxidEsales\SecurityModule\Authentication\OAuth2\Service\Provider;
 
 use League\OAuth2\Client\Provider\Google as GoogleProvider;
 use League\OAuth2\Client\Token\AccessTokenInterface;
+use OxidEsales\SecurityModule\Authentication\OAuth2\DataType\UserDataType;
+use OxidEsales\SecurityModule\Authentication\OAuth2\DataType\UserDataTypeInterface;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Service\ModuleSettingsServiceInterface;
 
 class Google implements ProviderInterface
@@ -22,7 +24,7 @@ class Google implements ProviderInterface
 
     public function getClient(): GoogleProvider
     {
-        return new GoogleProvider([
+        return $this->client = new GoogleProvider([
             'clientId'     => $this->moduleSettings->getGoogleClientId(),
             'clientSecret' => $this->moduleSettings->getGoogleClientSecret(),
             'redirectUri'  => $this->moduleSettings->getGoogleRedirectUrl(),
@@ -31,7 +33,7 @@ class Google implements ProviderInterface
 
     public function isActive(): bool
     {
-        return true; //todo: add admin setting
+        return $this->moduleSettings->isGoogleActive();
     }
 
     public function getAuthorizationUrl(string $state): string
@@ -49,20 +51,19 @@ class Google implements ProviderInterface
         ]);
     }
 
-    public function getUserInfo(AccessTokenInterface $token): array
+    public function getUserInfo(AccessTokenInterface $token): UserDataTypeInterface
     {
         $user = $this->client->getResourceOwner($token);
 
-        return [
-            'id'     => $user->getId(),
-            'email'  => $user->getEmail(),
-            'name'   => $user->getName(),
-            'avatar' => $user->getAvatar(),
-        ];
+        return new UserDataType(
+            $user->getFirstName(),
+            $user->getLastName(),
+            $user->getEmail(),
+        );
     }
 
     public function validateToken(AccessTokenInterface $token): bool
     {
-        return !$token->hasExpired();
+        return true;
     }
 }
