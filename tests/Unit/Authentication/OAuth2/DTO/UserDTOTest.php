@@ -7,18 +7,16 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\SecurityModule\Tests\Unit\Authentication\OAuth2\DataType;
+namespace OxidEsales\SecurityModule\Tests\Unit\Authentication\OAuth2\DTO;
 
 use Codeception\PHPUnit\TestCase;
-use OxidEsales\SecurityModule\Authentication\OAuth2\DataType\UserDataType;
-use PHPUnit\Framework\Attributes\Test;
+use OxidEsales\SecurityModule\Authentication\OAuth2\DTO\UserDTO;
 
-class UserDataTypeTest extends TestCase
+class UserDTOTest extends TestCase
 {
-    #[Test]
-    public function initializeAndReadProperties(): void
+    public function testInitializeAndReadProperties(): void
     {
-        $sut = new UserDataType(
+        $sut = new UserDTO(
             firstName: $firstName = uniqid(),
             lastName: $lastName = uniqid(),
             email: $email = uniqid(),

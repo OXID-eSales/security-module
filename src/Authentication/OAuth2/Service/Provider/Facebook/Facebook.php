@@ -10,10 +10,11 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Authentication\OAuth2\Service\Provider\Facebook;
 
 use League\OAuth2\Client\Provider\AbstractProvider;
+use League\OAuth2\Client\Token\AccessToken;
 use League\OAuth2\Client\Token\AccessTokenInterface;
 use League\OAuth2\Client\Provider\Facebook as FacebookProvider;
-use OxidEsales\SecurityModule\Authentication\OAuth2\DataType\UserDataType;
-use OxidEsales\SecurityModule\Authentication\OAuth2\DataType\UserDataTypeInterface;
+use OxidEsales\SecurityModule\Authentication\OAuth2\DTO\UserDTO;
+use OxidEsales\SecurityModule\Authentication\OAuth2\DTO\UserDTOInterface;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Service\ModuleSettingsServiceInterface;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Service\Provider\ProviderInterface;
 
@@ -43,9 +44,9 @@ class Facebook implements ProviderInterface
         return $this->facebookProvider;
     }
 
-    public function getAuthorizationUrl(): string
+    public function getAuthorizationUrl(array $options = []): string
     {
-        return $this->facebookProvider->getAuthorizationUrl();
+        return $this->facebookProvider->getAuthorizationUrl($options);
     }
 
     public function getAccessToken(string $code): AccessTokenInterface
@@ -53,11 +54,12 @@ class Facebook implements ProviderInterface
         return $this->facebookProvider->getAccessToken('authorization_code', ['code' => $code]);
     }
 
-    public function getUserInfo(AccessTokenInterface $token): UserDataTypeInterface
+    public function getUserInfo(AccessTokenInterface $token): UserDTOInterface
     {
+        /** @var AccessToken $token */
         $user = $this->facebookProvider->getResourceOwner($token);
 
-        return new UserDataType(
+        return new UserDTO(
             $user->getFirstName(),
             $user->getLastName(),
             $user->getEmail(),

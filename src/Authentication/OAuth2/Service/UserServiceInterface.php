@@ -8,13 +8,13 @@
 namespace OxidEsales\SecurityModule\Authentication\OAuth2\Service;
 
 use OxidEsales\Eshop\Application\Model\User;
-use OxidEsales\SecurityModule\Authentication\OAuth2\DataType\UserDataTypeInterface;
+use OxidEsales\SecurityModule\Authentication\OAuth2\DTO\UserDTOInterface;
 
 interface UserServiceInterface
 {
-    public function login(UserDataTypeInterface $userDataType): void;
+    public function login(UserDTOInterface $userDTO): void;
 
-    public function getUserByUserEmail(string $username): User|bool;
+    public function getUserByUserEmail(string $username): User;
 
-    public function createUser(UserDataTypeInterface $userDataType): User;
+    public function createUser(UserDTOInterface $userDTO): User;
 }

@@ -13,7 +13,7 @@ use OxidEsales\Eshop\Application\Model\Object2Group;
 use OxidEsales\Eshop\Application\Model\User as UserModel;
 use OxidEsales\EshopCommunity\Internal\Framework\Session\SessionInterface;
 use OxidEsales\EshopCommunity\Tests\Integration\IntegrationTestCase;
-use OxidEsales\SecurityModule\Authentication\OAuth2\DataType\UserDataTypeInterface;
+use OxidEsales\SecurityModule\Authentication\OAuth2\DTO\UserDTOInterface;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Exception\UserBlockedException;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Exception\UserNotFoundException;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Factory\UserFactoryInterface;
@@ -26,12 +26,12 @@ class UserServiceTest extends IntegrationTestCase
         $username = uniqid();
         $userId = $this->createTestUser($username);
 
-        $userDataTypeMock = $this->createMock(UserDataTypeInterface::class);
-        $userDataTypeMock->method('getEmail')->willReturn($username);
+        $userDTOMock = $this->createMock(UserDTOInterface::class);
+        $userDTOMock->method('getEmail')->willReturn($username);
 
         $sut = $this->getSut();
 
-        $sut->login($userDataTypeMock);
+        $sut->login($userDTOMock);
 
         $this->assertSame(
             $this->get(SessionInterface::class)->get('usr'),
@@ -44,12 +44,12 @@ class UserServiceTest extends IntegrationTestCase
         $username = uniqid();
         $this->createTestUser(uniqid());
 
-        $userDataTypeMock = $this->createMock(UserDataTypeInterface::class);
-        $userDataTypeMock->method('getEmail')->willReturn($username);
+        $userDTOMock = $this->createMock(UserDTOInterface::class);
+        $userDTOMock->method('getEmail')->willReturn($username);
 
         $sut = $this->getSut();
 
-        $sut->login($userDataTypeMock);
+        $sut->login($userDTOMock);
 
         $this->assertNotEmpty(
             $this->get(SessionInterface::class)->get('usr'),
@@ -62,14 +62,28 @@ class UserServiceTest extends IntegrationTestCase
         $userId = $this->createTestUser($username);
         $this->addUserGroup($userId, 'oxidblocked');
 
-        $userDataTypeMock = $this->createMock(UserDataTypeInterface::class);
-        $userDataTypeMock->method('getEmail')->willReturn($username);
+        $userDTOMock = $this->createMock(UserDTOInterface::class);
+        $userDTOMock->method('getEmail')->willReturn($username);
 
         $sut = $this->getSut();
 
         $this->expectException(UserBlockedException::class);
 
-        $sut->login($userDataTypeMock);
+        $sut->login($userDTOMock);
+    }
+
+    public function testLoginWithNonExistingUser(): void
+    {
+        $username = uniqid();
+        $this->createTestUser($username);
+
+        $userDTOMock = $this->createMock(UserDTOInterface::class);
+
+        $sut = $this->getSut();
+
+        $this->expectException(UserNotFoundException::class);
+
+        $sut->login($userDTOMock);
     }
 
     public function testGetUserByUserEmailIsFound(): void
@@ -101,14 +115,14 @@ class UserServiceTest extends IntegrationTestCase
         $lastName = uniqid();
         $email = uniqid();
 
-        $userDataTypeMock = $this->createMock(UserDataTypeInterface::class);
-        $userDataTypeMock->method('getFirstName')->willReturn($firstName);
-        $userDataTypeMock->method('getLastName')->willReturn($lastName);
-        $userDataTypeMock->method('getEmail')->willReturn($email);
+        $userDTOMock = $this->createMock(UserDTOInterface::class);
+        $userDTOMock->method('getFirstName')->willReturn($firstName);
+        $userDTOMock->method('getLastName')->willReturn($lastName);
+        $userDTOMock->method('getEmail')->willReturn($email);
 
         $sut = $this->getSut();
 
-        $userModel = $sut->createUser($userDataTypeMock);
+        $userModel = $sut->createUser($userDTOMock);
 
         $this->assertInstanceOf(UserModel::class, $userModel);
         $this->assertSame($firstName, $userModel->getFieldData('oxfname'));
@@ -143,7 +157,7 @@ class UserServiceTest extends IntegrationTestCase
 
     private function getSut(
         UserFactoryInterface $userFactory = null,
-        SessionInterface $session = null
+        SessionInterface $session = null,
     ): UserService {
         return new UserService(
             userFactory: $userFactory ?? $this->get(UserFactoryInterface::class),

@@ -4,7 +4,7 @@ namespace OxidEsales\SecurityModule\Authentication\OAuth2\Service\Provider;
 
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Token\AccessTokenInterface;
-use OxidEsales\SecurityModule\Authentication\OAuth2\DataType\UserDataTypeInterface;
+use OxidEsales\SecurityModule\Authentication\OAuth2\DTO\UserDTOInterface;
 
 interface ProviderInterface
 {
@@ -21,7 +21,7 @@ interface ProviderInterface
     /**
      * Get the authorization URL to redirect the user for login/consent.
      */
-    public function getAuthorizationUrl(): string;
+    public function getAuthorizationUrl(array $options = []): string;
 
     /**
      * Exchange the authorization code for an access token.
@@ -32,7 +32,7 @@ interface ProviderInterface
      * Fetch user information (claims) from the provider using the access token.
      * Should return standardized data: id, email, name, avatar, etc.
      */
-    public function getUserInfo(AccessTokenInterface $token): UserDataTypeInterface;
+    public function getUserInfo(AccessTokenInterface $token): UserDTOInterface;
 
     /**
      * Validate the provider response.

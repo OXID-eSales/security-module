@@ -9,20 +9,17 @@ use OxidEsales\SecurityModule\Authentication\OAuth2\Service\UserServiceInterface
 
 class OAuthController extends FrontendController
 {
-    public function render()
+    public function login(): void
     {
         $providerCollector = $this->getService(ProviderCollectorInterface::class);
 
-        $provider = $providerCollector
-            ->getProvider($_GET['provider'])
-            ->getClient();
+        $provider = $providerCollector->getProvider($_GET['provider']);
+        $provider->getClient();
 
-        Registry::getUtils()->redirect($provider->getAuthorizationUrl(), 302);
-
-        exit;
+        Registry::getUtils()->redirect($provider->getAuthorizationUrl());
     }
 
-    public function redirect()
+    public function redirect(): void
     {
         $provider = $this
             ->getService(ProviderCollectorInterface::class)
@@ -32,12 +29,12 @@ class OAuthController extends FrontendController
 
         $accessToken = $provider->getAccessToken($_GET['code']);
 
-        $userDataType = $provider->getUserInfo($accessToken);
+        $userDTO = $provider->getUserInfo($accessToken);
 
         $this
             ->getService(UserServiceInterface::class)
-            ->login($userDataType);
+            ->login($userDTO);
 
-        Registry::getUtils()->redirect('', 302);
+        Registry::getUtils()->redirect('');
     }
 }
