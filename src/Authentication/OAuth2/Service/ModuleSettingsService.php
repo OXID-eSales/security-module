@@ -29,6 +29,11 @@ class ModuleSettingsService implements ModuleSettingsServiceInterface
         return $this->moduleSettingService->getBoolean(self::FACEBOOK_ACTIVE, Module::MODULE_ID);
     }
 
+    public function saveFacebookEnabled(bool $value): void
+    {
+        $this->moduleSettingService->saveBoolean(self::FACEBOOK_ACTIVE, $value, Module::MODULE_ID);
+    }
+
     public function getFacebookClientId(): string
     {
         return $this->getStringValue(self::FACEBOOK_CLIENT_ID);

@@ -2,5 +2,8 @@
 
 {% block user_checkout_noregistration_form %}
     {{ parent() }}
+
     {% include '@oe_security_module/form/captcha.html.twig' %}
+
+    {% include '@oe_security_module/form/providers.html.twig' %}
 {% endblock %}

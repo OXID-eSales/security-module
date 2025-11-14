@@ -1,0 +1,13 @@
+{% if oViewConf.getActiveProviders() %}
+    <div class="sign-in-providers">
+    {% for provider in oViewConf.getActiveProviders() %}
+        <div class="provider">
+            <a href="{{ seo_url({ ident: oViewConf.getSelfLink() ~ "cl=oauth&fnc=redirect&provider=" ~ provider.getName() }) }}">
+                {{ translate({ ident: 'SIGN_IN_PROVIDER', args: provider.getName()|capitalize }) }}
+            </a>
+        </div>
+    {% endfor %}
+    </div>
+{% endif %}
+
+{{ style({ include: oViewConf.getModuleUrl('oe_security_module', 'out/src/css/providers.css') }) }}

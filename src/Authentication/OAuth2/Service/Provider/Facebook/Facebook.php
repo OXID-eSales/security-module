@@ -27,6 +27,11 @@ class Facebook implements ProviderInterface
     ) {
     }
 
+    public function isActive(): bool
+    {
+        return $this->moduleSettings->isFacebookActive();
+    }
+
     public function getName(): string
     {
         return 'facebook';

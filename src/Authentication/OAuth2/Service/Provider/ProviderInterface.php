@@ -14,6 +14,11 @@ interface ProviderInterface
     public function getName(): string;
 
     /**
+     * Check if the provider is active/enabled.
+     */
+    public function isActive(): bool;
+
+    /**
      * Get the underlying OAuth2 client (League provider instance).
      */
     public function getClient(): AbstractProvider;
