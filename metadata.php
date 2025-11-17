@@ -10,6 +10,7 @@
  */
 
 use OxidEsales\SecurityModule\Authentication\OAuth2\Service\ModuleSettingsService;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\ModuleSettingsService as TwoFactorAuthModuleSettings;
 use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsService as PasswordPolicyModuleSettings;
 use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsService as CaptchaModuleSettings;
 use OxidEsales\SecurityModule\Core\Module;
@@ -137,6 +138,21 @@ $aModule = [
             'group' => 'oauth',
             'name'  => ModuleSettingsService::FACEBOOK_REDIRECT_URL,
             'type'  => 'str',
+            'value' => ''
+        ],
+
+        //TwoFactorAuth settings
+        [
+            'group' => 'two_factor_auth',
+            'name'  => TwoFactorAuthModuleSettings::ACTIVE,
+            'type'  => 'bool',
+            'value' => false
+        ],
+        [
+            'group' => 'two_factor_auth',
+            'name'  => TwoFactorAuthModuleSettings::TWO_FACTOR_TYPE,
+            'type'  => 'select',
+            'constraints' => 'otp|totp|both',
             'value' => ''
         ],
     ],

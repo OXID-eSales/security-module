@@ -32,4 +32,11 @@ $aLang = [
     'SHOP_MODULE_oeSecurityFacebookClientId'    => 'Facebook client id',
     'SHOP_MODULE_oeSecurityFacebookSecret'      => 'Facebook secret',
     'SHOP_MODULE_oeSecurityFacebookRedirectUrl' => 'Facebook redirect url',
+
+    'SHOP_MODULE_GROUP_two_factor_auth'            => 'Two Factor Authentication',
+    'SHOP_MODULE_oeSecurityTwoFactorAuthEnabled'   => 'Enable Two Factor Authentication',
+    'SHOP_MODULE_oeSecurityTwoFactorAuthType'      => 'Two Factor Authentication type',
+    'SHOP_MODULE_oeSecurityTwoFactorAuthType_otp'  => 'OTP',
+    'SHOP_MODULE_oeSecurityTwoFactorAuthType_totp' => 'TOTP',
+    'SHOP_MODULE_oeSecurityTwoFactorAuthType_both' => 'OTP and TOTP',
 ];
