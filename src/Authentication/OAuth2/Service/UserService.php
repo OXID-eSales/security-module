@@ -12,8 +12,8 @@ namespace OxidEsales\SecurityModule\Authentication\OAuth2\Service;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\EshopCommunity\Internal\Framework\Session\SessionInterface;
 use OxidEsales\SecurityModule\Authentication\OAuth2\DTO\UserDTOInterface;
-use OxidEsales\SecurityModule\Authentication\OAuth2\Exception\UserBlockedException;
-use OxidEsales\SecurityModule\Authentication\OAuth2\Exception\UserNotFoundException;
+use OxidEsales\SecurityModule\Authentication\OAuth2\Service\Exception\UserBlockedException;
+use OxidEsales\SecurityModule\Authentication\OAuth2\Service\Exception\UserNotFoundException;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Factory\UserFactoryInterface;
 
 readonly class UserService implements UserServiceInterface

@@ -1,12 +1,20 @@
 <?php
 
-namespace OxidEsales\SecurityModule\Authentication\OAuth2\Service\Provider;
+/**
+ * Copyright © OXID eSales AG. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
+declare(strict_types=1);
+
+namespace OxidEsales\SecurityModule\Authentication\OAuth2\Service\Provider\Google;
 
 use League\OAuth2\Client\Provider\Google as GoogleProvider;
 use League\OAuth2\Client\Token\AccessTokenInterface;
-use OxidEsales\SecurityModule\Authentication\OAuth2\DataType\UserDataType;
-use OxidEsales\SecurityModule\Authentication\OAuth2\DataType\UserDataTypeInterface;
+use OxidEsales\SecurityModule\Authentication\OAuth2\DTO\UserDTO;
+use OxidEsales\SecurityModule\Authentication\OAuth2\DTO\UserDTOInterface;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Service\ModuleSettingsServiceInterface;
+use OxidEsales\SecurityModule\Authentication\OAuth2\Service\Provider\ProviderInterface;
 
 class Google implements ProviderInterface
 {
@@ -36,12 +44,9 @@ class Google implements ProviderInterface
         return $this->moduleSettings->isGoogleActive();
     }
 
-    public function getAuthorizationUrl(string $state): string
+    public function getAuthorizationUrl(array $options = []): string
     {
-        return $this->client->getAuthorizationUrl([
-            'scope' => ['openid', 'email', 'profile'],
-            'state' => $state,
-        ]);
+        return $this->client->getAuthorizationUrl($options);
     }
 
     public function getAccessToken(string $code): AccessTokenInterface
@@ -51,19 +56,14 @@ class Google implements ProviderInterface
         ]);
     }
 
-    public function getUserInfo(AccessTokenInterface $token): UserDataTypeInterface
+    public function getUserInfo(AccessTokenInterface $token): UserDTOInterface
     {
         $user = $this->client->getResourceOwner($token);
 
-        return new UserDataType(
+        return new UserDTO(
             $user->getFirstName(),
             $user->getLastName(),
             $user->getEmail(),
         );
-    }
-
-    public function validateToken(AccessTokenInterface $token): bool
-    {
-        return true;
     }
 }

@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Authentication\OAuth2\Service;
 
 use OxidEsales\SecurityModule\Authentication\OAuth2\Service\Provider\ProviderInterface;
-use OxidEsales\SecurityModule\Authentication\OAuth2\Service\Provider\ProviderNotFound;
+use OxidEsales\SecurityModule\Authentication\OAuth2\Service\Exception\ProviderNotFound;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Service\ProviderCollector;
 use PHPUnit\Framework\TestCase;
 
@@ -57,6 +57,7 @@ class ProviderCollectorTest extends TestCase
         ]);
         $provider2 = $this->createConfiguredMock(ProviderInterface::class, [
             'getName' => 'provider 2',
+            'isActive' => true,
         ]);
         $provider3 = $this->createConfiguredMock(ProviderInterface::class, [
             'getName' => 'provider 3',

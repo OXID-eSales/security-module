@@ -139,25 +139,25 @@ $aModule = [
             'value' => ''
         ],
         [
-            'group' => 'oauth2',
+            'group' => 'oauth',
             'name'  => OAuthModuleSettings::GOOGLE_ACTIVE,
             'type'  => 'bool',
             'value' => true
         ],
         [
-            'group' => 'oauth2',
+            'group' => 'oauth',
             'name'  => OAuthModuleSettings::GOOGLE_CLIENT_ID,
             'type'  => 'str',
             'value' => ''
         ],
         [
-            'group' => 'oauth2',
+            'group' => 'oauth',
             'name'  => OAuthModuleSettings::GOOGLE_CLIENT_SECRET,
             'type'  => 'str',
             'value' => ''
         ],
         [
-            'group' => 'oauth2',
+            'group' => 'oauth',
             'name'  => OAuthModuleSettings::GOOGLE_REDIRECT_URL,
             'type'  => 'str',
             'value' => ''

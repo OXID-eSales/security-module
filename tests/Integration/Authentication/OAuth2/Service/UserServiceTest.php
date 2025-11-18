@@ -14,8 +14,8 @@ use OxidEsales\Eshop\Application\Model\User as UserModel;
 use OxidEsales\EshopCommunity\Internal\Framework\Session\SessionInterface;
 use OxidEsales\EshopCommunity\Tests\Integration\IntegrationTestCase;
 use OxidEsales\SecurityModule\Authentication\OAuth2\DTO\UserDTOInterface;
-use OxidEsales\SecurityModule\Authentication\OAuth2\Exception\UserBlockedException;
-use OxidEsales\SecurityModule\Authentication\OAuth2\Exception\UserNotFoundException;
+use OxidEsales\SecurityModule\Authentication\OAuth2\Service\Exception\UserBlockedException;
+use OxidEsales\SecurityModule\Authentication\OAuth2\Service\Exception\UserNotFoundException;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Factory\UserFactoryInterface;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Service\UserService;
 

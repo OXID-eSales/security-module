@@ -7,12 +7,12 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\SecurityModule\Authentication\OAuth2\Exception;
+namespace OxidEsales\SecurityModule\Authentication\OAuth2\Service\Exception;
 
-class UserNotFoundException extends \Exception
+class UserBlockedException extends \Exception
 {
     public function __construct()
     {
-        parent::__construct('ERROR_USER_NOT_FOUND');
+        parent::__construct('ERROR_USER_BLOCKED');
     }
 }

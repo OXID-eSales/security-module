@@ -44,6 +44,11 @@ class Facebook implements ProviderInterface
         return $this->facebookProvider;
     }
 
+    public function isActive(): bool
+    {
+        return $this->moduleSettings->isFacebookActive();
+    }
+
     public function getAuthorizationUrl(array $options = []): string
     {
         return $this->facebookProvider->getAuthorizationUrl($options);
@@ -64,10 +69,5 @@ class Facebook implements ProviderInterface
             $user->getLastName(),
             $user->getEmail(),
         );
-    }
-
-    public function validateToken(AccessTokenInterface $token): bool
-    {
-        return true;
     }
 }

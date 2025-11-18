@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Copyright © OXID eSales AG. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
 namespace OxidEsales\SecurityModule\Authentication\OAuth2\Service\Provider;
 
 use League\OAuth2\Client\Provider\AbstractProvider;
@@ -38,9 +43,4 @@ interface ProviderInterface
      * Should return standardized data: id, email, name, avatar, etc.
      */
     public function getUserInfo(AccessTokenInterface $token): UserDTOInterface;
-
-    /**
-     * Validate the provider response.
-     */
-    public function validateToken(AccessTokenInterface $token): bool;
 }

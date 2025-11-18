@@ -9,8 +9,9 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Authentication\OAuth2\Service;
 
+use OxidEsales\SecurityModule\Authentication\OAuth2\Service\Exception\ProviderNotActive;
+use OxidEsales\SecurityModule\Authentication\OAuth2\Service\Exception\ProviderNotFound;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Service\Provider\ProviderInterface;
-use OxidEsales\SecurityModule\Authentication\OAuth2\Service\Provider\ProviderNotFound;
 
 class ProviderCollector implements ProviderCollectorInterface
 {
@@ -41,6 +42,10 @@ class ProviderCollector implements ProviderCollectorInterface
 
         if (!isset($providers[$name])) {
             throw new ProviderNotFound();
+        }
+
+        if (!$providers[$name]->isActive()) {
+            throw new ProviderNotActive();
         }
 
         return $providers[$name];

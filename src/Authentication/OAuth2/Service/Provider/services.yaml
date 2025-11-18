@@ -5,3 +5,6 @@ services:
 
   OxidEsales\SecurityModule\Authentication\OAuth2\Service\Provider\Facebook\Facebook:
     tags: [ 'security.oauth.tag.provider' ]
+
+  OxidEsales\SecurityModule\Authentication\OAuth2\Service\Provider\Google\Google:
+    tags: [ 'security.oauth.tag.provider' ]
