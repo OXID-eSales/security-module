@@ -40,5 +40,5 @@ $aLang = [
 
     'GENERATE_STRONG_PASSWORD' => 'Starkes Passwort generieren',
 
-    'SIGN_IN_PROVIDER' => 'Sign in with %s',
+    'SIGN_IN_PROVIDER' => 'Anmelden mit %s',
 ];
