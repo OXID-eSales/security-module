@@ -29,7 +29,7 @@ readonly class UserRepository implements UserRepositoryInterface
             ->where('u.oxusername = :oxusername')
             ->setParameter('oxusername', $username);
 
-        /** @var Result<array> $result */
+        /** @var Result $result */
         $result = $queryBuilder->execute();
 
         return $result->fetchOne();

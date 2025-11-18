@@ -7,6 +7,8 @@
 
 declare(strict_types=1);
 
+namespace OxidEsales\SecurityModule\Tests\Unit\Authentication\OAuth2\Provider;
+
 use OxidEsales\SecurityModule\Authentication\OAuth2\Service\Provider\Facebook\Facebook as FacebookProvider;
 use PHPUnit\Framework\TestCase;
 use League\OAuth2\Client\Provider\Facebook;

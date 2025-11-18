@@ -10,6 +10,8 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Authentication\OAuth2\Service\Provider\Google;
 
 use League\OAuth2\Client\Provider\Google as GoogleProvider;
+use League\OAuth2\Client\Provider\GoogleUser;
+use League\OAuth2\Client\Token\AccessToken;
 use League\OAuth2\Client\Token\AccessTokenInterface;
 use OxidEsales\SecurityModule\Authentication\OAuth2\DTO\UserDTO;
 use OxidEsales\SecurityModule\Authentication\OAuth2\DTO\UserDTOInterface;
@@ -58,8 +60,10 @@ class Google implements ProviderInterface
 
     public function getUserInfo(AccessTokenInterface $token): UserDTOInterface
     {
+        /** @var AccessToken $token */
         $user = $this->client->getResourceOwner($token);
 
+        /** @var GoogleUser $user */
         return new UserDTO(
             $user->getFirstName(),
             $user->getLastName(),
