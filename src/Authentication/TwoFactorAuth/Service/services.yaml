@@ -1,3 +1,6 @@
+imports:
+  - { resource: Provider/services.yaml }
+
 services:
   _defaults:
     autowire: true
@@ -5,4 +8,6 @@ services:
 
   OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\ModuleSettingsServiceInterface:
     class: OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\ModuleSettingsService
-    public: true
+
+  OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\AuthorizeServiceInterface:
+    class: OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\AuthorizeService
