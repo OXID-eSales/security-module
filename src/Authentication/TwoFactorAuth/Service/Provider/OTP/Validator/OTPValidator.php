@@ -9,43 +9,35 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\Provider\OTP\Validator;
 
-use OxidEsales\Eshop\Application\Model\User as UserModel;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\AttemptLimitExceededException;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\InvalidCodeException;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\TimeExpiredException;
 
 readonly class OTPValidator implements OTPValidatorInterface
 {
-    public function __construct(
-        private UserModel $userModel
-    ) {
-        //todo: use loaded user model
-    }
+    private const MAX_ATTEMPTS = 5;
 
-    public function validateCode(string $code): void
+    public function validateCode(string $userCode, string $inputCode): void
     {
-        if (strlen($code) < 1) {
+        if (empty($inputCode)) {
             throw new InvalidCodeException();
         }
 
-
-        if ($this->userModel->getFieldData('OTPCODE') !== $code) {
+        if ($userCode !== $inputCode) {
             throw new InvalidCodeException();
         }
     }
 
-    public function checkLoginAttempts(): void
+    public function checkLoginAttempts(int $attempts): void
     {
-        //todo: setting how much attempts user has?
-        if ($this->userModel->getFieldData('OTPATTEMPTS') >= 5) {
+        if ($attempts >= self::MAX_ATTEMPTS) {
             throw new AttemptLimitExceededException();
         }
     }
 
-    public function checkExpirationTime(): void
+    public function checkExpirationTime(int $expiresAt): void
     {
-        //todo: setting how long password is valid?
-        if ($this->userModel->getFieldData('OTPEXPIRETIME') >= 5) {
+        if (time() > $expiresAt) {
             throw new TimeExpiredException();
         }
     }

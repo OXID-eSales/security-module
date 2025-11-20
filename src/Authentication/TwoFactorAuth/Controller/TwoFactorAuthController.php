@@ -1,0 +1,20 @@
+<?php
+
+namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Controller;
+
+use OxidEsales\Eshop\Application\Controller\FrontendController;
+use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\Provider\OTP\Service\OTPServiceInterface;
+
+class TwoFactorAuthController extends FrontendController
+{
+    private function handleOTP(): void
+    {
+        $code = Registry::getRequest()->getRequestEscapedParameter('code');
+        $sessionUser =  Registry::getSession()->getVariable('usr');
+        $user = oxNew(User::class);
+        $user->load($sessionUser);
+
+        $this->getService(OTPServiceInterface::class)->validateCode($user, $code);
+    }
+}

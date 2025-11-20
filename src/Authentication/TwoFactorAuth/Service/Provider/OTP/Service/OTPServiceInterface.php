@@ -7,7 +7,9 @@
 
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\Provider\OTP\Service;
 
+use OxidEsales\Eshop\Application\Model\User as UserModel;
+
 interface OTPServiceInterface
 {
-    public function validateCode(string $code): void;
+    public function validateCode(UserModel $user, string $code): void;
 }
