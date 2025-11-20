@@ -21,8 +21,8 @@ class ModuleSettingsTest extends TestCase
     public static function gettersDataProvider(): array
     {
         return [
-            self::prepareBooleanSetting('isFacebookActive', ModuleSettingsService::FACEBOOK_ACTIVE, true),
-            self::prepareBooleanSetting('isFacebookActive', ModuleSettingsService::FACEBOOK_ACTIVE, false),
+            self::prepareBooleanSetting('isFacebookLoginEnabled', ModuleSettingsService::FACEBOOK_LOGIN_ENABLED, true),
+            self::prepareBooleanSetting('isFacebookLoginEnabled', ModuleSettingsService::FACEBOOK_LOGIN_ENABLED, false),
 
             self::prepareStringTestItem('getFacebookClientId', ModuleSettingsService::FACEBOOK_CLIENT_ID),
             self::prepareStringTestItem('getFacebookClientSecret', ModuleSettingsService::FACEBOOK_CLIENT_SECRET),

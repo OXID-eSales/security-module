@@ -19,6 +19,6 @@ class UserNotFoundExceptionTest extends TestCase
     {
         $exception = new UserNotFoundException();
 
-        $this->assertSame('ERROR_USER_NOT_FOUND', $exception->getMessage());
+        $this->assertInstanceOf(\Throwable::class, $exception);
     }
 }

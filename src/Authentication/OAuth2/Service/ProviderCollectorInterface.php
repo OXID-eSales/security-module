@@ -7,7 +7,7 @@
 
 namespace OxidEsales\SecurityModule\Authentication\OAuth2\Service;
 
-use OxidEsales\SecurityModule\Authentication\OAuth2\Service\Provider\ProviderInterface;
+use OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Provider\ProviderInterface;
 
 interface ProviderCollectorInterface
 {

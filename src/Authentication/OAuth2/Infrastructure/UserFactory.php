@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\SecurityModule\Authentication\OAuth2\Factory;
+namespace OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure;
 
 use OxidEsales\Eshop\Application\Model\User;
 

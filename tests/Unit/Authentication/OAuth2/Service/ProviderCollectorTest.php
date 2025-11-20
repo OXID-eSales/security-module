@@ -9,8 +9,8 @@ declare(strict_types=1);
 
 namespace Authentication\OAuth2\Service;
 
-use OxidEsales\SecurityModule\Authentication\OAuth2\Service\Provider\ProviderInterface;
-use OxidEsales\SecurityModule\Authentication\OAuth2\Service\Provider\ProviderNotFound;
+use OxidEsales\SecurityModule\Authentication\OAuth2\Exception\ProviderNotFoundException;
+use OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Provider\ProviderInterface;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Service\ProviderCollector;
 use PHPUnit\Framework\TestCase;
 
@@ -18,16 +18,17 @@ class ProviderCollectorTest extends TestCase
 {
     public function testGetProviders(): void
     {
-        $sut = new ProviderCollector($this->getProviders());
+        $providers = [
+            uniqid(),
+            uniqid(),
+        ];
+
+        $sut = new ProviderCollector($this->getProviders($providers));
         $result = $sut->getProviders();
 
         $this->assertSame(
-            [
-                'provider 1',
-                'provider 2',
-                'provider 3'
-            ],
-            array_keys($result)
+            $providers,
+            array_map(fn($item) => $item->getName(), $result)
         );
 
         $this->assertContainsOnlyInstancesOf(ProviderInterface::class, $result);
@@ -35,37 +36,43 @@ class ProviderCollectorTest extends TestCase
 
     public function testGetExistingProvider()
     {
-        $sut = new ProviderCollector($this->getProviders());
-        $result = $sut->getProvider('provider 2');
+        $providers = [
+            uniqid(),
+            uniqid(),
+        ];
+
+        $searchProvider = $providers[array_rand($providers)];
+
+        $sut = new ProviderCollector($this->getProviders($providers));
+        $result = $sut->getProvider($searchProvider);
 
         $this->assertInstanceOf(ProviderInterface::class, $result);
-        $this->assertSame('provider 2', $result->getName());
+        $this->assertSame($searchProvider, $result->getName());
     }
 
     public function testGetNotExistingProvider()
     {
-        $this->expectException(ProviderNotFound::class);
+        $providers = [
+            uniqid(),
+            uniqid(),
+        ];
 
-        $sut = new ProviderCollector($this->getProviders());
+        $this->expectException(ProviderNotFoundException::class);
+
+        $sut = new ProviderCollector($this->getProviders($providers));
         $sut->getProvider('provider 9');
     }
 
-    private function getProviders(): array
+    private function getProviders(array $providers): array
     {
-        $provider1 = $this->createConfiguredMock(ProviderInterface::class, [
-            'getName' => 'provider 1',
-        ]);
-        $provider2 = $this->createConfiguredMock(ProviderInterface::class, [
-            'getName' => 'provider 2',
-        ]);
-        $provider3 = $this->createConfiguredMock(ProviderInterface::class, [
-            'getName' => 'provider 3',
-        ]);
+        $stubs = [];
 
-        return [
-            $provider1,
-            $provider2,
-            $provider3
-        ];
+        foreach ($providers as $provider) {
+            $stubs[] = $this->createConfiguredStub(ProviderInterface::class, [
+                'getName' => $provider,
+            ]);
+        }
+
+        return $stubs;
     }
 }

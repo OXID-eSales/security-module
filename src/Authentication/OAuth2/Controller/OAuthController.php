@@ -14,7 +14,6 @@ class OAuthController extends FrontendController
         $providerCollector = $this->getService(ProviderCollectorInterface::class);
 
         $provider = $providerCollector->getProvider($_GET['provider']);
-        $provider->getClient();
 
         Registry::getUtils()->redirect($provider->getAuthorizationUrl());
     }
@@ -25,15 +24,13 @@ class OAuthController extends FrontendController
             ->getService(ProviderCollectorInterface::class)
             ->getProvider('facebook');
 
-        $provider->getClient();
-
         $accessToken = $provider->getAccessToken($_GET['code']);
 
-        $userDTO = $provider->getUserInfo($accessToken);
+        $userDataObject = $provider->getUserInfo($accessToken);
 
         $this
             ->getService(UserServiceInterface::class)
-            ->login($userDTO);
+            ->login($userDataObject);
 
         Registry::getUtils()->redirect('');
     }

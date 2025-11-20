@@ -1,10 +1,14 @@
 <?php
 
-namespace OxidEsales\SecurityModule\Authentication\OAuth2\Service\Provider;
+/**
+ * Copyright © OXID eSales AG. All rights reserved.
+ * See LICENSE file for license details.
+ */
 
-use League\OAuth2\Client\Provider\AbstractProvider;
+namespace OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Provider;
+
 use League\OAuth2\Client\Token\AccessTokenInterface;
-use OxidEsales\SecurityModule\Authentication\OAuth2\DTO\UserDTOInterface;
+use OxidEsales\SecurityModule\Authentication\OAuth2\DataObject\UserInterface;
 
 interface ProviderInterface
 {
@@ -19,11 +23,6 @@ interface ProviderInterface
     public function isActive(): bool;
 
     /**
-     * Get the underlying OAuth2 client (League provider instance).
-     */
-    public function getClient(): AbstractProvider;
-
-    /**
      * Get the authorization URL to redirect the user for login/consent.
      */
     public function getAuthorizationUrl(array $options = []): string;
@@ -35,12 +34,7 @@ interface ProviderInterface
 
     /**
      * Fetch user information (claims) from the provider using the access token.
-     * Should return standardized data: id, email, name, avatar, etc.
+     * Should return UserInterface
      */
-    public function getUserInfo(AccessTokenInterface $token): UserDTOInterface;
-
-    /**
-     * Validate the provider response.
-     */
-    public function validateToken(AccessTokenInterface $token): bool;
+    public function getUserInfo(AccessTokenInterface $token): UserInterface;
 }

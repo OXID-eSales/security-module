@@ -9,40 +9,35 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Authentication\OAuth2\Service;
 
-use OxidEsales\SecurityModule\Authentication\OAuth2\Service\Provider\ProviderInterface;
-use OxidEsales\SecurityModule\Authentication\OAuth2\Service\Provider\ProviderNotFound;
+use OxidEsales\SecurityModule\Authentication\OAuth2\Exception\ProviderNotFoundException;
+use OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Provider\ProviderInterface;
 
 class ProviderCollector implements ProviderCollectorInterface
 {
+    /**
+     * @param iterable<ProviderInterface> $providers
+     */
     public function __construct(
         protected iterable $providers,
     ) {
     }
 
-    /**
-     * @return array<ProviderInterface>
-     */
     public function getProviders(): array
     {
-        $result = [];
-
-        foreach ($this->providers as $provider) {
-            $result[$provider->getName()] = $provider;
-        }
-
-        ksort($result);
-
-        return $result;
+        return iterator_to_array($this->providers, false);
     }
 
     public function getProvider(string $name): ProviderInterface
     {
-        $providers = $this->getProviders();
+        $providerFound = array_filter(
+            iterator_to_array($this->providers, false),
+            fn ($provider) => $provider->getName() === $name
+        );
 
-        if (!isset($providers[$name])) {
-            throw new ProviderNotFound();
+        if (!$providerFound) {
+            throw new ProviderNotFoundException();
         }
 
-        return $providers[$name];
+        return reset($providerFound);
     }
 }

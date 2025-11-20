@@ -117,7 +117,7 @@ $aModule = [
         //OAuth2 settings
         [
             'group' => 'oauth',
-            'name'  => ModuleSettingsService::FACEBOOK_ACTIVE,
+            'name'  => ModuleSettingsService::FACEBOOK_LOGIN_ENABLED,
             'type'  => 'bool',
             'value' => false
         ],

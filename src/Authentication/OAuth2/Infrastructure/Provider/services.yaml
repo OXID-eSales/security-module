@@ -1,0 +1,10 @@
+services:
+  _defaults:
+    autowire: true
+    public: false
+
+  OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Provider\Facebook\FacebookProviderFactory:
+    class: OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Provider\Facebook\FacebookProviderFactory
+
+  OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Provider\Facebook\Facebook:
+    tags: [ 'security.oauth.tag.provider' ]
