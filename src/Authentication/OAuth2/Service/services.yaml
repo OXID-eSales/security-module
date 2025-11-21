@@ -5,6 +5,7 @@ services:
 
   OxidEsales\SecurityModule\Authentication\OAuth2\Service\ModuleSettingsServiceInterface:
     class: OxidEsales\SecurityModule\Authentication\OAuth2\Service\ModuleSettingsService
+    public: true
 
   OxidEsales\SecurityModule\Authentication\OAuth2\Service\UserServiceInterface:
     class: OxidEsales\SecurityModule\Authentication\OAuth2\Service\UserService

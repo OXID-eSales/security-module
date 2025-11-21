@@ -86,6 +86,55 @@ class UserServiceTest extends IntegrationTestCase
         $sut->login($userDataObjectMock);
     }
 
+    public function testLoginWithoutEmail(): void
+    {
+        $userDataObjectMock = $this->createMock(UserInterface::class);
+
+        $sut = $this->getSut();
+
+        $this->expectException(UserNotFoundException::class);
+
+        $sut->login($userDataObjectMock);
+    }
+
+    public function testGetUserByUserEmailIsFound(): void
+    {
+        $userDataObjectMock = $this->createMock(UserInterface::class);
+        $userDataObjectMock->method('getEmail')->willReturn(uniqid());
+
+        $userRepositoryMock = $this->createMock(UserRepositoryInterface::class);
+        $userRepositoryMock->method('getUserByUserEmail')->willReturn(new UserModel());
+        $userRepositoryMock->expects($this->never())->method('createUser');
+
+        $sut = $this->getSut(
+            userRepository: $userRepositoryMock
+        );
+
+        $sut->login($userDataObjectMock);
+    }
+
+    public function testGetUserByUserEmailIsNotFoundByCreated(): void
+    {
+        $userDataObjectMock = $this->createMock(UserInterface::class);
+        $userDataObjectMock->method('getEmail')->willReturn(uniqid());
+
+        $userRepositoryMock = $this->createMock(UserRepositoryInterface::class);
+        $userRepositoryMock
+            ->method('getUserByUserEmail')
+            ->willThrowException(new UserNotFoundException());
+        $userRepositoryMock
+            ->expects($this->once())
+            ->method('createUser')
+            ->with($userDataObjectMock)
+            ->willReturn(new UserModel());
+
+        $sut = $this->getSut(
+            userRepository: $userRepositoryMock
+        );
+
+        $sut->login($userDataObjectMock);
+    }
+
     private function createTestUser(string $username): string
     {
         $user = oxNew(UserModel::class);

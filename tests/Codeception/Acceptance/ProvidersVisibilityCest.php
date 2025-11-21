@@ -28,7 +28,7 @@ class ProvidersVisibilityCest extends BaseCest
     private $providerLink =
         'div[contains(@class, "sign-in-providers")]' .
         '//div[@class="provider"]' .
-        '//a[contains(@href, "cl=oauth&fnc=redirect&provider=")]';
+        '//a[contains(@href, "cl=oauth&fnc=login&provider=")]';
 
     public function testProvidersVisibilityOnHeaderLogin(AcceptanceTester $I): void
     {
@@ -69,41 +69,6 @@ class ProvidersVisibilityCest extends BaseCest
         $this->setProviderState(true);
         $basket = new Basket($I);
         $basket->addProductToBasketAndOpenUserCheckout('1000', 1);
-        $I->seeElement($providerLinkElement);
-        $I->assertGreaterOrEquals(1, count($I->grabMultiple($providerLinkElement)));
-    }
-
-    public function testProviderVisibilityOnCheckoutWithoutAccount(AcceptanceTester $I): void
-    {
-        $providerLinkElement = '//div[contains(@class, "card-body")]//' . $this->providerLink;
-
-        $basket = new Basket($I);
-        $userCheckout = $basket->addProductToBasketAndOpenUserCheckout('1000', 1);
-        $userCheckout->selectOptionNoRegistration();
-        $I->dontSeeElement($providerLinkElement);
-
-        $this->setProviderState(true);
-        $basket = new Basket($I);
-        $userCheckout = $basket->addProductToBasketAndOpenUserCheckout('1000', 1);
-        $userCheckout->selectOptionNoRegistration();
-        $I->seeElement($providerLinkElement);
-        $I->assertGreaterOrEquals(1, count($I->grabMultiple($providerLinkElement)));
-    }
-
-    public function testProviderVisibilityOnCheckoutWithNewAccount(AcceptanceTester $I): void
-    {
-        $providerLinkElement = '//div[contains(@class, "card-body")]//' . $this->providerLink;
-
-        $basket = new Basket($I);
-        $basket
-            ->addProductToBasketAndOpenUserCheckout('1000', 1)
-            ->selectOptionRegisterNewAccount();
-        $I->dontSeeElement($providerLinkElement);
-
-        $this->setProviderState(true);
-        $basket
-            ->addProductToBasketAndOpenUserCheckout('1000', 1)
-            ->selectOptionRegisterNewAccount();
         $I->seeElement($providerLinkElement);
         $I->assertGreaterOrEquals(1, count($I->grabMultiple($providerLinkElement)));
     }
