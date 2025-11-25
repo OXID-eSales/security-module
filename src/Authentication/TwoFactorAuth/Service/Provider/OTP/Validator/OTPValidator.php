@@ -12,6 +12,7 @@ namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\Provide
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\AttemptLimitExceededException;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\InvalidCodeException;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\TimeExpiredException;
+use DateTime;
 
 readonly class OTPValidator implements OTPValidatorInterface
 {
@@ -35,7 +36,7 @@ readonly class OTPValidator implements OTPValidatorInterface
         }
     }
 
-    public function checkExpirationTime(int $expiresAt): void
+    public function checkExpirationTime(\DateTimeInterface $expiresAt): void
     {
         if (time() > $expiresAt) {
             throw new TimeExpiredException();

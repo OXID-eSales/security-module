@@ -12,6 +12,7 @@ namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\Provide
 use OxidEsales\Eshop\Application\Model\User as UserModel;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\DTO\UserDTO;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\Provider\OTP\Validator\OTPValidatorInterface;
+use DateTimeImmutable;
 
 readonly class OTPService implements OTPServiceInterface
 {
@@ -25,7 +26,7 @@ readonly class OTPService implements OTPServiceInterface
         $otpData = new UserDTO(
             $user->getFieldData('OTPCODE'),
             (int) $user->getFieldData('OTPATTEMPTS'),
-            (int) $user->getFieldData('OTPEXPIRETIME')
+            new \DateTime($user->getFieldData('OTPEXPIRETIME'))
         );
 
         $this->otpValidator->checkLoginAttempts($otpData->getAttempts());

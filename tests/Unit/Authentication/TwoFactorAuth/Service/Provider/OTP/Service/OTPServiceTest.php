@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Tests\Unit\Authentication\TwoFactorAuth\Service\Provider\OTP\Service;
 
+use OxidEsales\Eshop\Application\Model\User as UserModel;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\AttemptLimitExceededException;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\InvalidCodeException;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\TimeExpiredException;
@@ -16,11 +17,21 @@ use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\Provider\OTP\
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\Provider\OTP\Service\OTPServiceInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\Provider\OTP\Validator\OTPValidatorInterface;
 use PHPUnit\Framework\TestCase;
+use DateTime;
 
 class OTPServiceTest extends TestCase
 {
     public function testInvalidCode(): void
     {
+        $userModelMock = $this->createMock(UserModel::class);
+        $userModelMock
+            ->method('getFieldData')
+            ->willReturnMap([
+                ['OTPCODE', uniqid()],
+                ['OTPATTEMPTS', 0],
+                ['OTPEXPIRETIME', (new DateTime('+1 hour'))->format('Y-m-d H:i:s')],
+            ]);
+
         $otpValidator = $this->createMock(OTPValidatorInterface::class);
         $otpValidator->method('validateCode')->willThrowException(new InvalidCodeException());
 
@@ -30,11 +41,20 @@ class OTPServiceTest extends TestCase
 
         $this->expectException(InvalidCodeException::class);
 
-        $otpService->validateCode(uniqid());
+        $otpService->validateCode($userModelMock, uniqid());
     }
 
     public function testExpiredCode(): void
     {
+        $userModelMock = $this->createMock(UserModel::class);
+        $userModelMock
+            ->method('getFieldData')
+            ->willReturnMap([
+                ['OTPCODE', uniqid()],
+                ['OTPATTEMPTS', 99],
+                ['OTPEXPIRETIME', (new DateTime('+1 hour'))->format('Y-m-d H:i:s')],
+            ]);
+
         $otpValidator = $this->createMock(OTPValidatorInterface::class);
         $otpValidator->method('validateCode')->willThrowException(new TimeExpiredException());
 
@@ -44,11 +64,23 @@ class OTPServiceTest extends TestCase
 
         $this->expectException(TimeExpiredException::class);
 
-        $otpService->validateCode(uniqid());
+        $otpService->validateCode(
+            $userModelMock,
+            uniqid()
+        );
     }
 
     public function testAttemptsCode(): void
     {
+        $userModelMock = $this->createMock(UserModel::class);
+        $userModelMock
+            ->method('getFieldData')
+            ->willReturnMap([
+                ['OTPCODE', uniqid()],
+                ['OTPATTEMPTS', 0],
+                ['OTPEXPIRETIME', (new DateTime('-1 hour'))->format('Y-m-d H:i:s')],
+            ]);
+
         $otpValidator = $this->createMock(OTPValidatorInterface::class);
         $otpValidator->method('validateCode')->willThrowException(new AttemptLimitExceededException());
 
@@ -58,7 +90,10 @@ class OTPServiceTest extends TestCase
 
         $this->expectException(AttemptLimitExceededException::class);
 
-        $otpService->validateCode(uniqid());
+        $otpService->validateCode(
+            $userModelMock,
+            uniqid()
+        );
     }
 
     public function getSut(
