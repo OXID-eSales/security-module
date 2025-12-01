@@ -9,7 +9,7 @@ namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\DTO;
 
 use DateTimeInterface;
 
-interface UserDTOInterface
+interface UserInterface
 {
     public function getCode(): ?string;
 

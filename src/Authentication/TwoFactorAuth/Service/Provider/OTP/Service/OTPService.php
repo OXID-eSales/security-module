@@ -10,7 +10,8 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\Provider\OTP\Service;
 
 use OxidEsales\Eshop\Application\Model\User as UserModel;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\DTO\UserDTO;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\DTO\User;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Repository\UserRepositoryInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\Provider\OTP\Validator\OTPValidatorInterface;
 use DateTimeImmutable;
 
@@ -18,12 +19,13 @@ readonly class OTPService implements OTPServiceInterface
 {
     public function __construct(
         private OTPValidatorInterface $otpValidator,
+        private UserRepositoryInterface $userRepository,
     ) {
     }
 
     public function validateCode(UserModel $user, string $inputCode): void
     {
-        $otpData = new UserDTO(
+        $otpData = new User(
             $user->getFieldData('OTPCODE'),
             (int) $user->getFieldData('OTPATTEMPTS'),
             new \DateTime($user->getFieldData('OTPEXPIRETIME'))
@@ -35,20 +37,12 @@ readonly class OTPService implements OTPServiceInterface
         try {
             $this->otpValidator->validateCode($otpData->getCode(), $inputCode);
         } catch (\Exception $e) {
-            // todo: got to repository
-            $user->assign([
-                'OTPATTEMPTS' => $otpData->getAttempts() + 1
-            ]);
+            $this->userRepository->updateAttempts($user->getId(), $otpData->getAttempts() + 1);
             $user->save();
             throw $e;
         }
 
-        // todo: got to repository
-        $user->assign([
-            'OTPCODE'       => '',
-            'OTPEXPIRETIME' => 0,
-            'OTPATTEMPTS'   => 0,
-        ]);
+        $this->userRepository->resetCodeFields($user->getId());
         $user->save();
     }
 }

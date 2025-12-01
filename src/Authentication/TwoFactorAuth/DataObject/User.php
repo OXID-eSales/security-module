@@ -11,7 +11,7 @@ namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\DTO;
 
 use DateTimeInterface;
 
-class UserDTO implements UserDTOInterface
+class User implements UserInterface
 {
     public function __construct(
         private readonly ?string $code,

@@ -15,4 +15,9 @@ class AuthorizeService
     {
         //todo: call correct provider service to validate the code
     }
+
+    public function generate($userName)
+    {
+        //todo: call correct provider service to generate the code
+    }
 }
