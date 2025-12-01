@@ -9,12 +9,10 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Provider\Facebook;
 
-use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\Facebook as FacebookProvider;
-use OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Provider\ClientProviderFactoryInterface;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Service\ModuleSettingsServiceInterface;
 
-class FacebookProviderFactory implements ClientProviderFactoryInterface
+class FacebookProviderFactory implements FacebookProviderFactoryInterface
 {
     public function __construct(
         private readonly ModuleSettingsServiceInterface $moduleSettings,
@@ -24,7 +22,7 @@ class FacebookProviderFactory implements ClientProviderFactoryInterface
     /**
      * @inheritDoc
      */
-    public function create(): AbstractProvider
+    public function create(): FacebookProvider
     {
         return new FacebookProvider([
             'clientId'        => $this->moduleSettings->getFacebookClientId(),

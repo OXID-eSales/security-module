@@ -7,10 +7,10 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\SecurityModule\Tests\Integration\Authentication\OAuth2\Infrastructure;
+namespace OxidEsales\SecurityModule\Tests\Integration\Authentication\OAuth2\Infrastructure\Factory;
 
 use OxidEsales\Eshop\Application\Model\User;
-use OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\UserFactory;
+use OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Factory\UserFactory;
 use PHPUnit\Framework\TestCase;
 
 class UserFactoryTest extends TestCase
@@ -32,7 +32,6 @@ class UserFactoryTest extends TestCase
 
         $newUserFactory = $userFactory->create();
         $this->assertInstanceOf(User::class, $newUserFactory);
-
         $this->assertNotSame($userModel, $newUserFactory);
     }
 }

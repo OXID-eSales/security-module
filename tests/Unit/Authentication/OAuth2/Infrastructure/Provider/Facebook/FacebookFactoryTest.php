@@ -18,11 +18,22 @@ class FacebookFactoryTest extends TestCase
 {
     public function testFactory(): void
     {
-        $facebookProviderFactory = new FacebookProviderFactory(
-            $this->createMock(ModuleSettingsServiceInterface::class)
+        $clientId = uniqid();
+        $redirectUrl = uniqid();
+
+        $moduleSettingsMock = $this->createStub(ModuleSettingsServiceInterface::class);
+        $moduleSettingsMock->method('getFacebookClientId')->willReturn($clientId);
+        $moduleSettingsMock->method('getFacebookRedirectUrl')->willReturn($redirectUrl);
+
+        $fbProviderFactory = new FacebookProviderFactory(
+            $moduleSettingsMock
         );
-        $facebookProvider = $facebookProviderFactory->create();
+        $facebookProvider = $fbProviderFactory->create();
+
+        $authUrl = $facebookProvider->getAuthorizationUrl();
 
         $this->assertInstanceOf(FacebookProvider::class, $facebookProvider);
+        $this->assertStringContainsString('client_id=' . $clientId, $authUrl);
+        $this->assertStringContainsString('redirect_uri=' . $redirectUrl, $authUrl);
     }
 }

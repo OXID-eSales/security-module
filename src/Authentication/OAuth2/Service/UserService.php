@@ -10,10 +10,10 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Authentication\OAuth2\Service;
 
 use OxidEsales\EshopCommunity\Internal\Framework\Session\SessionInterface;
-use OxidEsales\SecurityModule\Authentication\OAuth2\DataObject\UserInterface;
+use OxidEsales\SecurityModule\Authentication\OAuth2\DTO\OAuth2UserDTOInterface;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Exception\UserBlockedException;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Exception\UserNotFoundException;
-use OxidEsales\SecurityModule\Authentication\OAuth2\Repository\UserRepositoryInterface;
+use OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Repository\UserRepositoryInterface;
 
 readonly class UserService implements UserServiceInterface
 {
@@ -23,20 +23,19 @@ readonly class UserService implements UserServiceInterface
     ) {
     }
 
-    public function login(UserInterface $userDataObject): void
+    public function login(OAuth2UserDTOInterface $auth2UserDTO): void
     {
-        if (!$userDataObject->getEmail()) {
+        if (!$auth2UserDTO->getEmail()) {
             throw new UserNotFoundException();
         }
 
         try {
-            $userModel = $this->userRepository->getUserByUserEmail($userDataObject->getEmail());
-
-            if ($userModel->inGroup('oxidblocked')) {
+            $userModel = $this->userRepository->getUserByEmail($auth2UserDTO->getEmail());
+            if ($userModel->isBlocked()) {
                 throw new UserBlockedException();
             }
         } catch (UserNotFoundException $e) {
-            $userModel = $this->userRepository->createUser($userDataObject);
+            $userModel = $this->userRepository->createUser($auth2UserDTO);
         }
 
         $this->session->set('usr', $userModel->getId());

@@ -12,14 +12,23 @@ namespace Authentication\OAuth2\Infrastructure\Provider\Facebook;
 use League\OAuth2\Client\Provider\FacebookUser;
 use League\OAuth2\Client\Token\AccessToken;
 use League\OAuth2\Client\Token\AccessTokenInterface;
-use OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Provider\Facebook\Facebook;
+use OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Provider\Facebook\FacebookAdapter;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Provider\Facebook\FacebookProviderFactory;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Service\ModuleSettingsServiceInterface;
 use PHPUnit\Framework\TestCase;
 use League\OAuth2\Client\Provider\Facebook as FacebookOAuthProvider;
 
-class FacebookTest extends TestCase
+class FacebookAdapterTest extends TestCase
 {
+    public function testProviderGeInfoThrowException(): void
+    {
+        $sut = $this->getSut();
+
+        $this->expectException(\Exception::class);
+
+        $sut->getUserInfo($this->createStub(AccessTokenInterface::class));
+    }
+
     public function testProviderActivity(): void
     {
         $isActive = (bool) rand(0, 1);
@@ -66,12 +75,12 @@ class FacebookTest extends TestCase
     {
         $code = uniqid();
 
-        $expectedTokenMock = $this->createMock(AccessTokenInterface::class);
+        $expectedTokenStub = $this->createStub(AccessTokenInterface::class);
 
         $providerInstanceMock = $this->createMock(FacebookOAuthProvider::class);
         $providerInstanceMock
             ->method('getAccessToken')
-            ->willReturn($expectedTokenMock);
+            ->willReturn($expectedTokenStub);
 
         $providerFactoryMock = $this->createMock(FacebookProviderFactory::class);
         $providerFactoryMock
@@ -82,21 +91,26 @@ class FacebookTest extends TestCase
             facebookProvider: $providerFactoryMock
         );
 
-        $this->assertSame($expectedTokenMock, $sut->getAccessToken($code));
+        $this->assertSame($expectedTokenStub, $sut->getAccessToken($code));
     }
 
     public function testProviderUserInfo(): void
     {
+        $expectedFirstName = uniqid();
+        $expectedLastName = uniqid();
         $expectedEmail = uniqid();
 
+        $accessTokenMock = $this->createStub(AccessToken::class);
+
         $resourceOwnerMock = $this->createMock(FacebookUser::class);
-        $resourceOwnerMock
-            ->method('getEmail')
-            ->willReturn($expectedEmail);
+        $resourceOwnerMock->method('getFirstName')->willReturn($expectedFirstName);
+        $resourceOwnerMock->method('getLastName')->willReturn($expectedLastName);
+        $resourceOwnerMock->method('getEmail')->willReturn($expectedEmail);
 
         $providerInstanceMock = $this->createMock(FacebookOAuthProvider::class);
         $providerInstanceMock
             ->method('getResourceOwner')
+            ->with($accessTokenMock)
             ->willReturn($resourceOwnerMock);
 
         $providerFactoryMock = $this->createMock(FacebookProviderFactory::class);
@@ -108,17 +122,18 @@ class FacebookTest extends TestCase
             facebookProvider: $providerFactoryMock
         );
 
-        $accessTokenMock = $this->createMock(AccessToken::class);
         $userInfo = $sut->getUserInfo($accessTokenMock);
 
+        $this->assertSame($expectedFirstName, $userInfo->getFirstName());
+        $this->assertSame($expectedLastName, $userInfo->getLastName());
         $this->assertSame($expectedEmail, $userInfo->getEmail());
     }
 
     private function getSut(
         ModuleSettingsServiceInterface $moduleSettings = null,
         FacebookProviderFactory $facebookProvider = null,
-    ): Facebook {
-        return new Facebook(
+    ): FacebookAdapter {
+        return new FacebookAdapter(
             moduleSettings: $moduleSettings ?? $this->createStub(ModuleSettingsServiceInterface::class),
             facebookProvider: $facebookProvider ?? $this->createStub(FacebookProviderFactory::class)
         );

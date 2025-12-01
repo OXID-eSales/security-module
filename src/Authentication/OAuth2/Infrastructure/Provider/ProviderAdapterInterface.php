@@ -8,9 +8,9 @@
 namespace OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Provider;
 
 use League\OAuth2\Client\Token\AccessTokenInterface;
-use OxidEsales\SecurityModule\Authentication\OAuth2\DataObject\UserInterface;
+use OxidEsales\SecurityModule\Authentication\OAuth2\DTO\OAuth2UserDTOInterface;
 
-interface ProviderInterface
+interface ProviderAdapterInterface
 {
     /**
      * Get the unique identifier of the provider (e.g., 'google', 'facebook').
@@ -36,5 +36,5 @@ interface ProviderInterface
      * Fetch user information (claims) from the provider using the access token.
      * Should return UserInterface
      */
-    public function getUserInfo(AccessTokenInterface $token): UserInterface;
+    public function getUserInfo(AccessTokenInterface $token): OAuth2UserDTOInterface;
 }

@@ -16,7 +16,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\String\UnicodeString;
 
-class ModuleSettingsTest extends TestCase
+class ModuleSettingsServiceTest extends TestCase
 {
     public static function gettersDataProvider(): array
     {

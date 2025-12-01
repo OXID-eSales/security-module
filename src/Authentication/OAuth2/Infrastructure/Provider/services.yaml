@@ -3,8 +3,8 @@ services:
     autowire: true
     public: false
 
-  OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Provider\Facebook\FacebookProviderFactory:
+  OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Provider\Facebook\FacebookProviderFactoryInterface:
     class: OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Provider\Facebook\FacebookProviderFactory
 
-  OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Provider\Facebook\Facebook:
+  OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Provider\Facebook\FacebookAdapter:
     tags: [ 'security.oauth.tag.provider' ]
