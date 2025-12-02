@@ -14,12 +14,14 @@ use OxidEsales\SecurityModule\Authentication\OAuth2\DTO\UserDTOInterface;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Exception\UserNotFoundException;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Factory\UserDTOFactoryInterface;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Factory\UserFactoryInterface;
+use OxidEsales\SecurityModule\Shared\Service\PasswordGeneratorServiceInterface;
 
 class UserRepository implements UserRepositoryInterface
 {
     public function __construct(
         private UserFactoryInterface $userFactory,
         private UserDTOFactoryInterface $userDTOFactory,
+        private PasswordGeneratorServiceInterface $passwordGenerator
     ) {
     }
 
@@ -28,10 +30,7 @@ class UserRepository implements UserRepositoryInterface
         $userModel = $this->userFactory->create();
 
         $userId = $userModel->getIdByUserName($username);
-        if (
-            !$userId ||
-            !$userModel->load($userId)
-        ) {
+        if (!$userId || !$userModel->load($userId)) {
             throw new UserNotFoundException();
         }
 
@@ -45,9 +44,8 @@ class UserRepository implements UserRepositoryInterface
             'OXFNAME'    => $userDTO->getFirstName(),
             'OXLNAME'    => $userDTO->getLastName(),
             'OXUSERNAME' => $userDTO->getEmail(),
-            'OXREGISTER' => date('Y-m-d H:i:s')
         ]);
-        $userModel->setPassword(bin2hex(random_bytes(20)));
+        $userModel->setPassword($this->passwordGenerator->generatePasswordForOAuthUser());
         $userModel->createUser();
 
         return $this->userDTOFactory->createFromModel($userModel);

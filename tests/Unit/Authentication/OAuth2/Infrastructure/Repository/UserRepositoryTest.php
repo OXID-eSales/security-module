@@ -16,11 +16,12 @@ use OxidEsales\SecurityModule\Authentication\OAuth2\Exception\UserNotFoundExcept
 use OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Factory\UserDTOFactoryInterface;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Factory\UserFactoryInterface;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Repository\UserRepository;
+use OxidEsales\SecurityModule\Shared\Service\PasswordGeneratorServiceInterface;
 use PHPUnit\Framework\TestCase;
 
 class UserRepositoryTest extends TestCase
 {
-    public function testGetUserByEmailReturnsUserModel(): void
+    public function testGetUserByEmailReturnsUserDTO(): void
     {
         $username = uniqid();
         $userId = uniqid();
@@ -38,7 +39,6 @@ class UserRepositoryTest extends TestCase
 
         $userDTOFactory = $this->createMock(UserDTOFactoryInterface::class);
         $userDTOFactory
-            ->expects($this->once())
             ->method('createFromModel')
             ->with($userModel)
             ->willReturn($userDTOStub);
@@ -48,10 +48,7 @@ class UserRepositoryTest extends TestCase
             userDTOFactory: $userDTOFactory,
         );
 
-        $this->assertEquals(
-            $userDTOStub,
-            $repository->getUserByEmail($username)
-        );
+        $this->assertSame($userDTOStub, $repository->getUserByEmail($username));
     }
 
     public function testGetUserByEmailThrowsExceptionIfUserNotFound(): void
@@ -93,23 +90,27 @@ class UserRepositoryTest extends TestCase
         $repository->getUserByEmail($username);
     }
 
-    public function testUserIsCreatedWhenNotFoundIdDB(): void
+    public function testCreateUser(): void
     {
         $firstName = uniqid();
         $lastName = uniqid();
         $username = uniqid();
-        $userId = uniqid();
 
         $userDTOMock = $this->createMock(OAuth2UserDTOInterface::class);
         $userDTOMock->method('getFirstName')->willReturn($firstName);
         $userDTOMock->method('getLastName')->willReturn($lastName);
         $userDTOMock->method('getEmail')->willReturn($username);
 
+        $passwordGenerator = $this->createMock(PasswordGeneratorServiceInterface::class);
+        $passwordGenerator->method('generatePasswordForOAuthUser')->willReturn($password = uniqid());
+
         $userModel = $this->createMock(UserModel::class);
-        $userModel->method('getId')->willReturn($userId);
-        $userModel->method('inGroup')->with('oxidblocked')->willReturn(false);
-        $userModel->expects($this->once())->method('assign');
-        $userModel->expects($this->once())->method('setPassword');
+        $userModel->method('assign')->with([
+            'OXFNAME'    => $firstName,
+            'OXLNAME'    => $lastName,
+            'OXUSERNAME' => $username,
+        ]);
+        $userModel->method('setPassword')->with($password);
 
         $userFactory = $this->createMock(UserFactoryInterface::class);
         $userFactory->method('create')->willReturn($userModel);
@@ -118,29 +119,28 @@ class UserRepositoryTest extends TestCase
 
         $userDTOFactory = $this->createStub(UserDTOFactoryInterface::class);
         $userDTOFactory
-            ->expects($this->once())
             ->method('createFromModel')
             ->with($userModel)
             ->willReturn($userDTOStub);
 
         $repository = $this->getSut(
             userFactory: $userFactory,
-            userDTOFactory: $userDTOFactory
+            userDTOFactory: $userDTOFactory,
+            passwordGenerator: $passwordGenerator
         );
 
-        $this->assertEquals(
-            $userDTOStub,
-            $repository->createUser($userDTOMock)
-        );
+        $this->assertEquals($userDTOStub, $repository->createUser($userDTOMock));
     }
 
     private function getSut(
         UserFactoryInterface $userFactory = null,
         UserDTOFactoryInterface $userDTOFactory = null,
+        PasswordGeneratorServiceInterface $passwordGenerator = null
     ): UserRepository {
         return new UserRepository(
             $userFactory ?? $this->createStub(UserFactoryInterface::class),
             $userDTOFactory ?? $this->createStub(UserDTOFactoryInterface::class),
+            $passwordGenerator ?? $this->createStub(PasswordGeneratorServiceInterface::class)
         );
     }
 }

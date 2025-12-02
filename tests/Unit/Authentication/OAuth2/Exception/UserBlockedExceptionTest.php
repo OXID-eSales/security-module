@@ -18,6 +18,6 @@ class UserBlockedExceptionTest extends TestCase
     {
         $exception = new UserBlockedException();
 
-        $this->assertInstanceOf(UserBlockedException::class, $exception);
+        $this->assertInstanceOf(\Exception::class, $exception);
     }
 }

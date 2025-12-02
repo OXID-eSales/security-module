@@ -18,6 +18,6 @@ class UserNotFoundExceptionTest extends TestCase
     {
         $exception = new UserNotFoundException();
 
-        $this->assertInstanceOf(UserNotFoundException::class, $exception);
+        $this->assertInstanceOf(\Exception::class, $exception);
     }
 }

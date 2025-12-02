@@ -30,14 +30,14 @@ readonly class UserService implements UserServiceInterface
         }
 
         try {
-            $userModel = $this->userRepository->getUserByEmail($auth2UserDTO->getEmail());
-            if ($userModel->isBlocked()) {
+            $userDTO = $this->userRepository->getUserByEmail($auth2UserDTO->getEmail());
+            if ($userDTO->isBlocked()) {
                 throw new UserBlockedException();
             }
         } catch (UserNotFoundException $e) {
-            $userModel = $this->userRepository->createUser($auth2UserDTO);
+            $userDTO = $this->userRepository->createUser($auth2UserDTO);
         }
 
-        $this->session->set('usr', $userModel->getId());
+        $this->session->set('usr', $userDTO->getId());
     }
 }

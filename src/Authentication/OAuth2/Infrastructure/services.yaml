@@ -2,8 +2,3 @@ imports:
   - { resource: Factory/services.yaml }
   - { resource: Provider/services.yaml }
   - { resource: Repository/services.yaml }
-
-services:
-  _defaults:
-    autowire: true
-    public: false

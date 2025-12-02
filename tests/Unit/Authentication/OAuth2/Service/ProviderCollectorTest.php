@@ -7,64 +7,72 @@
 
 declare(strict_types=1);
 
-namespace Authentication\OAuth2\Service;
+namespace OxidEsales\SecurityModule\Tests\Unit\Authentication\OAuth2\Service;
 
+use ArrayIterator;
+use Closure;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Exception\ProviderNotFoundException;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Provider\ProviderAdapterInterface;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Service\ProviderCollector;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class ProviderCollectorTest extends TestCase
 {
-    public function testGetProviders(): void
+    // This provider returns factories for each iterable type
+    public static function iteratorWrapperDataProvider(): \Generator
     {
-        $provider1 = $this->createConfiguredMock(ProviderAdapterInterface::class, [
-            'getName' => uniqid(),
-        ]);
-        $provider2 = $this->createConfiguredMock(ProviderAdapterInterface::class, [
-            'getName' => uniqid(),
-        ]);
+        yield 'array' => [fn(array $stubs) => $stubs];
+        yield 'ArrayIterator' => [fn(array $stubs) => new ArrayIterator($stubs)];
+        yield 'Generator' => [fn(array $stubs) => (function () use ($stubs) {
+            yield from $stubs;
+        })()];
+    }
 
-        $providers = [$provider1, $provider2];
-        $sut = new ProviderCollector($providers);
+    #[DataProvider('iteratorWrapperDataProvider')]
+    public function testGetProviders(Closure $wrapperFactory): void
+    {
+        $stub1 = $this->getProviderAdapterStub();
+        $stub2 = $this->getProviderAdapterStub();
+        $stubs = [$stub1, $stub2];
+
+        $sut = new ProviderCollector($wrapperFactory($stubs));
         $result = $sut->getProviders();
 
         $this->assertIsArray($result);
         $this->assertCount(2, $result);
-        $this->assertSame($providers, $result);
+        $this->assertSame($stubs, $result);
     }
 
-    public function testGetExistingProvider()
+    #[DataProvider('iteratorWrapperDataProvider')]
+    public function testGetExistingProvider(Closure $wrapperFactory): void
     {
-        $provider1 = $this->createConfiguredMock(ProviderAdapterInterface::class, [
-            'getName' => uniqid(),
-        ]);
-        $provider2 = $this->createConfiguredMock(ProviderAdapterInterface::class, [
-            'getName' => uniqid(),
-        ]);
+        $stub1 = $this->getProviderAdapterStub();
+        $stub2 = $this->getProviderAdapterStub();
+        $stubs = [$stub1, $stub2];
+        $searchProvider = $stubs[array_rand($stubs)];
 
-        $providers = [$provider1, $provider2];
-
-        $searchProvider = $providers[array_rand($providers)];
-
-        $sut = new ProviderCollector($providers);
+        $sut = new ProviderCollector($wrapperFactory($stubs));
         $result = $sut->getProvider($searchProvider->getName());
 
         $this->assertSame($searchProvider, $result);
     }
 
-    public function testGetNotExistingProvider()
+    #[DataProvider('iteratorWrapperDataProvider')]
+    public function testGetNotExistingProvider(Closure $wrapperFactory): void
     {
-        $provider1 = $this->createConfiguredMock(ProviderAdapterInterface::class, [
-            'getName' => uniqid(),
-        ]);
-        $provider2 = $this->createConfiguredMock(ProviderAdapterInterface::class, [
-            'getName' => uniqid(),
-        ]);
+        $stub1 = $this->getProviderAdapterStub();
+        $stub2 = $this->getProviderAdapterStub();
+        $stubs = [$stub1, $stub2];
 
         $this->expectException(ProviderNotFoundException::class);
 
-        $sut = new ProviderCollector([$provider1, $provider2]);
-        $sut->getProvider('provider 9');
+        $sut = new ProviderCollector($wrapperFactory($stubs));
+        $sut->getProvider('nonexistent-provider');
+    }
+
+    private function getProviderAdapterStub(): ProviderAdapterInterface
+    {
+        return $this->createConfiguredStub(ProviderAdapterInterface::class, ['getName' => uniqid()]);
     }
 }

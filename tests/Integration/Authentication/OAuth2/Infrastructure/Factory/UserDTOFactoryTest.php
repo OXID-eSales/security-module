@@ -7,10 +7,9 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\SecurityModule\Tests\Unit\Authentication\OAuth2\Infrastructure\Factory;
+namespace OxidEsales\SecurityModule\Tests\Integration\Authentication\OAuth2\Infrastructure\Factory;
 
 use OxidEsales\Eshop\Application\Model\User as UserModel;
-use OxidEsales\SecurityModule\Authentication\OAuth2\DTO\UserDTO;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Factory\UserDTOFactory;
 use PHPUnit\Framework\TestCase;
 
@@ -19,17 +18,16 @@ class UserDTOFactoryTest extends TestCase
     public function testCreateFromModel(): void
     {
         $userId = uniqid();
-        $isBlocked = true;
+        $isBlocked = (bool)rand(0, 1);
 
         $userModelMock = $this->createMock(UserModel::class);
         $userModelMock->method('getId')->willReturn($userId);
         $userModelMock->method('inGroup')->with('oxidblocked')->willReturn($isBlocked);
 
-        $factory = new UserDTOFactory();
+        $sut = new UserDTOFactory();
 
-        $userDTO = $factory->createFromModel($userModelMock);
+        $userDTO = $sut->createFromModel($userModelMock);
 
-        $this->assertInstanceOf(UserDTO::class, $userDTO);
         $this->assertSame($userId, $userDTO->getId());
         $this->assertSame($isBlocked, $userDTO->isBlocked());
     }

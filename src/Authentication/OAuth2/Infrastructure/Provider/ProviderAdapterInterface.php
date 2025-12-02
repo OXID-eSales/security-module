@@ -7,6 +7,7 @@
 
 namespace OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Provider;
 
+use Exception;
 use League\OAuth2\Client\Token\AccessTokenInterface;
 use OxidEsales\SecurityModule\Authentication\OAuth2\DTO\OAuth2UserDTOInterface;
 
@@ -35,6 +36,7 @@ interface ProviderAdapterInterface
     /**
      * Fetch user information (claims) from the provider using the access token.
      * Should return UserInterface
+     * @throws Exception
      */
     public function getUserInfo(AccessTokenInterface $token): OAuth2UserDTOInterface;
 }

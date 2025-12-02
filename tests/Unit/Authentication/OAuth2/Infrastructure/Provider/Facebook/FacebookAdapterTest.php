@@ -7,28 +7,21 @@
 
 declare(strict_types=1);
 
-namespace Authentication\OAuth2\Infrastructure\Provider\Facebook;
+namespace OxidEsales\SecurityModule\Tests\Unit\Authentication\OAuth2\Infrastructure\Provider\Facebook;
 
 use League\OAuth2\Client\Provider\FacebookUser;
 use League\OAuth2\Client\Token\AccessToken;
 use League\OAuth2\Client\Token\AccessTokenInterface;
+use OxidEsales\SecurityModule\Authentication\OAuth2\DTO\OAuth2UserDTOInterface;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Provider\Facebook\FacebookAdapter;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Provider\Facebook\FacebookProviderFactory;
+use OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Factory\OAuth2UserDTOFactoryInterface;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Service\ModuleSettingsServiceInterface;
 use PHPUnit\Framework\TestCase;
 use League\OAuth2\Client\Provider\Facebook as FacebookOAuthProvider;
 
 class FacebookAdapterTest extends TestCase
 {
-    public function testProviderGeInfoThrowException(): void
-    {
-        $sut = $this->getSut();
-
-        $this->expectException(\Exception::class);
-
-        $sut->getUserInfo($this->createStub(AccessTokenInterface::class));
-    }
-
     public function testProviderActivity(): void
     {
         $isActive = (bool) rand(0, 1);
@@ -94,48 +87,59 @@ class FacebookAdapterTest extends TestCase
         $this->assertSame($expectedTokenStub, $sut->getAccessToken($code));
     }
 
+    public function testProviderGetUserInfoThrowException(): void
+    {
+        $sut = $this->getSut();
+
+        $this->expectException(\Exception::class);
+
+        $sut->getUserInfo($this->createStub(AccessTokenInterface::class));
+    }
+
     public function testProviderUserInfo(): void
     {
-        $expectedFirstName = uniqid();
-        $expectedLastName = uniqid();
-        $expectedEmail = uniqid();
+        $accessTokenStub = $this->createStub(AccessToken::class);
 
-        $accessTokenMock = $this->createStub(AccessToken::class);
-
-        $resourceOwnerMock = $this->createMock(FacebookUser::class);
-        $resourceOwnerMock->method('getFirstName')->willReturn($expectedFirstName);
-        $resourceOwnerMock->method('getLastName')->willReturn($expectedLastName);
-        $resourceOwnerMock->method('getEmail')->willReturn($expectedEmail);
+        $facebookUserStub = $this->createStub(FacebookUser::class);
 
         $providerInstanceMock = $this->createMock(FacebookOAuthProvider::class);
         $providerInstanceMock
             ->method('getResourceOwner')
-            ->with($accessTokenMock)
-            ->willReturn($resourceOwnerMock);
+            ->with($accessTokenStub)
+            ->willReturn($facebookUserStub);
 
-        $providerFactoryMock = $this->createMock(FacebookProviderFactory::class);
-        $providerFactoryMock
+        $providerFactoryStub = $this->createStub(FacebookProviderFactory::class);
+        $providerFactoryStub
             ->method('create')
             ->willReturn($providerInstanceMock);
 
+        $expectedUserDTOStub = $this->createStub(OAuth2UserDTOInterface::class);
+
+        $oAuth2UserDTOFactoryMock = $this->createMock(OAuth2UserDTOFactoryInterface::class);
+        $oAuth2UserDTOFactoryMock
+            ->method('createFromFacebookUser')
+            ->with($facebookUserStub)
+            ->willReturn($expectedUserDTOStub);
+
         $sut = $this->getSut(
-            facebookProvider: $providerFactoryMock
+            facebookProvider: $providerFactoryStub,
+            oAuth2UserDTOFactory: $oAuth2UserDTOFactoryMock
         );
 
-        $userInfo = $sut->getUserInfo($accessTokenMock);
+        $result = $sut->getUserInfo($accessTokenStub);
 
-        $this->assertSame($expectedFirstName, $userInfo->getFirstName());
-        $this->assertSame($expectedLastName, $userInfo->getLastName());
-        $this->assertSame($expectedEmail, $userInfo->getEmail());
+        $this->assertSame($expectedUserDTOStub, $result);
     }
 
     private function getSut(
         ModuleSettingsServiceInterface $moduleSettings = null,
         FacebookProviderFactory $facebookProvider = null,
+        OAuth2UserDTOFactoryInterface $oAuth2UserDTOFactory = null,
     ): FacebookAdapter {
         return new FacebookAdapter(
             moduleSettings: $moduleSettings ?? $this->createStub(ModuleSettingsServiceInterface::class),
-            facebookProvider: $facebookProvider ?? $this->createStub(FacebookProviderFactory::class)
+            facebookProviderFactory: $facebookProvider ?? $this->createStub(FacebookProviderFactory::class),
+            oAuth2UserDTOFactory: $oAuth2UserDTOFactory ?? $this->createStub(OAuth2UserDTOFactoryInterface::class),
         );
     }
 }

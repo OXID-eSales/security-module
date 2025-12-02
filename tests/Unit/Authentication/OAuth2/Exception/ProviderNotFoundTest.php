@@ -18,6 +18,6 @@ class ProviderNotFoundTest extends TestCase
     {
         $exception = new ProviderNotFoundException();
 
-        $this->assertInstanceOf(ProviderNotFoundException::class, $exception);
+        $this->assertInstanceOf(\Exception::class, $exception);
     }
 }

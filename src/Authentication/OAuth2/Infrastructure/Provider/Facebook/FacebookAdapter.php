@@ -12,8 +12,8 @@ namespace OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Provide
 use League\OAuth2\Client\Provider\FacebookUser;
 use League\OAuth2\Client\Token\AccessToken;
 use League\OAuth2\Client\Token\AccessTokenInterface;
-use OxidEsales\SecurityModule\Authentication\OAuth2\DTO\OAuth2UserDTO;
 use OxidEsales\SecurityModule\Authentication\OAuth2\DTO\OAuth2UserDTOInterface;
+use OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Factory\OAuth2UserDTOFactoryInterface;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Provider\ProviderAdapterInterface;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Service\ModuleSettingsServiceInterface;
 use League\OAuth2\Client\Provider\Facebook as FacebookProvider;
@@ -25,9 +25,10 @@ class FacebookAdapter implements ProviderAdapterInterface
 
     public function __construct(
         private readonly ModuleSettingsServiceInterface $moduleSettings,
-        private readonly FacebookProviderFactoryInterface $facebookProvider,
+        private readonly FacebookProviderFactoryInterface $facebookProviderFactory,
+        private readonly OAuth2UserDTOFactoryInterface $oAuth2UserDTOFactory,
     ) {
-        $this->provider = $this->facebookProvider->create();
+        $this->provider = $this->facebookProviderFactory->create();
     }
 
     public function isActive(): bool
@@ -59,10 +60,6 @@ class FacebookAdapter implements ProviderAdapterInterface
         /** @var FacebookUser $user */
         $user = $this->provider->getResourceOwner($token);
 
-        return new OAuth2UserDTO(
-            $user->getFirstName(),
-            $user->getLastName(),
-            $user->getEmail(),
-        );
+        return $this->oAuth2UserDTOFactory->createFromFacebookUser($user);
     }
 }

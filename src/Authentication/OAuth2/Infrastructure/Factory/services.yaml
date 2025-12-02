@@ -8,3 +8,6 @@ services:
 
   OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Factory\UserDTOFactoryInterface:
     class: OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Factory\UserDTOFactory
+
+  OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Factory\OAuth2UserDTOFactoryInterface:
+    class: OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Factory\OAuth2UserDTOFactory

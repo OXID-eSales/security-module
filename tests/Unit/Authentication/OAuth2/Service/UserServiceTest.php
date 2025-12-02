@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\SecurityModule\Tests\Integration\Authentication\OAuth2\Service;
+namespace OxidEsales\SecurityModule\Tests\Unit\Authentication\OAuth2\Service;
 
 use OxidEsales\EshopCommunity\Internal\Framework\Session\SessionInterface;
 use OxidEsales\SecurityModule\Authentication\OAuth2\DTO\OAuth2UserDTOInterface;
@@ -22,33 +22,50 @@ class UserServiceTest extends TestCase
 {
     public function testLoginWithExistingUser(): void
     {
-        $username = uniqid();
+        $userId = uniqid();
+        $userEmail = uniqid();
 
         $sessionMock = $this->createMock(SessionInterface::class);
-        $sessionMock->expects($this->once())->method('set')->with('usr');
+        $sessionMock->method('set')->with('usr', $userId);
 
         $oAuth2UserStub = $this->createStub(OAuth2UserDTOInterface::class);
-        $oAuth2UserStub->method('getEmail')->willReturn($username)->willReturn($username);
+        $oAuth2UserStub->method('getEmail')->willReturn($userEmail);
 
-        $sut = $this->getSut(
-            session: $sessionMock
-        );
+        $userDTOStub = $this->createConfiguredStub(UserDTOInterface::class, [
+            'getId' => $userId,
+            'isBlocked' => false
+        ]);
+
+        $userRepositoryMock = $this->createMock(UserRepositoryInterface::class);
+        $userRepositoryMock->method('getUserByEmail')->with($userEmail)->willReturn($userDTOStub);
+        $userRepositoryMock->expects($this->never())->method('createUser');
+
+        $sut = $this->getSut(session: $sessionMock, userRepository: $userRepositoryMock);
 
         $sut->login($oAuth2UserStub);
     }
 
     public function testLoginWillCreateUser(): void
     {
-        $username = uniqid();
+        $userId = uniqid();
+        $userEmail = uniqid();
 
         $sessionMock = $this->createMock(SessionInterface::class);
-        $sessionMock->expects($this->once())->method('set')->with('usr');
+        $sessionMock->method('set')->with('usr', $userId);
 
         $oAuth2UserStub = $this->createStub(OAuth2UserDTOInterface::class);
-        $oAuth2UserStub->method('getEmail')->willReturn($username);
+        $oAuth2UserStub->method('getEmail')->willReturn($userEmail);
+
+        $userDTOStub = $this->createConfiguredStub(UserDTOInterface::class, ['getId' => $userId]);
+
+        $userRepositoryMock = $this->createMock(UserRepositoryInterface::class);
+        $userRepositoryMock->method('getUserByEmail')->with($userEmail)
+            ->willThrowException(new UserNotFoundException());
+        $userRepositoryMock->method('createUser')->with($oAuth2UserStub)->willReturn($userDTOStub);
 
         $sut = $this->getSut(
-            session: $sessionMock
+            session: $sessionMock,
+            userRepository: $userRepositoryMock
         );
 
         $sut->login($oAuth2UserStub);
@@ -56,20 +73,23 @@ class UserServiceTest extends TestCase
 
     public function testLoginWithBlockedUser(): void
     {
+        $username = uniqid();
+
         $sessionMock = $this->createMock(SessionInterface::class);
         $sessionMock->expects($this->never())->method('set')->with('usr');
 
-        $username = uniqid();
-        $userInfraStub = $this->createStub(UserRepositoryInterface::class);
-        $userInfraStub->method('getUserByEmail')
+        $userDTOStub = $this->createConfiguredStub(UserDTOInterface::class, ['isBlocked' => true]);
+
+        $userRepositoryStub = $this->createStub(UserRepositoryInterface::class);
+        $userRepositoryStub->method('getUserByEmail')
             ->with($username)
-            ->willThrowException(new UserBlockedException());
+            ->willReturn($userDTOStub);
 
         $oAuth2UserStub = $this->createStub(OAuth2UserDTOInterface::class);
         $oAuth2UserStub->method('getEmail')->willReturn($username);
 
         $sut = $this->getSut(
-            userRepository: $userInfraStub,
+            userRepository: $userRepositoryStub,
             session: $sessionMock
         );
 
@@ -78,10 +98,10 @@ class UserServiceTest extends TestCase
         $sut->login($oAuth2UserStub);
     }
 
-    public function testLoginWithNonExistingUser(): void
+    public function testCannotLoginWithoutEmail(): void
     {
         $sessionMock = $this->createMock(SessionInterface::class);
-        $sessionMock->expects($this->never())->method('set')->with('usr');
+        $sessionMock->expects($this->never())->method('set');
 
         $oAuth2UserStub = $this->createStub(OAuth2UserDTOInterface::class);
         $oAuth2UserStub->method('getEmail')->willReturn(null);
@@ -91,88 +111,6 @@ class UserServiceTest extends TestCase
         );
 
         $this->expectException(UserNotFoundException::class);
-
-        $sut->login($oAuth2UserStub);
-    }
-
-    public function testCannotLoginWithoutEmail(): void
-    {
-        $sessionMock = $this->createMock(SessionInterface::class);
-        $sessionMock->expects($this->never())->method('set')->with('usr');
-
-        $oAuth2UserStub = $this->createStub(OAuth2UserDTOInterface::class);
-
-        $sut = $this->getSut(
-            session: $sessionMock
-        );
-
-        $this->expectException(UserNotFoundException::class);
-
-        $sut->login($oAuth2UserStub);
-    }
-
-    public function testLoginWithExistingEmail(): void
-    {
-        $username = uniqid();
-
-        $sessionMock = $this->createMock(SessionInterface::class);
-        $sessionMock->expects($this->once())->method('set')->with('usr');
-
-        $oAuth2UserStub = $this->createStub(OAuth2UserDTOInterface::class);
-        $oAuth2UserStub->method('getEmail')->willReturn($username);
-
-        $userDTOStub = $this->createConfiguredStub(UserDTOInterface::class, [
-            'getId' => uniqid(),
-            'isBlocked' => false,
-        ]);
-
-        $userInfraStub = $this->createMock(UserRepositoryInterface::class);
-        $userInfraStub
-            ->method('getUserByEmail')
-            ->with($username)
-            ->willReturn($userDTOStub);
-        $userInfraStub
-            ->expects($this->never())
-            ->method('createUser');
-
-        $sut = $this->getSut(
-            userRepository: $userInfraStub,
-            session: $sessionMock
-        );
-
-        $sut->login($oAuth2UserStub);
-    }
-
-    public function testLoginCreateUserWhenEmailNotFoundInDB(): void
-    {
-        $username = uniqid();
-
-        $sessionMock = $this->createMock(SessionInterface::class);
-        $sessionMock->expects($this->once())->method('set')->with('usr');
-
-        $oAuth2UserStub = $this->createStub(OAuth2UserDTOInterface::class);
-        $oAuth2UserStub->method('getEmail')->willReturn($username);
-
-        $userDTOStub = $this->createConfiguredStub(UserDTOInterface::class, [
-            'getId' => uniqid(),
-            'isBlocked' => false,
-        ]);
-
-        $userInfraStub = $this->createMock(UserRepositoryInterface::class);
-        $userInfraStub
-            ->method('getUserByEmail')
-            ->with($username)
-            ->willThrowException(new UserNotFoundException());
-        $userInfraStub
-            ->expects($this->once())
-            ->method('createUser')
-            ->with($oAuth2UserStub)
-            ->willReturn($userDTOStub);
-
-        $sut = $this->getSut(
-            userRepository: $userInfraStub,
-            session: $sessionMock
-        );
 
         $sut->login($oAuth2UserStub);
     }
