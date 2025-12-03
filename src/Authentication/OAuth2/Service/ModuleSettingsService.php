@@ -58,6 +58,11 @@ class ModuleSettingsService implements ModuleSettingsServiceInterface
         return $this->moduleSettingService->getBoolean(self::GOOGLE_LOGIN_ENABLED, Module::MODULE_ID);
     }
 
+    public function saveGoogleEnabled(bool $value): void
+    {
+        $this->moduleSettingService->saveBoolean(self::GOOGLE_LOGIN_ENABLED, $value, Module::MODULE_ID);
+    }
+
     public function getGoogleClientId(): string
     {
         return $this->getStringValue(self::GOOGLE_CLIENT_ID);

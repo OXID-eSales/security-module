@@ -52,8 +52,10 @@ class ViewConfig extends ViewConfig_parent
         return 'data:image/jpeg;base64,' . base64_encode($images[ImageCaptchaService::CAPTCHA_NAME]);
     }
 
-    public function getProviders(): iterable
+    public function getActiveProviders(): iterable
     {
-        return $this->getService(ProviderCollectorInterface::class)->getProviders();
+        $providers = $this->getService(ProviderCollectorInterface::class)->getProviders();
+
+        return array_filter($providers, fn($provider) => $provider->isActive());
     }
 }

@@ -40,7 +40,8 @@ abstract class BaseCest
 
     protected function setProviderState(bool $state)
     {
-        ContainerFacade::get(OAuthModuleSettingsServiceInterface::class)
-            ->saveFacebookEnabled($state);
+        $moduleSettings = ContainerFacade::get(OAuthModuleSettingsServiceInterface::class);
+        $moduleSettings->saveFacebookEnabled($state);
+        $moduleSettings->saveGoogleEnabled($state);
     }
 }

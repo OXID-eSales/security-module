@@ -1,6 +1,6 @@
-{% if oViewConf.getProviders() %}
+{% if oViewConf.getActiveProviders() %}
     <div class="sign-in-providers">
-    {% for provider in oViewConf.getProviders() %}
+    {% for provider in oViewConf.getActiveProviders() %}
         <div class="provider">
             <a href="{{ seo_url({ ident: oViewConf.getSelfLink() ~ "cl=oauth&fnc=login&provider=" ~ provider.getName() }) }}">
                 {{ translate({ ident: 'SIGN_IN_PROVIDER', args: provider.getName()|capitalize }) }}
