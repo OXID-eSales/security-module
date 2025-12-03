@@ -7,66 +7,72 @@
 
 declare(strict_types=1);
 
-namespace Authentication\OAuth2\Service;
+namespace OxidEsales\SecurityModule\Tests\Unit\Authentication\OAuth2\Service;
 
-use OxidEsales\SecurityModule\Authentication\OAuth2\Service\Provider\ProviderInterface;
-use OxidEsales\SecurityModule\Authentication\OAuth2\Service\Exception\ProviderNotFound;
+use ArrayIterator;
+use Closure;
+use OxidEsales\SecurityModule\Authentication\OAuth2\Exception\ProviderNotFoundException;
+use OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Provider\ProviderAdapterInterface;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Service\ProviderCollector;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class ProviderCollectorTest extends TestCase
 {
-    public function testGetProviders(): void
+    // This provider returns factories for each iterable type
+    public static function iteratorWrapperDataProvider(): \Generator
     {
-        $sut = new ProviderCollector($this->getProviders());
+        yield 'array' => [fn(array $stubs) => $stubs];
+        yield 'ArrayIterator' => [fn(array $stubs) => new ArrayIterator($stubs)];
+        yield 'Generator' => [fn(array $stubs) => (function () use ($stubs) {
+            yield from $stubs;
+        })()];
+    }
+
+    #[DataProvider('iteratorWrapperDataProvider')]
+    public function testGetProviders(Closure $wrapperFactory): void
+    {
+        $stub1 = $this->getProviderAdapterStub();
+        $stub2 = $this->getProviderAdapterStub();
+        $stubs = [$stub1, $stub2];
+
+        $sut = new ProviderCollector($wrapperFactory($stubs));
         $result = $sut->getProviders();
 
-        $this->assertSame(
-            [
-                'provider 1',
-                'provider 2',
-                'provider 3'
-            ],
-            array_keys($result)
-        );
-
-        $this->assertContainsOnlyInstancesOf(ProviderInterface::class, $result);
+        $this->assertIsArray($result);
+        $this->assertCount(2, $result);
+        $this->assertSame($stubs, $result);
     }
 
-    public function testGetExistingProvider()
+    #[DataProvider('iteratorWrapperDataProvider')]
+    public function testGetExistingProvider(Closure $wrapperFactory): void
     {
-        $sut = new ProviderCollector($this->getProviders());
-        $result = $sut->getProvider('provider 2');
+        $stub1 = $this->getProviderAdapterStub();
+        $stub2 = $this->getProviderAdapterStub();
+        $stubs = [$stub1, $stub2];
+        $searchProvider = $stubs[array_rand($stubs)];
 
-        $this->assertInstanceOf(ProviderInterface::class, $result);
-        $this->assertSame('provider 2', $result->getName());
+        $sut = new ProviderCollector($wrapperFactory($stubs));
+        $result = $sut->getProvider($searchProvider->getName());
+
+        $this->assertSame($searchProvider, $result);
     }
 
-    public function testGetNotExistingProvider()
+    #[DataProvider('iteratorWrapperDataProvider')]
+    public function testGetNotExistingProvider(Closure $wrapperFactory): void
     {
-        $this->expectException(ProviderNotFound::class);
+        $stub1 = $this->getProviderAdapterStub();
+        $stub2 = $this->getProviderAdapterStub();
+        $stubs = [$stub1, $stub2];
 
-        $sut = new ProviderCollector($this->getProviders());
-        $sut->getProvider('provider 9');
+        $this->expectException(ProviderNotFoundException::class);
+
+        $sut = new ProviderCollector($wrapperFactory($stubs));
+        $sut->getProvider('nonexistent-provider');
     }
 
-    private function getProviders(): array
+    private function getProviderAdapterStub(): ProviderAdapterInterface
     {
-        $provider1 = $this->createConfiguredMock(ProviderInterface::class, [
-            'getName' => 'provider 1',
-        ]);
-        $provider2 = $this->createConfiguredMock(ProviderInterface::class, [
-            'getName' => 'provider 2',
-            'isActive' => true,
-        ]);
-        $provider3 = $this->createConfiguredMock(ProviderInterface::class, [
-            'getName' => 'provider 3',
-        ]);
-
-        return [
-            $provider1,
-            $provider2,
-            $provider3
-        ];
+        return $this->createConfiguredStub(ProviderAdapterInterface::class, ['getName' => uniqid()]);
     }
 }

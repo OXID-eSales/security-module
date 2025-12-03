@@ -11,8 +11,4 @@ namespace OxidEsales\SecurityModule\Authentication\OAuth2\Service\Exception;
 
 class UserNotFoundException extends \Exception
 {
-    public function __construct()
-    {
-        parent::__construct('ERROR_USER_NOT_FOUND');
-    }
 }

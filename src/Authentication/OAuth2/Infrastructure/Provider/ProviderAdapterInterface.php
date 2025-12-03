@@ -5,23 +5,18 @@
  * See LICENSE file for license details.
  */
 
-namespace OxidEsales\SecurityModule\Authentication\OAuth2\Service\Provider;
+namespace OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Provider;
 
-use League\OAuth2\Client\Provider\AbstractProvider;
+use Exception;
 use League\OAuth2\Client\Token\AccessTokenInterface;
-use OxidEsales\SecurityModule\Authentication\OAuth2\DTO\UserDTOInterface;
+use OxidEsales\SecurityModule\Authentication\OAuth2\DTO\OAuth2UserDTOInterface;
 
-interface ProviderInterface
+interface ProviderAdapterInterface
 {
     /**
      * Get the unique identifier of the provider (e.g., 'google', 'facebook').
      */
     public function getName(): string;
-
-    /**
-     * Get the underlying OAuth2 client (League provider instance).
-     */
-    public function getClient(): AbstractProvider;
 
     /**
      * Check if the provider is active/enabled.
@@ -40,7 +35,8 @@ interface ProviderInterface
 
     /**
      * Fetch user information (claims) from the provider using the access token.
-     * Should return standardized data: id, email, name, avatar, etc.
+     * Should return UserInterface
+     * @throws Exception
      */
-    public function getUserInfo(AccessTokenInterface $token): UserDTOInterface;
+    public function getUserInfo(AccessTokenInterface $token): OAuth2UserDTOInterface;
 }

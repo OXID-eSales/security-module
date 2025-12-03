@@ -19,7 +19,6 @@ class OAuthController extends FrontendController
         $providerCollector = $this->getService(ProviderCollectorInterface::class);
 
         $provider = $providerCollector->getProvider($_GET['provider']);
-        $provider->getClient();
 
         Registry::getUtils()->redirect($provider->getAuthorizationUrl());
     }
@@ -31,8 +30,8 @@ class OAuthController extends FrontendController
             ->getService(ProviderCollectorInterface::class)
             ->getProvider('google');
 
-        $provider->getClient();
         $accessToken = $provider->getAccessToken($_GET['code']);
+
         $userDTO = $provider->getUserInfo($accessToken);
 
         $this

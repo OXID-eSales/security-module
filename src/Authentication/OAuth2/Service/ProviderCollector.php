@@ -9,15 +9,20 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Authentication\OAuth2\Service;
 
-use OxidEsales\SecurityModule\Authentication\OAuth2\Service\Exception\ProviderNotActive;
-use OxidEsales\SecurityModule\Authentication\OAuth2\Service\Exception\ProviderNotFound;
-use OxidEsales\SecurityModule\Authentication\OAuth2\Service\Provider\ProviderInterface;
+use OxidEsales\SecurityModule\Authentication\OAuth2\Exception\ProviderNotFoundException;
+use OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Provider\ProviderAdapterInterface;
 
 class ProviderCollector implements ProviderCollectorInterface
 {
+    private readonly array $collectedProviders;
+
+    /**
+     * @param iterable<ProviderAdapterInterface> $providers
+     */
     public function __construct(
         protected iterable $providers,
     ) {
+        $this->collectedProviders = iterator_to_array($this->providers, false);
     }
 
     /**
@@ -25,29 +30,24 @@ class ProviderCollector implements ProviderCollectorInterface
      */
     public function getProviders(): array
     {
-        $result = [];
-
-        foreach ($this->providers as $provider) {
-            $result[$provider->getName()] = $provider;
-        }
-
-        ksort($result);
-
-        return $result;
+        return $this->collectedProviders;
     }
 
-    public function getProvider(string $name): ProviderInterface
+    public function getProvider(string $name): ProviderAdapterInterface
     {
-        $providers = $this->getProviders();
+        $providerFound = array_filter(
+            $this->collectedProviders,
+            fn ($provider) => $provider->getName() === $name
+        );
 
-        if (!isset($providers[$name])) {
-            throw new ProviderNotFound();
+        if (!$providerFound) {
+            throw new ProviderNotFoundException();
         }
 
         if (!$providers[$name]->isActive()) {
             throw new ProviderNotActive();
         }
 
-        return $providers[$name];
+        return reset($providerFound);
     }
 }

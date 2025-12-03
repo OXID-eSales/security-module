@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Tests\Unit\Authentication\OAuth2\Exception;
 
 use Codeception\PHPUnit\TestCase;
-use OxidEsales\SecurityModule\Authentication\OAuth2\Service\Exception\UserNotFoundException;
+use OxidEsales\SecurityModule\Authentication\OAuth2\Exception\UserNotFoundException;
 
 class UserNotFoundExceptionTest extends TestCase
 {
@@ -18,6 +18,6 @@ class UserNotFoundExceptionTest extends TestCase
     {
         $exception = new UserNotFoundException();
 
-        $this->assertSame('ERROR_USER_NOT_FOUND', $exception->getMessage());
+        $this->assertInstanceOf(\Exception::class, $exception);
     }
 }

@@ -7,11 +7,9 @@
 
 namespace OxidEsales\SecurityModule\Authentication\OAuth2\Service;
 
-use Symfony\Component\String\UnicodeString;
-
 interface ModuleSettingsServiceInterface
 {
-    public function isFacebookActive(): bool;
+    public function isFacebookLoginEnabled(): bool;
 
     public function getFacebookClientId(): string;
 

@@ -17,13 +17,11 @@ class UserDTOTest extends TestCase
     public function testInitializeAndReadProperties(): void
     {
         $sut = new UserDTO(
-            firstName: $firstName = uniqid(),
-            lastName: $lastName = uniqid(),
-            email: $email = uniqid(),
+            userId: $userId = uniqid(),
+            isBlocked: $isBlocked = (bool) rand(0, 1),
         );
 
-        $this->assertSame($firstName, $sut->getFirstName());
-        $this->assertSame($lastName, $sut->getLastName());
-        $this->assertSame($email, $sut->getEmail());
+        $this->assertSame($userId, $sut->getId());
+        $this->assertSame($isBlocked, $sut->isBlocked());
     }
 }

@@ -28,10 +28,10 @@ $aLang = [
     'SHOP_MODULE_oeSecurityCaptchaLifeTime_30min' => '30 min',
 
     'SHOP_MODULE_GROUP_oauth'                   => 'OAuth2',
-    'SHOP_MODULE_oeSecurityFacebookEnable'      => 'Enable login with Facebook',
-    'SHOP_MODULE_oeSecurityFacebookClientId'    => 'Facebook client id',
-    'SHOP_MODULE_oeSecurityFacebookSecret'      => 'Facebook client secret',
-    'SHOP_MODULE_oeSecurityFacebookRedirectUrl' => 'Facebook redirect url',
+    'SHOP_MODULE_oeSecurityFacebookEnabled'     => 'Facebook OAuth2 Login aktivieren',
+    'SHOP_MODULE_oeSecurityFacebookClientId'    => 'Facebook Client-ID',
+    'SHOP_MODULE_oeSecurityFacebookSecret'      => 'Facebook Secret',
+    'SHOP_MODULE_oeSecurityFacebookRedirectUrl' => 'Facebook Weiterleitungs-URL',
 
     'SHOP_MODULE_oeSecurityGoogleEnable'      => 'Enable login with Google',
     'SHOP_MODULE_oeSecurityGoogleClientId'    => 'Google client id',

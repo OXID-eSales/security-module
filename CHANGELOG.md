@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Extracted reusable Twig code into captcha.html.twig and password.html.twig
+- Facebook login OAuth-provider
 
 ### Changed
 - Show multiple errors on invalid password

@@ -14,7 +14,7 @@ use OxidEsales\SecurityModule\Core\Module;
 
 class ModuleSettingsService implements ModuleSettingsServiceInterface
 {
-    public const FACEBOOK_ACTIVE = 'oeSecurityFacebookEnable';
+    public const FACEBOOK_LOGIN_ENABLED = 'oeSecurityFacebookEnabled';
     public const FACEBOOK_CLIENT_ID = 'oeSecurityFacebookClientId';
     public const FACEBOOK_CLIENT_SECRET = 'oeSecurityFacebookSecret';
     public const FACEBOOK_REDIRECT_URL = 'oeSecurityFacebookRedirectUrl';
@@ -28,9 +28,14 @@ class ModuleSettingsService implements ModuleSettingsServiceInterface
     ) {
     }
 
-    public function isFacebookActive(): bool
+    public function isFacebookLoginEnabled(): bool
     {
-        return $this->moduleSettingService->getBoolean(self::FACEBOOK_ACTIVE, Module::MODULE_ID);
+        return $this->moduleSettingService->getBoolean(self::FACEBOOK_LOGIN_ENABLED, Module::MODULE_ID);
+    }
+
+    public function saveFacebookEnabled(bool $value): void
+    {
+        $this->moduleSettingService->saveBoolean(self::FACEBOOK_LOGIN_ENABLED, $value, Module::MODULE_ID);
     }
 
     public function getFacebookClientId(): string
