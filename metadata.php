@@ -140,7 +140,7 @@ $aModule = [
         ],
         [
             'group' => 'oauth',
-            'name'  => OAuthModuleSettings::GOOGLE_ACTIVE,
+            'name'  => OAuthModuleSettings::GOOGLE_LOGIN_ENABLED,
             'type'  => 'bool',
             'value' => true
         ],
