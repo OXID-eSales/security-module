@@ -10,13 +10,13 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Tests\Unit\Authentication\OAuth2\Exception;
 
 use Codeception\PHPUnit\TestCase;
-use OxidEsales\SecurityModule\Authentication\OAuth2\Exception\ProviderNotFoundException;
+use OxidEsales\SecurityModule\Authentication\OAuth2\Exception\ProviderNotActiveException;
 
-class ProviderNotFoundTest extends TestCase
+class ProviderNotActiveExceptionTest extends TestCase
 {
     public function testException(): void
     {
-        $exception = new ProviderNotFoundException();
+        $exception = new ProviderNotActiveException();
 
         $this->assertInstanceOf(\Exception::class, $exception);
     }

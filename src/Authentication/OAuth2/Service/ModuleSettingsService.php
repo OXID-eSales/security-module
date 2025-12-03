@@ -18,7 +18,7 @@ class ModuleSettingsService implements ModuleSettingsServiceInterface
     public const FACEBOOK_CLIENT_ID = 'oeSecurityFacebookClientId';
     public const FACEBOOK_CLIENT_SECRET = 'oeSecurityFacebookSecret';
     public const FACEBOOK_REDIRECT_URL = 'oeSecurityFacebookRedirectUrl';
-    public const GOOGLE_ACTIVE = 'oeSecurityGoogleEnable';
+    public const GOOGLE_LOGIN_ENABLED = 'oeSecurityGoogleEnabled';
     public const GOOGLE_CLIENT_ID = 'oeSecurityGoogleClientId';
     public const GOOGLE_CLIENT_SECRET = 'oeSecurityGoogleSecret';
     public const GOOGLE_REDIRECT_URL = 'oeSecurityGoogleRedirectUrl';
@@ -53,9 +53,9 @@ class ModuleSettingsService implements ModuleSettingsServiceInterface
         return $this->getStringValue(self::FACEBOOK_REDIRECT_URL);
     }
 
-    public function isGoogleActive(): bool
+    public function isGoogleLoginEnabled(): bool
     {
-        return $this->moduleSettingService->getBoolean(self::GOOGLE_ACTIVE, Module::MODULE_ID);
+        return $this->moduleSettingService->getBoolean(self::GOOGLE_LOGIN_ENABLED, Module::MODULE_ID);
     }
 
     public function getGoogleClientId(): string

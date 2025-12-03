@@ -8,3 +8,9 @@ services:
 
   OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Provider\Facebook\FacebookAdapter:
     tags: [ 'security.oauth.tag.provider' ]
+
+  OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Provider\Google\GoogleProviderFactoryInterface:
+    class: OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Provider\Google\GoogleProviderFactory
+
+  OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Provider\Google\GoogleAdapter:
+    tags: [ 'security.oauth.tag.provider' ]

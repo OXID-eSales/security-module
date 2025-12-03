@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\SecurityModule\Authentication\OAuth2\Service\Exception;
+namespace OxidEsales\SecurityModule\Authentication\OAuth2\Exception;
 
 class UserNotFoundException extends \Exception
 {

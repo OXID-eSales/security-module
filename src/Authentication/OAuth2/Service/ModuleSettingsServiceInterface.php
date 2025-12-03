@@ -17,7 +17,7 @@ interface ModuleSettingsServiceInterface
 
     public function getFacebookRedirectUrl(): string;
 
-    public function isGoogleActive(): bool;
+    public function isGoogleLoginEnabled(): bool;
 
     public function getGoogleClientId(): string;
 

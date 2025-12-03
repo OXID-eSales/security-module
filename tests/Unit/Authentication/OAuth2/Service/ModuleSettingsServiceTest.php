@@ -23,10 +23,15 @@ class ModuleSettingsServiceTest extends TestCase
         return [
             self::prepareBooleanSetting('isFacebookLoginEnabled', ModuleSettingsService::FACEBOOK_LOGIN_ENABLED, true),
             self::prepareBooleanSetting('isFacebookLoginEnabled', ModuleSettingsService::FACEBOOK_LOGIN_ENABLED, false),
-
             self::prepareStringTestItem('getFacebookClientId', ModuleSettingsService::FACEBOOK_CLIENT_ID),
             self::prepareStringTestItem('getFacebookClientSecret', ModuleSettingsService::FACEBOOK_CLIENT_SECRET),
             self::prepareStringTestItem('getFacebookRedirectUrl', ModuleSettingsService::FACEBOOK_REDIRECT_URL),
+
+            self::prepareBooleanSetting('isGoogleLoginEnabled', ModuleSettingsService::GOOGLE_LOGIN_ENABLED, true),
+            self::prepareBooleanSetting('isGoogleLoginEnabled', ModuleSettingsService::GOOGLE_LOGIN_ENABLED, false),
+            self::prepareStringTestItem('getGoogleClientId', ModuleSettingsService::GOOGLE_CLIENT_ID),
+            self::prepareStringTestItem('getGoogleClientSecret', ModuleSettingsService::GOOGLE_CLIENT_SECRET),
+            self::prepareStringTestItem('getGoogleRedirectUrl', ModuleSettingsService::GOOGLE_REDIRECT_URL),
         ];
     }
 

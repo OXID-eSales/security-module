@@ -64,8 +64,8 @@ class UserServiceTest extends TestCase
         $userRepositoryMock->method('createUser')->with($oAuth2UserStub)->willReturn($userDTOStub);
 
         $sut = $this->getSut(
-            session: $sessionMock,
-            userRepository: $userRepositoryMock
+            userRepository: $userRepositoryMock,
+            session: $sessionMock
         );
 
         $sut->login($oAuth2UserStub);

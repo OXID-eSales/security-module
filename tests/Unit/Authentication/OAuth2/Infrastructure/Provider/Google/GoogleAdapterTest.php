@@ -7,27 +7,27 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\SecurityModule\Tests\Unit\Authentication\OAuth2\Infrastructure\Provider\Facebook;
+namespace OxidEsales\SecurityModule\Tests\Unit\Authentication\OAuth2\Infrastructure\Provider\Google;
 
-use League\OAuth2\Client\Provider\FacebookUser;
+use League\OAuth2\Client\Provider\GoogleUser;
 use League\OAuth2\Client\Token\AccessToken;
 use League\OAuth2\Client\Token\AccessTokenInterface;
 use OxidEsales\SecurityModule\Authentication\OAuth2\DTO\OAuth2UserDTOInterface;
-use OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Provider\Facebook\FacebookAdapter;
-use OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Provider\Facebook\FacebookProviderFactory;
+use OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Provider\Google\GoogleProviderFactory;
+use OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Provider\Google\GoogleAdapter;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Factory\OAuth2UserDTOFactoryInterface;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Service\ModuleSettingsServiceInterface;
 use PHPUnit\Framework\TestCase;
-use League\OAuth2\Client\Provider\Facebook as FacebookOAuthProvider;
+use League\OAuth2\Client\Provider\Google as GoogleOAuthProvider;
 
-class FacebookAdapterTest extends TestCase
+class GoogleAdapterTest extends TestCase
 {
     public function testProviderActivity(): void
     {
         $isActive = (bool) rand(0, 1);
 
         $moduleSettingsMock = $this->createMock(ModuleSettingsServiceInterface::class);
-        $moduleSettingsMock->method('isFacebookLoginEnabled')
+        $moduleSettingsMock->method('isGoogleLoginEnabled')
             ->willReturn($isActive);
 
         $sut = $this->getSut(
@@ -41,24 +41,24 @@ class FacebookAdapterTest extends TestCase
     {
         $sut = $this->getSut();
 
-        $this->assertSame('facebook', $sut->getName());
+        $this->assertSame('google', $sut->getName());
     }
 
     public function testProviderAuthorizeUrl(): void
     {
         $expectedUrl = uniqid();
 
-        $providerInstanceMock = $this->createMock(FacebookOAuthProvider::class);
+        $providerInstanceMock = $this->createMock(GoogleOAuthProvider::class);
         $providerInstanceMock->method('getAuthorizationUrl')
             ->willReturn($expectedUrl);
 
-        $providerFactoryMock = $this->createMock(FacebookProviderFactory::class);
+        $providerFactoryMock = $this->createMock(GoogleProviderFactory::class);
         $providerFactoryMock
             ->method('create')
             ->willReturn($providerInstanceMock);
 
         $sut = $this->getSut(
-            facebookProvider: $providerFactoryMock
+            googleProvider: $providerFactoryMock
         );
 
         $this->assertSame($expectedUrl, $sut->getAuthorizationUrl());
@@ -70,18 +70,18 @@ class FacebookAdapterTest extends TestCase
 
         $expectedTokenStub = $this->createStub(AccessTokenInterface::class);
 
-        $providerInstanceMock = $this->createMock(FacebookOAuthProvider::class);
+        $providerInstanceMock = $this->createMock(GoogleOAuthProvider::class);
         $providerInstanceMock
             ->method('getAccessToken')
             ->willReturn($expectedTokenStub);
 
-        $providerFactoryMock = $this->createMock(FacebookProviderFactory::class);
+        $providerFactoryMock = $this->createMock(GoogleProviderFactory::class);
         $providerFactoryMock
             ->method('create')
             ->willReturn($providerInstanceMock);
 
         $sut = $this->getSut(
-            facebookProvider: $providerFactoryMock
+            googleProvider: $providerFactoryMock
         );
 
         $this->assertSame($expectedTokenStub, $sut->getAccessToken($code));
@@ -100,15 +100,15 @@ class FacebookAdapterTest extends TestCase
     {
         $accessTokenStub = $this->createStub(AccessToken::class);
 
-        $facebookUserStub = $this->createStub(FacebookUser::class);
+        $googleUserStub = $this->createStub(GoogleUser::class);
 
-        $providerInstanceMock = $this->createMock(FacebookOAuthProvider::class);
+        $providerInstanceMock = $this->createMock(GoogleOAuthProvider::class);
         $providerInstanceMock
             ->method('getResourceOwner')
             ->with($accessTokenStub)
-            ->willReturn($facebookUserStub);
+            ->willReturn($googleUserStub);
 
-        $providerFactoryStub = $this->createStub(FacebookProviderFactory::class);
+        $providerFactoryStub = $this->createStub(GoogleProviderFactory::class);
         $providerFactoryStub
             ->method('create')
             ->willReturn($providerInstanceMock);
@@ -117,12 +117,12 @@ class FacebookAdapterTest extends TestCase
 
         $oAuth2UserDTOFactoryMock = $this->createMock(OAuth2UserDTOFactoryInterface::class);
         $oAuth2UserDTOFactoryMock
-            ->method('createFromFacebookUser')
-            ->with($facebookUserStub)
+            ->method('createFromGoogleUser')
+            ->with($googleUserStub)
             ->willReturn($expectedUserDTOStub);
 
         $sut = $this->getSut(
-            facebookProvider: $providerFactoryStub,
+            googleProvider: $providerFactoryStub,
             oAuth2UserDTOFactory: $oAuth2UserDTOFactoryMock
         );
 
@@ -133,12 +133,12 @@ class FacebookAdapterTest extends TestCase
 
     private function getSut(
         ModuleSettingsServiceInterface $moduleSettings = null,
-        FacebookProviderFactory $facebookProvider = null,
+        GoogleProviderFactory $googleProvider = null,
         OAuth2UserDTOFactoryInterface $oAuth2UserDTOFactory = null,
-    ): FacebookAdapter {
-        return new FacebookAdapter(
+    ): GoogleAdapter {
+        return new GoogleAdapter(
             moduleSettings: $moduleSettings ?? $this->createStub(ModuleSettingsServiceInterface::class),
-            facebookProvider: $facebookProvider ?? $this->createStub(FacebookProviderFactory::class),
+            googleProvider: $googleProvider ?? $this->createStub(GoogleProviderFactory::class),
             oAuth2UserDTOFactory: $oAuth2UserDTOFactory ?? $this->createStub(OAuth2UserDTOFactoryInterface::class),
         );
     }
