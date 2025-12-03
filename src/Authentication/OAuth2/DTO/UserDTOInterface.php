@@ -9,9 +9,7 @@ namespace OxidEsales\SecurityModule\Authentication\OAuth2\DTO;
 
 interface UserDTOInterface
 {
-    public function getFirstName(): ?string;
+    public function getId(): string;
 
-    public function getLastName(): ?string;
-
-    public function getEmail(): ?string;
+    public function isBlocked(): bool;
 }

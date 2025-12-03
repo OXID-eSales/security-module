@@ -13,10 +13,11 @@ use OxidEsales\EshopCommunity\Tests\Integration\IntegrationTestCase;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\CharacterAnalysisServiceInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\StringAnalysisService;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\StringAnalysisServiceInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class StringAnalysisServiceTest extends IntegrationTestCase
 {
-    /** @dataProvider dataProviderUpperCase */
+    #[DataProvider('dataProviderUpperCase')]
     public function testHasUpperCaseCharacterReturnsCorrectValue(string $origin, bool $expectedValue): void
     {
         $sut = $this->getSut();
@@ -47,7 +48,7 @@ class StringAnalysisServiceTest extends IntegrationTestCase
         ];
     }
 
-    /** @dataProvider dataProviderDigitCase */
+    #[DataProvider('dataProviderDigitCase')]
     public function testHasDigitReturnsCorrectValue(string $origin, bool $expectedValue): void
     {
         $sut = $this->getSut();
@@ -79,7 +80,7 @@ class StringAnalysisServiceTest extends IntegrationTestCase
     }
 
 
-    /** @dataProvider dataProviderLowerCase */
+    #[DataProvider('dataProviderLowerCase')]
     public function testHasLowerCaseCharacterReturnsCorrectValue(string $origin, bool $expectedValue): void
     {
         $sut = $this->getSut();
@@ -110,7 +111,7 @@ class StringAnalysisServiceTest extends IntegrationTestCase
         ];
     }
 
-    /** @dataProvider dataProviderSpecialChar */
+    #[DataProvider('dataProviderSpecialChar')]
     public function testHasSpecialCharacterReturnsCorrectValue(string $origin, bool $expectedValue): void
     {
         $sut = $this->getSut();

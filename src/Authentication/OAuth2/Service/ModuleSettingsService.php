@@ -14,19 +14,28 @@ use OxidEsales\SecurityModule\Core\Module;
 
 class ModuleSettingsService implements ModuleSettingsServiceInterface
 {
-    public const FACEBOOK_ACTIVE = 'oeSecurityFacebookEnable';
+    public const FACEBOOK_LOGIN_ENABLED = 'oeSecurityFacebookEnabled';
     public const FACEBOOK_CLIENT_ID = 'oeSecurityFacebookClientId';
     public const FACEBOOK_CLIENT_SECRET = 'oeSecurityFacebookSecret';
     public const FACEBOOK_REDIRECT_URL = 'oeSecurityFacebookRedirectUrl';
+    public const GOOGLE_LOGIN_ENABLED = 'oeSecurityGoogleEnabled';
+    public const GOOGLE_CLIENT_ID = 'oeSecurityGoogleClientId';
+    public const GOOGLE_CLIENT_SECRET = 'oeSecurityGoogleSecret';
+    public const GOOGLE_REDIRECT_URL = 'oeSecurityGoogleRedirectUrl';
 
     public function __construct(
         private readonly ModuleSettingServiceInterface $moduleSettingService
     ) {
     }
 
-    public function isFacebookActive(): bool
+    public function isFacebookLoginEnabled(): bool
     {
-        return $this->moduleSettingService->getBoolean(self::FACEBOOK_ACTIVE, Module::MODULE_ID);
+        return $this->moduleSettingService->getBoolean(self::FACEBOOK_LOGIN_ENABLED, Module::MODULE_ID);
+    }
+
+    public function saveFacebookEnabled(bool $value): void
+    {
+        $this->moduleSettingService->saveBoolean(self::FACEBOOK_LOGIN_ENABLED, $value, Module::MODULE_ID);
     }
 
     public function getFacebookClientId(): string
@@ -44,13 +53,38 @@ class ModuleSettingsService implements ModuleSettingsServiceInterface
         return $this->getStringValue(self::FACEBOOK_REDIRECT_URL);
     }
 
+    public function isGoogleLoginEnabled(): bool
+    {
+        return $this->moduleSettingService->getBoolean(self::GOOGLE_LOGIN_ENABLED, Module::MODULE_ID);
+    }
+
+    public function saveGoogleEnabled(bool $value): void
+    {
+        $this->moduleSettingService->saveBoolean(self::GOOGLE_LOGIN_ENABLED, $value, Module::MODULE_ID);
+    }
+
+    public function getGoogleClientId(): string
+    {
+        return $this->getStringValue(self::GOOGLE_CLIENT_ID);
+    }
+
+    public function getGoogleClientSecret(): string
+    {
+        return $this->getStringValue(self::GOOGLE_CLIENT_SECRET);
+    }
+
+    public function getGoogleRedirectUrl(): string
+    {
+        return $this->getStringValue(self::GOOGLE_REDIRECT_URL);
+    }
+
     private function getStringValue(string $key): string
     {
         return $this->moduleSettingService->getString(
             $key,
             Module::MODULE_ID
         )
-        ->trim()
-        ->toString();
+            ->trim()
+            ->toString();
     }
 }

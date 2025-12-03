@@ -1,0 +1,13 @@
+services:
+  _defaults:
+    autowire: true
+    public: false
+
+  OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Factory\UserFactoryInterface:
+    class: OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Factory\UserFactory
+
+  OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Factory\UserDTOFactoryInterface:
+    class: OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Factory\UserDTOFactory
+
+  OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Factory\OAuth2UserDTOFactoryInterface:
+    class: OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Factory\OAuth2UserDTOFactory

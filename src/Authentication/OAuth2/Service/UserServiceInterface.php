@@ -7,14 +7,15 @@
 
 namespace OxidEsales\SecurityModule\Authentication\OAuth2\Service;
 
-use OxidEsales\Eshop\Application\Model\User;
-use OxidEsales\SecurityModule\Authentication\OAuth2\DTO\UserDTOInterface;
+use OxidEsales\SecurityModule\Authentication\OAuth2\DTO\OAuth2UserDTOInterface;
+use OxidEsales\SecurityModule\Authentication\OAuth2\Exception\UserBlockedException;
+use OxidEsales\SecurityModule\Authentication\OAuth2\Exception\UserNotFoundException;
 
 interface UserServiceInterface
 {
-    public function login(UserDTOInterface $userDTO): void;
-
-    public function getUserByUserEmail(string $username): User;
-
-    public function createUser(UserDTOInterface $userDTO): User;
+    /**
+     * @throws UserNotFoundException If the user is not found.
+     * @throws UserBlockedException If the user is blocked.
+     */
+    public function login(OAuth2UserDTOInterface $auth2UserDTO): void;
 }

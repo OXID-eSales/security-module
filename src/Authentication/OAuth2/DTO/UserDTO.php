@@ -12,24 +12,18 @@ namespace OxidEsales\SecurityModule\Authentication\OAuth2\DTO;
 class UserDTO implements UserDTOInterface
 {
     public function __construct(
-        private readonly ?string $firstName,
-        private readonly ?string $lastName,
-        private readonly ?string $email,
+        private readonly string $userId,
+        private readonly bool $isBlocked
     ) {
     }
 
-    public function getFirstName(): ?string
+    public function getId(): string
     {
-        return $this->firstName;
+        return $this->userId;
     }
 
-    public function getLastName(): ?string
+    public function isBlocked(): bool
     {
-        return $this->lastName;
-    }
-
-    public function getEmail(): ?string
-    {
-        return $this->email;
+        return $this->isBlocked;
     }
 }

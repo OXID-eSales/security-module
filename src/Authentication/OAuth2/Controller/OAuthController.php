@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Copyright © OXID eSales AG. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
 namespace OxidEsales\SecurityModule\Authentication\OAuth2\Controller;
 
 use OxidEsales\Eshop\Application\Controller\FrontendController;
@@ -14,18 +19,16 @@ class OAuthController extends FrontendController
         $providerCollector = $this->getService(ProviderCollectorInterface::class);
 
         $provider = $providerCollector->getProvider($_GET['provider']);
-        $provider->getClient();
 
         Registry::getUtils()->redirect($provider->getAuthorizationUrl());
     }
 
     public function redirect(): void
     {
+        //todo: get provider dynamically
         $provider = $this
             ->getService(ProviderCollectorInterface::class)
-            ->getProvider('facebook');
-
-        $provider->getClient();
+            ->getProvider('google');
 
         $accessToken = $provider->getAccessToken($_GET['code']);
 

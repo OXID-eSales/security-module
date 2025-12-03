@@ -7,11 +7,18 @@
 
 namespace OxidEsales\SecurityModule\Authentication\OAuth2\Service;
 
-use OxidEsales\SecurityModule\Authentication\OAuth2\Service\Provider\ProviderInterface;
+use OxidEsales\SecurityModule\Authentication\OAuth2\Exception\ProviderNotFoundException;
+use OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Provider\ProviderAdapterInterface;
 
 interface ProviderCollectorInterface
 {
+    /**
+     * @return array<ProviderAdapterInterface>
+     */
     public function getProviders(): array;
 
-    public function getProvider(string $name): ProviderInterface;
+    /**
+     * @throws ProviderNotFoundException
+     */
+    public function getProvider(string $name): ProviderAdapterInterface;
 }

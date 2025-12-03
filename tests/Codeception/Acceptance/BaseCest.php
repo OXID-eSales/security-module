@@ -11,6 +11,8 @@ namespace OxidEsales\SecurityModule\Tests\Codeception\Acceptance;
 
 use Codeception\Util\Fixtures;
 use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
+use OxidEsales\SecurityModule\Authentication\OAuth2\Service\ModuleSettingsServiceInterface
+    as OAuthModuleSettingsServiceInterface;
 use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface as CaptchaSettingsServiceInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsServiceInterface as PasswordSettingsServiceInterface;
 
@@ -34,5 +36,12 @@ abstract class BaseCest
     protected function setCaptchaState(bool $state)
     {
         ContainerFacade::get(CaptchaSettingsServiceInterface::class)->saveIsCaptchaEnabled($state);
+    }
+
+    protected function setProviderState(bool $state)
+    {
+        $moduleSettings = ContainerFacade::get(OAuthModuleSettingsServiceInterface::class);
+        $moduleSettings->saveFacebookEnabled($state);
+        $moduleSettings->saveGoogleEnabled($state);
     }
 }

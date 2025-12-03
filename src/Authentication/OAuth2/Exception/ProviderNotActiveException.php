@@ -7,8 +7,8 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\SecurityModule\Authentication\OAuth2\Service\Provider;
+namespace OxidEsales\SecurityModule\Authentication\OAuth2\Exception;
 
-class ProviderNotFound extends \Exception
+class ProviderNotActiveException extends \Exception
 {
 }

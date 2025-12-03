@@ -9,67 +9,35 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Authentication\OAuth2\Service;
 
-use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\EshopCommunity\Internal\Framework\Session\SessionInterface;
-use OxidEsales\SecurityModule\Authentication\OAuth2\DTO\UserDTOInterface;
+use OxidEsales\SecurityModule\Authentication\OAuth2\DTO\OAuth2UserDTOInterface;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Exception\UserBlockedException;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Exception\UserNotFoundException;
-use OxidEsales\SecurityModule\Authentication\OAuth2\Factory\UserFactoryInterface;
+use OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Repository\UserRepositoryInterface;
 
 readonly class UserService implements UserServiceInterface
 {
     public function __construct(
-        private UserFactoryInterface $userFactory,
+        private UserRepositoryInterface $userRepository,
         private SessionInterface $session,
     ) {
     }
 
-    public function login(UserDTOInterface $userDTO): void
+    public function login(OAuth2UserDTOInterface $auth2UserDTO): void
     {
-        if (!$userDTO->getEmail()) {
+        if (!$auth2UserDTO->getEmail()) {
             throw new UserNotFoundException();
         }
 
         try {
-            $userModel = $this->getUserByUserEmail($userDTO->getEmail());
+            $userDTO = $this->userRepository->getUserByEmail($auth2UserDTO->getEmail());
+            if ($userDTO->isBlocked()) {
+                throw new UserBlockedException();
+            }
         } catch (UserNotFoundException $e) {
-            $userModel = $this->createUser($userDTO);
+            $userDTO = $this->userRepository->createUser($auth2UserDTO);
         }
 
-        if ($userModel->inGroup('oxidblocked')) {
-            throw new UserBlockedException();
-        }
-
-        $this->session->set('usr', $userModel->getId());
-    }
-
-    public function getUserByUserEmail(string $username): User
-    {
-        $userModel = $this->userFactory->create();
-
-        $userId = $userModel->getIdByUserName($username);
-        if (
-            !$userId ||
-            !$userModel->load($userId)
-        ) {
-            throw new UserNotFoundException();
-        }
-
-        return $userModel;
-    }
-
-    public function createUser(UserDTOInterface $userDTO): User
-    {
-        $user = $this->userFactory->create();
-        $user->assign([
-            'OXUSERNAME' => $userDTO->getEmail(),
-            'OXFNAME'    => $userDTO->getFirstName(),
-            'OXLNAME'    => $userDTO->getLastName(),
-            'OXREGISTER' => date('Y-m-d H:i:s')
-        ]);
-        $user->setPassword(bin2hex(random_bytes(20)));
-        $user->createUser();
-
-        return $user;
+        $this->session->set('usr', $userDTO->getId());
     }
 }

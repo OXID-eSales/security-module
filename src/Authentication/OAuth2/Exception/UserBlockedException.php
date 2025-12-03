@@ -11,8 +11,4 @@ namespace OxidEsales\SecurityModule\Authentication\OAuth2\Exception;
 
 class UserBlockedException extends \Exception
 {
-    public function __construct()
-    {
-        parent::__construct('ERROR_USER_BLOCKED');
-    }
 }

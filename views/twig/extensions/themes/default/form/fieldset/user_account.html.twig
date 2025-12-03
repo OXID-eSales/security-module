@@ -23,5 +23,6 @@
 
 {% block user_account_form_fields %}
     {{ parent() }}
+
     {% include '@oe_security_module/form/captcha.html.twig' %}
 {% endblock %}
