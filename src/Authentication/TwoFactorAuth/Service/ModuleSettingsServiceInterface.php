@@ -7,8 +7,6 @@
 
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service;
 
-use Symfony\Component\String\UnicodeString;
-
 interface ModuleSettingsServiceInterface
 {
     public function isTwoFactorAuthEnabled(): bool;

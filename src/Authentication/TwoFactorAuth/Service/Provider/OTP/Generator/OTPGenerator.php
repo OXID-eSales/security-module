@@ -4,8 +4,7 @@ namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\Provide
 
 use OxidEsales\Eshop\Application\Model\User as UserModel;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\DTO\User;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Repository\UserRepositoryInterface;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\Provider\OTP\Validator\OTPValidatorInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository\UserRepositoryInterface;
 
 readonly class OTPGenerator implements OTPGeneratorInterface
 {

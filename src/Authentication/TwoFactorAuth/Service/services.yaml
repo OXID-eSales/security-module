@@ -8,6 +8,8 @@ services:
 
   OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\ModuleSettingsServiceInterface:
     class: OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\ModuleSettingsService
+    public: true
 
   OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\AuthorizeServiceInterface:
     class: OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\AuthorizeService
+    public: true

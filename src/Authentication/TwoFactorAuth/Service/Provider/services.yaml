@@ -1,8 +1,2 @@
 imports:
   - { resource: OTP/services.yaml }
-
-services:
-  _defaults:
-    public: false
-    autowire: true
-

@@ -7,5 +7,5 @@ use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\DTO\User;
 
 interface OTPGeneratorInterface
 {
-    public function generate(UserModel $user): User;
+    public function generateCode(UserModel $user): User;
 }

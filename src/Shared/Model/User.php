@@ -17,7 +17,8 @@ use OxidEsales\SecurityModule\Captcha\Captcha\Image\Exception\CaptchaValidateExc
 use OxidEsales\SecurityModule\Captcha\Captcha\HoneyPot\Exception\CaptchaValidateException as HoneyPotCaptchaException;
 use OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface;
 use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface as CaptchaSettingsServiceInterface;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\ModuleSettingsServiceInterface as TwoFASettingsServiceInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\ModuleSettingsServiceInterface
+    as TwoFASettingsServiceInterface;
 use OxidEsales\SecurityModule\Shared\Core\InputValidator;
 
 /**

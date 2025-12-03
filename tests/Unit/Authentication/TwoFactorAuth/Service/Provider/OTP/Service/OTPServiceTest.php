@@ -13,6 +13,7 @@ use OxidEsales\Eshop\Application\Model\User as UserModel;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\AttemptLimitExceededException;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\InvalidCodeException;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\TimeExpiredException;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository\UserRepositoryInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\Provider\OTP\Service\OTPService;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\Provider\OTP\Service\OTPServiceInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\Provider\OTP\Validator\OTPValidatorInterface;
@@ -97,10 +98,12 @@ class OTPServiceTest extends TestCase
     }
 
     public function getSut(
-        OTPValidatorInterface $otpValidator = null
+        OTPValidatorInterface $otpValidator = null,
+        UserRepositoryInterface $userRepository = null
     ): OTPServiceInterface {
         return new OTPService(
-            otpValidator: $otpValidator ?? $this->createMock(OTPValidatorInterface::class)
+            otpValidator: $otpValidator ?? $this->createStub(OTPValidatorInterface::class),
+            userRepository: $userRepository ?? $this->createStub(UserRepositoryInterface::class),
         );
     }
 }

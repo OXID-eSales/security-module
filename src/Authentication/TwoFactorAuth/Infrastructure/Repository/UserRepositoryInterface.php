@@ -5,9 +5,7 @@
  * See LICENSE file for license details.
  */
 
-namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Repository;
-
-use OxidEsales\SecurityModule\Authentication\OAuth2\DataObject\UserInterface;
+namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository;
 
 interface UserRepositoryInterface
 {

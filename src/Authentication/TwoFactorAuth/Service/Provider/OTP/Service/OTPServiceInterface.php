@@ -11,5 +11,5 @@ use OxidEsales\Eshop\Application\Model\User as UserModel;
 
 interface OTPServiceInterface
 {
-    public function validateCode(UserModel $user, string $code): void;
+    public function validateCode(UserModel $user, string $inputCode): void;
 }

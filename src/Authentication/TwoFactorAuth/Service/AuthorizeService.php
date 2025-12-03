@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service;
 
-class AuthorizeService
+class AuthorizeService implements AuthorizeServiceInterface
 {
     public function validate()
     {

@@ -7,12 +7,9 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Repository;
+namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository;
 
-use OxidEsales\Eshop\Application\Model\User as UserModel;
-use OxidEsales\SecurityModule\Authentication\OAuth2\DataObject\UserInterface;
-use OxidEsales\SecurityModule\Authentication\OAuth2\Exception\UserNotFoundException;
-use OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\UserFactoryInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\UserFactoryInterface;
 
 class UserRepository implements UserRepositoryInterface
 {
