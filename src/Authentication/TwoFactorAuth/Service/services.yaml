@@ -8,12 +8,14 @@ services:
 
   OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\ModuleSettingsServiceInterface:
     class: OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\ModuleSettingsService
+    public: true
 
   OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\AuthorizeServiceInterface:
     class: OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\AuthorizeService
+    public: true
 
-  OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\NotifierServiceInterface:
-    class: OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\NotifierService
+  OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\NotifierCollectorInterface:
+    class: OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\NotifierCollector
     public: true
     arguments:
       $notifiers: !tagged 'security.twofa.tag.notify.provider'

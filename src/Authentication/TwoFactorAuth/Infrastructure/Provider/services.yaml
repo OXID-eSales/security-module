@@ -6,5 +6,5 @@ services:
     autowire: true
     public: false
 
-  OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Provider\EmailAdapter:
+  OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Provider\Email\EmailAdapter:
     tags: [ 'security.twofa.tag.notify.provider' ]

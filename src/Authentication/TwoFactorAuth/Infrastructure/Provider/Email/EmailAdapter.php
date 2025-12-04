@@ -7,23 +7,24 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Provider;
+namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Provider\Email;
 
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Provider\Factory\EmailFactoryInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Provider\NotifierAdapterInterface;
 
-class EmailAdapter
+class EmailAdapter implements NotifierAdapterInterface
 {
     public function __construct(
         readonly private EmailFactoryInterface $emailFactory,
     ) {
     }
 
-    public function getName()
+    public function getName(): string
     {
         return 'email';
     }
 
-    public function notify($recipient, $code): void
+    public function notify(string $recipient, string $code): void
     {
         $emailModel = $this->emailFactory->create();
         $emailModel->sendEmail(
