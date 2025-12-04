@@ -11,12 +11,12 @@ namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service;
 
 class AuthorizeService implements AuthorizeServiceInterface
 {
-    public function validate()
+    public function validate(): void
     {
         //todo: call correct provider service to validate the code
     }
 
-    public function generate($userName)
+    public function generate($userName): void
     {
         //todo: call correct provider service to generate the code
     }

@@ -12,7 +12,7 @@ namespace OxidEsales\SecurityModule\Shared\Model;
 use OxidEsales\Eshop\Core\Exception\InputException;
 use OxidEsales\Eshop\Core\Exception\UserException;
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\AuthorizeService;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\UserServiceInterface;
 use OxidEsales\SecurityModule\Captcha\Captcha\Image\Exception\CaptchaValidateException as ImageCaptchaException;
 use OxidEsales\SecurityModule\Captcha\Captcha\HoneyPot\Exception\CaptchaValidateException as HoneyPotCaptchaException;
 use OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface;
@@ -77,16 +77,23 @@ class User extends User_parent
             }
         }
 
-        $login = parent::login($userName, $password, $setSessionCookie);
-
-        //todo: $userService->handleLogin($login);
-
-        if (!$this->isOTPEnabled()) {
-            return $login;
+        if (!$this->isOTPEnabled() || $this->isAdmin()) {
+            return parent::login($userName, $password, $setSessionCookie);
         }
 
-        $authorizeService = $this->getService(AuthorizeService::class);
-        $authorizeService->generate($userName); //save to db and send to email
+        $userService = $this->getService(UserServiceInterface::class);
+        if (!$userService->checkPassword($password, $userName)) {
+            return false; // invalid login
+        }
+
+        $userService->handleLogin($userName);
+        Registry::getSession()->setVariable('pending_otp_user', $this->getId());
+        Registry::getUtils()->redirect(Registry::getConfig()->getShopHomeUrl() . 'cl=twofactorauth');
+
+        // We do NOT return success and do NOT create session
+        return false;
+//        $authorizeService = $this->getService(AuthorizeService::class);
+//        $authorizeService->generate($userName); //save to db and send to email
         // redirect to template for code -> submit
         // validate code on submit
         //redirect to whatever

@@ -14,4 +14,6 @@ interface UserRepositoryInterface
     public function resetCodeFields(string $userId): void;
 
     public function addOTPtoUser(string $userId, string $otp, int $expiresAt): bool;
+
+    public function getUserPasswordHash(string $userId): string;
 }

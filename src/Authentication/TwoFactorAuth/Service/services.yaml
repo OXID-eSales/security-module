@@ -14,6 +14,10 @@ services:
     class: OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\AuthorizeService
     public: true
 
+  OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\UserServiceInterface:
+    class: OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\UserService
+    public: true
+
   OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\NotifierCollectorInterface:
     class: OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\NotifierCollector
     public: true
