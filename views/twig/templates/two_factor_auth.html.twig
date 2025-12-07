@@ -1,5 +1,6 @@
 {% capture append = "oxidBlock_content" %}
     <h1 class="page-header">{{ translate({ ident: "TWO_FACTOR_AUTHENTICATION_TITLE" }) }}</h1>
+    <p >{{ translate({ ident: "TWO_FACTOR_AUTHENTICATION_DESCRIPTION" }) }}</p>
     <br>
     <form action="{{ oViewConf.getSelfLink()|raw }}" name="two_factor_auth" method="post" role="form">
         <div class="hidden">

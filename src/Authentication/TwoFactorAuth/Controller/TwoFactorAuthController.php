@@ -8,6 +8,9 @@ use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\Provider\OTP\
 
 class TwoFactorAuthController extends FrontendController
 {
+
+    protected $_sThisTemplate = '@oe_security_module/templates/two_factor_auth';
+
     private function handleOTP(): void
     {
         $code = Registry::getRequest()->getRequestEscapedParameter('code');
