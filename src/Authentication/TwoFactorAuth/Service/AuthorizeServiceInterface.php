@@ -11,5 +11,5 @@ interface AuthorizeServiceInterface
 {
     public function validate(): void;
 
-    public function generate($userName): void;
+    public function generate(): void;
 }

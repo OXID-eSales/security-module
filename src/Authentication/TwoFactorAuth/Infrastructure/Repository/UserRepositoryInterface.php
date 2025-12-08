@@ -7,9 +7,13 @@
 
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository;
 
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\DTO\User as UserDTO;
+
 interface UserRepositoryInterface
 {
-    public function updateAttempts(string $userId, int $attempts): int;
+    public function getUserOTPData(string $userId): UserDTO;
+
+    public function updateAttempts(string $userId, int $attempts): void;
 
     public function resetCodeFields(string $userId): void;
 

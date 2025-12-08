@@ -7,13 +7,15 @@
 
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\DTO;
 
-use DateTimeInterface;
+use DateTimeImmutable;
 
 interface UserInterface
 {
+    public function getId(): string;
+
     public function getCode(): ?string;
 
     public function getAttempts(): ?int;
 
-    public function getExpiresAt(): ?DateTimeInterface;
+    public function getExpiresAt(): ?DateTimeImmutable;
 }

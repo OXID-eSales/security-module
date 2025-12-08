@@ -9,15 +9,15 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Tests\Unit\Authentication\TwoFactorAuth\Service;
 
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\NotifierNotFoundException;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Provider\NotifierAdapterInterface;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\NotifierCollector;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\VerificatorNotFoundException;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\Verificator\VerificatorAdapterInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\VerificationCollectorService;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ArrayIterator;
 use Closure;
 
-class NotifierCollectorTest extends TestCase
+class VerificationCollectorTest extends TestCase
 {
     // This provider returns factories for each iterable type
     public static function iteratorWrapperDataProvider(): \Generator
@@ -35,12 +35,12 @@ class NotifierCollectorTest extends TestCase
         $stub1 = $this->getNotifierAdapterStub();
         $stub2 = $this->getNotifierAdapterStub();
         $stubs = [$stub1, $stub2];
-        $searchNotifier = $stubs[array_rand($stubs)];
+        $searchVerificator = $stubs[array_rand($stubs)];
 
-        $sut = new NotifierCollector($wrapperFactory($stubs));
-        $result = $sut->getNotifier($searchNotifier->getName());
+        $sut = new VerificationCollectorService($wrapperFactory($stubs));
+        $result = $sut->getVerificator($searchVerificator->getName());
 
-        $this->assertSame($searchNotifier, $result);
+        $this->assertSame($searchVerificator, $result);
     }
 
     #[DataProvider('iteratorWrapperDataProvider')]
@@ -50,14 +50,14 @@ class NotifierCollectorTest extends TestCase
         $stub2 = $this->getNotifierAdapterStub();
         $stubs = [$stub1, $stub2];
 
-        $this->expectException(NotifierNotFoundException::class);
+        $this->expectException(VerificatorNotFoundException::class);
 
-        $sut = new NotifierCollector($wrapperFactory($stubs));
-        $sut->getNotifier('nonexisting_notifier_name');
+        $sut = new VerificationCollectorService($wrapperFactory($stubs));
+        $sut->getVerificator('nonexisting_verificator_name');
     }
 
-    private function getNotifierAdapterStub(): NotifierAdapterInterface
+    private function getNotifierAdapterStub(): VerificatorAdapterInterface
     {
-        return $this->createConfiguredStub(NotifierAdapterInterface::class, ['getName' => uniqid()]);
+        return $this->createConfiguredStub(VerificatorAdapterInterface::class, ['getName' => uniqid()]);
     }
 }

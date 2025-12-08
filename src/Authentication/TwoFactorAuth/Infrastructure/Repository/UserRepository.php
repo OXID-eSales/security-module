@@ -9,8 +9,9 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository;
 
+use DateTime;
 use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\DataObject\UserInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\DTO\User as UserDTO;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\UserFactoryInterface;
 
 class UserRepository implements UserRepositoryInterface
@@ -21,13 +22,28 @@ class UserRepository implements UserRepositoryInterface
     ) {
     }
 
+    public function getUserOTPData(string $userId): UserDTO
+    {
+        //todo: exception if not found
+        //todo: use query builder
+        $userModel = $this->userFactory->create();
+        $userModel->load($userId);
+
+        return new UserDTO(
+            $userModel->getId(),
+            $userModel->getFieldData('OTPCODE'),
+            (int) $userModel->getFieldData('OTPATTEMPTS'),
+            new DateTime($userModel->getFieldData('OTPEXPIRETIME'))
+        );
+    }
+
     public function addOTPtoUser(string $userId, string $otp, int $expiresAt): bool
     {
         $userModel = $this->userFactory->create();
         $userModel->load($userId);
         $userModel->assign([
             'OESMOTPCODE'       => $otp,
-            'OESMOTPEXPTIME' => $expiresAt,
+            'OESMOTPEXPTIME'    => $expiresAt,
             'OESMOTPATTEMPTS'   => 0,
         ]);
         $userModel->save();
@@ -35,7 +51,7 @@ class UserRepository implements UserRepositoryInterface
         return true;
     }
 
-    public function updateAttempts(string $userId, int $attempts): int
+    public function updateAttempts(string $userId, int $attempts): void
     {
         $userModel = $this->userFactory->create();
         $userModel->load($userId);

@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\Provider\OTP\Validator;
+namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\Verificator\OTP\Validator;
 
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\AttemptLimitExceededException;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\InvalidCodeException;
@@ -38,7 +38,7 @@ readonly class OTPValidator implements OTPValidatorInterface
 
     public function checkExpirationTime(\DateTimeInterface $expiresAt): void
     {
-        if (time() > $expiresAt) {
+        if (time() > $expiresAt->getTimestamp()) {
             throw new TimeExpiredException();
         }
     }
