@@ -12,7 +12,6 @@ namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\Verific
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\AttemptLimitExceededException;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\InvalidCodeException;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\TimeExpiredException;
-use DateTime;
 
 readonly class OTPValidator implements OTPValidatorInterface
 {

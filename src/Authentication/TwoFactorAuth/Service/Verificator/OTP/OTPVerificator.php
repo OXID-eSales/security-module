@@ -49,6 +49,11 @@ class OTPVerificator implements VerificatorAdapterInterface
 
     public function generate(string $userId): string
     {
+        //todo: stop if user not found?
+        //todo: wait time between generations, in case of abuse like
+        //spamming the generate button or
+        //user hit limit and try to generate new code to bypass it
+
         return $this->otpGenerator->generateCode($userId);
     }
 }

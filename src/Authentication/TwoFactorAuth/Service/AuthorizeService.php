@@ -18,16 +18,16 @@ class AuthorizeService implements AuthorizeServiceInterface
     ) {
     }
 
-    public function validate(): void
+    public function validate(string $inputCode): void
     {
         $activeVerificator = $this->moduleSettings->getTwoFactorAuthType();
 
         $verificator = $this->verificationCollectorService->getVerificator(
             $activeVerificator
         );
-        //todo: use transput to get the code from request
+
         //todo: use session to get user id
-        $verificator->validateCode(uniqid(), uniqid());
+        $verificator->validateCode('7b4dfcca4669a8bbfcbd29c77cbc82f3', $inputCode);
     }
 
     public function generate(): void

@@ -61,6 +61,7 @@ class User extends User_parent
      */
     public function login($userName, $password, $setSessionCookie = false): bool
     {
+        //todo: login should be reworded, disabled captcha is killing OTP login flow
         if (!$this->isCaptchaEnabled()) {
             return parent::login($userName, $password, $setSessionCookie);
         }

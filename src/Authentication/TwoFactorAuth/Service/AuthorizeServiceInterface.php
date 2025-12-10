@@ -9,7 +9,7 @@ namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service;
 
 interface AuthorizeServiceInterface
 {
-    public function validate(): void;
+    public function validate(string $inputCode): void;
 
     public function generate(): void;
 }

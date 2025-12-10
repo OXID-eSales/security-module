@@ -3,28 +3,35 @@
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Controller;
 
 use OxidEsales\Eshop\Application\Controller\FrontendController;
-use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\AuthorizeServiceInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Transput\OTPRequestInterface;
 
 class TwoFactorAuthController extends FrontendController
 {
     protected $_sThisTemplate = '@oe_security_module/templates/two_factor_auth';
 
-    private function handleOTP(): void
+    public function handleOTP(): void
     {
-        $code = Registry::getRequest()->getRequestEscapedParameter('code');
-        $sessionUser =  Registry::getSession()->getVariable('usr');
-        $user = oxNew(User::class);
-        $user->load($sessionUser);
+        $OTPRequest = $this->getService(OTPRequestInterface::class);
 
-        $this->getService(OTPServiceInterface::class)->validateCode($user, $code);
+        //todo: catch only OTP exception that will be shown to user, maybe some abstract OTP exception?
+        try {
+            $authorizeService = $this->getService(AuthorizeServiceInterface::class);
+            $authorizeService->validate(
+                $OTPRequest->getOTPCode()
+            );
+        } catch (\Exception $e) {
+            //todo: display error message to user
+        }
     }
 
-    public function render()
+    public function generate(): void
     {
+        //todo: stop execution if not ajax
+        //todo: prevent spam by rate limiting
+        //todo: should return json response with success or error message
+
         $authorizeService = $this->getService(AuthorizeServiceInterface::class);
         $authorizeService->generate();
-
-        exit;
     }
 }

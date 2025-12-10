@@ -38,8 +38,11 @@ class User implements UserInterface
 
     public function getExpiresAt(): ?DateTimeImmutable
     {
+        //todo: possible bug - should be null if not set
+        $expireAt = $this->expiresAt ?? time();
+
         $dateTime = new DateTimeImmutable();
 
-        return $dateTime->setTimestamp($this->expiresAt);
+        return $dateTime->setTimestamp($expireAt);
     }
 }

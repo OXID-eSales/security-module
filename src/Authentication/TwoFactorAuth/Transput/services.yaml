@@ -1,0 +1,8 @@
+services:
+  _defaults:
+    autowire: true
+    public: false
+
+  OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Transput\OTPRequestInterface:
+    class: OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Transput\OTPRequest
+    public: true

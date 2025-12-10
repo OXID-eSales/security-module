@@ -17,7 +17,7 @@ use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factor
 class UserRepository implements UserRepositoryInterface
 {
     public function __construct(
-        private UserFactoryInterface $userFactory,
+        private readonly UserFactoryInterface $userFactory,
         private readonly QueryBuilderFactoryInterface $queryBuilderFactory,
     ) {
     }
@@ -31,9 +31,9 @@ class UserRepository implements UserRepositoryInterface
 
         return new UserDTO(
             $userModel->getId(),
-            $userModel->getFieldData('OTPCODE'),
-            (int) $userModel->getFieldData('OTPATTEMPTS'),
-            new DateTime($userModel->getFieldData('OTPEXPIRETIME'))
+            $userModel->getFieldData('OESMOTPCODE'),
+            (int) $userModel->getFieldData('OESMOTPATTEMPTS'),
+            (int) $userModel->getFieldData('OESMOTPEXPTIME')
         );
     }
 
@@ -66,21 +66,21 @@ class UserRepository implements UserRepositoryInterface
         $userModel = $this->userFactory->create();
         $userModel->load($userId);
         $userModel->assign([
-            'OESMOTPCODE'       => '',
-            'OESMOTPEXPTIME' => 0,
-            'OESMOTPATTEMPTS'   => 0,
+            'OESMOTPCODE'     => '',
+            'OESMOTPEXPTIME'  => 0,
+            'OESMOTPATTEMPTS' => 0,
         ]);
         $userModel->save();
     }
 
     public function getUserPasswordHash(string $userName): string
     {
-        $qb = $this->queryBuilderFactory->create();
-        $qb->select('OXPASSWORD')
+        $builder = $this->queryBuilderFactory->create();
+        $builder->select('OXPASSWORD')
             ->from('oxuser')
             ->where('oxusername = :userName')
             ->setParameter('userName', $userName);
 
-        return $qb->execute()->fetchOne();
+        return $builder->execute()->fetchOne();
     }
 }
