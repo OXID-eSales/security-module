@@ -7,7 +7,7 @@
 
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Transput;
 
-interface OTPRequestInterface
+interface AuthCodeRequestInterface
 {
-    public function getOTPCode(): string;
+    public function getCode(): string;
 }

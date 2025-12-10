@@ -10,11 +10,11 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Tests\Unit\Authentication\TwoFactorAuth\Transput;
 
 use OxidEsales\EshopCommunity\Internal\Framework\Request\RequestInterface;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Transput\OTPRequest;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Transput\OTPRequestInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Transput\AuthCodeRequest;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Transput\AuthCodeRequestInterface;
 use PHPUnit\Framework\TestCase;
 
-class OTPRequestTest extends TestCase
+class AuthCodeRequestTest extends TestCase
 {
     public function testOTPCode()
     {
@@ -27,13 +27,13 @@ class OTPRequestTest extends TestCase
             request: $requestMock,
         );
 
-        $this->assertSame($code, $sut->getOTPCode());
+        $this->assertSame($code, $sut->getCode());
     }
 
     private function getSut(
         RequestInterface $request,
-    ): OTPRequestInterface {
-        return new OTPRequest(
+    ): AuthCodeRequestInterface {
+        return new AuthCodeRequest(
             request: $request,
         );
     }

@@ -7,17 +7,18 @@
 
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository;
 
+use DateTime;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\DTO\User as UserDTO;
 
 interface UserRepositoryInterface
 {
-    public function getUserOTPData(string $userId): UserDTO;
+    public function getUserOTPData(string $userName): UserDTO;
 
     public function updateAttempts(string $userId, int $attempts): void;
 
     public function resetCodeFields(string $userId): void;
 
-    public function addOTPtoUser(string $userId, string $otp, int $expiresAt): bool;
+    public function addOTPtoUser(string $userId, string $otp, DateTime $expiresAt): bool;
 
     public function getUserPasswordHash(string $userId): string;
 }

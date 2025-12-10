@@ -11,14 +11,14 @@ namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Transput;
 
 use OxidEsales\EshopCommunity\Internal\Framework\Request\RequestInterface;
 
-readonly class OTPRequest implements OTPRequestInterface
+readonly class AuthCodeRequest implements AuthCodeRequestInterface
 {
     public function __construct(
         private RequestInterface $request,
     ) {
     }
 
-    public function getOTPCode(): string
+    public function getCode(): string
     {
         return $this->request->get('auth_code');
     }

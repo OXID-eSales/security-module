@@ -63,7 +63,7 @@ class User extends User_parent
     {
         //todo: login should be reworded, disabled captcha is killing OTP login flow
         if (!$this->isCaptchaEnabled()) {
-            return parent::login($userName, $password, $setSessionCookie);
+//            return parent::login($userName, $password, $setSessionCookie);
         }
 
         if (!$this->isAdmin()) {
@@ -83,21 +83,17 @@ class User extends User_parent
         }
 
         $userService = $this->getService(UserServiceInterface::class);
-        if (!$userService->checkPassword($password, $userName)) {
+        if (!$userService->checkPassword($userName, $password)) {
             return false; // invalid login
         }
 
+        //todo: re-login will send new OTP, should we avoid that?
         $userService->handleLogin($userName);
-        Registry::getSession()->setVariable('pending_otp_user', $this->getId());
+
+        //todo: redirect to correct page decided by verificator method? (otp: otp page, TOTP: totp page, etc)
         Registry::getUtils()->redirect(Registry::getConfig()->getShopHomeUrl() . 'cl=twofactorauth');
 
-        // We do NOT return success and do NOT create session
         return false;
-//        $authorizeService = $this->getService(AuthorizeService::class);
-//        $authorizeService->generate($userName); //save to db and send to email
-        // redirect to template for code -> submit
-        // validate code on submit
-        //redirect to whatever
     }
 
     private function isCaptchaEnabled(): bool

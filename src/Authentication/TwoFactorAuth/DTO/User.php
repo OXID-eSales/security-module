@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\DTO;
 
-use DateTimeImmutable;
+use DateTime;
 
 class User implements UserInterface
 {
@@ -17,7 +17,7 @@ class User implements UserInterface
         private readonly string $userId,
         private readonly ?string $code,
         private readonly ?int $attempts,
-        private readonly ?int $expiresAt,
+        private readonly ?DateTime $expiresAt,
     ) {
     }
 
@@ -36,13 +36,9 @@ class User implements UserInterface
         return $this->attempts;
     }
 
-    public function getExpiresAt(): ?DateTimeImmutable
+    public function getExpiresAt(): ?DateTime
     {
         //todo: possible bug - should be null if not set
-        $expireAt = $this->expiresAt ?? time();
-
-        $dateTime = new DateTimeImmutable();
-
-        return $dateTime->setTimestamp($expireAt);
+        return $this->expiresAt;
     }
 }

@@ -26,6 +26,7 @@ class EmailAdapter implements NotifierAdapterInterface
 
     public function notify(string $recipient, string $code): void
     {
+        //todo: replayto is same as recipient
         $emailModel = $this->emailFactory->create();
         $emailModel->sendEmail(
             $recipient,

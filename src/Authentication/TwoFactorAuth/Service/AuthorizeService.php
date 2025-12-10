@@ -9,12 +9,15 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service;
 
+use OxidEsales\EshopCommunity\Internal\Framework\Session\SessionInterface;
+
 class AuthorizeService implements AuthorizeServiceInterface
 {
     public function __construct(
         private ModuleSettingsServiceInterface $moduleSettings,
         private VerificationCollectorServiceInterface $verificationCollectorService,
         private NotifierCollectorInterface $notifierCollectorService,
+        private SessionInterface $session
     ) {
     }
 
@@ -26,22 +29,35 @@ class AuthorizeService implements AuthorizeServiceInterface
             $activeVerificator
         );
 
-        //todo: use session to get user id
-        $verificator->validateCode('7b4dfcca4669a8bbfcbd29c77cbc82f3', $inputCode);
+        //todo: use session to get email/username or userId
+        $userName = $this->session->get('pending_otp_user');
+
+        $verificator->validateCode($userName, $inputCode);
     }
 
-    public function generate(): void
+    public function generate(string $userName): void
     {
         $activeVerificator = $this->moduleSettings->getTwoFactorAuthType();
 
         $verificator = $this->verificationCollectorService->getVerificator(
             $activeVerificator
         );
-        //todo: use session to get user id
-        $OTPCode = $verificator->generate(uniqid());
+
+        $OTPCode = $verificator->generate($userName);
 
         //todo: module setting?
         $notifier = $this->notifierCollectorService->getNotifier('email');
-        $notifier->notify('localhost@localhost.local', $OTPCode);
+        $notifier->notify($userName, $OTPCode);
+    }
+
+    public function getVerificationUrl(): string
+    {
+        $activeVerificator = $this->moduleSettings->getTwoFactorAuthType();
+
+        $verificator = $this->verificationCollectorService->getVerificator(
+            $activeVerificator
+        );
+
+        return $verificator->getVerificationUrl();
     }
 }

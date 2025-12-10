@@ -47,13 +47,22 @@ class OTPVerificator implements VerificatorAdapterInterface
         $this->userRepository->resetCodeFields($otpData->getId());
     }
 
-    public function generate(string $userId): string
+    public function generate(string $userName): string
     {
+        //todo: userId from parameter or DTO
+        $otpData = $this->userRepository->getUserOTPData($userName);
+
         //todo: stop if user not found?
         //todo: wait time between generations, in case of abuse like
         //spamming the generate button or
         //user hit limit and try to generate new code to bypass it
 
-        return $this->otpGenerator->generateCode($userId);
+        return $this->otpGenerator->generateCode($otpData->getId());
+    }
+
+    public function getVerificationUrl(): string
+    {
+        //todo: this should be called from User Model or AuthorizeService
+        return 'twofactorauth';
     }
 }

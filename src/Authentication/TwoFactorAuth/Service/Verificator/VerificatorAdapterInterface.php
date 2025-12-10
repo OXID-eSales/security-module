@@ -5,8 +5,6 @@
  * See LICENSE file for license details.
  */
 
-declare(strict_types=1);
-
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\Verificator;
 
 interface VerificatorAdapterInterface
@@ -15,5 +13,7 @@ interface VerificatorAdapterInterface
 
     public function validateCode(string $userId, string $inputCode): void;
 
-    public function generate(string $userId): string;
+    public function generate(string $userName): string;
+
+    public function getVerificationUrl(): string;
 }

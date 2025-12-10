@@ -22,28 +22,43 @@ class UserRepository implements UserRepositoryInterface
     ) {
     }
 
-    public function getUserOTPData(string $userId): UserDTO
+    public function getUserOTPData(string $userName): UserDTO
     {
         //todo: exception if not found
-        //todo: use query builder
-        $userModel = $this->userFactory->create();
-        $userModel->load($userId);
+        //todo: separate method for id and username?
+        $builder = $this->queryBuilderFactory->create();
+        $builder->select([
+                'OXID',
+                'OESMOTPCODE',
+                'OESMOTPATTEMPTS',
+                'OESMOTPEXPTIME'
+            ])
+            ->from('oxuser')
+            ->where('oxusername = :userName')
+            ->orWhere('oxid = :userName')
+            ->setParameter('userName', $userName);
+
+        $userData = $builder->execute()->fetchAssociative();
+        if (!$userData) {
+            //todo: throw correct exception
+            throw new \RuntimeException('User not found');
+        }
 
         return new UserDTO(
-            $userModel->getId(),
-            $userModel->getFieldData('OESMOTPCODE'),
-            (int) $userModel->getFieldData('OESMOTPATTEMPTS'),
-            (int) $userModel->getFieldData('OESMOTPEXPTIME')
+            $userData['OXID'],
+            $userData['OESMOTPCODE'],
+            $userData['OESMOTPATTEMPTS'],
+            new DateTime($userData['OESMOTPEXPTIME'])
         );
     }
 
-    public function addOTPtoUser(string $userId, string $otp, int $expiresAt): bool
+    public function addOTPtoUser(string $userId, string $otp, DateTime $expiresAt): bool
     {
         $userModel = $this->userFactory->create();
         $userModel->load($userId);
         $userModel->assign([
             'OESMOTPCODE'       => $otp,
-            'OESMOTPEXPTIME'    => $expiresAt,
+            'OESMOTPEXPTIME'    => $expiresAt->format('Y-m-d H:i:s'),
             'OESMOTPATTEMPTS'   => 0,
         ]);
         $userModel->save();

@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Tests\Unit\Authentication\TwoFactorAuth\Service\Verificator\OTP;
 
-use DateTimeImmutable;
+use DateTime;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\DTO\User;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\AttemptLimitExceededException;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\InvalidCodeException;
@@ -38,7 +38,7 @@ class OTPVerificatorTest extends TestCase
         $userDTOMock = $this->createMock(User::class);
         $userDTOMock->method('getCode')->willReturn($code);
         $userDTOMock->method('getAttempts')->willReturn($attempts);
-        $userDTOMock->method('getExpiresAt')->willReturn(new DateTimeImmutable());
+        $userDTOMock->method('getExpiresAt')->willReturn(new DateTime());
 
         $userRepositoryMock = $this->createMock(UserRepositoryInterface::class);
         $userRepositoryMock
@@ -67,7 +67,7 @@ class OTPVerificatorTest extends TestCase
         $userDTOMock = $this->createMock(User::class);
         $userDTOMock->method('getCode')->willReturn($code);
         $userDTOMock->method('getAttempts')->willReturn($attempts);
-        $userDTOMock->method('getExpiresAt')->willReturn(new DateTimeImmutable());
+        $userDTOMock->method('getExpiresAt')->willReturn(new DateTime());
 
         $userRepositoryMock = $this->createMock(UserRepositoryInterface::class);
         $userRepositoryMock
@@ -96,7 +96,7 @@ class OTPVerificatorTest extends TestCase
         $userDTOMock = $this->createMock(User::class);
         $userDTOMock->method('getCode')->willReturn($code);
         $userDTOMock->method('getAttempts')->willReturn($attempts);
-        $userDTOMock->method('getExpiresAt')->willReturn(new DateTimeImmutable());
+        $userDTOMock->method('getExpiresAt')->willReturn(new DateTime());
 
         $userRepositoryMock = $this->createMock(UserRepositoryInterface::class);
         $userRepositoryMock

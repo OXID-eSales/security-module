@@ -5,7 +5,6 @@
  * See LICENSE file for license details.
  */
 
-
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\Verificator\OTP\Generator;
 
 interface OTPGeneratorInterface

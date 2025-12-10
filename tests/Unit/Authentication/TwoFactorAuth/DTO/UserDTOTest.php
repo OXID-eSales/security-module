@@ -11,6 +11,7 @@ namespace OxidEsales\SecurityModule\Tests\Unit\Authentication\TwoFactorAuth\DTO;
 
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\DTO\User;
 use PHPUnit\Framework\TestCase;
+use DateTime;
 
 class UserDTOTest extends TestCase
 {
@@ -20,12 +21,12 @@ class UserDTOTest extends TestCase
             userId: $userId = uniqid(),
             code: $code = uniqid(),
             attempts: $attempts = rand(),
-            expiresAt: $expiresAt = time()
+            expiresAt: $expiresAt = new DateTime()
         );
 
         $this->assertSame($userId, $sut->getId());
         $this->assertSame($code, $sut->getCode());
         $this->assertSame($attempts, $sut->getAttempts());
-        $this->assertSame($expiresAt, $sut->getExpiresAt()->getTimestamp());
+        $this->assertSame($expiresAt, $sut->getExpiresAt());
     }
 }

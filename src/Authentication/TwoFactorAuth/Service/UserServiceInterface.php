@@ -11,5 +11,5 @@ interface UserServiceInterface
 {
     public function handleLogin($userName): void;
 
-    public function checkPassword($password, $userId): bool;
+    public function checkPassword(string $userName, string $password): bool;
 }
