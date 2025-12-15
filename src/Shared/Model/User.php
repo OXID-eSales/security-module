@@ -87,7 +87,6 @@ class User extends User_parent
             return false; // invalid login
         }
 
-        //todo: re-login will send new OTP, should we avoid that?
         $userService->handleLogin($userName);
 
         //todo: redirect to correct page decided by verificator method? (otp: otp page, TOTP: totp page, etc)

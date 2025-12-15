@@ -25,7 +25,6 @@ class OAuth2UserDTOFactory implements OAuth2UserDTOFactoryInterface
         );
     }
 
-    //TODO: use one factory for all providers
     public function createFromGoogleUser(GoogleUser $googleUser): OAuth2UserDTOInterface
     {
         return new OAuth2UserDTO(

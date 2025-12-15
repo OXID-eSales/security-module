@@ -11,7 +11,7 @@ interface AuthorizeServiceInterface
 {
     public function validate(string $inputCode): void;
 
-    public function generate(string $userName): void;
+    public function generate(): void;
 
     public function getVerificationUrl(): string;
 }

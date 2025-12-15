@@ -37,13 +37,10 @@ class TwoFactorAuthController extends FrontendController
 
     public function generate(): void
     {
-        //todo: use session to get email/username
-        $username = uniqid();
-
         //todo: stop execution if not ajax
         //todo: prevent spam by rate limiting
         //todo: should return json response with success or error message
         $authorizeService = $this->getService(AuthorizeServiceInterface::class);
-        $authorizeService->generate($username);
+        $authorizeService->generate();
     }
 }

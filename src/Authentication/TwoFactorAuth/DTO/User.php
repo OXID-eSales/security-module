@@ -38,7 +38,6 @@ class User implements UserInterface
 
     public function getExpiresAt(): ?DateTime
     {
-        //todo: possible bug - should be null if not set
         return $this->expiresAt;
     }
 }

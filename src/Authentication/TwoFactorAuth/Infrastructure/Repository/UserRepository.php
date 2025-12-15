@@ -25,7 +25,6 @@ class UserRepository implements UserRepositoryInterface
     public function getUserOTPData(string $userName): UserDTO
     {
         //todo: exception if not found
-        //todo: separate method for id and username?
         $builder = $this->queryBuilderFactory->create();
         $builder->select([
                 'OXID',
@@ -35,7 +34,6 @@ class UserRepository implements UserRepositoryInterface
             ])
             ->from('oxuser')
             ->where('oxusername = :userName')
-            ->orWhere('oxid = :userName')
             ->setParameter('userName', $userName);
 
         $userData = $builder->execute()->fetchAssociative();

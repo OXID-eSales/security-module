@@ -11,14 +11,12 @@ namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service;
 
 use OxidEsales\EshopCommunity\Internal\Domain\Authentication\Bridge\PasswordServiceBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Session\SessionInterface;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\UserFactoryInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository\UserRepositoryInterface;
 
 class UserService implements UserServiceInterface
 {
     public function __construct(
         private AuthorizeServiceInterface $authorizeService,
-        private UserFactoryInterface $userFactory,
         private UserRepositoryInterface $userRepository,
         private PasswordServiceBridgeInterface $passwordServiceBridge,
         private SessionInterface $session
@@ -27,20 +25,19 @@ class UserService implements UserServiceInterface
 
     public function handleLogin($userName): void
     {
-        $this->authorizeService->generate($userName);
+        $this->session->set(AuthorizeService::USER_SESSION_KEY, $userName);
 
-        //todo: this should be handled by authorize service?
-        $this->session->set('pending_otp_user', $userName);
+        $this->authorizeService->generate();
         // redirect to controller and rende template
         // use template renderer to render the template
     }
 
     public function checkPassword(string $userName, string $password): bool
     {
-//        var_dump($userId);
 //        $userModel = $this->userFactory->create();
 //        $userModel->load($userId);
 
+        //todo: got exception if user not found
         $userPasswordHash = $this->userRepository->getUserPasswordHash($userName);
 //        var_dump($userPasswordHash);
         return $this->passwordServiceBridge

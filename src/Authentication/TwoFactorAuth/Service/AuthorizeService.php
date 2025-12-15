@@ -13,6 +13,8 @@ use OxidEsales\EshopCommunity\Internal\Framework\Session\SessionInterface;
 
 class AuthorizeService implements AuthorizeServiceInterface
 {
+    public const USER_SESSION_KEY = 'pending_authorized_user';
+
     public function __construct(
         private ModuleSettingsServiceInterface $moduleSettings,
         private VerificationCollectorServiceInterface $verificationCollectorService,
@@ -29,14 +31,15 @@ class AuthorizeService implements AuthorizeServiceInterface
             $activeVerificator
         );
 
-        //todo: use session to get email/username or userId
-        $userName = $this->session->get('pending_otp_user');
+        $userName = $this->session->get(self::USER_SESSION_KEY);
 
         $verificator->validateCode($userName, $inputCode);
     }
 
-    public function generate(string $userName): void
+    public function generate(): void
     {
+        $userName = $this->session->get(self::USER_SESSION_KEY);
+
         $activeVerificator = $this->moduleSettings->getTwoFactorAuthType();
 
         $verificator = $this->verificationCollectorService->getVerificator(
@@ -45,7 +48,6 @@ class AuthorizeService implements AuthorizeServiceInterface
 
         $OTPCode = $verificator->generate($userName);
 
-        //todo: module setting?
         $notifier = $this->notifierCollectorService->getNotifier('email');
         $notifier->notify($userName, $OTPCode);
     }

@@ -29,10 +29,10 @@ class OTPVerificator implements VerificatorAdapterInterface
         return 'otp';
     }
 
-    public function validateCode(string $userId, string $inputCode): void
+    public function validateCode(string $userName, string $inputCode): void
     {
         //todo: userId from parameter or DTO
-        $otpData = $this->userRepository->getUserOTPData($userId);
+        $otpData = $this->userRepository->getUserOTPData($userName);
 
         $this->otpValidator->checkLoginAttempts($otpData->getAttempts());
         $this->otpValidator->checkExpirationTime($otpData->getExpiresAt());

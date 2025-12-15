@@ -31,7 +31,7 @@ class OTPVerificatorTest extends TestCase
 
     public function testInvalidCode(): void
     {
-        $userId = uniqid();
+        $userName = uniqid();
         $attempts = rand();
         $code = uniqid();
 
@@ -55,12 +55,12 @@ class OTPVerificatorTest extends TestCase
 
         $this->expectException(InvalidCodeException::class);
 
-        $otpService->validateCode($userId, $code);
+        $otpService->validateCode($userName, $code);
     }
 
     public function testExpiredCode(): void
     {
-        $userId = uniqid();
+        $userName = uniqid();
         $attempts = rand();
         $code = uniqid();
 
@@ -84,12 +84,12 @@ class OTPVerificatorTest extends TestCase
 
         $this->expectException(TimeExpiredException::class);
 
-        $otpService->validateCode($userId, $code);
+        $otpService->validateCode($userName, $code);
     }
 
     public function testAttemptsCode(): void
     {
-        $userId = uniqid();
+        $userName = uniqid();
         $attempts = rand();
         $code = uniqid();
 
@@ -113,7 +113,7 @@ class OTPVerificatorTest extends TestCase
 
         $this->expectException(AttemptLimitExceededException::class);
 
-        $otpService->validateCode($userId, $code);
+        $otpService->validateCode($userName, $code);
     }
 
     public function getSut(
