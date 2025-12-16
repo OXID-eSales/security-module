@@ -65,7 +65,6 @@ class User extends User_parent
         if (!$this->isCaptchaEnabled()) {
 //            return parent::login($userName, $password, $setSessionCookie);
         }
-
         if (!$this->isAdmin()) {
             $captchaService = $this->getService(CaptchaServiceInterface::class);
 
@@ -84,13 +83,11 @@ class User extends User_parent
 
         $userService = $this->getService(UserServiceInterface::class);
         if (!$userService->checkPassword($userName, $password)) {
+            //todo: log invalid login attempt and throw exception
             return false; // invalid login
         }
 
         $userService->handleLogin($userName);
-
-        //todo: redirect to correct page decided by verificator method? (otp: otp page, TOTP: totp page, etc)
-        Registry::getUtils()->redirect(Registry::getConfig()->getShopHomeUrl() . 'cl=twofactorauth');
 
         return false;
     }

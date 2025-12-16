@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\Verificator\OTP;
 
+use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\InvalidCodeException;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository\UserRepositoryInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\Verificator\OTP\Generator\OTPGeneratorInterface;
@@ -62,7 +63,6 @@ class OTPVerificator implements VerificatorAdapterInterface
 
     public function getVerificationUrl(): string
     {
-        //todo: this should be called from User Model or AuthorizeService
         return 'twofactorauth';
     }
 }

@@ -15,6 +15,8 @@ class AuthorizeService implements AuthorizeServiceInterface
 {
     public const USER_SESSION_KEY = 'pending_authorized_user';
 
+    public const OTP_TARGET_URL = 'otp_target_url';
+
     public function __construct(
         private ModuleSettingsServiceInterface $moduleSettings,
         private VerificationCollectorServiceInterface $verificationCollectorService,
