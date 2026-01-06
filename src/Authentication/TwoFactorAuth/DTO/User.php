@@ -9,15 +9,15 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\DTO;
 
-use DateTime;
+use DateTimeInterface;
 
 class User implements UserInterface
 {
     public function __construct(
         private readonly string $userId,
+        private readonly int $attempts,
         private readonly ?string $code,
-        private readonly ?int $attempts,
-        private readonly ?DateTime $expiresAt,
+        private readonly ?DateTimeInterface $expiresAt,
     ) {
     }
 
@@ -31,12 +31,12 @@ class User implements UserInterface
         return $this->code;
     }
 
-    public function getAttempts(): ?int
+    public function getAttempts(): int
     {
         return $this->attempts;
     }
 
-    public function getExpiresAt(): ?DateTime
+    public function getExpiresAt(): ?DateTimeInterface
     {
         return $this->expiresAt;
     }

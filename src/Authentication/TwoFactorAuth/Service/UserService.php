@@ -19,12 +19,12 @@ class UserService implements UserServiceInterface
     public function __construct(
         private AuthorizeServiceInterface $authorizeService,
         private UserRepositoryInterface $userRepository,
-        private PasswordServiceBridgeInterface $passwordServiceBridge,
+        private PasswordServiceBridgeInterface $pwdServiceBridge,
         private SessionInterface $session
     ) {
     }
 
-    public function handleLogin($userName): void
+    public function handleLogin(string $userName): void
     {
         $this->session->set(AuthorizeService::USER_SESSION_KEY, $userName);
         $this->session->set(
@@ -45,7 +45,7 @@ class UserService implements UserServiceInterface
         //todo: got exception if user not found
         $userPasswordHash = $this->userRepository->getUserPasswordHash($userName);
 
-        return $this->passwordServiceBridge
+        return $this->pwdServiceBridge
             ->verifyPassword($password, $userPasswordHash);
     }
 }

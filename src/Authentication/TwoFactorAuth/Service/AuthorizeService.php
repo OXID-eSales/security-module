@@ -19,8 +19,8 @@ class AuthorizeService implements AuthorizeServiceInterface
 
     public function __construct(
         private ModuleSettingsServiceInterface $moduleSettings,
-        private VerificationCollectorServiceInterface $verificationCollectorService,
-        private NotifierCollectorInterface $notifierCollectorService,
+        private VerificationCollectorServiceInterface $verifyCollector,
+        private NotifierCollectorInterface $notifierCollector,
         private SessionInterface $session
     ) {
     }
@@ -29,7 +29,7 @@ class AuthorizeService implements AuthorizeServiceInterface
     {
         $activeVerificator = $this->moduleSettings->getTwoFactorAuthType();
 
-        $verificator = $this->verificationCollectorService->getVerificator(
+        $verificator = $this->verifyCollector->getVerificator(
             $activeVerificator
         );
 
@@ -44,13 +44,13 @@ class AuthorizeService implements AuthorizeServiceInterface
 
         $activeVerificator = $this->moduleSettings->getTwoFactorAuthType();
 
-        $verificator = $this->verificationCollectorService->getVerificator(
+        $verificator = $this->verifyCollector->getVerificator(
             $activeVerificator
         );
 
         $OTPCode = $verificator->generate($userName);
 
-        $notifier = $this->notifierCollectorService->getNotifier('email');
+        $notifier = $this->notifierCollector->getNotifier('email');
         $notifier->notify($userName, $OTPCode);
     }
 
@@ -58,7 +58,7 @@ class AuthorizeService implements AuthorizeServiceInterface
     {
         $activeVerificator = $this->moduleSettings->getTwoFactorAuthType();
 
-        $verificator = $this->verificationCollectorService->getVerificator(
+        $verificator = $this->verifyCollector->getVerificator(
             $activeVerificator
         );
 

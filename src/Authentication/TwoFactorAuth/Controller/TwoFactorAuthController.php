@@ -14,6 +14,12 @@ use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Transput\AuthCodeRequ
 
 class TwoFactorAuthController extends FrontendController
 {
+    /**
+     * Current view template
+     *
+     * @var string
+     * @SuppressWarnings("PHPMD.CamelCasePropertyName")
+     */
     protected $_sThisTemplate = '@oe_security_module/templates/two_factor_auth';
 
     public function handleOTP(): void

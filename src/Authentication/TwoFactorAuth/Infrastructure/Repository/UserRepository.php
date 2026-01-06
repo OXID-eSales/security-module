@@ -10,9 +10,11 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository;
 
 use DateTime;
+use Doctrine\DBAL\Result;
 use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\DTO\User as UserDTO;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\UserFactoryInterface;
+use RuntimeException;
 
 class UserRepository implements UserRepositoryInterface
 {
@@ -36,16 +38,18 @@ class UserRepository implements UserRepositoryInterface
             ->where('oxusername = :userName')
             ->setParameter('userName', $userName);
 
-        $userData = $builder->execute()->fetchAssociative();
+        /** @var Result $queryResult */
+        $queryResult = $builder->execute();
+        $userData = $queryResult->fetchAssociative();
         if (!$userData) {
             //todo: throw correct exception
-            throw new \RuntimeException('User not found');
+            throw new RuntimeException('User not found');
         }
 
         return new UserDTO(
             $userData['OXID'],
-            $userData['OESMOTPCODE'],
             $userData['OESMOTPATTEMPTS'],
+            $userData['OESMOTPCODE'],
             new DateTime($userData['OESMOTPEXPTIME'])
         );
     }
@@ -94,6 +98,8 @@ class UserRepository implements UserRepositoryInterface
             ->where('oxusername = :userName')
             ->setParameter('userName', $userName);
 
-        return $builder->execute()->fetchOne();
+        /** @var Result $queryResult */
+        $queryResult = $builder->execute();
+        return $queryResult->fetchOne();
     }
 }

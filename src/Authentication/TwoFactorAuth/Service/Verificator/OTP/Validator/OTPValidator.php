@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\Verificator\OTP\Validator;
 
+use DateTimeInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\AttemptLimitExceededException;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\InvalidCodeException;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\TimeExpiredException;
@@ -17,9 +18,9 @@ readonly class OTPValidator implements OTPValidatorInterface
 {
     private const MAX_ATTEMPTS = 5;
 
-    public function validateCode(string $userCode, string $inputCode): void
+    public function validateCode(?string $userCode, string $inputCode): void
     {
-        if (empty($inputCode)) {
+        if (!$userCode || empty($inputCode)) {
             throw new InvalidCodeException();
         }
 
@@ -35,9 +36,12 @@ readonly class OTPValidator implements OTPValidatorInterface
         }
     }
 
-    public function checkExpirationTime(\DateTimeInterface $expiresAt): void
+    public function checkExpirationTime(?DateTimeInterface $expiresAt): void
     {
-        if (time() > $expiresAt->getTimestamp()) {
+        if (
+            !($expiresAt instanceof DateTimeInterface)
+            || time() > $expiresAt->getTimestamp()
+        ) {
             throw new TimeExpiredException();
         }
     }

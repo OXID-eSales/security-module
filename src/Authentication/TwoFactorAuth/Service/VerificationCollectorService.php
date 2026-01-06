@@ -14,7 +14,7 @@ use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\Verificator\V
 
 class VerificationCollectorService implements VerificationCollectorServiceInterface
 {
-    private readonly array $collectedVerificators;
+    private readonly array $verificatorAdapters;
 
     /**
      * @param iterable<VerificatorAdapterInterface> $verificators
@@ -22,13 +22,13 @@ class VerificationCollectorService implements VerificationCollectorServiceInterf
     public function __construct(
         protected iterable $verificators,
     ) {
-        $this->collectedVerificators = iterator_to_array($this->verificators, false);
+        $this->verificatorAdapters = iterator_to_array($this->verificators, false);
     }
 
     public function getVerificator(string $name): VerificatorAdapterInterface
     {
         $verificatorFound = array_filter(
-            $this->collectedVerificators,
+            $this->verificatorAdapters,
             fn ($verificator) => $verificator->getName() === $name
         );
 

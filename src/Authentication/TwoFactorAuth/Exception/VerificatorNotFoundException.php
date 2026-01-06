@@ -11,4 +11,8 @@ namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception;
 
 class VerificatorNotFoundException extends \Exception
 {
+    public function __construct()
+    {
+        parent::__construct('ERROR_VERIFICATOR_NOT_FOUND');
+    }
 }
