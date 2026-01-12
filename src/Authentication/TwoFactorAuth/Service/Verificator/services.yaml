@@ -5,6 +5,8 @@ services:
   _defaults:
     autowire: true
     public: false
+    bind:
+      OxidEsales\Eshop\Core\Config: '@=service("OxidEsales\\SecurityModule\\Core\\Registry").getConfig()'
 
   OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\Verificator\OTP\OTPVerificator:
     tags: [ 'security.twofa.tag.verificator' ]

@@ -20,5 +20,5 @@ interface UserRepositoryInterface
 
     public function addOTPtoUser(string $userId, string $otp, DateTime $expiresAt): bool;
 
-    public function getUserPasswordHash(string $userId): string;
+    public function getUserPasswordHash(string $userId): ?string;
 }

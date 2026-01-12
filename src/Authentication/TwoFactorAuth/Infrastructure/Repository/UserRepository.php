@@ -13,8 +13,8 @@ use DateTime;
 use Doctrine\DBAL\Result;
 use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\DTO\User as UserDTO;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\UserNotFoundException;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\UserFactoryInterface;
-use RuntimeException;
 
 class UserRepository implements UserRepositoryInterface
 {
@@ -26,7 +26,6 @@ class UserRepository implements UserRepositoryInterface
 
     public function getUserOTPData(string $userName): UserDTO
     {
-        //todo: exception if not found
         $builder = $this->queryBuilderFactory->create();
         $builder->select([
                 'OXID',
@@ -42,8 +41,7 @@ class UserRepository implements UserRepositoryInterface
         $queryResult = $builder->execute();
         $userData = $queryResult->fetchAssociative();
         if (!$userData) {
-            //todo: throw correct exception
-            throw new RuntimeException('User not found');
+            throw new UserNotFoundException();
         }
 
         return new UserDTO(
@@ -90,7 +88,7 @@ class UserRepository implements UserRepositoryInterface
         $userModel->save();
     }
 
-    public function getUserPasswordHash(string $userName): string
+    public function getUserPasswordHash(string $userName): ?string
     {
         $builder = $this->queryBuilderFactory->create();
         $builder->select('OXPASSWORD')
@@ -100,6 +98,8 @@ class UserRepository implements UserRepositoryInterface
 
         /** @var Result $queryResult */
         $queryResult = $builder->execute();
-        return $queryResult->fetchOne();
+        $userPass = $queryResult->fetchOne();
+
+        return $userPass ?: null;
     }
 }

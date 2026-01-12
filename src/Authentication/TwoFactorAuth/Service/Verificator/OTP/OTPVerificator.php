@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\Verificator\OTP;
 
-use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Config;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\InvalidCodeException;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository\UserRepositoryInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\Verificator\OTP\Generator\OTPGeneratorInterface;
@@ -22,6 +22,7 @@ class OTPVerificator implements VerificatorAdapterInterface
         private OTPGeneratorInterface $otpGenerator,
         private OTPValidatorInterface $otpValidator,
         private UserRepositoryInterface $userRepository,
+        private Config $config,
     ) {
     }
 
@@ -50,10 +51,7 @@ class OTPVerificator implements VerificatorAdapterInterface
 
     public function generate(string $userName): string
     {
-        //todo: userId from parameter or DTO
         $otpData = $this->userRepository->getUserOTPData($userName);
-
-        //todo: stop if user not found?
         //todo: wait time between generations, in case of abuse like
         //spamming the generate button or
         //user hit limit and try to generate new code to bypass it
@@ -63,6 +61,6 @@ class OTPVerificator implements VerificatorAdapterInterface
 
     public function getVerificationUrl(): string
     {
-        return 'twofactorauth';
+        return $this->config->getShopHomeUrl() . 'cl=twofactorauth';
     }
 }

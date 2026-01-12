@@ -61,11 +61,11 @@ class User extends User_parent
      */
     public function login($userName, $password, $setSessionCookie = false): bool
     {
-        //todo: login should be reworded, disabled captcha is killing OTP login flow
-        if (!$this->isCaptchaEnabled()) {
-//            return parent::login($userName, $password, $setSessionCookie);
+        if ($this->isAdmin()) {
+            return parent::login($userName, $password, $setSessionCookie);
         }
-        if (!$this->isAdmin()) {
+
+        if ($this->isCaptchaEnabled()) {
             $captchaService = $this->getService(CaptchaServiceInterface::class);
 
             try {
@@ -77,19 +77,22 @@ class User extends User_parent
             }
         }
 
-        if (!$this->isOTPEnabled() || $this->isAdmin()) {
-            return parent::login($userName, $password, $setSessionCookie);
+        if ($this->isOTPEnabled()) {
+            $userService = $this->getService(UserServiceInterface::class);
+            if (!$userService->checkPassword($userName, $password)) {
+                throw oxNew(UserException::class, 'ERROR_MESSAGE_USER_NOVALIDLOGIN');
+            }
+
+            try {
+                $userService->handleLogin($userName);
+            } catch (\Exception $e) {
+                throw oxNew(UserException::class, 'ERROR_MESSAGE_USER_NOVALIDLOGIN');
+            }
+
+            return false;
         }
 
-        $userService = $this->getService(UserServiceInterface::class);
-        if (!$userService->checkPassword($userName, $password)) {
-            //todo: log invalid login attempt and throw exception
-            return false; // invalid login
-        }
-
-        $userService->handleLogin($userName);
-
-        return false;
+        return parent::login($userName, $password, $setSessionCookie);
     }
 
     private function isCaptchaEnabled(): bool

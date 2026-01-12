@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Tests\Unit\Authentication\TwoFactorAuth\Service\Verificator\OTP;
 
 use DateTime;
+use OxidEsales\Eshop\Core\Config;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\DTO\User;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\AttemptLimitExceededException;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\InvalidCodeException;
@@ -121,10 +122,14 @@ class OTPVerificatorTest extends TestCase
         OTPValidatorInterface $otpValidator = null,
         UserRepositoryInterface $userRepository = null
     ): OTPVerificator {
+        $configStub = $this->createStub(Config::class);
+        $configStub->method('getShopHomeUrl')->willReturn(uniqid());
+
         return new OTPVerificator(
             otpGenerator: $otpGenerator ?? $this->createStub(OTPGeneratorInterface::class),
             otpValidator: $otpValidator ?? $this->createStub(OTPValidatorInterface::class),
-            userRepository: $userRepository ?? $this->createStub(UserRepositoryInterface::class)
+            userRepository: $userRepository ?? $this->createStub(UserRepositoryInterface::class),
+            config: $configStub
         );
     }
 }
