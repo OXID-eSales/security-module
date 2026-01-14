@@ -11,6 +11,7 @@ namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Controller;
 
 use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository\UserRepositoryInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\AuthorizeServiceInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Transput\AuthCodeRequestInterface;
 
@@ -24,15 +25,19 @@ class TwoFactorAuthController extends FrontendController
      */
     protected $_sThisTemplate = '@oe_security_module/templates/two_factor_auth';
 
+    public function __construct(
+        private readonly AuthorizeServiceInterface $authService,
+        private readonly AuthCodeRequestInterface $authCodeRequest,
+    ) {
+        parent::__construct();
+    }
+
     public function handleOTP(): void
     {
-        $OTPRequest = $this->getService(AuthCodeRequestInterface::class);
-
         //todo: catch only OTP exception that will be shown to user, maybe some abstract OTP exception?
         try {
-            $authorizeService = $this->getService(AuthorizeServiceInterface::class);
-            $authorizeService->validate(
-                $OTPRequest->getCode()
+            $this->authService->validate(
+                $this->authCodeRequest->getCode()
             );
 
             //todo: redirect to originally requested page after successful OTP validation
@@ -41,5 +46,10 @@ class TwoFactorAuthController extends FrontendController
             //todo: display translated error message to user
             Registry::getUtilsView()->addErrorToDisplay($e->getMessage());
         }
+    }
+
+    public function resendCode(): void
+    {
+        $this->authService->generate();
     }
 }

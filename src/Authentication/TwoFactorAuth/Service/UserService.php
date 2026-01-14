@@ -35,7 +35,6 @@ class UserService implements UserServiceInterface
             $this->request->getRequestUrl()
         );
 
-        //todo: prevent spam by rate limiting
         $this->authorizeService->generate();
 
         $redirectUrl = $this->authorizeService->getVerificationUrl();

@@ -10,8 +10,10 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository;
 
 use DateTime;
+use DateTimeImmutable;
 use Doctrine\DBAL\Result;
 use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\DTO\UserInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\DTO\User as UserDTO;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\UserNotFoundException;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\UserFactoryInterface;
@@ -24,14 +26,15 @@ class UserRepository implements UserRepositoryInterface
     ) {
     }
 
-    public function getUserOTPData(string $userName): UserDTO
+    public function getUserOTPData(string $userName): UserInterface
     {
         $builder = $this->queryBuilderFactory->create();
         $builder->select([
                 'OXID',
                 'OESMOTPCODE',
                 'OESMOTPATTEMPTS',
-                'OESMOTPEXPTIME'
+                'OESMOTPEXPTIME',
+                'OESMOTPLASTSENT',
             ])
             ->from('oxuser')
             ->where('oxusername = :userName')
@@ -48,7 +51,8 @@ class UserRepository implements UserRepositoryInterface
             $userData['OXID'],
             $userData['OESMOTPATTEMPTS'],
             $userData['OESMOTPCODE'],
-            $userData['OESMOTPEXPTIME'] ? new DateTime($userData['OESMOTPEXPTIME']) : null
+            $userData['OESMOTPEXPTIME'] ? new DateTime($userData['OESMOTPEXPTIME']) : null,
+            $userData['OESMOTPLASTSENT'] ? new DateTime($userData['OESMOTPLASTSENT']) : null,
         );
     }
 
@@ -81,9 +85,10 @@ class UserRepository implements UserRepositoryInterface
         $userModel = $this->userFactory->create();
         $userModel->load($userId);
         $userModel->assign([
-            'OESMOTPCODE'     => '',
-            'OESMOTPEXPTIME'  => 0,
+            'OESMOTPCODE'     => null,
+            'OESMOTPEXPTIME'  => null,
             'OESMOTPATTEMPTS' => 0,
+            'OESMOTPLASTSENT' => null,
         ]);
         $userModel->save();
     }
@@ -101,5 +106,15 @@ class UserRepository implements UserRepositoryInterface
         $userPass = $queryResult->fetchOne();
 
         return $userPass ?: null;
+    }
+
+    public function markOtpAsSent(string $userId): void
+    {
+        $userModel = $this->userFactory->create();
+        $userModel->load($userId);
+        $userModel->assign([
+            'OESMOTPLASTSENT' => (new DateTimeImmutable())->format('Y-m-d H:i:s')
+        ]);
+        $userModel->save();
     }
 }

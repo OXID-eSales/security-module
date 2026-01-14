@@ -18,4 +18,6 @@ interface UserInterface
     public function getAttempts(): int;
 
     public function getExpiresAt(): ?DateTimeInterface;
+
+    public function getLastSentAt(): ?DateTimeInterface;
 }

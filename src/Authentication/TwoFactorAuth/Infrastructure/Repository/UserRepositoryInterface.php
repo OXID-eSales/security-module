@@ -8,11 +8,11 @@
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository;
 
 use DateTime;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\DTO\User as UserDTO;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\DTO\UserInterface;
 
 interface UserRepositoryInterface
 {
-    public function getUserOTPData(string $userName): UserDTO;
+    public function getUserOTPData(string $userName): UserInterface;
 
     public function updateAttempts(string $userId, int $attempts): void;
 
@@ -21,4 +21,6 @@ interface UserRepositoryInterface
     public function addOTPtoUser(string $userId, string $otp, DateTime $expiresAt): bool;
 
     public function getUserPasswordHash(string $userId): ?string;
+
+    public function markOtpAsSent(string $userId): void;
 }

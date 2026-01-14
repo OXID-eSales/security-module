@@ -7,6 +7,7 @@ import { PasswordStrength } from "./module/password-validator.js";
 import { PasswordGenerator } from "./module/password-generator.js";
 import { CaptchaRefresh } from "./module/captcha-refresh.js";
 import { CaptchaAudio } from "./module/captcha-audio.js";
+import { ResendOtp } from './module/resend-otp.js';
 
 document.querySelectorAll("div[data-type='passwordStrength']").forEach((el) => {
     new PasswordStrength({
@@ -46,3 +47,14 @@ document.querySelectorAll('.captcha-play').forEach((el) => {
         fieldTarget: el
     })
 });
+
+const resendBtn = document.getElementById('resend-btn');
+if (resendBtn) {
+    const resendOtp = new ResendOtp(resendBtn);
+
+    // restore cooldown on refresh
+    resendOtp.restoreIfNeeded();
+    resendBtn.addEventListener('click', function () {
+        resendOtp.resend();
+    });
+}
