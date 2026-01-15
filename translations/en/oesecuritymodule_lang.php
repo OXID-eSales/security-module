@@ -45,5 +45,5 @@ $aLang = [
     'TWO_FACTOR_AUTHENTICATION_TITLE'       => 'Two Factor Authentication',
     'TWO_FACTOR_AUTHENTICATION_DESCRIPTION' => 'Code has been sent to your email. Please enter it below to proceed.',
 
-    'RESENT_CODE' => 'Resend Code'
+    'RESEND_CODE' => 'Resend Code'
 ];
