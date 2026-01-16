@@ -99,4 +99,21 @@ class UserTest extends IntegrationTestCase
         $subject = oxNew(User::class);
         $subject->login('', '');
     }
+
+    public function testLoginWithOtpEnabledAndInvalidPasswordThrows(): void
+    {
+        $this->requestMock
+            ->method('getRequestParameter')
+            ->willReturnCallback(function ($param) {
+                if ($param === 'captcha') {
+                    return 'valid_captcha';
+                }
+                return null;
+            });
+
+        $this->expectException(UserException::class);
+
+        $subject = oxNew(User::class);
+        $subject->login(uniqid(), uniqid());
+    }
 }

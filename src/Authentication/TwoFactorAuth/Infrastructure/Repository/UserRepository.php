@@ -48,7 +48,7 @@ class UserRepository implements UserRepositoryInterface
             $userData['OXID'],
             $userData['OESMOTPATTEMPTS'],
             $userData['OESMOTPCODE'],
-            new DateTime($userData['OESMOTPEXPTIME'])
+            $userData['OESMOTPEXPTIME'] ? new DateTime($userData['OESMOTPEXPTIME']) : null
         );
     }
 

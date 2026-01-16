@@ -36,27 +36,27 @@ class OTPVerificatorTest extends TestCase
         $attempts = rand();
         $code = uniqid();
 
-        $userDTOMock = $this->createMock(User::class);
-        $userDTOMock->method('getCode')->willReturn($code);
-        $userDTOMock->method('getAttempts')->willReturn($attempts);
-        $userDTOMock->method('getExpiresAt')->willReturn(new DateTime());
+        $userDTOStub = $this->createStub(User::class);
+        $userDTOStub->method('getCode')->willReturn($code);
+        $userDTOStub->method('getAttempts')->willReturn($attempts);
+        $userDTOStub->method('getExpiresAt')->willReturn(new DateTime());
 
         $userRepositoryMock = $this->createMock(UserRepositoryInterface::class);
         $userRepositoryMock
             ->method('getUserOTPData')
-            ->willReturn($userDTOMock);
+            ->willReturn($userDTOStub);
 
-        $otpValidator = $this->createMock(OTPValidatorInterface::class);
-        $otpValidator->method('validateCode')->willThrowException(new InvalidCodeException());
+        $otpValidatorMock = $this->createMock(OTPValidatorInterface::class);
+        $otpValidatorMock->method('validateCode')->willThrowException(new InvalidCodeException());
 
-        $otpService = $this->getSut(
-            otpValidator: $otpValidator,
+        $sut = $this->getSut(
+            otpValidator: $otpValidatorMock,
             userRepository: $userRepositoryMock,
         );
 
         $this->expectException(InvalidCodeException::class);
 
-        $otpService->validateCode($userName, $code);
+        $sut->validateCode($userName, $code);
     }
 
     public function testExpiredCode(): void
@@ -65,27 +65,27 @@ class OTPVerificatorTest extends TestCase
         $attempts = rand();
         $code = uniqid();
 
-        $userDTOMock = $this->createMock(User::class);
-        $userDTOMock->method('getCode')->willReturn($code);
-        $userDTOMock->method('getAttempts')->willReturn($attempts);
-        $userDTOMock->method('getExpiresAt')->willReturn(new DateTime());
+        $userDTOStub = $this->createStub(User::class);
+        $userDTOStub->method('getCode')->willReturn($code);
+        $userDTOStub->method('getAttempts')->willReturn($attempts);
+        $userDTOStub->method('getExpiresAt')->willReturn(new DateTime());
 
         $userRepositoryMock = $this->createMock(UserRepositoryInterface::class);
         $userRepositoryMock
             ->method('getUserOTPData')
-            ->willReturn($userDTOMock);
+            ->willReturn($userDTOStub);
 
-        $otpValidator = $this->createMock(OTPValidatorInterface::class);
-        $otpValidator->method('validateCode')->willThrowException(new TimeExpiredException());
+        $otpValidatorMock = $this->createMock(OTPValidatorInterface::class);
+        $otpValidatorMock->method('validateCode')->willThrowException(new TimeExpiredException());
 
-        $otpService = $this->getSut(
-            otpValidator: $otpValidator,
+        $sut = $this->getSut(
+            otpValidator: $otpValidatorMock,
             userRepository: $userRepositoryMock,
         );
 
         $this->expectException(TimeExpiredException::class);
 
-        $otpService->validateCode($userName, $code);
+        $sut->validateCode($userName, $code);
     }
 
     public function testAttemptsCode(): void
@@ -94,27 +94,104 @@ class OTPVerificatorTest extends TestCase
         $attempts = rand();
         $code = uniqid();
 
-        $userDTOMock = $this->createMock(User::class);
-        $userDTOMock->method('getCode')->willReturn($code);
-        $userDTOMock->method('getAttempts')->willReturn($attempts);
-        $userDTOMock->method('getExpiresAt')->willReturn(new DateTime());
+        $userDTOStub = $this->createStub(User::class);
+        $userDTOStub->method('getCode')->willReturn($code);
+        $userDTOStub->method('getAttempts')->willReturn($attempts);
+        $userDTOStub->method('getExpiresAt')->willReturn(new DateTime());
 
         $userRepositoryMock = $this->createMock(UserRepositoryInterface::class);
         $userRepositoryMock
             ->method('getUserOTPData')
-            ->willReturn($userDTOMock);
+            ->willReturn($userDTOStub);
 
-        $otpValidator = $this->createMock(OTPValidatorInterface::class);
-        $otpValidator->method('validateCode')->willThrowException(new AttemptLimitExceededException());
+        $otpValidatorMock = $this->createMock(OTPValidatorInterface::class);
+        $otpValidatorMock->method('validateCode')->willThrowException(new AttemptLimitExceededException());
 
-        $otpService = $this->getSut(
-            otpValidator: $otpValidator,
+        $sut = $this->getSut(
+            otpValidator: $otpValidatorMock,
             userRepository: $userRepositoryMock,
         );
 
         $this->expectException(AttemptLimitExceededException::class);
 
-        $otpService->validateCode($userName, $code);
+        $sut->validateCode($userName, $code);
+    }
+
+    public function testValidateCodeSuccessResetsOtpData(): void
+    {
+        $userDTOStub = $this->createStub(User::class);
+        $userDTOStub->method('getId')->willReturn($userId = uniqid());
+        $userDTOStub->method('getCode')->willReturn($code = uniqid());
+        $userDTOStub->method('getAttempts')->willReturn(1);
+        $userDTOStub->method('getExpiresAt')->willReturn(new DateTime('+5 minutes'));
+
+        $userRepositorySpy = $this->createMock(UserRepositoryInterface::class);
+        $userRepositorySpy->method('getUserOTPData')->willReturn($userDTOStub);
+        $userRepositorySpy->expects($this->once())
+            ->method('resetCodeFields')
+            ->with($userId);
+        $userRepositorySpy->expects($this->never())
+            ->method('updateAttempts');
+
+        $otpValidatorSpy = $this->createMock(OTPValidatorInterface::class);
+        $otpValidatorSpy->expects($this->once())
+            ->method('checkLoginAttempts')
+            ->with(1);
+        $otpValidatorSpy->expects($this->once())
+            ->method('checkExpirationTime');
+        $otpValidatorSpy->expects($this->once())
+            ->method('validateCode')
+            ->with($code, $code);
+
+        $otpService = $this->getSut(
+            otpValidator: $otpValidatorSpy,
+            userRepository: $userRepositorySpy,
+        );
+
+        $otpService->validateCode('user', $code);
+    }
+
+    public function testGenerateReturnsGeneratedOtp(): void
+    {
+        $userDTOStub = $this->createStub(User::class);
+        $userDTOStub->method('getId')->willReturn($userId = uniqid());
+
+        $userRepositoryStub = $this->createStub(UserRepositoryInterface::class);
+        $userRepositoryStub->method('getUserOTPData')->willReturn($userDTOStub);
+
+        $otpGeneratorSpy = $this->createMock(OTPGeneratorInterface::class);
+        $otpGeneratorSpy->expects($this->once())
+            ->method('generateCode')
+            ->with($userId)
+            ->willReturn($code = uniqid());
+
+        $otpService = $this->getSut(
+            otpGenerator: $otpGeneratorSpy,
+            userRepository: $userRepositoryStub,
+        );
+
+        $this->assertSame(
+            $code,
+            $otpService->generate('user')
+        );
+    }
+
+    public function testGetVerificationUrl(): void
+    {
+        $configStub = $this->createStub(Config::class);
+        $configStub->method('getShopHomeUrl')->willReturn($url = uniqid());
+
+        $otpService = new OTPVerificator(
+            otpGenerator: $this->createStub(OTPGeneratorInterface::class),
+            otpValidator: $this->createStub(OTPValidatorInterface::class),
+            userRepository: $this->createStub(UserRepositoryInterface::class),
+            config: $configStub,
+        );
+
+        $this->assertSame(
+            $url . 'cl=twofactorauth',
+            $otpService->getVerificationUrl()
+        );
     }
 
     public function getSut(

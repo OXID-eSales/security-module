@@ -28,21 +28,20 @@ class UserServiceTest extends TestCase
         $username = uniqid();
         $url = uniqid();
 
-        $request = $this->createMock(Request::class);
-        $request->expects($this->once())
+        $requestSpy = $this->createMock(Request::class);
+        $requestSpy->expects($this->once())
             ->method('getRequestUrl')
             ->willReturn($url);
 
-        $authorizeService = $this->createMock(AuthorizeServiceInterface::class);
-        $authorizeService->expects($this->once())
+        $authorizeServiceSpy = $this->createMock(AuthorizeServiceInterface::class);
+        $authorizeServiceSpy->expects($this->once())
             ->method('generate');
-
-        $authorizeService->expects($this->once())
+        $authorizeServiceSpy->expects($this->once())
             ->method('getVerificationUrl')
             ->willReturn($url);
 
-        $session = $this->createMock(SessionInterface::class);
-        $session->expects($this->exactly(2))
+        $sessionSpy = $this->createMock(SessionInterface::class);
+        $sessionSpy->expects($this->exactly(2))
             ->method('set')
             ->willReturnCallback(function (string $key, $value) use ($username, $url) {
                 match ($key) {
@@ -57,18 +56,19 @@ class UserServiceTest extends TestCase
                 };
             });
 
-        $utils = $this->createMock(Utils::class);
-        $utils->expects($this->once())
+        $utilsSpy = $this->createMock(Utils::class);
+        $utilsSpy->expects($this->once())
             ->method('redirect')
             ->with($url);
 
-        $userService = $this->getSut(
-            authorizeService: $authorizeService,
-            session: $session,
-            request: $request,
-            utils: $utils,
+        $sut = $this->getSut(
+            authorizeService: $authorizeServiceSpy,
+            session: $sessionSpy,
+            request: $requestSpy,
+            utils: $utilsSpy,
         );
-        $userService->handleLogin($username);
+
+        $sut->handleLogin($username);
     }
 
     public function testCheckPasswordReturnsFalseIfUserNotFound(): void
@@ -76,14 +76,14 @@ class UserServiceTest extends TestCase
         $username = uniqid();
         $password = uniqid();
 
-        $userRepository = $this->createMock(UserRepositoryInterface::class);
-        $userRepository->expects($this->once())
+        $userRepositorySpy = $this->createMock(UserRepositoryInterface::class);
+        $userRepositorySpy->expects($this->once())
             ->method('getUserPasswordHash')
             ->with($username)
             ->willThrowException(new \Exception());
 
         $userService = $this->getSut(
-            userRepository: $userRepository,
+            userRepository: $userRepositorySpy,
         );
         $this->assertFalse($userService->checkPassword($username, $password));
     }
@@ -93,14 +93,14 @@ class UserServiceTest extends TestCase
         $username = uniqid();
         $password = uniqid();
 
-        $userRepository = $this->createMock(UserRepositoryInterface::class);
-        $userRepository->expects($this->once())
+        $userRepositorySpy = $this->createMock(UserRepositoryInterface::class);
+        $userRepositorySpy->expects($this->once())
             ->method('getUserPasswordHash')
             ->with($username)
             ->willReturn(null);
 
         $userService = $this->getSut(
-            userRepository: $userRepository,
+            userRepository: $userRepositorySpy,
         );
         $this->assertFalse($userService->checkPassword($username, $password));
     }
@@ -111,21 +111,21 @@ class UserServiceTest extends TestCase
         $password = uniqid();
         $hash = uniqid();
 
-        $userRepository = $this->createMock(UserRepositoryInterface::class);
-        $userRepository->expects($this->once())
+        $userRepositorySpy = $this->createMock(UserRepositoryInterface::class);
+        $userRepositorySpy->expects($this->once())
             ->method('getUserPasswordHash')
             ->with($username)
             ->willReturn($hash);
 
-        $pwdServiceBridge = $this->createMock(PasswordServiceBridgeInterface::class);
-        $pwdServiceBridge->expects($this->once())
+        $pwdServiceBridgeSpy = $this->createMock(PasswordServiceBridgeInterface::class);
+        $pwdServiceBridgeSpy->expects($this->once())
             ->method('verifyPassword')
             ->with($password, $hash)
             ->willReturn(true);
 
         $userService = $this->getSut(
-            userRepository: $userRepository,
-            pwdServiceBridge: $pwdServiceBridge,
+            userRepository: $userRepositorySpy,
+            pwdServiceBridge: $pwdServiceBridgeSpy,
         );
         $this->assertTrue($userService->checkPassword($username, $password));
     }
@@ -136,21 +136,21 @@ class UserServiceTest extends TestCase
         $password = 'pwd';
         $hash = 'hashedpwd';
 
-        $userRepository = $this->createMock(UserRepositoryInterface::class);
-        $userRepository->expects($this->once())
+        $userRepositorySpy = $this->createMock(UserRepositoryInterface::class);
+        $userRepositorySpy->expects($this->once())
             ->method('getUserPasswordHash')
             ->with($username)
             ->willReturn($hash);
 
-        $pwdServiceBridge = $this->createMock(PasswordServiceBridgeInterface::class);
-        $pwdServiceBridge->expects($this->once())
+        $pwdServiceBridgeSpy = $this->createMock(PasswordServiceBridgeInterface::class);
+        $pwdServiceBridgeSpy->expects($this->once())
             ->method('verifyPassword')
             ->with($password, $hash)
             ->willReturn(false);
 
         $userService = $this->getSut(
-            userRepository: $userRepository,
-            pwdServiceBridge: $pwdServiceBridge,
+            userRepository: $userRepositorySpy,
+            pwdServiceBridge: $pwdServiceBridgeSpy,
         );
         $this->assertFalse($userService->checkPassword($username, $password));
     }

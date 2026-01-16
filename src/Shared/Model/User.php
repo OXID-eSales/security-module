@@ -9,9 +9,11 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Shared\Model;
 
+use Doctrine\DBAL\Exception;
 use OxidEsales\Eshop\Core\Exception\InputException;
 use OxidEsales\Eshop\Core\Exception\UserException;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\UserNotFoundException;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\UserServiceInterface;
 use OxidEsales\SecurityModule\Captcha\Captcha\Image\Exception\CaptchaValidateException as ImageCaptchaException;
 use OxidEsales\SecurityModule\Captcha\Captcha\HoneyPot\Exception\CaptchaValidateException as HoneyPotCaptchaException;
@@ -85,7 +87,7 @@ class User extends User_parent
 
             try {
                 $userService->handleLogin($userName);
-            } catch (\Exception $e) {
+            } catch (Exception | UserNotFoundException $e) {
                 throw oxNew(UserException::class, 'ERROR_MESSAGE_USER_NOVALIDLOGIN');
             }
 
