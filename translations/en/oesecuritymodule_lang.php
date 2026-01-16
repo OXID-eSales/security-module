@@ -41,4 +41,9 @@ $aLang = [
     'GENERATE_STRONG_PASSWORD' => 'Generate Strong Password',
 
     'SIGN_IN_PROVIDER' => 'Sign in with %s',
+
+    'TWO_FACTOR_AUTHENTICATION_TITLE'       => 'Two Factor Authentication',
+    'TWO_FACTOR_AUTHENTICATION_DESCRIPTION' => 'Code has been sent to your email. Please enter it below to proceed.',
+
+    'RESEND_CODE' => 'Resend Code'
 ];

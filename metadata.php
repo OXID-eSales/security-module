@@ -9,6 +9,8 @@
  * Metadata version
  */
 
+use OxidEsales\SecurityModule\Authentication\OAuth2\Service\ModuleSettingsService;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\ModuleSettingsService as TwoFactorAuthModuleSettings;
 use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsService as PasswordPolicyModuleSettings;
 use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsService as CaptchaModuleSettings;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Service\ModuleSettingsService as OAuthModuleSettings;
@@ -41,7 +43,8 @@ $aModule = [
     'controllers' => [
         'captcha' => \OxidEsales\SecurityModule\Captcha\Controller\CaptchaController::class,
         'password' => \OxidEsales\SecurityModule\PasswordPolicy\Controller\PasswordAjaxController::class,
-        'oauth' => \OxidEsales\SecurityModule\Authentication\OAuth2\Controller\OAuthController::class
+        'oauth' => \OxidEsales\SecurityModule\Authentication\OAuth2\Controller\OAuthController::class,
+        'twofactorauth' => \OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Controller\TwoFactorAuthController::class,
     ],
     'templates'   => [
     ],
@@ -161,6 +164,21 @@ $aModule = [
             'name'  => OAuthModuleSettings::GOOGLE_REDIRECT_URL,
             'type'  => 'str',
             'value' => ''
-        ]
+        ],
+
+        //TwoFactorAuth settings
+        [
+            'group' => 'two_factor_auth',
+            'name'  => TwoFactorAuthModuleSettings::ACTIVE,
+            'type'  => 'bool',
+            'value' => false
+        ],
+        [
+            'group' => 'two_factor_auth',
+            'name'  => TwoFactorAuthModuleSettings::TWO_FACTOR_TYPE,
+            'type'  => 'select',
+            'constraints' => 'otp|totp',
+            'value' => ''
+        ],
     ],
 ];

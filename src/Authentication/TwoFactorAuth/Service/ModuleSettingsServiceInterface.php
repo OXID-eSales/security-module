@@ -7,9 +7,9 @@
 
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service;
 
-interface TwoFactorAuthInterface
+interface ModuleSettingsServiceInterface
 {
-    public function generateQRCode(string $username): string;
+    public function isTwoFactorAuthEnabled(): bool;
 
-    public function generateOTPCode(): int;
+    public function getTwoFactorAuthType(): string;
 }

@@ -32,9 +32,15 @@ $aLang = [
     'SHOP_MODULE_oeSecurityFacebookClientId'    => 'Facebook Client-ID',
     'SHOP_MODULE_oeSecurityFacebookSecret'      => 'Facebook Secret',
     'SHOP_MODULE_oeSecurityFacebookRedirectUrl' => 'Facebook Weiterleitungs-URL',
-
     'SHOP_MODULE_oeSecurityGoogleEnable'      => 'Enable login with Google',
     'SHOP_MODULE_oeSecurityGoogleClientId'    => 'Google client id',
     'SHOP_MODULE_oeSecurityGoogleSecret'      => 'Google client secret',
     'SHOP_MODULE_oeSecurityGoogleRedirectUrl' => 'Google redirect url',
+
+    'SHOP_MODULE_GROUP_two_factor_auth'            => 'Two Factor Authentication',
+    'SHOP_MODULE_oeSecurityTwoFactorAuthEnabled'   => 'Enable Two Factor Authentication',
+    'SHOP_MODULE_oeSecurityTwoFactorAuthType'      => 'Two Factor Authentication type',
+    'SHOP_MODULE_oeSecurityTwoFactorAuthType_otp'  => 'OTP',
+    'SHOP_MODULE_oeSecurityTwoFactorAuthType_totp' => 'TOTP',
+    'SHOP_MODULE_oeSecurityTwoFactorAuthType_both' => 'OTP and TOTP',
 ];

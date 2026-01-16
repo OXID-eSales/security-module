@@ -55,7 +55,7 @@ class PasswordStrengthService implements PasswordStrengthServiceInterface
         }
 
         $pool = $lower + $upper + $digit + $symbol + $control + $other;
-        $entropy =  $chars * log($pool, 2) + ($length - $chars) * log($chars, 2);
+        $entropy = $chars * log($pool, 2) + ($length - $chars) * log($chars, 2);
 
         return match (true) {
             $entropy >= 120 => self::STRENGTH_VERY_STRONG,

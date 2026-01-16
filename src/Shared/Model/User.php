@@ -12,10 +12,13 @@ namespace OxidEsales\SecurityModule\Shared\Model;
 use OxidEsales\Eshop\Core\Exception\InputException;
 use OxidEsales\Eshop\Core\Exception\UserException;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\UserServiceInterface;
 use OxidEsales\SecurityModule\Captcha\Captcha\Image\Exception\CaptchaValidateException as ImageCaptchaException;
 use OxidEsales\SecurityModule\Captcha\Captcha\HoneyPot\Exception\CaptchaValidateException as HoneyPotCaptchaException;
 use OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface;
-use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface;
+use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface as CaptchaSettingsServiceInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\ModuleSettingsServiceInterface
+    as TwoFASettingsServiceInterface;
 use OxidEsales\SecurityModule\Shared\Core\InputValidator;
 
 /**
@@ -58,10 +61,10 @@ class User extends User_parent
      */
     public function login($userName, $password, $setSessionCookie = false): bool
     {
+        //todo: login should be reworded, disabled captcha is killing OTP login flow
         if (!$this->isCaptchaEnabled()) {
-            return parent::login($userName, $password, $setSessionCookie);
+//            return parent::login($userName, $password, $setSessionCookie);
         }
-
         if (!$this->isAdmin()) {
             $captchaService = $this->getService(CaptchaServiceInterface::class);
 
@@ -74,13 +77,31 @@ class User extends User_parent
             }
         }
 
-        return parent::login($userName, $password, $setSessionCookie);
+        if (!$this->isOTPEnabled() || $this->isAdmin()) {
+            return parent::login($userName, $password, $setSessionCookie);
+        }
+
+        $userService = $this->getService(UserServiceInterface::class);
+        if (!$userService->checkPassword($userName, $password)) {
+            //todo: log invalid login attempt and throw exception
+            return false; // invalid login
+        }
+
+        $userService->handleLogin($userName);
+
+        return false;
     }
 
     private function isCaptchaEnabled(): bool
     {
-        $settingsService = $this->getService(ModuleSettingsServiceInterface::class);
+        $settingsService = $this->getService(CaptchaSettingsServiceInterface::class);
         return $settingsService->isCaptchaEnabled() || $settingsService->isHoneyPotCaptchaEnabled();
+    }
+
+    private function isOTPEnabled(): bool
+    {
+        $settingsService = $this->getService(TwoFASettingsServiceInterface::class);
+        return $settingsService->isTwoFactorAuthEnabled();
     }
 
     protected function shouldValidateCaptcha(): bool

@@ -9,10 +9,8 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Authentication\OAuth2\Service;
 
-use OxidEsales\SecurityModule\Authentication\OAuth2\Exception\ProviderNotActiveException;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Exception\ProviderNotFoundException;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Provider\ProviderAdapterInterface;
-use OxidEsales\SecurityModule\Authentication\OAuth2\Service\Exception\ProviderNotActive;
 use Symfony\Component\Translation\Provider\ProviderInterface;
 
 class ProviderCollector implements ProviderCollectorInterface

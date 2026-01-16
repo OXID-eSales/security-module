@@ -1,0 +1,31 @@
+imports:
+  - { resource: Verificator/services.yaml }
+
+services:
+  _defaults:
+    autowire: true
+    public: false
+
+  OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\ModuleSettingsServiceInterface:
+    class: OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\ModuleSettingsService
+    public: true
+
+  OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\UserServiceInterface:
+    class: OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\UserService
+    public: true
+
+  OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\AuthorizeServiceInterface:
+    class: OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\AuthorizeService
+    public: true
+
+  OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\NotifierCollectorInterface:
+    class: OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\NotifierCollector
+    public: true
+    arguments:
+      $notifiers: !tagged 'security.twofa.tag.notify.provider'
+
+  OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\VerificationCollectorServiceInterface:
+    class: OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\VerificationCollectorService
+    public: true
+    arguments:
+      $verificators: !tagged 'security.twofa.tag.verificator'
