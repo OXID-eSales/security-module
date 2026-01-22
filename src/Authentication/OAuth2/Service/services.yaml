@@ -1,0 +1,19 @@
+services:
+  _defaults:
+    autowire: true
+    public: false
+
+  OxidEsales\SecurityModule\Authentication\OAuth2\Service\ModuleSettingsServiceInterface:
+    class: OxidEsales\SecurityModule\Authentication\OAuth2\Service\ModuleSettingsService
+    public: true
+
+  OxidEsales\SecurityModule\Authentication\OAuth2\Service\UserServiceInterface:
+    class: OxidEsales\SecurityModule\Authentication\OAuth2\Service\UserService
+    public: true
+
+  OxidEsales\SecurityModule\Authentication\OAuth2\Service\ProviderCollectorInterface:
+    class: OxidEsales\SecurityModule\Authentication\OAuth2\Service\ProviderCollector
+    public: true
+    arguments:
+      $providers: !tagged 'security.oauth.tag.provider'
+

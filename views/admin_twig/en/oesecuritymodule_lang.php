@@ -26,4 +26,21 @@ $aLang = [
     'SHOP_MODULE_oeSecurityCaptchaLifeTime_5min'  => '5 min',
     'SHOP_MODULE_oeSecurityCaptchaLifeTime_15min' => '15 min',
     'SHOP_MODULE_oeSecurityCaptchaLifeTime_30min' => '30 min',
+
+    'SHOP_MODULE_GROUP_oauth'                   => 'OAuth2',
+    'SHOP_MODULE_oeSecurityFacebookEnabled'     => 'Enable Facebook OAuth2 login',
+    'SHOP_MODULE_oeSecurityFacebookClientId'    => 'Facebook client id',
+    'SHOP_MODULE_oeSecurityFacebookSecret'      => 'Facebook client secret',
+    'SHOP_MODULE_oeSecurityFacebookRedirectUrl' => 'Facebook redirect url',
+    'SHOP_MODULE_oeSecurityGoogleEnable'      => 'Enable login with Google',
+    'SHOP_MODULE_oeSecurityGoogleClientId'    => 'Google client id',
+    'SHOP_MODULE_oeSecurityGoogleSecret'      => 'Google client secret',
+    'SHOP_MODULE_oeSecurityGoogleRedirectUrl' => 'Google redirect url',
+
+    'SHOP_MODULE_GROUP_two_factor_auth'            => 'Two Factor Authentication',
+    'SHOP_MODULE_oeSecurityTwoFactorAuthEnabled'   => 'Enable Two Factor Authentication',
+    'SHOP_MODULE_oeSecurityTwoFactorAuthType'      => 'Two Factor Authentication type',
+    'SHOP_MODULE_oeSecurityTwoFactorAuthType_otp'  => 'OTP',
+    'SHOP_MODULE_oeSecurityTwoFactorAuthType_totp' => 'TOTP',
+    'SHOP_MODULE_oeSecurityTwoFactorAuthType_both' => 'OTP and TOTP',
 ];

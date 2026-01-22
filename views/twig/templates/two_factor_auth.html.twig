@@ -1,0 +1,22 @@
+{% capture append = "oxidBlock_content" %}
+    <h1 class="page-header">{{ translate({ ident: "TWO_FACTOR_AUTHENTICATION_TITLE" }) }}</h1>
+    <p >{{ translate({ ident: "TWO_FACTOR_AUTHENTICATION_DESCRIPTION" }) }}</p>
+    <br>
+    <form action="{{ oViewConf.getSelfLink()|raw }}" name="two_factor_auth" method="post" role="form">
+        <div class="hidden">
+            {{ oViewConf.getHiddenSid()|raw }}
+            <input type="hidden" name="cl" value="twofactorauth">
+            <input type="hidden" name="fnc" value="handleOTP">
+        </div>
+        <div>
+            <input type="text" class="editinput" maxlength="254" id="auth_code" name="auth_code" value="">
+            <button class="btn btn-primary submitButton largeButton" type="submit" id="auth_submit" class="submitButton">{{ translate({ ident: "SUBMIT" }) }}</button>
+        </div>
+        <div>
+            <button class="btn btn-secondary submitButton largeButton" type="button">{{ translate({ ident: "RESENT_CODE" }) }}</button>
+        </div>
+    </form>
+    <br>
+{% endcapture %}
+
+{% include "layout/page.html.twig" %}

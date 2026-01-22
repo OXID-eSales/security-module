@@ -38,5 +38,12 @@ $aLang = [
     'ERROR_PASSWORD_STRENGTH_3' => "Stark",
     'ERROR_PASSWORD_STRENGTH_4' => "Sehr Stark",
 
-    'GENERATE_STRONG_PASSWORD' => 'Starkes Passwort generieren'
+    'GENERATE_STRONG_PASSWORD' => 'Starkes Passwort generieren',
+
+    'SIGN_IN_PROVIDER' => 'Anmelden mit %s',
+
+    'TWO_FACTOR_AUTHENTICATION_TITLE'       => 'Two Factor Authentication',
+    'TWO_FACTOR_AUTHENTICATION_DESCRIPTION' => 'Code has been sent to your email. Please enter it below to proceed.',
+
+    'RESENT_CODE' => 'Code erneut senden'
 ];
