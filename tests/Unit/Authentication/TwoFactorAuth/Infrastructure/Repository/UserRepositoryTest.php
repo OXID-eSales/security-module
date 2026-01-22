@@ -153,9 +153,10 @@ class UserRepositoryTest extends TestCase
         $userModelSpy = $this->createMock(User::class);
         $userModelSpy->expects($this->once())->method('load')->with($userId = uniqid());
         $userModelSpy->expects($this->once())->method('assign')->with([
-            'OESMOTPCODE'     => '',
-            'OESMOTPEXPTIME'  => 0,
+            'OESMOTPCODE'     => null,
+            'OESMOTPEXPTIME'  => null,
             'OESMOTPATTEMPTS' => 0,
+            'OESMOTPLASTSENT' => null
         ]);
         $userModelSpy->expects($this->once())->method('save');
 
