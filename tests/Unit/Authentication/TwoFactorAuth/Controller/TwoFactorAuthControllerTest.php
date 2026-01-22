@@ -11,6 +11,7 @@ namespace OxidEsales\SecurityModule\Tests\Unit\Authentication\TwoFactorAuth\Cont
 
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Controller\TwoFactorAuthController;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\AuthorizeServiceInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\UserServiceInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Transput\AuthCodeRequestInterface;
 use PHPUnit\Framework\TestCase;
 
@@ -24,6 +25,7 @@ class TwoFactorAuthControllerTest extends TestCase
 
         $controller = new TwoFactorAuthController(
             authService: $authService,
+            userService: $this->createMock(UserServiceInterface::class),
             authCodeRequest: $this->createMock(AuthCodeRequestInterface::class),
         );
 

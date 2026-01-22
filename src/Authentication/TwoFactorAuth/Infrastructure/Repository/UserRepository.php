@@ -13,6 +13,7 @@ use DateTime;
 use DateTimeImmutable;
 use Doctrine\DBAL\Result;
 use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
+use OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\DTO\UserInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\DTO\User as UserDTO;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\UserNotFoundException;
@@ -23,6 +24,7 @@ class UserRepository implements UserRepositoryInterface
     public function __construct(
         private readonly UserFactoryInterface $userFactory,
         private readonly QueryBuilderFactoryInterface $queryBuilderFactory,
+        private readonly ContextInterface $context,
     ) {
     }
 
@@ -38,7 +40,9 @@ class UserRepository implements UserRepositoryInterface
             ])
             ->from('oxuser')
             ->where('oxusername = :userName')
-            ->setParameter('userName', $userName);
+            ->andWhere('oxshopid = :shopId')
+            ->setParameter('userName', $userName)
+            ->setParameter('shopId', $this->context->getCurrentShopId());
 
         /** @var Result $queryResult */
         $queryResult = $builder->execute();
@@ -99,13 +103,34 @@ class UserRepository implements UserRepositoryInterface
         $builder->select('OXPASSWORD')
             ->from('oxuser')
             ->where('oxusername = :userName')
-            ->setParameter('userName', $userName);
+            ->andWhere('oxshopid = :shopId')
+            ->setParameter('userName', $userName)
+            ->setParameter('shopId', $this->context->getCurrentShopId());
 
         /** @var Result $queryResult */
         $queryResult = $builder->execute();
         $userPass = $queryResult->fetchOne();
 
         return $userPass ?: null;
+    }
+
+    public function getUserIdByUserName(string $userName): ?string
+    {
+        $builder = $this->queryBuilderFactory->create();
+        $builder->select('OXID')
+            ->from('oxuser')
+            ->where('oxusername = :userName')
+            ->andWhere('oxshopid = :shopId')
+            ->andWhere('oxactive = 1')
+            ->andWhere("oxpassword != ''")
+            ->setParameter('userName', $userName)
+            ->setParameter('shopId', $this->context->getCurrentShopId());
+
+        /** @var Result $queryResult */
+        $queryResult = $builder->execute();
+        $userId = $queryResult->fetchOne();
+
+        return $userId ?: null;
     }
 
     public function markOtpAsSent(string $userId): void

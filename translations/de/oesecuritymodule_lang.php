@@ -42,8 +42,12 @@ $aLang = [
 
     'SIGN_IN_PROVIDER' => 'Anmelden mit %s',
 
-    'TWO_FACTOR_AUTHENTICATION_TITLE'       => 'Two Factor Authentication',
-    'TWO_FACTOR_AUTHENTICATION_DESCRIPTION' => 'Code has been sent to your email. Please enter it below to proceed.',
+    'TWO_FACTOR_AUTHENTICATION_TITLE'       => 'Zwei-Faktor-Authentifizierung',
+    'TWO_FACTOR_AUTHENTICATION_DESCRIPTION' => 'Ein Code wurde an Ihre E-Mail-Adresse gesendet. Bitte geben Sie ihn unten ein, um fortzufahren.',
 
-    'RESEND_CODE' => 'Code erneut senden'
+    'RESENT_CODE' => 'Code erneut senden',
+
+    'ERROR_INVALID_CODE'           => 'Der Bestätigungscode ist ungültig. Bitte versuchen Sie es erneut.',
+    'ERROR_CODE_TIME_EXPIRED'      => 'Der Bestätigungscode ist abgelaufen. Bitte fordern Sie einen neuen Code an.',
+    'ERROR_ATTEMPT_LIMIT_EXCEEDED' => 'Zu viele fehlgeschlagene Versuche. Bitte fordern Sie einen neuen Code an.',
 ];
