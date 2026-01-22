@@ -9,9 +9,11 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Shared\Model;
 
+use Doctrine\DBAL\Exception;
 use OxidEsales\Eshop\Core\Exception\InputException;
 use OxidEsales\Eshop\Core\Exception\UserException;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\UserNotFoundException;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\UserServiceInterface;
 use OxidEsales\SecurityModule\Captcha\Captcha\Image\Exception\CaptchaValidateException as ImageCaptchaException;
 use OxidEsales\SecurityModule\Captcha\Captcha\HoneyPot\Exception\CaptchaValidateException as HoneyPotCaptchaException;
@@ -61,11 +63,11 @@ class User extends User_parent
      */
     public function login($userName, $password, $setSessionCookie = false): bool
     {
-        //todo: login should be reworded, disabled captcha is killing OTP login flow
-        if (!$this->isCaptchaEnabled()) {
-//            return parent::login($userName, $password, $setSessionCookie);
+        if ($this->isAdmin()) {
+            return parent::login($userName, $password, $setSessionCookie);
         }
-        if (!$this->isAdmin()) {
+
+        if ($this->isCaptchaEnabled()) {
             $captchaService = $this->getService(CaptchaServiceInterface::class);
 
             try {
@@ -77,19 +79,22 @@ class User extends User_parent
             }
         }
 
-        if (!$this->isOTPEnabled() || $this->isAdmin()) {
-            return parent::login($userName, $password, $setSessionCookie);
+        if ($this->isOTPEnabled()) {
+            $userService = $this->getService(UserServiceInterface::class);
+            if (!$userService->checkPassword($userName, $password)) {
+                throw oxNew(UserException::class, 'ERROR_MESSAGE_USER_NOVALIDLOGIN');
+            }
+
+            try {
+                $userService->handleLogin($userName);
+            } catch (Exception | UserNotFoundException $e) {
+                throw oxNew(UserException::class, 'ERROR_MESSAGE_USER_NOVALIDLOGIN');
+            }
+
+            return false;
         }
 
-        $userService = $this->getService(UserServiceInterface::class);
-        if (!$userService->checkPassword($userName, $password)) {
-            //todo: log invalid login attempt and throw exception
-            return false; // invalid login
-        }
-
-        $userService->handleLogin($userName);
-
-        return false;
+        return parent::login($userName, $password, $setSessionCookie);
     }
 
     private function isCaptchaEnabled(): bool

@@ -12,4 +12,6 @@ interface ModuleSettingsServiceInterface
     public function isTwoFactorAuthEnabled(): bool;
 
     public function getTwoFactorAuthType(): string;
+
+    public function saveIsTwoFactorAuthEnabled(bool $value): void;
 }

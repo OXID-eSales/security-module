@@ -23,10 +23,10 @@ class ModuleSettingsTest extends TestCase
     public function testGetters($method, $systemMethod, $key, $mockValue, $expectedValue): void
     {
         $sut = $this->getSut(
-            moduleSettingService: $settingService = $this->createMock(ModuleSettingServiceInterface::class)
+            moduleSettingService: $settingServiceStub = $this->createStub(ModuleSettingServiceInterface::class)
         );
 
-        $settingService->method($systemMethod)
+        $settingServiceStub->method($systemMethod)
             ->with($key, Module::MODULE_ID)
             ->willReturn($mockValue);
 

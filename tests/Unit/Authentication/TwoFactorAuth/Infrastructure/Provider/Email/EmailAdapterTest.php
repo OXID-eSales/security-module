@@ -28,8 +28,8 @@ class EmailAdapterTest extends TestCase
         $recipient = uniqid();
         $code = uniqid();
 
-        $emailModelMock = $this->createMock(Email::class);
-        $emailModelMock->expects($this->once())
+        $emailModelSpy = $this->createMock(Email::class);
+        $emailModelSpy->expects($this->once())
             ->method('sendEmail')
             ->with(
                 $this->equalTo($recipient),
@@ -38,7 +38,7 @@ class EmailAdapterTest extends TestCase
             );
 
         $emailFactoryMock = $this->createMock(EmailFactoryInterface::class);
-        $emailFactoryMock->method('create')->willReturn($emailModelMock);
+        $emailFactoryMock->method('create')->willReturn($emailModelSpy);
 
         $sut = $this->getSut(
             emailFactory: $emailFactoryMock

@@ -42,13 +42,4 @@ class TwoFactorAuthController extends FrontendController
             Registry::getUtilsView()->addErrorToDisplay($e->getMessage());
         }
     }
-
-    public function generate(): void
-    {
-        //todo: stop execution if not ajax
-        //todo: prevent spam by rate limiting
-        //todo: should return json response with success or error message
-        $authorizeService = $this->getService(AuthorizeServiceInterface::class);
-        $authorizeService->generate();
-    }
 }

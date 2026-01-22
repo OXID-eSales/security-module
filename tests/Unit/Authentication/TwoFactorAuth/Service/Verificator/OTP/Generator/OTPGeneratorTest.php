@@ -20,8 +20,8 @@ class OTPGeneratorTest extends TestCase
     public function testGenerateCodeCreatesOtpAndPersistsIt(): void
     {
         $userId = uniqid();
-        $repository = $this->createMock(UserRepositoryInterface::class);
-        $repository
+        $repositorySpy = $this->createMock(UserRepositoryInterface::class);
+        $repositorySpy
             ->expects($this->once())
             ->method('addOTPtoUser')
             ->with(
@@ -34,7 +34,7 @@ class OTPGeneratorTest extends TestCase
                 })
             );
 
-        $generator = $this->getSut($repository);
+        $generator = $this->getSut($repositorySpy);
 
         $otp = $generator->generateCode($userId);
 

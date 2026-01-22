@@ -22,113 +22,163 @@ use PHPUnit\Framework\TestCase;
 
 class AuthorizeServiceTest extends TestCase
 {
-    private ModuleSettingsServiceInterface $settings;
-    private VerificationCollectorServiceInterface $collector;
-    private NotifierCollectorInterface $notifierCollector;
-    private SessionInterface $session;
-
-    protected function setUp(): void
-    {
-        $this->settings = $this->createMock(ModuleSettingsServiceInterface::class);
-        $this->collector = $this->createMock(VerificationCollectorServiceInterface::class);
-        $this->notifierCollector = $this->createMock(NotifierCollectorInterface::class);
-        $this->session = $this->createMock(SessionInterface::class);
-    }
-
     public function testValidateThrowsWhenVerificatorNotFound(): void
     {
-        $this->settings->method('getTwoFactorAuthType')->willReturn('unknown');
-        $this->collector
+        $settingsStub = $this->createStub(ModuleSettingsServiceInterface::class);
+        $settingsStub
+            ->method('getTwoFactorAuthType')
+            ->willReturn('unknown');
+
+        $sessionStub = $this->createStub(SessionInterface::class);
+        $sessionStub
+            ->method('get')
+            ->willReturn(uniqid());
+
+        $collectorMock = $this->createMock(VerificationCollectorServiceInterface::class);
+        $collectorMock
             ->method('getVerificator')
             ->with('unknown')
             ->willThrowException(new VerificatorNotFoundException());
 
-        $this->session->method('get')->willReturn(uniqid());
+        $sut = $this->getSut(
+            moduleSettings: $settingsStub,
+            verifyCollector: $collectorMock,
+            session: $sessionStub
+        );
 
         $this->expectException(VerificatorNotFoundException::class);
 
-        $service = new AuthorizeService(
-            $this->settings,
-            $this->collector,
-            $this->createMock(NotifierCollectorInterface::class),
-            $this->session
-        );
-
-        $service->validate(uniqid());
+        $sut->validate(uniqid());
     }
 
     public function testValidateBubblesVerificatorException(): void
     {
         $exception = new InvalidCodeException();
 
-        $verificator = $this->createMock(VerificatorAdapterInterface::class);
-        $verificator
+        $verificatorMock = $this->createMock(VerificatorAdapterInterface::class);
+        $verificatorMock
             ->method('validateCode')
             ->willThrowException($exception);
 
-        $this->settings->method('getTwoFactorAuthType')->willReturn('otp');
-        $this->collector->method('getVerificator')->willReturn($verificator);
-        $this->session->method('get')->willReturn(uniqid());
+        $settingsStub = $this->createStub(ModuleSettingsServiceInterface::class);
+        $settingsStub
+            ->method('getTwoFactorAuthType')
+            ->willReturn('otp');
+
+        $sessionStub = $this->createStub(SessionInterface::class);
+        $sessionStub
+            ->method('get')
+            ->willReturn(uniqid());
+
+        $collectorMock = $this->createMock(VerificationCollectorServiceInterface::class);
+        $collectorMock
+            ->method('getVerificator')
+            ->with('otp')
+            ->willReturn($verificatorMock);
+
+        $sut = $this->getSut(
+            moduleSettings: $settingsStub,
+            verifyCollector: $collectorMock,
+            session: $sessionStub
+        );
 
         $this->expectExceptionObject($exception);
 
-        $service = new AuthorizeService(
-            $this->settings,
-            $this->collector,
-            $this->createMock(NotifierCollectorInterface::class),
-            $this->session
-        );
-
-        $service->validate(uniqid());
+        $sut->validate(uniqid());
     }
 
     public function testValidateWithValidCodeDoesNotThrow(): void
     {
-        $verificator = $this->createMock(VerificatorAdapterInterface::class);
-        $verificator
+        $email = uniqid();
+        $code = uniqid();
+
+        $verificatorMock = $this->createMock(VerificatorAdapterInterface::class);
+        $verificatorMock
             ->expects($this->once())
             ->method('validateCode')
-            ->with($email = uniqid(), $code = uniqid());
+            ->with($email, $code);
 
-        $settings = $this->createMock(ModuleSettingsServiceInterface::class);
-        $collector = $this->createMock(VerificationCollectorServiceInterface::class);
-        $session = $this->createMock(SessionInterface::class);
+        $settingsStub = $this->createStub(ModuleSettingsServiceInterface::class);
+        $settingsStub
+            ->method('getTwoFactorAuthType')
+            ->willReturn('otp');
 
-        $settings->method('getTwoFactorAuthType')->willReturn('otp');
-        $collector->method('getVerificator')->willReturn($verificator);
-        $session->method('get')->willReturn($email);
+        $collectorStub = $this->createStub(VerificationCollectorServiceInterface::class);
+        $collectorStub
+            ->method('getVerificator')
+            ->willReturn($verificatorMock);
 
-        $service = new AuthorizeService(
-            $settings,
-            $collector,
-            $this->createMock(NotifierCollectorInterface::class),
-            $session
+        $sessionStub = $this->createStub(SessionInterface::class);
+        $sessionStub
+            ->method('get')
+            ->willReturn($email);
+
+        $sut = $this->getSut(
+            moduleSettings: $settingsStub,
+            verifyCollector: $collectorStub,
+            session: $sessionStub
         );
 
-        $service->validate($code);
+        $sut->validate($code);
+
         $this->addToAssertionCount(1);
     }
 
     public function testGenerateNotifiesUser(): void
     {
-        $verificator = $this->createMock(VerificatorAdapterInterface::class);
-        $verificator->method('generate')->willReturn(uniqid());
+        $generatedCode = uniqid();
 
-        $notifier = $this->createMock(NotifierAdapterInterface::class);
-        $notifier->expects($this->once())->method('notify');
+        $verificatorStub = $this->createStub(VerificatorAdapterInterface::class);
+        $verificatorStub
+            ->method('generate')
+            ->willReturn($generatedCode);
 
-        $this->settings->method('getTwoFactorAuthType')->willReturn('otp');
-        $this->collector->method('getVerificator')->willReturn($verificator);
-        $this->notifierCollector->method('getNotifier')->willReturn($notifier);
-        $this->session->method('get')->willReturn(uniqid());
+        $notifierMock = $this->createMock(NotifierAdapterInterface::class);
+        $notifierMock
+            ->expects($this->once())
+            ->method('notify');
 
-        $service = new AuthorizeService(
-            $this->settings,
-            $this->collector,
-            $this->notifierCollector,
-            $this->session
+        $settingsStub = $this->createStub(ModuleSettingsServiceInterface::class);
+        $settingsStub
+            ->method('getTwoFactorAuthType')
+            ->willReturn('otp');
+
+        $collectorStub = $this->createStub(VerificationCollectorServiceInterface::class);
+        $collectorStub
+            ->method('getVerificator')
+            ->willReturn($verificatorStub);
+
+        $notifierCollectorStub = $this->createStub(NotifierCollectorInterface::class);
+        $notifierCollectorStub
+            ->method('getNotifier')
+            ->willReturn($notifierMock);
+
+        $sessionStub = $this->createStub(SessionInterface::class);
+        $sessionStub
+            ->method('get')
+            ->willReturn(uniqid());
+
+        $sut = $this->getSut(
+            moduleSettings: $settingsStub,
+            verifyCollector: $collectorStub,
+            notifierCollector: $notifierCollectorStub,
+            session: $sessionStub
         );
 
-        $service->generate();
+        $sut->generate();
+    }
+
+    protected function getSut(
+        ModuleSettingsServiceInterface $moduleSettings = null,
+        VerificationCollectorServiceInterface $verifyCollector = null,
+        NotifierCollectorInterface $notifierCollector = null,
+        SessionInterface $session = null
+    ): AuthorizeService {
+        return new AuthorizeService(
+            moduleSettings: $moduleSettings ?? $this->createStub(ModuleSettingsServiceInterface::class),
+            verifyCollector: $verifyCollector ?? $this->createStub(VerificationCollectorServiceInterface::class),
+            notifierCollector: $notifierCollector ?? $this->createStub(NotifierCollectorInterface::class),
+            session: $session ?? $this->createStub(SessionInterface::class),
+        );
     }
 }

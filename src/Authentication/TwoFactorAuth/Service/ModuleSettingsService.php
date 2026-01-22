@@ -33,6 +33,15 @@ class ModuleSettingsService implements ModuleSettingsServiceInterface
         return $this->getStringValue(self::TWO_FACTOR_TYPE);
     }
 
+    public function saveIsTwoFactorAuthEnabled(bool $value): void
+    {
+        $this->moduleSettingService->saveBoolean(
+            self::ACTIVE,
+            $value,
+            Module::MODULE_ID
+        );
+    }
+
     private function getStringValue(string $key): string
     {
         return $this->moduleSettingService->getString(
