@@ -24,7 +24,7 @@ class TwoFAAuthenticationCest extends BaseCest
 {
     private string $otpInput = '#auth_code';
     private string $otpSubmitBtn = '#auth_submit';
-    private string $otpResendBtn = 'RESENT_CODE';
+    private string $otpResendBtn = 'RESEND_CODE';
 
     public function _before(AcceptanceTester $I): void
     {
