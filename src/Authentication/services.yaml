@@ -1,3 +1,0 @@
-imports:
-  - { resource: OAuth2/services.yaml }
-  - { resource: TwoFactorAuth/services.yaml }

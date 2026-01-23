@@ -9,11 +9,8 @@
  * Metadata version
  */
 
-use OxidEsales\SecurityModule\Authentication\OAuth2\Service\ModuleSettingsService;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\ModuleSettingsService as TwoFactorAuthModuleSettings;
 use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsService as PasswordPolicyModuleSettings;
 use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsService as CaptchaModuleSettings;
-use OxidEsales\SecurityModule\Authentication\OAuth2\Service\ModuleSettingsService as OAuthModuleSettings;
 use OxidEsales\SecurityModule\Core\Module;
 
 $sMetadataVersion = '2.1';
@@ -42,9 +39,7 @@ $aModule = [
     ],
     'controllers' => [
         'captcha' => \OxidEsales\SecurityModule\Captcha\Controller\CaptchaController::class,
-        'password' => \OxidEsales\SecurityModule\PasswordPolicy\Controller\PasswordAjaxController::class,
-        'oauth' => \OxidEsales\SecurityModule\Authentication\OAuth2\Controller\OAuthController::class,
-        'twofactorauth' => \OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Controller\TwoFactorAuthController::class,
+        'password' => \OxidEsales\SecurityModule\PasswordPolicy\Controller\PasswordAjaxController::class
     ],
     'templates'   => [
     ],
@@ -114,71 +109,6 @@ $aModule = [
             'type'  => 'select',
             'constraints' => '5min|15min|30min',
             'value' => '15min'
-        ],
-
-        //OAuth2 settings
-        [
-            'group' => 'oauth',
-            'name'  => OAuthModuleSettings::FACEBOOK_LOGIN_ENABLED,
-            'type'  => 'bool',
-            'value' => false
-        ],
-        [
-            'group' => 'oauth',
-            'name'  => OAuthModuleSettings::FACEBOOK_CLIENT_ID,
-            'type'  => 'str',
-            'value' => ''
-        ],
-        [
-            'group' => 'oauth',
-            'name'  => OAuthModuleSettings::FACEBOOK_CLIENT_SECRET,
-            'type'  => 'str',
-            'value' => ''
-        ],
-        [
-            'group' => 'oauth',
-            'name'  => OAuthModuleSettings::FACEBOOK_REDIRECT_URL,
-            'type'  => 'str',
-            'value' => ''
-        ],
-        [
-            'group' => 'oauth',
-            'name'  => OAuthModuleSettings::GOOGLE_LOGIN_ENABLED,
-            'type'  => 'bool',
-            'value' => true
-        ],
-        [
-            'group' => 'oauth',
-            'name'  => OAuthModuleSettings::GOOGLE_CLIENT_ID,
-            'type'  => 'str',
-            'value' => ''
-        ],
-        [
-            'group' => 'oauth',
-            'name'  => OAuthModuleSettings::GOOGLE_CLIENT_SECRET,
-            'type'  => 'str',
-            'value' => ''
-        ],
-        [
-            'group' => 'oauth',
-            'name'  => OAuthModuleSettings::GOOGLE_REDIRECT_URL,
-            'type'  => 'str',
-            'value' => ''
-        ],
-
-        //TwoFactorAuth settings
-        [
-            'group' => 'two_factor_auth',
-            'name'  => TwoFactorAuthModuleSettings::ACTIVE,
-            'type'  => 'bool',
-            'value' => false
-        ],
-        [
-            'group' => 'two_factor_auth',
-            'name'  => TwoFactorAuthModuleSettings::TWO_FACTOR_TYPE,
-            'type'  => 'select',
-            'constraints' => 'otp|totp',
-            'value' => 'otp'
-        ],
+        ]
     ],
 ];

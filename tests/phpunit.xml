@@ -15,7 +15,6 @@
          displayDetailsOnTestsThatTriggerNotices="true"
          displayDetailsOnTestsThatTriggerErrors="true"
          displayDetailsOnTestsThatTriggerDeprecations="true"
-         displayDetailsOnPhpunitDeprecations="true"
          colors="true">
     <testsuites>
         <testsuite name="Unit">

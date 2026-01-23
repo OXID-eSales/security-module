@@ -1,4 +1,0 @@
-imports:
-  - { resource: Infrastructure/services.yaml }
-  - { resource: Service/services.yaml }
-  - { resource: Transput/services.yaml }
