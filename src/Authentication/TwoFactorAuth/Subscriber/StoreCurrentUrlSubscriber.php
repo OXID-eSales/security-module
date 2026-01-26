@@ -31,6 +31,9 @@ class StoreCurrentUrlSubscriber implements EventSubscriberInterface
         ];
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function onViewRendered(ViewRenderedEvent $event): void
     {
         if ($this->isAdmin()) {

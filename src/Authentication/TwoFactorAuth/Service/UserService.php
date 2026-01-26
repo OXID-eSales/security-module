@@ -42,6 +42,7 @@ class UserService implements UserServiceInterface
         $redirectUrl = $this->getRedirectUrl();
 
         $this->session->set('OTP_PASS', $userId);
+        /** @phpstan-ignore argument.type (password is null because user already authenticated via OTP) */
         $user->login($user->getFieldData('oxusername'), null, false);
         $this->clearOTPSessionVariables();
         Registry::getUtils()->redirect($redirectUrl, false);

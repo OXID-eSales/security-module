@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Tests\Unit\Authentication\TwoFactorAuth\Controller;
 
-use OxidEsales\Eshop\Core\Language;
 use OxidEsales\Eshop\Core\UtilsView;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Controller\TwoFactorAuthController;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\InvalidCodeException;
@@ -71,32 +70,25 @@ class TwoFactorAuthControllerTest extends TestCase
         $this->assertNull($result);
     }
 
-    public function testHandleOTPDisplaysTranslatedErrorOnValidationFailure(): void
+    public function testHandleOTPDisplaysErrorOnValidationFailure(): void
     {
-        $translatedMessage = 'The code is invalid';
+        $exception = new InvalidCodeException();
 
         $authCodeRequestStub = $this->createStub(AuthCodeRequestInterface::class);
         $authCodeRequestStub->method('getCode')->willReturn('invalid');
 
         $authServiceStub = $this->createStub(AuthorizeServiceInterface::class);
         $authServiceStub->method('validate')
-            ->willThrowException(new InvalidCodeException());
-
-        $languageMock = $this->createMock(Language::class);
-        $languageMock->expects($this->once())
-            ->method('translateString')
-            ->with('ERROR_INVALID_CODE')
-            ->willReturn($translatedMessage);
+            ->willThrowException($exception);
 
         $utilsViewMock = $this->createMock(UtilsView::class);
         $utilsViewMock->expects($this->once())
             ->method('addErrorToDisplay')
-            ->with($translatedMessage);
+            ->with($exception);
 
         $controller = $this->getSut(
             authService: $authServiceStub,
             authCodeRequest: $authCodeRequestStub,
-            language: $languageMock,
             utilsView: $utilsViewMock,
         );
 
@@ -140,14 +132,12 @@ class TwoFactorAuthControllerTest extends TestCase
         AuthorizeServiceInterface $authService = null,
         UserServiceInterface $userService = null,
         AuthCodeRequestInterface $authCodeRequest = null,
-        Language $language = null,
         UtilsView $utilsView = null,
     ): TwoFactorAuthController {
         return new TwoFactorAuthController(
             authService: $authService ?? $this->createStub(AuthorizeServiceInterface::class),
             userService: $userService ?? $this->createStub(UserServiceInterface::class),
             authCodeRequest: $authCodeRequest ?? $this->createStub(AuthCodeRequestInterface::class),
-            language: $language ?? $this->createStub(Language::class),
             utilsView: $utilsView ?? $this->createStub(UtilsView::class),
         );
     }

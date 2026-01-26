@@ -80,6 +80,7 @@ class User extends User_parent
         return parent::login($userName, $password, $setSessionCookie);
     }
 
+    /** @phpstan-ignore missingType.return (inherited from parent without return type) */
     protected function onLogin($userName, $password)
     {
         parent::onLogin($userName, $password);
