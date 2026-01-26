@@ -28,20 +28,18 @@ class ResendOTPServiceTest extends TestCase
 
     public function testMarkAsSentDelegatesToRepository(): void
     {
-        $otpDataStub = $this->createStub(UserInterface::class);
-        $otpDataStub->method('getId')->willReturn($userId = uniqid());
+        $userId = uniqid();
 
-        $userRepositorySpy = $this->createMock(UserRepositoryInterface::class);
-        $userRepositorySpy->method('getUserOTPData')->willReturn($otpDataStub);
-        $userRepositorySpy->expects($this->once())
+        $userRepositoryMock = $this->createMock(UserRepositoryInterface::class);
+        $userRepositoryMock->expects($this->once())
             ->method('markOtpAsSent')
             ->with($userId);
 
         $sut = $this->getSut(
-            userRepository: $userRepositorySpy,
+            userRepository: $userRepositoryMock,
         );
 
-        $sut->markAsSent(uniqid());
+        $sut->markAsSent($userId);
     }
 
     public function testCanSendReturnsTrueWhenNeverSent(): void
@@ -69,11 +67,11 @@ class ResendOTPServiceTest extends TestCase
         $userRepositoryStub = $this->createStub(UserRepositoryInterface::class);
         $userRepositoryStub->method('getUserOTPData')->willReturn($otpDataStub);
 
-        $service = $this->getSut(
+        $sut = $this->getSut(
             userRepository: $userRepositoryStub,
         );
 
-        $this->assertFalse($service->canSend(uniqid()));
+        $this->assertFalse($sut->canSend(uniqid()));
     }
 
     public function testCanSendReturnsTrueWhenCooldownPassed(): void
@@ -86,10 +84,10 @@ class ResendOTPServiceTest extends TestCase
         $userRepositoryStub = $this->createStub(UserRepositoryInterface::class);
         $userRepositoryStub->method('getUserOTPData')->willReturn($otpDataStub);
 
-        $service = $this->getSut(
+        $sut = $this->getSut(
             userRepository: $userRepositoryStub,
         );
 
-        $this->assertTrue($service->canSend(uniqid()));
+        $this->assertTrue($sut->canSend(uniqid()));
     }
 }

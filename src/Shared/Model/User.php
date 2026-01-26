@@ -12,7 +12,6 @@ namespace OxidEsales\SecurityModule\Shared\Model;
 use OxidEsales\Eshop\Core\Exception\InputException;
 use OxidEsales\Eshop\Core\Exception\UserException;
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\AuthorizeService;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\UserServiceInterface;
 use OxidEsales\SecurityModule\Captcha\Captcha\Image\Exception\CaptchaValidateException as ImageCaptchaException;
 use OxidEsales\SecurityModule\Captcha\Captcha\HoneyPot\Exception\CaptchaValidateException as HoneyPotCaptchaException;
@@ -89,14 +88,19 @@ class User extends User_parent
             return;
         }
 
+        $userId = $this->getId();
+        if (!$userId) {
+            return;
+        }
+
         $userService = $this->getService(UserServiceInterface::class);
         $userSessionKey = Registry::getSession()->getVariable('OTP_PASS');
-        if ($userSessionKey && $userSessionKey === $this->getId()) {
+        if ($userSessionKey && $userSessionKey === $userId) {
             $userService->clearOTPSessionVariables();
             return;
         }
 
-        $userService->handleLogin($this->getId());
+        $userService->handleLogin($userId);
     }
 
     private function isCaptchaEnabled(): bool

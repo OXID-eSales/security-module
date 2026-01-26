@@ -116,7 +116,26 @@ class UserTest extends IntegrationTestCase
         $subject->login('', '');
     }
 
-    public function testLoginWithOTPEnabledAndValidCredentialsReturnsFalse(): void
+    public function testLoginWithValidCaptchaAndValidCredentials(): void
+    {
+        $this->disableTwoFactorAuth();
+
+        $this->requestMock
+            ->method('getRequestParameter')
+            ->willReturnCallback(function ($param) {
+                if ($param === 'captcha') {
+                    return 'valid_captcha';
+                }
+                return null;
+            });
+
+        $subject = oxNew(User::class);
+        $result = $subject->login(self::OTP_USER_NAME, self::OTP_USER_PASSWORD);
+
+        $this->assertTrue($result);
+    }
+
+    public function testLoginWithOTPEnabledAndValidCredentialsRedirectsToOTP(): void
     {
         $this->disableCaptcha();
         $this->enableTwoFactorAuth();
@@ -126,11 +145,9 @@ class UserTest extends IntegrationTestCase
         Registry::set(Utils::class, $utilsMock);
 
         $subject = oxNew(User::class);
-        $result = $subject->login(self::OTP_USER_NAME, self::OTP_USER_PASSWORD);
+        $subject->login(self::OTP_USER_NAME, self::OTP_USER_PASSWORD);
 
-        $this->assertFalse($result);
-        $this->assertEquals(
-            self::OTP_USER_NAME,
+        $this->assertNotNull(
             Registry::getSession()->getVariable(AuthorizeService::USER_SESSION_KEY)
         );
     }
@@ -173,7 +190,7 @@ class UserTest extends IntegrationTestCase
         );
     }
 
-    public function testLoginWithOTPEnabledStoresUserInSession(): void
+    public function testLoginWithOTPEnabledStoresUserIdInSession(): void
     {
         $this->disableCaptcha();
         $this->enableTwoFactorAuth();
@@ -185,8 +202,62 @@ class UserTest extends IntegrationTestCase
         $subject = oxNew(User::class);
         $subject->login(self::OTP_USER_NAME, self::OTP_USER_PASSWORD);
 
-        $sessionUserName = Registry::getSession()->getVariable(AuthorizeService::USER_SESSION_KEY);
-        $this->assertEquals(self::OTP_USER_NAME, $sessionUserName);
+        $sessionUserId = Registry::getSession()->getVariable(AuthorizeService::USER_SESSION_KEY);
+        $this->assertNotNull($sessionUserId);
+        $this->assertEquals($subject->getId(), $sessionUserId);
+    }
+
+    public function testLoginWithOTPPassSessionVariableSkipsOTPRedirect(): void
+    {
+        $this->disableCaptcha();
+        $this->enableTwoFactorAuth();
+
+        $subject = oxNew(User::class);
+        $subject->load($this->getOTPUserId());
+
+        Registry::getSession()->setVariable('OTP_PASS', $subject->getId());
+
+        $utilsMock = $this->createMock(Utils::class);
+        $utilsMock->expects($this->never())->method('redirect');
+        Registry::set(Utils::class, $utilsMock);
+
+        $result = $subject->login(self::OTP_USER_NAME, self::OTP_USER_PASSWORD);
+
+        $this->assertTrue($result);
+        $this->assertNull(
+            Registry::getSession()->getVariable('OTP_PASS'),
+            'OTP_PASS session variable should be cleared after successful login'
+        );
+        $this->assertNull(
+            Registry::getSession()->getVariable(AuthorizeService::USER_SESSION_KEY),
+            'USER_SESSION_KEY should not be set when OTP was already validated'
+        );
+    }
+
+    public function testLoginWithOTPPassSessionVariableMismatchTriggersOTPFlow(): void
+    {
+        $this->disableCaptcha();
+        $this->enableTwoFactorAuth();
+
+        $mismatchedUserId = 'different-user-id';
+        Registry::getSession()->setVariable('OTP_PASS', $mismatchedUserId);
+
+        $utilsMock = $this->createMock(Utils::class);
+        $utilsMock->method('redirect');
+        Registry::set(Utils::class, $utilsMock);
+
+        $subject = oxNew(User::class);
+        $subject->login(self::OTP_USER_NAME, self::OTP_USER_PASSWORD);
+
+        $this->assertNotNull(
+            Registry::getSession()->getVariable(AuthorizeService::USER_SESSION_KEY),
+            'USER_SESSION_KEY should be set when OTP flow is triggered'
+        );
+        $this->assertSame(
+            $mismatchedUserId,
+            Registry::getSession()->getVariable('OTP_PASS'),
+            'OTP_PASS should NOT be cleared when user ID does not match'
+        );
     }
 
     private function enableTwoFactorAuth(): void
@@ -218,5 +289,12 @@ class UserTest extends IntegrationTestCase
     {
         $captchaSettings = ContainerFacade::get(CaptchaSettingsServiceInterface::class);
         $captchaSettings->saveIsCaptchaEnabled(false);
+    }
+
+    private function getOTPUserId(): string
+    {
+        $user = oxNew(User::class);
+        $user->load($user->getIdByUserName(self::OTP_USER_NAME));
+        return $user->getId();
     }
 }

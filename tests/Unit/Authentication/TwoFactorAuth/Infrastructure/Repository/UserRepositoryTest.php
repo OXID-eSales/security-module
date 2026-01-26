@@ -14,6 +14,7 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
+use OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\UserNotFoundException;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\UserFactoryInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository\UserRepository;
@@ -25,10 +26,12 @@ class UserRepositoryTest extends TestCase
     public function getSut(
         UserFactoryInterface $userFactory = null,
         QueryBuilderFactoryInterface $qbFactory = null,
+        ContextInterface $context = null,
     ): UserRepositoryInterface {
         return new UserRepository(
             userFactory: $userFactory ?? $this->createStub(UserFactoryInterface::class),
             queryBuilderFactory: $qbFactory ?? $this->createStub(QueryBuilderFactoryInterface::class),
+            context: $context ?? $this->createStub(ContextInterface::class),
         );
     }
 
@@ -36,38 +39,35 @@ class UserRepositoryTest extends TestCase
     {
         $data = [
             'OXID' => uniqid(),
+            'OXUSERNAME' => uniqid() . '@example.com',
             'OESMOTPCODE' => uniqid(),
             'OESMOTPATTEMPTS' => random_int(1, 10),
             'OESMOTPEXPTIME' => '2026-01-01T10:00:00',
             'OESMOTPLASTSENT' => '2026-01-01T09:00:00',
         ];
 
-        $qbSpy = $this->createMock(QueryBuilder::class);
-        $qbSpy->method('select')->willReturnSelf();
-        $qbSpy->method('from')->willReturnSelf();
-        $qbSpy->method('where')->willReturnSelf();
-        $qbSpy->method('setParameter')->willReturnSelf();
+        $qbStub = $this->createStub(QueryBuilder::class);
+        $qbStub->method('select')->willReturnSelf();
+        $qbStub->method('from')->willReturnSelf();
+        $qbStub->method('where')->willReturnSelf();
+        $qbStub->method('andWhere')->willReturnSelf();
+        $qbStub->method('setParameter')->willReturnSelf();
 
-        $qbFactorySpy = $this->createMock(QueryBuilderFactoryInterface::class);
-        $qbFactorySpy->expects($this->once())
-            ->method('create')
-            ->willReturn($qbSpy);
+        $qbFactoryStub = $this->createStub(QueryBuilderFactoryInterface::class);
+        $qbFactoryStub->method('create')->willReturn($qbStub);
 
-        $resultSpy = $this->createMock(Result::class);
-        $qbSpy->expects($this->once())
-            ->method('execute')
-            ->willReturn($resultSpy);
+        $resultStub = $this->createStub(Result::class);
+        $qbStub->method('execute')->willReturn($resultStub);
+        $resultStub->method('fetchAssociative')->willReturn($data);
 
-        $resultSpy->expects($this->once())
-            ->method('fetchAssociative')
-            ->willReturn($data);
-
-        $repository = $this->getSut(
-            qbFactory: $qbFactorySpy,
+        $sut = $this->getSut(
+            qbFactory: $qbFactoryStub,
         );
-        $dto = $repository->getUserOTPData('user');
+
+        $dto = $sut->getUserOTPData('user');
 
         $this->assertSame($data['OXID'], $dto->getId());
+        $this->assertSame($data['OXUSERNAME'], $dto->getEmail());
         $this->assertSame($data['OESMOTPATTEMPTS'], $dto->getAttempts());
         $this->assertSame($data['OESMOTPCODE'], $dto->getCode());
         $this->assertEquals(
@@ -82,140 +82,115 @@ class UserRepositoryTest extends TestCase
 
     public function testGetUserOtpDataThrowsWhenUserNotFound(): void
     {
-        $queryBuilderMock = $this->createMock(QueryBuilder::class);
-        $queryBuilderMock->method('select')->willReturnSelf();
-        $queryBuilderMock->method('from')->willReturnSelf();
-        $queryBuilderMock->method('where')->willReturnSelf();
-        $queryBuilderMock->method('setParameter')->willReturnSelf();
+        $qbStub = $this->createStub(QueryBuilder::class);
+        $qbStub->method('select')->willReturnSelf();
+        $qbStub->method('from')->willReturnSelf();
+        $qbStub->method('where')->willReturnSelf();
+        $qbStub->method('andWhere')->willReturnSelf();
+        $qbStub->method('setParameter')->willReturnSelf();
 
-        $queryBuilderFactoryMock = $this->createMock(QueryBuilderFactoryInterface::class);
-        $queryBuilderFactoryMock->method('create')->willReturn($queryBuilderMock);
+        $qbFactoryStub = $this->createStub(QueryBuilderFactoryInterface::class);
+        $qbFactoryStub->method('create')->willReturn($qbStub);
 
-        $resultMock = $this->createMock(Result::class);
-        $queryBuilderMock->method('execute')->willReturn($resultMock);
-        $resultMock->method('fetchAssociative')->willReturn(false);
+        $resultStub = $this->createStub(Result::class);
+        $qbStub->method('execute')->willReturn($resultStub);
+        $resultStub->method('fetchAssociative')->willReturn(false);
 
-        $repository = $this->getSut(
-            qbFactory: $queryBuilderFactoryMock,
+        $sut = $this->getSut(
+            qbFactory: $qbFactoryStub,
         );
 
         $this->expectException(UserNotFoundException::class);
 
-        $repository->getUserOTPData('missing-user');
+        $sut->getUserOTPData('missing-user');
     }
 
     public function testAddOtpToUserPersistsCorrectData(): void
     {
+        $userId = uniqid();
+        $code = uniqid();
         $expiresAt = new DateTime('+5 minutes');
 
-        $userModelSpy = $this->createMock(User::class);
-        $userModelSpy->expects($this->once())->method('load')->with($userId = uniqid());
-        $userModelSpy->expects($this->once())->method('assign')->with([
-            'OESMOTPCODE'     => $code = uniqid(),
+        $userModelMock = $this->createMock(User::class);
+        $userModelMock->expects($this->once())->method('load')->with($userId);
+        $userModelMock->expects($this->once())->method('assign')->with([
+            'OESMOTPCODE'     => $code,
             'OESMOTPEXPTIME'  => $expiresAt->format('Y-m-d H:i:s'),
             'OESMOTPATTEMPTS' => 0,
         ]);
-        $userModelSpy->expects($this->once())->method('save');
+        $userModelMock->expects($this->once())->method('save');
 
-        $userFactoryMock = $this->createMock(UserFactoryInterface::class);
-        $userFactoryMock->method('create')->willReturn($userModelSpy);
+        $userFactoryStub = $this->createStub(UserFactoryInterface::class);
+        $userFactoryStub->method('create')->willReturn($userModelMock);
 
-        $repository = $this->getSut(
-            userFactory: $userFactoryMock,
+        $sut = $this->getSut(
+            userFactory: $userFactoryStub,
         );
 
-        $this->assertTrue(
-            $repository->addOTPtoUser($userId, $code, $expiresAt)
-        );
+        $this->assertTrue($sut->addOTPtoUser($userId, $code, $expiresAt));
     }
 
     public function testUpdateAttempts(): void
     {
-        $userModelSpy = $this->createMock(User::class);
-        $userModelSpy->expects($this->once())->method('load')->with($userId = uniqid());
-        $userModelSpy->expects($this->once())->method('assign')->with([
+        $userId = uniqid();
+
+        $userModelMock = $this->createMock(User::class);
+        $userModelMock->expects($this->once())->method('load')->with($userId);
+        $userModelMock->expects($this->once())->method('assign')->with([
             'OESMOTPATTEMPTS' => 3,
         ]);
-        $userModelSpy->expects($this->once())->method('save');
+        $userModelMock->expects($this->once())->method('save');
 
-        $userFactoryMock = $this->createMock(UserFactoryInterface::class);
-        $userFactoryMock->method('create')->willReturn($userModelSpy);
+        $userFactoryStub = $this->createStub(UserFactoryInterface::class);
+        $userFactoryStub->method('create')->willReturn($userModelMock);
 
-        $repository = $this->getSut(
-            userFactory: $userFactoryMock,
+        $sut = $this->getSut(
+            userFactory: $userFactoryStub,
         );
 
-        $repository->updateAttempts($userId, 3);
+        $sut->updateAttempts($userId, 3);
     }
 
     public function testResetCodeFieldsClearsOtpData(): void
     {
-        $userModelSpy = $this->createMock(User::class);
-        $userModelSpy->expects($this->once())->method('load')->with($userId = uniqid());
-        $userModelSpy->expects($this->once())->method('assign')->with([
+        $userId = uniqid();
+
+        $userModelMock = $this->createMock(User::class);
+        $userModelMock->expects($this->once())->method('load')->with($userId);
+        $userModelMock->expects($this->once())->method('assign')->with([
             'OESMOTPCODE'     => null,
             'OESMOTPEXPTIME'  => null,
             'OESMOTPATTEMPTS' => 0,
-            'OESMOTPLASTSENT' => null
+            'OESMOTPLASTSENT' => null,
         ]);
-        $userModelSpy->expects($this->once())->method('save');
+        $userModelMock->expects($this->once())->method('save');
 
-        $userFactoryMock = $this->createMock(UserFactoryInterface::class);
-        $userFactoryMock->method('create')->willReturn($userModelSpy);
+        $userFactoryStub = $this->createStub(UserFactoryInterface::class);
+        $userFactoryStub->method('create')->willReturn($userModelMock);
 
-        $repository = $this->getSut(
-            userFactory: $userFactoryMock,
+        $sut = $this->getSut(
+            userFactory: $userFactoryStub,
         );
 
-        $repository->resetCodeFields($userId);
+        $sut->resetCodeFields($userId);
     }
 
-    public function testGetUserPasswordHashReturnsHash(): void
+    public function testMarkOtpAsSent(): void
     {
-        $queryBuilderMock = $this->createMock(QueryBuilder::class);
-        $queryBuilderMock->method('select')->willReturnSelf();
-        $queryBuilderMock->method('from')->willReturnSelf();
-        $queryBuilderMock->method('where')->willReturnSelf();
-        $queryBuilderMock->method('setParameter')->willReturnSelf();
+        $userId = uniqid();
 
-        $queryBuilderFactoryMock = $this->createMock(QueryBuilderFactoryInterface::class);
-        $queryBuilderFactoryMock->method('create')->willReturn($queryBuilderMock);
+        $userModelMock = $this->createMock(User::class);
+        $userModelMock->expects($this->once())->method('load')->with($userId);
+        $userModelMock->expects($this->once())->method('assign');
+        $userModelMock->expects($this->once())->method('save');
 
-        $resultStub = $this->createStub(Result::class);
-        $queryBuilderMock->method('execute')->willReturn($resultStub);
-        $resultStub->method('fetchOne')->willReturn($pwd = uniqid());
+        $userFactoryStub = $this->createStub(UserFactoryInterface::class);
+        $userFactoryStub->method('create')->willReturn($userModelMock);
 
-        $repository = $this->getSut(
-            qbFactory: $queryBuilderFactoryMock,
+        $sut = $this->getSut(
+            userFactory: $userFactoryStub,
         );
 
-        $this->assertSame(
-            $pwd,
-            $repository->getUserPasswordHash('user')
-        );
-    }
-
-    public function testGetUserPasswordHashReturnsNullWhenEmpty(): void
-    {
-        $queryBuilderMock = $this->createMock(QueryBuilder::class);
-        $queryBuilderMock->method('select')->willReturnSelf();
-        $queryBuilderMock->method('from')->willReturnSelf();
-        $queryBuilderMock->method('where')->willReturnSelf();
-        $queryBuilderMock->method('setParameter')->willReturnSelf();
-
-        $queryBuilderFactoryMock = $this->createMock(QueryBuilderFactoryInterface::class);
-        $queryBuilderFactoryMock->method('create')->willReturn($queryBuilderMock);
-
-        $resultStub = $this->createStub(Result::class);
-        $queryBuilderMock->method('execute')->willReturn($resultStub);
-        $resultStub->method('fetchOne')->willReturn(false);
-
-        $repository = $this->getSut(
-            qbFactory: $queryBuilderFactoryMock,
-        );
-
-        $this->assertNull(
-            $repository->getUserPasswordHash(uniqid())
-        );
+        $sut->markOtpAsSent($userId);
     }
 }
