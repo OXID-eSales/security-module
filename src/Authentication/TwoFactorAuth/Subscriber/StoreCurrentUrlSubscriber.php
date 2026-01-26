@@ -20,6 +20,10 @@ class StoreCurrentUrlSubscriber implements EventSubscriberInterface
         'twofactorauth',
     ];
 
+    private const EXCLUDED_FUNCTIONS = [
+        'logout',
+    ];
+
     public static function getSubscribedEvents(): array
     {
         return [
@@ -34,9 +38,14 @@ class StoreCurrentUrlSubscriber implements EventSubscriberInterface
         }
 
         $currentController = $this->getCurrentController();
+        $currentFunction = $this->getCurrentFunction();
 
-        // Skip widgets (they start with 'oxw') and excluded controllers
-        if ($this->isWidget($currentController) || $this->shouldExcludeController($currentController)) {
+        // Skip widgets, excluded controllers, and excluded functions (like logout)
+        if (
+            $this->isWidget($currentController)
+            || $this->shouldExcludeController($currentController)
+            || $this->shouldExcludeFunction($currentFunction)
+        ) {
             return;
         }
 
@@ -69,6 +78,16 @@ class StoreCurrentUrlSubscriber implements EventSubscriberInterface
     private function shouldExcludeController(string $controller): bool
     {
         return in_array($controller, self::EXCLUDED_CONTROLLERS, true);
+    }
+
+    private function getCurrentFunction(): string
+    {
+        return strtolower((string) Registry::getRequest()->getRequestParameter('fnc'));
+    }
+
+    private function shouldExcludeFunction(string $function): bool
+    {
+        return in_array($function, self::EXCLUDED_FUNCTIONS, true);
     }
 
     private function getCurrentPageUrl(): ?string
