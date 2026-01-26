@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service;
 
 use OxidEsales\EshopCommunity\Internal\Framework\Session\SessionInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository\UserRepositoryInterface;
 
 class AuthorizeService implements AuthorizeServiceInterface
 {
@@ -22,6 +23,7 @@ class AuthorizeService implements AuthorizeServiceInterface
         private VerificationCollectorServiceInterface $verifyCollector,
         private NotifierCollectorInterface $notifierCollector,
         private ResendOTPServiceInterface $resendOTPService,
+        private UserRepositoryInterface $userRepository,
         private SessionInterface $session
     ) {
     }
@@ -34,9 +36,9 @@ class AuthorizeService implements AuthorizeServiceInterface
             $activeVerificator
         );
 
-        $userName = $this->session->get(self::USER_SESSION_KEY);
+        $userId = $this->session->get(self::USER_SESSION_KEY);
 
-        $verificator->validateCode($userName, $inputCode);
+        $verificator->validateCode($userId, $inputCode);
     }
 
     public function generate(): void
@@ -47,16 +49,17 @@ class AuthorizeService implements AuthorizeServiceInterface
             $activeVerificator
         );
 
-        $userName = $this->session->get(self::USER_SESSION_KEY);
-        if (!$this->resendOTPService->canSend($userName)) {
+        $userId = $this->session->get(self::USER_SESSION_KEY);
+        if (!$this->resendOTPService->canSend($userId)) {
             return;
         }
 
-        $OTPCode = $verificator->generate($userName);
+        $OTPCode = $verificator->generate($userId);
 
+        $user = $this->userRepository->getUserOTPData($userId);
         $notifier = $this->notifierCollector->getNotifier('email');
-        $notifier->notify($userName, $OTPCode);
-        $this->resendOTPService->markAsSent($userName);
+        $notifier->notify($user->getEmail(), $OTPCode);
+        $this->resendOTPService->markAsSent($userId);
     }
 
     public function getVerificationUrl(): string

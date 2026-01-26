@@ -2,6 +2,9 @@ services:
   _defaults:
     autowire: true
     public: false
+    bind:
+      OxidEsales\Eshop\Core\UtilsView: '@=service("OxidEsales\\SecurityModule\\Core\\Registry").getUtilsView()'
+      OxidEsales\Eshop\Core\Language: '@=service("OxidEsales\\SecurityModule\\Core\\Registry").getLang()'
 
   OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Controller\TwoFactorAuthController:
     public: true

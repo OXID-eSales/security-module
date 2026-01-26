@@ -9,11 +9,10 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Shared\Model;
 
-use Doctrine\DBAL\Exception;
 use OxidEsales\Eshop\Core\Exception\InputException;
 use OxidEsales\Eshop\Core\Exception\UserException;
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\UserNotFoundException;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\AuthorizeService;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\UserServiceInterface;
 use OxidEsales\SecurityModule\Captcha\Captcha\Image\Exception\CaptchaValidateException as ImageCaptchaException;
 use OxidEsales\SecurityModule\Captcha\Captcha\HoneyPot\Exception\CaptchaValidateException as HoneyPotCaptchaException;
@@ -79,22 +78,25 @@ class User extends User_parent
             }
         }
 
-        if ($this->isOTPEnabled()) {
-            $userService = $this->getService(UserServiceInterface::class);
-            if (!$userService->checkPassword($userName, $password)) {
-                throw oxNew(UserException::class, 'ERROR_MESSAGE_USER_NOVALIDLOGIN');
-            }
+        return parent::login($userName, $password, $setSessionCookie);
+    }
 
-            try {
-                $userService->handleLogin($userName);
-            } catch (Exception | UserNotFoundException $e) {
-                throw oxNew(UserException::class, 'ERROR_MESSAGE_USER_NOVALIDLOGIN');
-            }
+    protected function onLogin($userName, $password)
+    {
+        parent::onLogin($userName, $password);
 
-            return false;
+        if (!$this->isOTPEnabled()) {
+            return;
         }
 
-        return parent::login($userName, $password, $setSessionCookie);
+        $userService = $this->getService(UserServiceInterface::class);
+        $userSessionKey = Registry::getSession()->getVariable('OTP_PASS');
+        if ($userSessionKey && $userSessionKey === $this->getId()) {
+            $userService->clearOTPSessionVariables();
+            return;
+        }
+
+        $userService->handleLogin($this->getId());
     }
 
     private function isCaptchaEnabled(): bool

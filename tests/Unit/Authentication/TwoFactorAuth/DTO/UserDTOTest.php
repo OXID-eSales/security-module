@@ -19,6 +19,7 @@ class UserDTOTest extends TestCase
     {
         $sut = new User(
             userId: $userId = uniqid(),
+            email: $email = uniqid() . '@example.com',
             attempts: $attempts = rand(),
             code: $code = uniqid(),
             expiresAt: $expiresAt = new DateTime(),
@@ -26,6 +27,7 @@ class UserDTOTest extends TestCase
         );
 
         $this->assertSame($userId, $sut->getId());
+        $this->assertSame($email, $sut->getEmail());
         $this->assertSame($code, $sut->getCode());
         $this->assertSame($attempts, $sut->getAttempts());
         $this->assertSame($expiresAt, $sut->getExpiresAt());

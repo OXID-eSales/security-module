@@ -31,10 +31,9 @@ class OTPVerificator implements VerificatorAdapterInterface
         return 'otp';
     }
 
-    public function validateCode(string $userName, string $inputCode): void
+    public function validateCode(string $userId, string $inputCode): void
     {
-        //todo: userId from parameter or DTO
-        $otpData = $this->userRepository->getUserOTPData($userName);
+        $otpData = $this->userRepository->getUserOTPData($userId);
 
         $this->otpValidator->checkLoginAttempts($otpData->getAttempts());
         $this->otpValidator->checkExpirationTime($otpData->getExpiresAt());
@@ -42,18 +41,16 @@ class OTPVerificator implements VerificatorAdapterInterface
         try {
             $this->otpValidator->validateCode($otpData->getCode(), $inputCode);
         } catch (InvalidCodeException $e) {
-            $this->userRepository->updateAttempts($otpData->getId(), $otpData->getAttempts() + 1);
+            $this->userRepository->updateAttempts($userId, $otpData->getAttempts() + 1);
             throw $e;
         }
 
-        $this->userRepository->resetCodeFields($otpData->getId());
+        $this->userRepository->resetCodeFields($userId);
     }
 
-    public function generate(string $userName): string
+    public function generate(string $userId): string
     {
-        $otpData = $this->userRepository->getUserOTPData($userName);
-
-        return $this->otpGenerator->generateCode($otpData->getId());
+        return $this->otpGenerator->generateCode($userId);
     }
 
     public function getVerificationUrl(): string

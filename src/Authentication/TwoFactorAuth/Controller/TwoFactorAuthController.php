@@ -10,7 +10,8 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Controller;
 
 use OxidEsales\Eshop\Application\Controller\FrontendController;
-use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Language;
+use OxidEsales\Eshop\Core\UtilsView;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\OTPValidationException;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\AuthorizeServiceInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\UserServiceInterface;
@@ -30,6 +31,8 @@ class TwoFactorAuthController extends FrontendController
         private readonly AuthorizeServiceInterface $authService,
         private readonly UserServiceInterface $userService,
         private readonly AuthCodeRequestInterface $authCodeRequest,
+        private readonly Language $language,
+        private readonly UtilsView $utilsView,
     ) {
         parent::__construct();
     }
@@ -44,8 +47,8 @@ class TwoFactorAuthController extends FrontendController
             $this->userService->finalizeLogin();
 
         } catch (OTPValidationException $e) {
-            $translatedMessage = Registry::getLang()->translateString($e->getMessage());
-            Registry::getUtilsView()->addErrorToDisplay($translatedMessage);
+            $translatedMessage = $this->language->translateString($e->getMessage());
+            $this->utilsView->addErrorToDisplay($translatedMessage);
         }
 
         return null;

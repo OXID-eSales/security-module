@@ -21,16 +21,14 @@ class ResendOTPService implements ResendOTPServiceInterface
     ) {
     }
 
-    public function markAsSent(string $userName): void
+    public function markAsSent(string $userId): void
     {
-        $otpData = $this->userRepository->getUserOTPData($userName);
-
-        $this->userRepository->markOtpAsSent($otpData->getId());
+        $this->userRepository->markOtpAsSent($userId);
     }
 
-    public function canSend(string $userName): bool
+    public function canSend(string $userId): bool
     {
-        $otpData = $this->userRepository->getUserOTPData($userName);
+        $otpData = $this->userRepository->getUserOTPData($userId);
 
         $lastSentAt = $otpData->getLastSentAt();
         if ($lastSentAt === null) {

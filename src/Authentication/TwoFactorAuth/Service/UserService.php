@@ -11,26 +11,22 @@ namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service;
 
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Utils;
-use OxidEsales\EshopCommunity\Internal\Domain\Authentication\Bridge\PasswordServiceBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Session\SessionInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\UserFactoryInterface;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository\UserRepositoryInterface;
 
 class UserService implements UserServiceInterface
 {
     public function __construct(
         private AuthorizeServiceInterface $authorizeService,
-        private UserRepositoryInterface $userRepository,
         private UserFactoryInterface $userFactory,
-        private PasswordServiceBridgeInterface $pwdServiceBridge,
         private SessionInterface $session,
         private Utils $utils,
     ) {
     }
 
-    public function handleLogin(string $userName): void
+    public function handleLogin(string $userId): void
     {
-        $this->session->set(AuthorizeService::USER_SESSION_KEY, $userName);
+        $this->session->set(AuthorizeService::USER_SESSION_KEY, $userId);
 
         $this->authorizeService->generate();
 
@@ -38,52 +34,24 @@ class UserService implements UserServiceInterface
         $this->utils->redirect($redirectUrl);
     }
 
-    public function checkPassword(string $userName, string $password): bool
-    {
-        try {
-            $userPasswordHash = $this->userRepository->getUserPasswordHash($userName);
-        } catch (\Throwable $e) {
-            return false;
-        }
-
-        if ($userPasswordHash === null) {
-            return false;
-        }
-
-        return $this->pwdServiceBridge
-            ->verifyPassword($password, $userPasswordHash);
-    }
-
     public function finalizeLogin(): void
     {
-        $userName = $this->session->get(AuthorizeService::USER_SESSION_KEY);
-
-        $userId = $this->userRepository->getUserIdByUserName($userName);
+        $userId = $this->session->get(AuthorizeService::USER_SESSION_KEY);
         $user = $this->userFactory->create();
         $user->load($userId);
-
-        // Reset cached active user so getUser() loads from session
-        $user->setUser(null);
-
         $redirectUrl = $this->getRedirectUrl();
 
-        $shopSession = Registry::getSession();
-
-        // Regenerate session ID like OXID's normal login flow (UserComponent::afterLogin)
-        if ($shopSession->isSessionStarted()) {
-            $shopSession->regenerateSessionId();
-        }
-
-        // Set active view with target URL for OXID's redirect mechanism
-        $redirectView = oxNew(\OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Controller\RedirectView::class);
-        $redirectView->setRedirectUrl($redirectUrl);
-        Registry::getConfig()->setActiveView($redirectView);
-
-        $shopSession->setVariable('usr', $userId);
-        $shopSession->setVariable('login-token', $user->getHash($user->getFieldData('oxpassword')));
-
-        $this->userRepository->resetCodeFields($userId);
+        $this->session->set('OTP_PASS', $userId);
+        $user->login($user->getFieldData('oxusername'), null, false);
         $this->clearOTPSessionVariables();
+        Registry::getUtils()->redirect($redirectUrl, false);
+    }
+
+    public function clearOTPSessionVariables(): void
+    {
+        $this->session->remove(AuthorizeService::USER_SESSION_KEY);
+        $this->session->remove(AuthorizeService::OTP_TARGET_URL);
+        $this->session->remove('OTP_PASS');
     }
 
     private function getRedirectUrl(): string
@@ -103,11 +71,5 @@ class UserService implements UserServiceInterface
         $sslShopUrl = Registry::getConfig()->getSslShopUrl();
 
         return str_starts_with($url, $shopUrl) || str_starts_with($url, $sslShopUrl);
-    }
-
-    private function clearOTPSessionVariables(): void
-    {
-        $this->session->remove(AuthorizeService::USER_SESSION_KEY);
-        $this->session->remove(AuthorizeService::OTP_TARGET_URL);
     }
 }

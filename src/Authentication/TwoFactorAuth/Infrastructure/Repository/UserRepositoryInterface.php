@@ -12,17 +12,13 @@ use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\DTO\UserInterface;
 
 interface UserRepositoryInterface
 {
-    public function getUserOTPData(string $userName): UserInterface;
+    public function getUserOTPData(string $userId): UserInterface;
 
     public function updateAttempts(string $userId, int $attempts): void;
 
     public function resetCodeFields(string $userId): void;
 
     public function addOTPtoUser(string $userId, string $otp, DateTime $expiresAt): bool;
-
-    public function getUserPasswordHash(string $userName): ?string;
-
-    public function getUserIdByUserName(string $userName): ?string;
 
     public function markOtpAsSent(string $userId): void;
 }

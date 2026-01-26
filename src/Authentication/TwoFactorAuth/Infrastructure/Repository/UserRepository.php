@@ -28,20 +28,21 @@ class UserRepository implements UserRepositoryInterface
     ) {
     }
 
-    public function getUserOTPData(string $userName): UserInterface
+    public function getUserOTPData(string $userId): UserInterface
     {
         $builder = $this->queryBuilderFactory->create();
         $builder->select([
                 'OXID',
+                'OXUSERNAME',
                 'OESMOTPCODE',
                 'OESMOTPATTEMPTS',
                 'OESMOTPEXPTIME',
                 'OESMOTPLASTSENT',
             ])
             ->from('oxuser')
-            ->where('oxusername = :userName')
+            ->where('oxid = :userId')
             ->andWhere('oxshopid = :shopId')
-            ->setParameter('userName', $userName)
+            ->setParameter('userId', $userId)
             ->setParameter('shopId', $this->context->getCurrentShopId());
 
         /** @var Result $queryResult */
@@ -53,7 +54,8 @@ class UserRepository implements UserRepositoryInterface
 
         return new UserDTO(
             $userData['OXID'],
-            $userData['OESMOTPATTEMPTS'],
+            $userData['OXUSERNAME'],
+            (int)$userData['OESMOTPATTEMPTS'],
             $userData['OESMOTPCODE'],
             $userData['OESMOTPEXPTIME'] ? new DateTime($userData['OESMOTPEXPTIME']) : null,
             $userData['OESMOTPLASTSENT'] ? new DateTime($userData['OESMOTPLASTSENT']) : null,
@@ -95,42 +97,6 @@ class UserRepository implements UserRepositoryInterface
             'OESMOTPLASTSENT' => null,
         ]);
         $userModel->save();
-    }
-
-    public function getUserPasswordHash(string $userName): ?string
-    {
-        $builder = $this->queryBuilderFactory->create();
-        $builder->select('OXPASSWORD')
-            ->from('oxuser')
-            ->where('oxusername = :userName')
-            ->andWhere('oxshopid = :shopId')
-            ->setParameter('userName', $userName)
-            ->setParameter('shopId', $this->context->getCurrentShopId());
-
-        /** @var Result $queryResult */
-        $queryResult = $builder->execute();
-        $userPass = $queryResult->fetchOne();
-
-        return $userPass ?: null;
-    }
-
-    public function getUserIdByUserName(string $userName): ?string
-    {
-        $builder = $this->queryBuilderFactory->create();
-        $builder->select('OXID')
-            ->from('oxuser')
-            ->where('oxusername = :userName')
-            ->andWhere('oxshopid = :shopId')
-            ->andWhere('oxactive = 1')
-            ->andWhere("oxpassword != ''")
-            ->setParameter('userName', $userName)
-            ->setParameter('shopId', $this->context->getCurrentShopId());
-
-        /** @var Result $queryResult */
-        $queryResult = $builder->execute();
-        $userId = $queryResult->fetchOne();
-
-        return $userId ?: null;
     }
 
     public function markOtpAsSent(string $userId): void
