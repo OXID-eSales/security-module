@@ -28,49 +28,49 @@ class ResendOTPServiceTest extends TestCase
 
     public function testMarkAsSentDelegatesToRepository(): void
     {
-        $otpData = $this->createMock(UserInterface::class);
-        $otpData->method('getId')->willReturn($userId = uniqid());
+        $otpDataStub = $this->createStub(UserInterface::class);
+        $otpDataStub->method('getId')->willReturn($userId = uniqid());
 
-        $userRepository = $this->createMock(UserRepositoryInterface::class);
-        $userRepository->method('getUserOTPData')->willReturn($otpData);
-        $userRepository->expects($this->once())
+        $userRepositorySpy = $this->createMock(UserRepositoryInterface::class);
+        $userRepositorySpy->method('getUserOTPData')->willReturn($otpDataStub);
+        $userRepositorySpy->expects($this->once())
             ->method('markOtpAsSent')
             ->with($userId);
 
-        $service = $this->getSut(
-            userRepository: $userRepository,
+        $sut = $this->getSut(
+            userRepository: $userRepositorySpy,
         );
 
-        $service->markAsSent(uniqid());
+        $sut->markAsSent(uniqid());
     }
 
     public function testCanSendReturnsTrueWhenNeverSent(): void
     {
-        $otpData = $this->createMock(UserInterface::class);
-        $otpData->method('getLastSentAt')->willReturn(null);
+        $otpDataStub = $this->createStub(UserInterface::class);
+        $otpDataStub->method('getLastSentAt')->willReturn(null);
 
-        $userRepository = $this->createMock(UserRepositoryInterface::class);
-        $userRepository->method('getUserOTPData')->willReturn($otpData);
+        $userRepositoryStub = $this->createStub(UserRepositoryInterface::class);
+        $userRepositoryStub->method('getUserOTPData')->willReturn($otpDataStub);
 
-        $service = $this->getSut(
-            userRepository: $userRepository,
+        $sut = $this->getSut(
+            userRepository: $userRepositoryStub,
         );
 
-        $this->assertTrue($service->canSend(uniqid()));
+        $this->assertTrue($sut->canSend(uniqid()));
     }
 
     public function testCanSendReturnsFalseWhenCooldownActive(): void
     {
         $lastSent = (new DateTimeImmutable())->modify('-30 seconds');
 
-        $otpData = $this->createMock(UserInterface::class);
-        $otpData->method('getLastSentAt')->willReturn($lastSent);
+        $otpDataStub = $this->createStub(UserInterface::class);
+        $otpDataStub->method('getLastSentAt')->willReturn($lastSent);
 
-        $userRepository = $this->createMock(UserRepositoryInterface::class);
-        $userRepository->method('getUserOTPData')->willReturn($otpData);
+        $userRepositoryStub = $this->createStub(UserRepositoryInterface::class);
+        $userRepositoryStub->method('getUserOTPData')->willReturn($otpDataStub);
 
         $service = $this->getSut(
-            userRepository: $userRepository,
+            userRepository: $userRepositoryStub,
         );
 
         $this->assertFalse($service->canSend(uniqid()));
@@ -80,14 +80,14 @@ class ResendOTPServiceTest extends TestCase
     {
         $lastSent = (new DateTimeImmutable())->modify('-120 seconds');
 
-        $otpData = $this->createMock(UserInterface::class);
-        $otpData->method('getLastSentAt')->willReturn($lastSent);
+        $otpDataStub = $this->createStub(UserInterface::class);
+        $otpDataStub->method('getLastSentAt')->willReturn($lastSent);
 
-        $userRepository = $this->createMock(UserRepositoryInterface::class);
-        $userRepository->method('getUserOTPData')->willReturn($otpData);
+        $userRepositoryStub = $this->createStub(UserRepositoryInterface::class);
+        $userRepositoryStub->method('getUserOTPData')->willReturn($otpDataStub);
 
         $service = $this->getSut(
-            userRepository: $userRepository,
+            userRepository: $userRepositoryStub,
         );
 
         $this->assertTrue($service->canSend(uniqid()));
