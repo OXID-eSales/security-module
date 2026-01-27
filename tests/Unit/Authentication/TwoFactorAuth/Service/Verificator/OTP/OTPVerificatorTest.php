@@ -37,7 +37,7 @@ class OTPVerificatorTest extends TestCase
 
         $userDTOStub = $this->createStub(User::class);
         $userDTOStub->method('getCode')->willReturn($code);
-        $userDTOStub->method('getAttempts')->willReturn(1);
+        $userDTOStub->method('getAttempts')->willReturnOnConsecutiveCalls(1, 1, 2);
         $userDTOStub->method('getExpiresAt')->willReturn(new DateTime('+5 minutes'));
 
         $userRepositoryStub = $this->createStub(UserRepositoryInterface::class);
@@ -45,6 +45,7 @@ class OTPVerificatorTest extends TestCase
 
         $otpValidatorStub = $this->createStub(OTPValidatorInterface::class);
         $otpValidatorStub->method('validateCode')->willThrowException(new InvalidCodeException());
+        $otpValidatorStub->method('getMaxAttempts')->willReturn(5);
 
         $sut = $this->getSut(
             otpValidator: $otpValidatorStub,
@@ -152,7 +153,11 @@ class OTPVerificatorTest extends TestCase
 
         $userDTOStub = $this->createStub(User::class);
         $userDTOStub->method('getCode')->willReturn('stored-code');
-        $userDTOStub->method('getAttempts')->willReturn($currentAttempts);
+        $userDTOStub->method('getAttempts')->willReturnOnConsecutiveCalls(
+            $currentAttempts,
+            $currentAttempts,
+            $currentAttempts + 1
+        );
         $userDTOStub->method('getExpiresAt')->willReturn(new DateTime('+5 minutes'));
 
         $userRepositorySpy = $this->createMock(UserRepositoryInterface::class);
@@ -165,6 +170,7 @@ class OTPVerificatorTest extends TestCase
 
         $otpValidatorStub = $this->createStub(OTPValidatorInterface::class);
         $otpValidatorStub->method('validateCode')->willThrowException(new InvalidCodeException());
+        $otpValidatorStub->method('getMaxAttempts')->willReturn(5);
 
         $sut = $this->getSut(
             otpValidator: $otpValidatorStub,
@@ -172,6 +178,41 @@ class OTPVerificatorTest extends TestCase
         );
 
         $this->expectException(InvalidCodeException::class);
+
+        $sut->validateCode($userId, $code);
+    }
+
+    public function testValidateCodeThrowsAttemptLimitExceededWhenLastAttemptFails(): void
+    {
+        $userId = uniqid();
+        $code = uniqid();
+        $currentAttempts = 4;
+
+        $userDTOStub = $this->createStub(User::class);
+        $userDTOStub->method('getCode')->willReturn('stored-code');
+        $userDTOStub->method('getAttempts')->willReturnOnConsecutiveCalls(
+            $currentAttempts,
+            $currentAttempts,
+            $currentAttempts + 1
+        );
+        $userDTOStub->method('getExpiresAt')->willReturn(new DateTime('+5 minutes'));
+
+        $userRepositorySpy = $this->createMock(UserRepositoryInterface::class);
+        $userRepositorySpy->method('getUserOTPData')->willReturn($userDTOStub);
+        $userRepositorySpy->expects($this->once())
+            ->method('updateAttempts')
+            ->with($userId, $currentAttempts + 1);
+
+        $otpValidatorStub = $this->createStub(OTPValidatorInterface::class);
+        $otpValidatorStub->method('validateCode')->willThrowException(new InvalidCodeException());
+        $otpValidatorStub->method('getMaxAttempts')->willReturn(5);
+
+        $sut = $this->getSut(
+            otpValidator: $otpValidatorStub,
+            userRepository: $userRepositorySpy,
+        );
+
+        $this->expectException(AttemptLimitExceededException::class);
 
         $sut->validateCode($userId, $code);
     }
@@ -207,6 +248,52 @@ class OTPVerificatorTest extends TestCase
         );
 
         $this->assertSame($url . 'cl=twofactorauth', $sut->getVerificationUrl());
+    }
+
+    public function testGetRemainingAttemptsReturnsCorrectValue(): void
+    {
+        $userId = uniqid();
+        $currentAttempts = 2;
+        $maxAttempts = 5;
+
+        $userDTOStub = $this->createStub(User::class);
+        $userDTOStub->method('getAttempts')->willReturn($currentAttempts);
+
+        $userRepositoryStub = $this->createStub(UserRepositoryInterface::class);
+        $userRepositoryStub->method('getUserOTPData')->willReturn($userDTOStub);
+
+        $otpValidatorStub = $this->createStub(OTPValidatorInterface::class);
+        $otpValidatorStub->method('getMaxAttempts')->willReturn($maxAttempts);
+
+        $sut = $this->getSut(
+            otpValidator: $otpValidatorStub,
+            userRepository: $userRepositoryStub,
+        );
+
+        $this->assertSame($maxAttempts - $currentAttempts, $sut->getRemainingAttempts($userId));
+    }
+
+    public function testGetRemainingAttemptsReturnsZeroWhenExceeded(): void
+    {
+        $userId = uniqid();
+        $currentAttempts = 7;
+        $maxAttempts = 5;
+
+        $userDTOStub = $this->createStub(User::class);
+        $userDTOStub->method('getAttempts')->willReturn($currentAttempts);
+
+        $userRepositoryStub = $this->createStub(UserRepositoryInterface::class);
+        $userRepositoryStub->method('getUserOTPData')->willReturn($userDTOStub);
+
+        $otpValidatorStub = $this->createStub(OTPValidatorInterface::class);
+        $otpValidatorStub->method('getMaxAttempts')->willReturn($maxAttempts);
+
+        $sut = $this->getSut(
+            otpValidator: $otpValidatorStub,
+            userRepository: $userRepositoryStub,
+        );
+
+        $this->assertSame(0, $sut->getRemainingAttempts($userId));
     }
 
     public function getSut(

@@ -277,6 +277,42 @@ class AuthorizeServiceTest extends TestCase
         $sut->generate();
     }
 
+    public function testGetRemainingAttemptsReturnsValueFromVerificator(): void
+    {
+        $userId = uniqid();
+        $remainingAttempts = 3;
+
+        $verificatorStub = $this->createStub(VerificatorAdapterInterface::class);
+        $verificatorStub
+            ->method('getRemainingAttempts')
+            ->with($userId)
+            ->willReturn($remainingAttempts);
+
+        $settingsStub = $this->createStub(ModuleSettingsServiceInterface::class);
+        $settingsStub
+            ->method('getTwoFactorAuthType')
+            ->willReturn('otp');
+
+        $collectorStub = $this->createStub(VerificationCollectorServiceInterface::class);
+        $collectorStub
+            ->method('getVerificator')
+            ->willReturn($verificatorStub);
+
+        $sessionStub = $this->createStub(SessionInterface::class);
+        $sessionStub
+            ->method('get')
+            ->with(AuthorizeService::USER_SESSION_KEY)
+            ->willReturn($userId);
+
+        $sut = $this->getSut(
+            moduleSettings: $settingsStub,
+            verifyCollector: $collectorStub,
+            session: $sessionStub
+        );
+
+        $this->assertSame($remainingAttempts, $sut->getRemainingAttempts());
+    }
+
     protected function getSut(
         ModuleSettingsServiceInterface $moduleSettings = null,
         VerificationCollectorServiceInterface $verifyCollector = null,

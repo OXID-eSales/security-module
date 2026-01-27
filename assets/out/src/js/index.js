@@ -53,7 +53,7 @@ if (resendBtn) {
     const resendOtp = new ResendOtp(resendBtn);
 
     // restore cooldown on refresh
-    resendOtp.restoreIfNeeded();
+    resendOtp.restoreOnRefresh();
     resendBtn.addEventListener('click', function () {
         resendOtp.resend();
     });
