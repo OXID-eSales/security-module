@@ -1,0 +1,9 @@
+services:
+  _defaults:
+    autowire: true
+    public: false
+
+  OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Controller\TwoFactorAuthController:
+    public: true
+    tags:
+        - { name: 'oxid.view_controller', controller_key: 'twofactorauth' }

@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Tests\Unit\Authentication\TwoFactorAuth\Service;
 
-use OxidEsales\Eshop\Core\Config;
 use OxidEsales\Eshop\Core\Request;
 use OxidEsales\Eshop\Core\Utils;
 use OxidEsales\EshopCommunity\Internal\Domain\Authentication\Bridge\PasswordServiceBridgeInterface;

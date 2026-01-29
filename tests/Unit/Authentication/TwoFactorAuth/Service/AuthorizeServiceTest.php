@@ -16,6 +16,7 @@ use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Provid
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\AuthorizeService;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\ModuleSettingsServiceInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\NotifierCollectorInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\ResendOTPServiceInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\VerificationCollectorServiceInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\Verificator\VerificatorAdapterInterface;
 use PHPUnit\Framework\TestCase;
@@ -138,6 +139,9 @@ class AuthorizeServiceTest extends TestCase
             ->expects($this->once())
             ->method('notify');
 
+        $resendOTPStub = $this->createStub(ResendOTPServiceInterface::class);
+        $resendOTPStub->method('canSend')->willReturn(true);
+
         $settingsStub = $this->createStub(ModuleSettingsServiceInterface::class);
         $settingsStub
             ->method('getTwoFactorAuthType')
@@ -162,22 +166,75 @@ class AuthorizeServiceTest extends TestCase
             moduleSettings: $settingsStub,
             verifyCollector: $collectorStub,
             notifierCollector: $notifierCollectorStub,
+            resendOTPService: $resendOTPStub,
             session: $sessionStub
         );
 
         $sut->generate();
     }
 
+    public function testGenerateDoesNothingWhenCannotSend(): void
+    {
+        $verificatorMock = $this->createMock(VerificatorAdapterInterface::class);
+        $verificatorMock
+            ->expects($this->never())
+            ->method('generate');
+
+        $notifierMock = $this->createMock(NotifierAdapterInterface::class);
+        $notifierMock
+            ->expects($this->never())
+            ->method('notify');
+
+        $resendOTPMock = $this->createMock(ResendOTPServiceInterface::class);
+        $resendOTPMock
+            ->method('canSend')
+            ->willReturn(false);
+        $resendOTPMock
+            ->expects($this->never())
+            ->method('markAsSent');
+
+        $settingsStub = $this->createStub(ModuleSettingsServiceInterface::class);
+        $settingsStub
+            ->method('getTwoFactorAuthType')
+            ->willReturn('otp');
+
+        $collectorStub = $this->createStub(VerificationCollectorServiceInterface::class);
+        $collectorStub
+            ->method('getVerificator')
+            ->willReturn($verificatorMock);
+
+        $notifierCollectorStub = $this->createStub(NotifierCollectorInterface::class);
+        $notifierCollectorStub
+            ->method('getNotifier')
+            ->willReturn($notifierMock);
+
+        $sessionStub = $this->createStub(SessionInterface::class);
+        $sessionStub
+            ->method('get')
+            ->willReturn(uniqid());
+
+        $service = $this->getSut(
+            moduleSettings: $settingsStub,
+            verifyCollector: $collectorStub,
+            notifierCollector: $notifierCollectorStub,
+            resendOTPService: $resendOTPMock,
+            session: $sessionStub
+        );
+        $service->generate();
+    }
+
     protected function getSut(
         ModuleSettingsServiceInterface $moduleSettings = null,
         VerificationCollectorServiceInterface $verifyCollector = null,
         NotifierCollectorInterface $notifierCollector = null,
+        ResendOTPServiceInterface $resendOTPService = null,
         SessionInterface $session = null
     ): AuthorizeService {
         return new AuthorizeService(
             moduleSettings: $moduleSettings ?? $this->createStub(ModuleSettingsServiceInterface::class),
             verifyCollector: $verifyCollector ?? $this->createStub(VerificationCollectorServiceInterface::class),
             notifierCollector: $notifierCollector ?? $this->createStub(NotifierCollectorInterface::class),
+            resendOTPService: $resendOTPService ?? $this->createStub(ResendOTPServiceInterface::class),
             session: $session ?? $this->createStub(SessionInterface::class),
         );
     }

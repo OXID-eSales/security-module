@@ -25,7 +25,6 @@ use OxidEsales\SecurityModule\Tests\Integration\IntegrationTestCase;
 
 class UserTest extends IntegrationTestCase
 {
-    // Fixture users from tests/Fixtures/testdata_ce.sql (password: useruser)
     private const OTP_USER_NAME = 'user@oxid-esales.com';
     private const OTP_USER_PASSWORD = 'useruser';
 

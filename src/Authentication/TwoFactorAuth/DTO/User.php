@@ -18,6 +18,7 @@ class User implements UserInterface
         private readonly int $attempts,
         private readonly ?string $code,
         private readonly ?DateTimeInterface $expiresAt,
+        private readonly ?DateTimeInterface $lastSentAt
     ) {
     }
 
@@ -39,5 +40,10 @@ class User implements UserInterface
     public function getExpiresAt(): ?DateTimeInterface
     {
         return $this->expiresAt;
+    }
+
+    public function getLastSentAt(): ?DateTimeInterface
+    {
+        return $this->lastSentAt;
     }
 }

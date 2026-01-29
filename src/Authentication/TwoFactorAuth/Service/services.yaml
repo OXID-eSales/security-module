@@ -32,3 +32,7 @@ services:
     public: true
     arguments:
       $verificators: !tagged 'security.twofa.tag.verificator'
+
+  OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\ResendOTPServiceInterface:
+    class: OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\ResendOTPService
+    public: true

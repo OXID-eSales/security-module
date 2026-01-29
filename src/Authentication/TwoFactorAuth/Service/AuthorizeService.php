@@ -21,6 +21,7 @@ class AuthorizeService implements AuthorizeServiceInterface
         private ModuleSettingsServiceInterface $moduleSettings,
         private VerificationCollectorServiceInterface $verifyCollector,
         private NotifierCollectorInterface $notifierCollector,
+        private ResendOTPServiceInterface $resendOTPService,
         private SessionInterface $session
     ) {
     }
@@ -40,18 +41,22 @@ class AuthorizeService implements AuthorizeServiceInterface
 
     public function generate(): void
     {
-        $userName = $this->session->get(self::USER_SESSION_KEY);
-
         $activeVerificator = $this->moduleSettings->getTwoFactorAuthType();
 
         $verificator = $this->verifyCollector->getVerificator(
             $activeVerificator
         );
 
+        $userName = $this->session->get(self::USER_SESSION_KEY);
+        if (!$this->resendOTPService->canSend($userName)) {
+            return;
+        }
+
         $OTPCode = $verificator->generate($userName);
 
         $notifier = $this->notifierCollector->getNotifier('email');
         $notifier->notify($userName, $OTPCode);
+        $this->resendOTPService->markAsSent($userName);
     }
 
     public function getVerificationUrl(): string

@@ -52,9 +52,6 @@ class OTPVerificator implements VerificatorAdapterInterface
     public function generate(string $userName): string
     {
         $otpData = $this->userRepository->getUserOTPData($userName);
-        //todo: wait time between generations, in case of abuse like
-        //spamming the generate button or
-        //user hit limit and try to generate new code to bypass it
 
         return $this->otpGenerator->generateCode($otpData->getId());
     }

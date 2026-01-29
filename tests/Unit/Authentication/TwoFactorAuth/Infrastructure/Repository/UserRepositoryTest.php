@@ -39,6 +39,7 @@ class UserRepositoryTest extends TestCase
             'OESMOTPCODE' => uniqid(),
             'OESMOTPATTEMPTS' => random_int(1, 10),
             'OESMOTPEXPTIME' => '2026-01-01T10:00:00',
+            'OESMOTPLASTSENT' => '2026-01-01T09:00:00',
         ];
 
         $qbSpy = $this->createMock(QueryBuilder::class);
@@ -72,6 +73,10 @@ class UserRepositoryTest extends TestCase
         $this->assertEquals(
             new DateTime($data['OESMOTPEXPTIME']),
             $dto->getExpiresAt()
+        );
+        $this->assertEquals(
+            new DateTime($data['OESMOTPLASTSENT']),
+            $dto->getLastSentAt()
         );
     }
 
@@ -148,9 +153,10 @@ class UserRepositoryTest extends TestCase
         $userModelSpy = $this->createMock(User::class);
         $userModelSpy->expects($this->once())->method('load')->with($userId = uniqid());
         $userModelSpy->expects($this->once())->method('assign')->with([
-            'OESMOTPCODE'     => '',
-            'OESMOTPEXPTIME'  => 0,
+            'OESMOTPCODE'     => null,
+            'OESMOTPEXPTIME'  => null,
             'OESMOTPATTEMPTS' => 0,
+            'OESMOTPLASTSENT' => null
         ]);
         $userModelSpy->expects($this->once())->method('save');
 
