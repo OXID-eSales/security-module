@@ -26,7 +26,7 @@ class GoogleProviderFactory implements GoogleProviderFactoryInterface
     {
         return new GoogleProvider([
             'clientId'        => $this->moduleSettings->getGoogleClientId(),
-            'clientSecret'    => $this->moduleSettings->getFacebookClientSecret(),
+            'clientSecret'    => $this->moduleSettings->getGoogleClientSecret(),
             'redirectUri'     => $this->moduleSettings->getGoogleRedirectUrl(),
         ]);
     }

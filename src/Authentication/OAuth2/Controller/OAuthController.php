@@ -11,24 +11,28 @@ use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Service\ProviderCollectorInterface;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Service\UserServiceInterface;
+use OxidEsales\SecurityModule\Authentication\Session\SessionKeys;
 
 class OAuthController extends FrontendController
 {
     public function login(): void
     {
+        $providerName = $_GET['provider'] ?? '';
+
         $providerCollector = $this->getService(ProviderCollectorInterface::class);
 
-        $provider = $providerCollector->getProvider($_GET['provider']);
+        $provider = $providerCollector->getProvider($providerName);
 
         Registry::getUtils()->redirect($provider->getAuthorizationUrl());
     }
 
     public function redirect(): void
     {
-        //todo: get provider dynamically
+        $providerName = $_GET['provider'] ?? '';
+
         $provider = $this
             ->getService(ProviderCollectorInterface::class)
-            ->getProvider('google');
+            ->getProvider($providerName);
 
         $accessToken = $provider->getAccessToken($_GET['code']);
 
@@ -38,6 +42,11 @@ class OAuthController extends FrontendController
             ->getService(UserServiceInterface::class)
             ->login($userDTO);
 
-        Registry::getUtils()->redirect('');
+        $redirectUrl = Registry::getSession()->getVariable(SessionKeys::AUTH_REDIRECT_URL);
+        if (!$redirectUrl) {
+            $redirectUrl = Registry::getConfig()->getShopHomeUrl();
+        }
+
+        Registry::getUtils()->redirect($redirectUrl, false);
     }
 }

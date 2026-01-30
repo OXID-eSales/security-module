@@ -12,6 +12,7 @@ namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service;
 use OxidEsales\Eshop\Core\Config;
 use OxidEsales\Eshop\Core\Utils;
 use OxidEsales\EshopCommunity\Internal\Framework\Session\SessionInterface;
+use OxidEsales\SecurityModule\Authentication\Session\SessionKeys;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\UserFactoryInterface;
 
 readonly class UserService implements UserServiceInterface
@@ -52,13 +53,13 @@ readonly class UserService implements UserServiceInterface
     public function clearOTPSessionVariables(): void
     {
         $this->session->remove(AuthorizeService::USER_SESSION_KEY);
-        $this->session->remove(AuthorizeService::OTP_TARGET_URL);
+        $this->session->remove(SessionKeys::AUTH_REDIRECT_URL);
         $this->session->remove('OTP_PASS');
     }
 
     private function getRedirectUrl(): string
     {
-        $storedUrl = $this->session->get(AuthorizeService::OTP_TARGET_URL);
+        $storedUrl = $this->session->get(SessionKeys::AUTH_REDIRECT_URL);
 
         if ($storedUrl && $this->isInternalUrl($storedUrl)) {
             return $storedUrl;

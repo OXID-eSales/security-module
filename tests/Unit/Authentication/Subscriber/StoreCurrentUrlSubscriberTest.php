@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\SecurityModule\Tests\Unit\Authentication\TwoFactorAuth\Subscriber;
+namespace OxidEsales\SecurityModule\Tests\Unit\Authentication\Subscriber;
 
 use Exception;
 use OxidEsales\Eshop\Core\Config;
@@ -15,8 +15,8 @@ use OxidEsales\Eshop\Core\Request;
 use OxidEsales\EshopCommunity\Application\Controller\FrontendController;
 use OxidEsales\EshopCommunity\Internal\Framework\Session\SessionInterface;
 use OxidEsales\EshopCommunity\Internal\Transition\ShopEvents\ViewRenderedEvent;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\AuthorizeService;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Subscriber\StoreCurrentUrlSubscriber;
+use OxidEsales\SecurityModule\Authentication\Session\SessionKeys;
+use OxidEsales\SecurityModule\Authentication\Subscriber\StoreCurrentUrlSubscriber;
 use PHPUnit\Framework\TestCase;
 
 class StoreCurrentUrlSubscriberTest extends TestCase
@@ -47,7 +47,7 @@ class StoreCurrentUrlSubscriberTest extends TestCase
         $sessionMock = $this->createMock(SessionInterface::class);
         $sessionMock->expects($this->once())
             ->method('set')
-            ->with(AuthorizeService::OTP_TARGET_URL, $currentUrl);
+            ->with(SessionKeys::AUTH_REDIRECT_URL, $currentUrl);
 
         $sut = $this->getSut(
             session: $sessionMock,
@@ -101,6 +101,31 @@ class StoreCurrentUrlSubscriberTest extends TestCase
     {
         $viewStub = $this->createStub(FrontendController::class);
         $viewStub->method('getClassKey')->willReturn('twofactorauth');
+
+        $configStub = $this->createStub(Config::class);
+        $configStub->method('isAdmin')->willReturn(false);
+        $configStub->method('getTopActiveView')->willReturn($viewStub);
+
+        $requestStub = $this->createStub(Request::class);
+        $requestStub->method('getRequestParameter')->with('fnc')->willReturn(null);
+
+        $sessionMock = $this->createMock(SessionInterface::class);
+        $sessionMock->expects($this->never())->method('set');
+
+        $sut = $this->getSut(
+            session: $sessionMock,
+            config: $configStub,
+            request: $requestStub,
+        );
+        $eventStub = $this->createStub(ViewRenderedEvent::class);
+
+        $sut->onViewRendered($eventStub);
+    }
+
+    public function testOnViewRenderedSkipsOAuthController(): void
+    {
+        $viewStub = $this->createStub(FrontendController::class);
+        $viewStub->method('getClassKey')->willReturn('oauth');
 
         $configStub = $this->createStub(Config::class);
         $configStub->method('isAdmin')->willReturn(false);
@@ -234,7 +259,7 @@ class StoreCurrentUrlSubscriberTest extends TestCase
         $sessionMock = $this->createMock(SessionInterface::class);
         $sessionMock->expects($this->once())
             ->method('set')
-            ->with(AuthorizeService::OTP_TARGET_URL, $currentUrl);
+            ->with(SessionKeys::AUTH_REDIRECT_URL, $currentUrl);
 
         $sut = $this->getSut(
             session: $sessionMock,

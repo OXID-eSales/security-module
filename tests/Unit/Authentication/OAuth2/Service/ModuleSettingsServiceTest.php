@@ -75,4 +75,26 @@ class ModuleSettingsServiceTest extends TestCase
             'expectedValue' => $exampleValue
         ];
     }
+
+    public static function saveBooleanDataProvider(): array
+    {
+        return [
+            ['saveFacebookEnabled', ModuleSettingsService::FACEBOOK_LOGIN_ENABLED, true],
+            ['saveFacebookEnabled', ModuleSettingsService::FACEBOOK_LOGIN_ENABLED, false],
+            ['saveGoogleEnabled', ModuleSettingsService::GOOGLE_LOGIN_ENABLED, true],
+            ['saveGoogleEnabled', ModuleSettingsService::GOOGLE_LOGIN_ENABLED, false],
+        ];
+    }
+
+    #[DataProvider('saveBooleanDataProvider')]
+    public function testSaveBooleanSettings(string $method, string $key, bool $value): void
+    {
+        $mssMock = $this->createPartialMock(ModuleSettingService::class, ['saveBoolean']);
+        $mssMock->expects($this->once())
+            ->method('saveBoolean')
+            ->with($key, $value, Module::MODULE_ID);
+
+        $sut = new ModuleSettingsService($mssMock);
+        $sut->$method($value);
+    }
 }

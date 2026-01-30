@@ -13,6 +13,7 @@ use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Config;
 use OxidEsales\Eshop\Core\Utils;
 use OxidEsales\EshopCommunity\Internal\Framework\Session\SessionInterface;
+use OxidEsales\SecurityModule\Authentication\Session\SessionKeys;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\UserFactoryInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\AuthorizeService;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\AuthorizeServiceInterface;
@@ -59,7 +60,7 @@ class UserServiceTest extends TestCase
 
         $expectedRemovals = [
             AuthorizeService::USER_SESSION_KEY,
-            AuthorizeService::OTP_TARGET_URL,
+            SessionKeys::AUTH_REDIRECT_URL,
             'OTP_PASS',
         ];
 
@@ -177,7 +178,7 @@ class UserServiceTest extends TestCase
                 if ($key === AuthorizeService::USER_SESSION_KEY) {
                     return $userId;
                 }
-                if ($key === AuthorizeService::OTP_TARGET_URL) {
+                if ($key === SessionKeys::AUTH_REDIRECT_URL) {
                     return $storedUrl;
                 }
                 return null;
@@ -221,7 +222,7 @@ class UserServiceTest extends TestCase
                 if ($key === AuthorizeService::USER_SESSION_KEY) {
                     return $userId;
                 }
-                if ($key === AuthorizeService::OTP_TARGET_URL) {
+                if ($key === SessionKeys::AUTH_REDIRECT_URL) {
                     return $externalUrl;
                 }
                 return null;

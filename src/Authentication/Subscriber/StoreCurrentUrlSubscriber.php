@@ -7,28 +7,32 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Subscriber;
+namespace OxidEsales\SecurityModule\Authentication\Subscriber;
 
 use OxidEsales\Eshop\Core\Config;
 use OxidEsales\Eshop\Core\Request;
 use OxidEsales\EshopCommunity\Internal\Framework\Session\SessionInterface;
 use OxidEsales\EshopCommunity\Internal\Transition\ShopEvents\ViewRenderedEvent;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\AuthorizeService;
+use OxidEsales\SecurityModule\Authentication\Session\SessionKeys;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 readonly class StoreCurrentUrlSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private SessionInterface $session, private Config $config, private Request $request)
-    {
-    }
-
     private const EXCLUDED_CONTROLLERS = [
         'twofactorauth',
+        'oauth',
     ];
 
     private const EXCLUDED_FUNCTIONS = [
         'logout',
     ];
+
+    public function __construct(
+        private SessionInterface $session,
+        private Config $config,
+        private Request $request
+    ) {
+    }
 
     public static function getSubscribedEvents(): array
     {
@@ -49,7 +53,6 @@ readonly class StoreCurrentUrlSubscriber implements EventSubscriberInterface
         $currentController = $this->getCurrentController();
         $currentFunction = $this->getCurrentFunction();
 
-        // Skip widgets, excluded controllers, and excluded functions (like logout)
         if (
             $this->isWidget($currentController)
             || $this->shouldExcludeController($currentController)
@@ -60,7 +63,7 @@ readonly class StoreCurrentUrlSubscriber implements EventSubscriberInterface
 
         $currentUrl = $this->getCurrentPageUrl();
         if ($currentUrl) {
-            $this->session->set(AuthorizeService::OTP_TARGET_URL, $currentUrl);
+            $this->session->set(SessionKeys::AUTH_REDIRECT_URL, $currentUrl);
         }
     }
 

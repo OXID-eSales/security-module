@@ -85,7 +85,7 @@ class User extends User_parent
     {
         parent::onLogin($userName, $password);
 
-        if (!$this->isOTPEnabled()) {
+        if (!$this->isOTPEnabled() || $this->isAdmin()) {
             return;
         }
 
