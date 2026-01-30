@@ -11,7 +11,6 @@ namespace OxidEsales\SecurityModule\Tests\Unit\Authentication\TwoFactorAuth\Serv
 
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Config;
-use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Utils;
 use OxidEsales\EshopCommunity\Internal\Framework\Session\SessionInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\UserFactoryInterface;
@@ -112,17 +111,17 @@ class UserServiceTest extends TestCase
 
         $configStub = $this->createStub(Config::class);
         $configStub->method('getShopHomeUrl')->willReturn($shopHomeUrl);
-        Registry::set(Config::class, $configStub);
 
         $utilsSpy = $this->createMock(Utils::class);
         $utilsSpy->expects($this->once())
             ->method('redirect')
             ->with($shopHomeUrl, false);
-        Registry::set(Utils::class, $utilsSpy);
 
         $sut = $this->getSut(
             userFactory: $userFactoryStub,
             session: $sessionStub,
+            utils: $utilsSpy,
+            config: $configStub,
         );
 
         $sut->finalizeLogin();
@@ -153,14 +152,14 @@ class UserServiceTest extends TestCase
 
         $configStub = $this->createStub(Config::class);
         $configStub->method('getShopHomeUrl')->willReturn(uniqid());
-        Registry::set(Config::class, $configStub);
 
         $utilsStub = $this->createStub(Utils::class);
-        Registry::set(Utils::class, $utilsStub);
 
         $sut = $this->getSut(
             userFactory: $userFactoryStub,
             session: $sessionSpy,
+            utils: $utilsStub,
+            config: $configStub,
         );
 
         $sut->finalizeLogin();
@@ -194,17 +193,17 @@ class UserServiceTest extends TestCase
         $configStub->method('getShopUrl')->willReturn($shopUrl);
         $configStub->method('getSslShopUrl')->willReturn($shopUrl);
         $configStub->method('getShopHomeUrl')->willReturn($shopUrl);
-        Registry::set(Config::class, $configStub);
 
         $utilsSpy = $this->createMock(Utils::class);
         $utilsSpy->expects($this->once())
             ->method('redirect')
             ->with($storedUrl, false);
-        Registry::set(Utils::class, $utilsSpy);
 
         $sut = $this->getSut(
             userFactory: $userFactoryStub,
             session: $sessionStub,
+            utils: $utilsSpy,
+            config: $configStub,
         );
 
         $sut->finalizeLogin();
@@ -238,17 +237,17 @@ class UserServiceTest extends TestCase
         $configStub->method('getShopUrl')->willReturn($shopUrl);
         $configStub->method('getSslShopUrl')->willReturn($shopUrl);
         $configStub->method('getShopHomeUrl')->willReturn($shopUrl);
-        Registry::set(Config::class, $configStub);
 
         $utilsSpy = $this->createMock(Utils::class);
         $utilsSpy->expects($this->once())
             ->method('redirect')
             ->with($shopUrl, false);
-        Registry::set(Utils::class, $utilsSpy);
 
         $sut = $this->getSut(
             userFactory: $userFactoryStub,
             session: $sessionStub,
+            utils: $utilsSpy,
+            config: $configStub,
         );
 
         $sut->finalizeLogin();
@@ -276,17 +275,17 @@ class UserServiceTest extends TestCase
 
         $configStub = $this->createStub(Config::class);
         $configStub->method('getShopHomeUrl')->willReturn($shopHomeUrl);
-        Registry::set(Config::class, $configStub);
 
         $utilsSpy = $this->createMock(Utils::class);
         $utilsSpy->expects($this->once())
             ->method('redirect')
             ->with($shopHomeUrl, false);
-        Registry::set(Utils::class, $utilsSpy);
 
         $sut = $this->getSut(
             userFactory: $userFactoryStub,
             session: $sessionStub,
+            utils: $utilsSpy,
+            config: $configStub,
         );
 
         $sut->finalizeLogin();
@@ -297,12 +296,14 @@ class UserServiceTest extends TestCase
         UserFactoryInterface $userFactory = null,
         SessionInterface $session = null,
         Utils $utils = null,
+        Config $config = null,
     ): UserServiceInterface {
         return new UserService(
             authorizeService: $authorizeService ?? $this->createStub(AuthorizeServiceInterface::class),
             userFactory: $userFactory ?? $this->createStub(UserFactoryInterface::class),
             session: $session ?? $this->createStub(SessionInterface::class),
             utils: $utils ?? $this->createStub(Utils::class),
+            config: $config ?? $this->createStub(Config::class),
         );
     }
 }

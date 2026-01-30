@@ -9,13 +9,19 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Subscriber;
 
-use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Config;
+use OxidEsales\Eshop\Core\Request;
+use OxidEsales\EshopCommunity\Internal\Framework\Session\SessionInterface;
 use OxidEsales\EshopCommunity\Internal\Transition\ShopEvents\ViewRenderedEvent;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\AuthorizeService;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class StoreCurrentUrlSubscriber implements EventSubscriberInterface
+readonly class StoreCurrentUrlSubscriber implements EventSubscriberInterface
 {
+    public function __construct(private SessionInterface $session, private Config $config, private Request $request)
+    {
+    }
+
     private const EXCLUDED_CONTROLLERS = [
         'twofactorauth',
     ];
@@ -54,18 +60,18 @@ class StoreCurrentUrlSubscriber implements EventSubscriberInterface
 
         $currentUrl = $this->getCurrentPageUrl();
         if ($currentUrl) {
-            Registry::getSession()->setVariable(AuthorizeService::OTP_TARGET_URL, $currentUrl);
+            $this->session->set(AuthorizeService::OTP_TARGET_URL, $currentUrl);
         }
     }
 
     private function isAdmin(): bool
     {
-        return Registry::getConfig()->isAdmin();
+        return $this->config->isAdmin();
     }
 
     private function getCurrentController(): string
     {
-        $activeView = Registry::getConfig()->getTopActiveView();
+        $activeView = $this->config->getTopActiveView();
         if (!$activeView) {
             return 'start';
         }
@@ -85,7 +91,7 @@ class StoreCurrentUrlSubscriber implements EventSubscriberInterface
 
     private function getCurrentFunction(): string
     {
-        return strtolower((string) Registry::getRequest()->getRequestParameter('fnc'));
+        return strtolower((string) $this->request->getRequestParameter('fnc'));
     }
 
     private function shouldExcludeFunction(string $function): bool
@@ -95,7 +101,7 @@ class StoreCurrentUrlSubscriber implements EventSubscriberInterface
 
     private function getCurrentPageUrl(): ?string
     {
-        $activeView = Registry::getConfig()->getTopActiveView();
+        $activeView = $this->config->getTopActiveView();
         try {
             return $activeView->getLink();
         } catch (\Throwable) {
