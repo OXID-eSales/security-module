@@ -10,9 +10,10 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Controller;
 
 use OxidEsales\Eshop\Application\Controller\FrontendController;
-use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository\UserRepositoryInterface;
+use OxidEsales\Eshop\Core\UtilsView;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\OTPValidationException;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\AuthorizeServiceInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\UserServiceInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Transput\AuthCodeRequestInterface;
 
 class TwoFactorAuthController extends FrontendController
@@ -27,25 +28,26 @@ class TwoFactorAuthController extends FrontendController
 
     public function __construct(
         private readonly AuthorizeServiceInterface $authService,
+        private readonly UserServiceInterface $userService,
         private readonly AuthCodeRequestInterface $authCodeRequest,
+        private readonly UtilsView $utilsView,
     ) {
         parent::__construct();
     }
 
-    public function handleOTP(): void
+    public function handleOTP(): ?string
     {
-        //todo: catch only OTP exception that will be shown to user, maybe some abstract OTP exception?
         try {
             $this->authService->validate(
                 $this->authCodeRequest->getCode()
             );
 
-            //todo: redirect to originally requested page after successful OTP validation
-            //todo: create correct session for logged in user (from service, handleLogin?)
-        } catch (\Exception $e) {
-            //todo: display translated error message to user
-            Registry::getUtilsView()->addErrorToDisplay($e->getMessage());
+            $this->userService->finalizeLogin();
+        } catch (OTPValidationException $e) {
+            $this->utilsView->addErrorToDisplay($e);
         }
+
+        return null;
     }
 
     public function resendCode(): void

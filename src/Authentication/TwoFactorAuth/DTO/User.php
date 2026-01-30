@@ -15,6 +15,7 @@ class User implements UserInterface
 {
     public function __construct(
         private readonly string $userId,
+        private readonly string $email,
         private readonly int $attempts,
         private readonly ?string $code,
         private readonly ?DateTimeInterface $expiresAt,
@@ -45,5 +46,10 @@ class User implements UserInterface
     public function getLastSentAt(): ?DateTimeInterface
     {
         return $this->lastSentAt;
+    }
+
+    public function getEmail(): string
+    {
+        return $this->email;
     }
 }

@@ -9,7 +9,9 @@ namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service;
 
 interface UserServiceInterface
 {
-    public function handleLogin(string $userName): void;
+    public function handleLogin(string $userId): void;
 
-    public function checkPassword(string $userName, string $password): bool;
+    public function finalizeLogin(): void;
+
+    public function clearOTPSessionVariables(): void;
 }

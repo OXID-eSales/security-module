@@ -9,7 +9,7 @@ namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service;
 
 interface ResendOTPServiceInterface
 {
-    public function markAsSent(string $userName): void;
+    public function markAsSent(string $userId): void;
 
-    public function canSend(string $userName): bool;
+    public function canSend(string $userId): bool;
 }

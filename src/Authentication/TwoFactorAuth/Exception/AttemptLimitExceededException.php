@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception;
 
-class AttemptLimitExceededException extends \Exception
+class AttemptLimitExceededException extends OTPValidationException
 {
     public function __construct()
     {

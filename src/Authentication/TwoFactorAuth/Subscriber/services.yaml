@@ -1,0 +1,11 @@
+services:
+  _defaults:
+    autowire: true
+    public: false
+    bind:
+      OxidEsales\Eshop\Core\Config: '@=service("OxidEsales\\SecurityModule\\Core\\Registry").getConfig()'
+      OxidEsales\Eshop\Core\Request: '@=service("OxidEsales\\SecurityModule\\Core\\Registry").getRequest()'
+
+  OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Subscriber\StoreCurrentUrlSubscriber:
+    tags:
+      - { name: kernel.event_subscriber }

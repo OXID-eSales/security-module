@@ -9,31 +9,25 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service;
 
-use OxidEsales\Eshop\Core\Request;
+use OxidEsales\Eshop\Core\Config;
 use OxidEsales\Eshop\Core\Utils;
-use OxidEsales\EshopCommunity\Internal\Domain\Authentication\Bridge\PasswordServiceBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Session\SessionInterface;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository\UserRepositoryInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\UserFactoryInterface;
 
-class UserService implements UserServiceInterface
+readonly class UserService implements UserServiceInterface
 {
     public function __construct(
         private AuthorizeServiceInterface $authorizeService,
-        private UserRepositoryInterface $userRepository,
-        private PasswordServiceBridgeInterface $pwdServiceBridge,
+        private UserFactoryInterface $userFactory,
         private SessionInterface $session,
-        private Request $request,
         private Utils $utils,
+        private Config $config,
     ) {
     }
 
-    public function handleLogin(string $userName): void
+    public function handleLogin(string $userId): void
     {
-        $this->session->set(AuthorizeService::USER_SESSION_KEY, $userName);
-        $this->session->set(
-            AuthorizeService::OTP_TARGET_URL,
-            $this->request->getRequestUrl()
-        );
+        $this->session->set(AuthorizeService::USER_SESSION_KEY, $userId);
 
         $this->authorizeService->generate();
 
@@ -41,19 +35,43 @@ class UserService implements UserServiceInterface
         $this->utils->redirect($redirectUrl);
     }
 
-    public function checkPassword(string $userName, string $password): bool
+    public function finalizeLogin(): void
     {
-        try {
-            $userPasswordHash = $this->userRepository->getUserPasswordHash($userName);
-        } catch (\Throwable $e) {
-            return false;
+        $userId = $this->session->get(AuthorizeService::USER_SESSION_KEY);
+        $user = $this->userFactory->create();
+        $user->load($userId);
+        $redirectUrl = $this->getRedirectUrl();
+
+        $this->session->set('OTP_PASS', $userId);
+        /** @phpstan-ignore argument.type (password is null because user already authenticated via OTP) */
+        $user->login($user->getFieldData('oxusername'), null, false);
+        $this->clearOTPSessionVariables();
+        $this->utils->redirect($redirectUrl, false);
+    }
+
+    public function clearOTPSessionVariables(): void
+    {
+        $this->session->remove(AuthorizeService::USER_SESSION_KEY);
+        $this->session->remove(AuthorizeService::OTP_TARGET_URL);
+        $this->session->remove('OTP_PASS');
+    }
+
+    private function getRedirectUrl(): string
+    {
+        $storedUrl = $this->session->get(AuthorizeService::OTP_TARGET_URL);
+
+        if ($storedUrl && $this->isInternalUrl($storedUrl)) {
+            return $storedUrl;
         }
 
-        if ($userPasswordHash === null) {
-            return false;
-        }
+        return $this->config->getShopHomeUrl();
+    }
 
-        return $this->pwdServiceBridge
-            ->verifyPassword($password, $userPasswordHash);
+    private function isInternalUrl(string $url): bool
+    {
+        $shopUrl = $this->config->getShopUrl();
+        $sslShopUrl = $this->config->getSslShopUrl();
+
+        return str_starts_with($url, $shopUrl) || str_starts_with($url, $sslShopUrl);
     }
 }

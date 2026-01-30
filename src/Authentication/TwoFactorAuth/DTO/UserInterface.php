@@ -20,4 +20,6 @@ interface UserInterface
     public function getExpiresAt(): ?DateTimeInterface;
 
     public function getLastSentAt(): ?DateTimeInterface;
+
+    public function getEmail(): string;
 }

@@ -10,9 +10,11 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Tests\Unit\Authentication\TwoFactorAuth\Service;
 
 use OxidEsales\EshopCommunity\Internal\Framework\Session\SessionInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\DTO\UserInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\InvalidCodeException;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\VerificatorNotFoundException;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Provider\NotifierAdapterInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository\UserRepositoryInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\AuthorizeService;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\ModuleSettingsServiceInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\NotifierCollectorInterface;
@@ -35,15 +37,14 @@ class AuthorizeServiceTest extends TestCase
             ->method('get')
             ->willReturn(uniqid());
 
-        $collectorMock = $this->createMock(VerificationCollectorServiceInterface::class);
-        $collectorMock
+        $collectorStub = $this->createStub(VerificationCollectorServiceInterface::class);
+        $collectorStub
             ->method('getVerificator')
-            ->with('unknown')
             ->willThrowException(new VerificatorNotFoundException());
 
         $sut = $this->getSut(
             moduleSettings: $settingsStub,
-            verifyCollector: $collectorMock,
+            verifyCollector: $collectorStub,
             session: $sessionStub
         );
 
@@ -56,8 +57,8 @@ class AuthorizeServiceTest extends TestCase
     {
         $exception = new InvalidCodeException();
 
-        $verificatorMock = $this->createMock(VerificatorAdapterInterface::class);
-        $verificatorMock
+        $verificatorStub = $this->createStub(VerificatorAdapterInterface::class);
+        $verificatorStub
             ->method('validateCode')
             ->willThrowException($exception);
 
@@ -71,15 +72,14 @@ class AuthorizeServiceTest extends TestCase
             ->method('get')
             ->willReturn(uniqid());
 
-        $collectorMock = $this->createMock(VerificationCollectorServiceInterface::class);
-        $collectorMock
+        $collectorStub = $this->createStub(VerificationCollectorServiceInterface::class);
+        $collectorStub
             ->method('getVerificator')
-            ->with('otp')
-            ->willReturn($verificatorMock);
+            ->willReturn($verificatorStub);
 
         $sut = $this->getSut(
             moduleSettings: $settingsStub,
-            verifyCollector: $collectorMock,
+            verifyCollector: $collectorStub,
             session: $sessionStub
         );
 
@@ -90,14 +90,14 @@ class AuthorizeServiceTest extends TestCase
 
     public function testValidateWithValidCodeDoesNotThrow(): void
     {
-        $email = uniqid();
+        $userId = uniqid();
         $code = uniqid();
 
         $verificatorMock = $this->createMock(VerificatorAdapterInterface::class);
         $verificatorMock
             ->expects($this->once())
             ->method('validateCode')
-            ->with($email, $code);
+            ->with($userId, $code);
 
         $settingsStub = $this->createStub(ModuleSettingsServiceInterface::class);
         $settingsStub
@@ -112,7 +112,7 @@ class AuthorizeServiceTest extends TestCase
         $sessionStub = $this->createStub(SessionInterface::class);
         $sessionStub
             ->method('get')
-            ->willReturn($email);
+            ->willReturn($userId);
 
         $sut = $this->getSut(
             moduleSettings: $settingsStub,
@@ -128,6 +128,7 @@ class AuthorizeServiceTest extends TestCase
     public function testGenerateNotifiesUser(): void
     {
         $generatedCode = uniqid();
+        $userEmail = 'user@example.com';
 
         $verificatorStub = $this->createStub(VerificatorAdapterInterface::class);
         $verificatorStub
@@ -137,10 +138,17 @@ class AuthorizeServiceTest extends TestCase
         $notifierMock = $this->createMock(NotifierAdapterInterface::class);
         $notifierMock
             ->expects($this->once())
-            ->method('notify');
+            ->method('notify')
+            ->with($userEmail, $generatedCode);
 
         $resendOTPStub = $this->createStub(ResendOTPServiceInterface::class);
         $resendOTPStub->method('canSend')->willReturn(true);
+
+        $userStub = $this->createStub(UserInterface::class);
+        $userStub->method('getEmail')->willReturn($userEmail);
+
+        $userRepositoryStub = $this->createStub(UserRepositoryInterface::class);
+        $userRepositoryStub->method('getUserOTPData')->willReturn($userStub);
 
         $settingsStub = $this->createStub(ModuleSettingsServiceInterface::class);
         $settingsStub
@@ -167,6 +175,51 @@ class AuthorizeServiceTest extends TestCase
             verifyCollector: $collectorStub,
             notifierCollector: $notifierCollectorStub,
             resendOTPService: $resendOTPStub,
+            userRepository: $userRepositoryStub,
+            session: $sessionStub
+        );
+
+        $sut->generate();
+    }
+
+    public function testGenerateSendsOtpAndMarksAsSent(): void
+    {
+        $userEmail = 'user@example.com';
+
+        $verificatorStub = $this->createStub(VerificatorAdapterInterface::class);
+        $verificatorStub->method('generate')->willReturn('123456');
+
+        $notifierMock = $this->createMock(NotifierAdapterInterface::class);
+        $notifierMock->expects($this->once())->method('notify');
+
+        $userStub = $this->createStub(UserInterface::class);
+        $userStub->method('getEmail')->willReturn($userEmail);
+
+        $userRepositoryStub = $this->createStub(UserRepositoryInterface::class);
+        $userRepositoryStub->method('getUserOTPData')->willReturn($userStub);
+
+        $settingsStub = $this->createStub(ModuleSettingsServiceInterface::class);
+        $settingsStub->method('getTwoFactorAuthType')->willReturn('otp');
+
+        $collectorStub = $this->createStub(VerificationCollectorServiceInterface::class);
+        $collectorStub->method('getVerificator')->willReturn($verificatorStub);
+
+        $notifierCollectorStub = $this->createStub(NotifierCollectorInterface::class);
+        $notifierCollectorStub->method('getNotifier')->willReturn($notifierMock);
+
+        $sessionStub = $this->createStub(SessionInterface::class);
+        $sessionStub->method('get')->willReturn(uniqid());
+
+        $resendOTPMock = $this->createMock(ResendOTPServiceInterface::class);
+        $resendOTPMock->method('canSend')->willReturn(true);
+        $resendOTPMock->expects($this->once())->method('markAsSent');
+
+        $sut = $this->getSut(
+            moduleSettings: $settingsStub,
+            verifyCollector: $collectorStub,
+            notifierCollector: $notifierCollectorStub,
+            resendOTPService: $resendOTPMock,
+            userRepository: $userRepositoryStub,
             session: $sessionStub
         );
 
@@ -213,14 +266,15 @@ class AuthorizeServiceTest extends TestCase
             ->method('get')
             ->willReturn(uniqid());
 
-        $service = $this->getSut(
+        $sut = $this->getSut(
             moduleSettings: $settingsStub,
             verifyCollector: $collectorStub,
             notifierCollector: $notifierCollectorStub,
             resendOTPService: $resendOTPMock,
             session: $sessionStub
         );
-        $service->generate();
+
+        $sut->generate();
     }
 
     protected function getSut(
@@ -228,6 +282,7 @@ class AuthorizeServiceTest extends TestCase
         VerificationCollectorServiceInterface $verifyCollector = null,
         NotifierCollectorInterface $notifierCollector = null,
         ResendOTPServiceInterface $resendOTPService = null,
+        UserRepositoryInterface $userRepository = null,
         SessionInterface $session = null
     ): AuthorizeService {
         return new AuthorizeService(
@@ -235,6 +290,7 @@ class AuthorizeServiceTest extends TestCase
             verifyCollector: $verifyCollector ?? $this->createStub(VerificationCollectorServiceInterface::class),
             notifierCollector: $notifierCollector ?? $this->createStub(NotifierCollectorInterface::class),
             resendOTPService: $resendOTPService ?? $this->createStub(ResendOTPServiceInterface::class),
+            userRepository: $userRepository ?? $this->createStub(UserRepositoryInterface::class),
             session: $session ?? $this->createStub(SessionInterface::class),
         );
     }

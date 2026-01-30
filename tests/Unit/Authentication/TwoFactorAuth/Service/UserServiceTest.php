@@ -9,11 +9,11 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Tests\Unit\Authentication\TwoFactorAuth\Service;
 
-use OxidEsales\Eshop\Core\Request;
+use OxidEsales\Eshop\Application\Model\User;
+use OxidEsales\Eshop\Core\Config;
 use OxidEsales\Eshop\Core\Utils;
-use OxidEsales\EshopCommunity\Internal\Domain\Authentication\Bridge\PasswordServiceBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Session\SessionInterface;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository\UserRepositoryInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\UserFactoryInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\AuthorizeService;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\AuthorizeServiceInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\UserService;
@@ -24,13 +24,8 @@ class UserServiceTest extends TestCase
 {
     public function testHandleLoginSetsSessionAndRedirects(): void
     {
-        $username = uniqid();
+        $userId = uniqid();
         $url = uniqid();
-
-        $requestSpy = $this->createMock(Request::class);
-        $requestSpy->expects($this->once())
-            ->method('getRequestUrl')
-            ->willReturn($url);
 
         $authorizeServiceSpy = $this->createMock(AuthorizeServiceInterface::class);
         $authorizeServiceSpy->expects($this->once())
@@ -40,20 +35,9 @@ class UserServiceTest extends TestCase
             ->willReturn($url);
 
         $sessionSpy = $this->createMock(SessionInterface::class);
-        $sessionSpy->expects($this->exactly(2))
+        $sessionSpy->expects($this->once())
             ->method('set')
-            ->willReturnCallback(function (string $key, $value) use ($username, $url) {
-                match ($key) {
-                    AuthorizeService::USER_SESSION_KEY =>
-                    $this->assertSame($username, $value),
-
-                    AuthorizeService::OTP_TARGET_URL =>
-                    $this->assertSame($url, $value),
-
-                    default =>
-                    $this->fail('Unexpected session key: ' . $key),
-                };
-            });
+            ->with(AuthorizeService::USER_SESSION_KEY, $userId);
 
         $utilsSpy = $this->createMock(Utils::class);
         $utilsSpy->expects($this->once())
@@ -63,112 +47,263 @@ class UserServiceTest extends TestCase
         $sut = $this->getSut(
             authorizeService: $authorizeServiceSpy,
             session: $sessionSpy,
-            request: $requestSpy,
             utils: $utilsSpy,
         );
 
-        $sut->handleLogin($username);
+        $sut->handleLogin($userId);
     }
 
-    public function testCheckPasswordReturnsFalseIfUserNotFound(): void
+    public function testClearOTPSessionVariablesRemovesAllKeys(): void
     {
-        $username = uniqid();
-        $password = uniqid();
+        $sessionMock = $this->createMock(SessionInterface::class);
 
-        $userRepositorySpy = $this->createMock(UserRepositoryInterface::class);
-        $userRepositorySpy->expects($this->once())
-            ->method('getUserPasswordHash')
-            ->with($username)
-            ->willThrowException(new \Exception());
+        $expectedRemovals = [
+            AuthorizeService::USER_SESSION_KEY,
+            AuthorizeService::OTP_TARGET_URL,
+            'OTP_PASS',
+        ];
 
-        $userService = $this->getSut(
-            userRepository: $userRepositorySpy,
+        $sessionMock->expects($this->exactly(3))
+            ->method('remove')
+            ->willReturnCallback(function ($key) use (&$expectedRemovals) {
+                $this->assertContains($key, $expectedRemovals);
+                $expectedRemovals = array_filter($expectedRemovals, fn($k) => $k !== $key);
+            });
+
+        $sut = $this->getSut(
+            session: $sessionMock,
         );
-        $this->assertFalse($userService->checkPassword($username, $password));
+
+        $sut->clearOTPSessionVariables();
+
+        $this->assertEmpty($expectedRemovals, 'All session keys should be removed');
     }
 
-    public function testCheckPasswordReturnsFalseIfHashIsNull(): void
+    public function testFinalizeLoginLoadsUserAndPerformsLogin(): void
     {
-        $username = uniqid();
-        $password = uniqid();
+        $userId = uniqid();
+        $userName = uniqid();
+        $shopHomeUrl = uniqid();
 
-        $userRepositorySpy = $this->createMock(UserRepositoryInterface::class);
-        $userRepositorySpy->expects($this->once())
-            ->method('getUserPasswordHash')
-            ->with($username)
-            ->willReturn(null);
+        $sessionStub = $this->createStub(SessionInterface::class);
+        $sessionStub->method('get')
+            ->willReturnCallback(function ($key) use ($userId) {
+                if ($key === AuthorizeService::USER_SESSION_KEY) {
+                    return $userId;
+                }
+                return null;
+            });
 
-        $userService = $this->getSut(
-            userRepository: $userRepositorySpy,
+        $userSpy = $this->createMock(User::class);
+        $userSpy->expects($this->once())
+            ->method('load')
+            ->with($userId);
+        $userSpy->expects($this->once())
+            ->method('getFieldData')
+            ->with('oxusername')
+            ->willReturn($userName);
+        $userSpy->expects($this->once())
+            ->method('login')
+            ->with($userName, null, false);
+
+        $userFactoryStub = $this->createStub(UserFactoryInterface::class);
+        $userFactoryStub->method('create')->willReturn($userSpy);
+
+        $configStub = $this->createStub(Config::class);
+        $configStub->method('getShopHomeUrl')->willReturn($shopHomeUrl);
+
+        $utilsSpy = $this->createMock(Utils::class);
+        $utilsSpy->expects($this->once())
+            ->method('redirect')
+            ->with($shopHomeUrl, false);
+
+        $sut = $this->getSut(
+            userFactory: $userFactoryStub,
+            session: $sessionStub,
+            utils: $utilsSpy,
+            config: $configStub,
         );
-        $this->assertFalse($userService->checkPassword($username, $password));
+
+        $sut->finalizeLogin();
     }
 
-    public function testCheckPasswordReturnsTrueIfPasswordMatches(): void
+    public function testFinalizeLoginSetsOTPPassInSession(): void
     {
-        $username = uniqid();
-        $password = uniqid();
-        $hash = uniqid();
+        $userId = uniqid();
 
-        $userRepositorySpy = $this->createMock(UserRepositoryInterface::class);
-        $userRepositorySpy->expects($this->once())
-            ->method('getUserPasswordHash')
-            ->with($username)
-            ->willReturn($hash);
+        $sessionSpy = $this->createMock(SessionInterface::class);
+        $sessionSpy->method('get')
+            ->willReturnCallback(function ($key) use ($userId) {
+                if ($key === AuthorizeService::USER_SESSION_KEY) {
+                    return $userId;
+                }
+                return null;
+            });
 
-        $pwdServiceBridgeSpy = $this->createMock(PasswordServiceBridgeInterface::class);
-        $pwdServiceBridgeSpy->expects($this->once())
-            ->method('verifyPassword')
-            ->with($password, $hash)
-            ->willReturn(true);
+        $sessionSpy->expects($this->once())
+            ->method('set')
+            ->with('OTP_PASS', $userId);
 
-        $userService = $this->getSut(
-            userRepository: $userRepositorySpy,
-            pwdServiceBridge: $pwdServiceBridgeSpy,
+        $userStub = $this->createStub(User::class);
+        $userStub->method('getFieldData')->willReturn(uniqid());
+
+        $userFactoryStub = $this->createStub(UserFactoryInterface::class);
+        $userFactoryStub->method('create')->willReturn($userStub);
+
+        $configStub = $this->createStub(Config::class);
+        $configStub->method('getShopHomeUrl')->willReturn(uniqid());
+
+        $utilsStub = $this->createStub(Utils::class);
+
+        $sut = $this->getSut(
+            userFactory: $userFactoryStub,
+            session: $sessionSpy,
+            utils: $utilsStub,
+            config: $configStub,
         );
-        $this->assertTrue($userService->checkPassword($username, $password));
+
+        $sut->finalizeLogin();
     }
 
-    public function testCheckPasswordReturnsFalseIfPasswordDoesNotMatch(): void
+    public function testFinalizeLoginRedirectsToStoredUrlWhenInternal(): void
     {
-        $username = 'user';
-        $password = 'pwd';
-        $hash = 'hashedpwd';
+        $userId = uniqid();
+        $shopUrl = uniqid();
+        $storedUrl = $shopUrl . uniqid();
 
-        $userRepositorySpy = $this->createMock(UserRepositoryInterface::class);
-        $userRepositorySpy->expects($this->once())
-            ->method('getUserPasswordHash')
-            ->with($username)
-            ->willReturn($hash);
+        $sessionStub = $this->createStub(SessionInterface::class);
+        $sessionStub->method('get')
+            ->willReturnCallback(function ($key) use ($userId, $storedUrl) {
+                if ($key === AuthorizeService::USER_SESSION_KEY) {
+                    return $userId;
+                }
+                if ($key === AuthorizeService::OTP_TARGET_URL) {
+                    return $storedUrl;
+                }
+                return null;
+            });
 
-        $pwdServiceBridgeSpy = $this->createMock(PasswordServiceBridgeInterface::class);
-        $pwdServiceBridgeSpy->expects($this->once())
-            ->method('verifyPassword')
-            ->with($password, $hash)
-            ->willReturn(false);
+        $userStub = $this->createStub(User::class);
+        $userStub->method('getFieldData')->willReturn(uniqid());
 
-        $userService = $this->getSut(
-            userRepository: $userRepositorySpy,
-            pwdServiceBridge: $pwdServiceBridgeSpy,
+        $userFactoryStub = $this->createStub(UserFactoryInterface::class);
+        $userFactoryStub->method('create')->willReturn($userStub);
+
+        $configStub = $this->createStub(Config::class);
+        $configStub->method('getShopUrl')->willReturn($shopUrl);
+        $configStub->method('getSslShopUrl')->willReturn($shopUrl);
+        $configStub->method('getShopHomeUrl')->willReturn($shopUrl);
+
+        $utilsSpy = $this->createMock(Utils::class);
+        $utilsSpy->expects($this->once())
+            ->method('redirect')
+            ->with($storedUrl, false);
+
+        $sut = $this->getSut(
+            userFactory: $userFactoryStub,
+            session: $sessionStub,
+            utils: $utilsSpy,
+            config: $configStub,
         );
-        $this->assertFalse($userService->checkPassword($username, $password));
+
+        $sut->finalizeLogin();
+    }
+
+    public function testFinalizeLoginRedirectsToShopHomeWhenStoredUrlIsExternal(): void
+    {
+        $userId = uniqid();
+        $shopUrl = uniqid();
+        $externalUrl = uniqid();
+
+        $sessionStub = $this->createStub(SessionInterface::class);
+        $sessionStub->method('get')
+            ->willReturnCallback(function ($key) use ($userId, $externalUrl) {
+                if ($key === AuthorizeService::USER_SESSION_KEY) {
+                    return $userId;
+                }
+                if ($key === AuthorizeService::OTP_TARGET_URL) {
+                    return $externalUrl;
+                }
+                return null;
+            });
+
+        $userStub = $this->createStub(User::class);
+        $userStub->method('getFieldData')->willReturn('user@example.com');
+
+        $userFactoryStub = $this->createStub(UserFactoryInterface::class);
+        $userFactoryStub->method('create')->willReturn($userStub);
+
+        $configStub = $this->createStub(Config::class);
+        $configStub->method('getShopUrl')->willReturn($shopUrl);
+        $configStub->method('getSslShopUrl')->willReturn($shopUrl);
+        $configStub->method('getShopHomeUrl')->willReturn($shopUrl);
+
+        $utilsSpy = $this->createMock(Utils::class);
+        $utilsSpy->expects($this->once())
+            ->method('redirect')
+            ->with($shopUrl, false);
+
+        $sut = $this->getSut(
+            userFactory: $userFactoryStub,
+            session: $sessionStub,
+            utils: $utilsSpy,
+            config: $configStub,
+        );
+
+        $sut->finalizeLogin();
+    }
+
+    public function testFinalizeLoginRedirectsToShopHomeWhenNoStoredUrl(): void
+    {
+        $userId = uniqid();
+        $shopHomeUrl = uniqid();
+
+        $sessionStub = $this->createStub(SessionInterface::class);
+        $sessionStub->method('get')
+            ->willReturnCallback(function ($key) use ($userId) {
+                if ($key === AuthorizeService::USER_SESSION_KEY) {
+                    return $userId;
+                }
+                return null;
+            });
+
+        $userStub = $this->createStub(User::class);
+        $userStub->method('getFieldData')->willReturn('user@example.com');
+
+        $userFactoryStub = $this->createStub(UserFactoryInterface::class);
+        $userFactoryStub->method('create')->willReturn($userStub);
+
+        $configStub = $this->createStub(Config::class);
+        $configStub->method('getShopHomeUrl')->willReturn($shopHomeUrl);
+
+        $utilsSpy = $this->createMock(Utils::class);
+        $utilsSpy->expects($this->once())
+            ->method('redirect')
+            ->with($shopHomeUrl, false);
+
+        $sut = $this->getSut(
+            userFactory: $userFactoryStub,
+            session: $sessionStub,
+            utils: $utilsSpy,
+            config: $configStub,
+        );
+
+        $sut->finalizeLogin();
     }
 
     public function getSut(
         AuthorizeServiceInterface $authorizeService = null,
-        UserRepositoryInterface $userRepository = null,
-        PasswordServiceBridgeInterface $pwdServiceBridge = null,
+        UserFactoryInterface $userFactory = null,
         SessionInterface $session = null,
-        Request $request = null,
         Utils $utils = null,
+        Config $config = null,
     ): UserServiceInterface {
         return new UserService(
-            authorizeService: $authorizeService ?? $this->createMock(AuthorizeServiceInterface::class),
-            userRepository: $userRepository ?? $this->createMock(UserRepositoryInterface::class),
-            pwdServiceBridge: $pwdServiceBridge ?? $this->createMock(PasswordServiceBridgeInterface::class),
-            session: $session ?? $this->createMock(SessionInterface::class),
-            request: $request ?? $this->createMock(Request::class),
-            utils: $utils ?? $this->createMock(Utils::class),
+            authorizeService: $authorizeService ?? $this->createStub(AuthorizeServiceInterface::class),
+            userFactory: $userFactory ?? $this->createStub(UserFactoryInterface::class),
+            session: $session ?? $this->createStub(SessionInterface::class),
+            utils: $utils ?? $this->createStub(Utils::class),
+            config: $config ?? $this->createStub(Config::class),
         );
     }
 }
