@@ -51,22 +51,16 @@ git clone --recurse-submodules https://github.com/OXID-eSales/security-module.gi
 You should be able to access the shop with http://localhost.local and the admin panel with http://localhost.local/admin
 (credentials: noreply@oxid-esales.com / admin)
 
-## Password strength and Captcha protection
+## Features
+
+### Password Strength Policy
 
 This module provides password strength estimation for any string input.
 It can validate password length and character variety based on configurable settings.
 It also includes a visual password strength indicator with a progress bar for real-time feedback via an Ajax widget.
 
-Additionally, the module features Image Captcha protection to prevent automated bot submissions.
-Users must enter the text displayed in the captcha image, with an audio captcha option available for accessibility.
-A honeypot captcha is also implemented as a hidden field to detect and block bots without affecting the user experience.
+#### Configuration
 
-### Configuration
-
-The module configurations provide an option to Enable/Disable any of the features -
-Password strength estimation, Image Captcha protection, Honeypot Captcha protection.
-
-Configurable options for password strength estimation are:
 - Enable/Disable password strength estimation
 - Minimum password length
 - Uppercase character requirement
@@ -74,10 +68,50 @@ Configurable options for password strength estimation are:
 - Digit requirement
 - Special character requirement
 
-Configurable options for Captcha protection are:
+### Captcha Protection
+
+The module features Image Captcha protection to prevent automated bot submissions.
+Users must enter the text displayed in the captcha image, with an audio captcha option available for accessibility.
+A honeypot captcha is also implemented as a hidden field to detect and block bots without affecting the user experience.
+
+#### Configuration
+
 - Enable/Disable Image Captcha protection
 - Enable/Disable Honeypot Captcha protection
-- Image Captcha lifetime
+- Image Captcha lifetime (5min, 15min, 30min)
+
+### Two-Factor Authentication (2FA)
+
+The module provides Two-Factor Authentication using email-based One-Time Password (OTP) verification.
+When enabled, users are required to enter a verification code sent to their email address after logging in with their credentials.
+
+#### Configuration
+
+- Enable/Disable Two-Factor Authentication
+- Verification type (currently supports OTP)
+
+### OAuth Social Login
+
+The module supports social login integration, allowing users to authenticate using their existing social media accounts.
+This provides a convenient and secure way for customers to log in without creating a separate password.
+
+#### Supported Providers
+
+**Facebook Login**
+- Enable/Disable Facebook login
+- Facebook Client ID
+- Facebook Client Secret
+- Facebook Redirect URL
+
+**Google Login**
+- Enable/Disable Google login
+- Google Client ID
+- Google Client Secret
+- Google Redirect URL
+
+To configure OAuth providers, you need to create applications in the respective developer consoles
+([Facebook Developers](https://developers.facebook.com/), [Google Cloud Console](https://console.cloud.google.com/))
+and obtain the Client ID and Client Secret credentials.
 
 ### Running the tests and quality tools
 

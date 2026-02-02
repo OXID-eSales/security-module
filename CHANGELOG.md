@@ -4,12 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.1.0] - unreleased
+## [3.0.0] - unreleased
+
+### Added
+- Two-Factor Authentication (2FA) with email OTP verification
+- Facebook login OAuth provider
+- Google login OAuth provider
+
+## [2.1.0] - 2026-01-14
 
 ### Added
 - Extracted reusable Twig code into captcha.html.twig and password.html.twig
-- Facebook login OAuth-provider
-- Google login OAuth-provider
 
 ### Changed
 - Show multiple errors on invalid password

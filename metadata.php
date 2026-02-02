@@ -174,7 +174,7 @@ $aModule = [
             'group' => 'two_factor_auth',
             'name'  => TwoFactorAuthModuleSettings::TWO_FACTOR_TYPE,
             'type'  => 'select',
-            'constraints' => 'otp|totp',
+            'constraints' => 'otp',
             'value' => 'otp'
         ],
     ],
