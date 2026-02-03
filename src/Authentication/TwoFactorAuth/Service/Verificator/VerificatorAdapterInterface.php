@@ -16,4 +16,6 @@ interface VerificatorAdapterInterface
     public function generate(string $userId): string;
 
     public function getVerificationUrl(): string;
+
+    public function getRemainingAttempts(string $userId): int;
 }

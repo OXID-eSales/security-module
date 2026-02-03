@@ -4,15 +4,38 @@
  */
 
 export class ResendOtp {
-    constructor(button, { hintId = 'resend-hint' } = {}) {
+    constructor(button, options = {}) {
+        const {
+            hintId = 'resend-hint',
+            submitButtonId = 'auth_submit',
+            attemptsDisplayId = 'remaining-attempts',
+            codeInputId = 'auth_code',
+            maxAttempts = 5
+        } = options;
+
         this.btn = button;
         this.hint = document.getElementById(hintId);
+        this.submitBtn = document.getElementById(submitButtonId);
+        this.attemptsDisplay = document.getElementById(attemptsDisplayId);
+        this.codeInput = document.getElementById(codeInputId);
+        this.maxAttempts = maxAttempts;
 
         this.cooldownSeconds = Number(button.dataset.cooldown || 60);
         this.url = button.dataset.url;
         this.storageKey = `otp_resend_until_${this.url}`;
 
         this.timer = null;
+
+        this.initAttemptsCheck();
+    }
+
+    initAttemptsCheck() {
+        if (this.attemptsDisplay) {
+            const attempts = parseInt(this.attemptsDisplay.textContent, 10);
+            if (attempts === 0) {
+                this.disableSubmit();
+            }
+        }
     }
 
     async resend() {
@@ -31,10 +54,37 @@ export class ResendOtp {
             this.storeUntil(until);
             this.startCooldown(until);
 
+            this.resetAttempts();
+
         } catch (e) {
             console.error(e);
             this.unlock();
             this.setHint('Could not resend code.');
+        }
+    }
+
+    resetAttempts() {
+        if (this.attemptsDisplay) {
+            this.attemptsDisplay.textContent = this.maxAttempts;
+        }
+        this.enableSubmit();
+    }
+
+    disableSubmit() {
+        if (this.submitBtn) {
+            this.submitBtn.disabled = true;
+        }
+        if (this.codeInput) {
+            this.codeInput.disabled = true;
+        }
+    }
+
+    enableSubmit() {
+        if (this.submitBtn) {
+            this.submitBtn.disabled = false;
+        }
+        if (this.codeInput) {
+            this.codeInput.disabled = false;
         }
     }
 
@@ -83,7 +133,7 @@ export class ResendOtp {
         localStorage.removeItem(this.storageKey);
     }
 
-    restoreIfNeeded() {
+    restoreOnRefresh() {
         console.log('Restoring OTP resend cooldown if needed');
         const until = this.getStoredUntil();
         if (until && until > Date.now()) {

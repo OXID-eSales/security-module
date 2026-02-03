@@ -14,4 +14,6 @@ interface AuthorizeServiceInterface
     public function generate(): void;
 
     public function getVerificationUrl(): string;
+
+    public function getRemainingAttempts(): int;
 }

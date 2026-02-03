@@ -50,4 +50,7 @@ $aLang = [
     'ERROR_INVALID_CODE'           => 'Der Bestätigungscode ist ungültig. Bitte versuchen Sie es erneut.',
     'ERROR_CODE_TIME_EXPIRED'      => 'Der Bestätigungscode ist abgelaufen. Bitte fordern Sie einen neuen Code an.',
     'ERROR_ATTEMPT_LIMIT_EXCEEDED' => 'Zu viele fehlgeschlagene Versuche. Bitte fordern Sie einen neuen Code an.',
+
+    'OE_SECURITY_REMAINING_ATTEMPTS' => 'Verbleibende Versuche',
+    'OE_SECURITY_ENTER_CODE'         => 'Bestätigungscode',
 ];

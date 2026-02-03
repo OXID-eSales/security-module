@@ -60,6 +60,13 @@ class OTPValidatorTest extends TestCase
         $OTPValidator->checkExpirationTime(new DateTime('-1 hour'));
     }
 
+    public function testGetMaxAttemptsReturnsExpectedValue(): void
+    {
+        $OTPValidator = $this->getSut();
+
+        $this->assertEquals(5, $OTPValidator->getMaxAttempts());
+    }
+
     public function getSut(): OTPValidatorInterface
     {
         return new OTPValidator();

@@ -20,4 +20,6 @@ interface OTPValidatorInterface
     public function checkLoginAttempts(int $attempts): void;
 
     public function checkExpirationTime(?DateTimeInterface $expiresAt): void;
+
+    public function getMaxAttempts(): int;
 }

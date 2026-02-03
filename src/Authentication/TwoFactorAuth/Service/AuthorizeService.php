@@ -72,4 +72,17 @@ class AuthorizeService implements AuthorizeServiceInterface
 
         return $verificator->getVerificationUrl();
     }
+
+    public function getRemainingAttempts(): int
+    {
+        $activeVerificator = $this->moduleSettings->getTwoFactorAuthType();
+
+        $verificator = $this->verifyCollector->getVerificator(
+            $activeVerificator
+        );
+
+        $userId = $this->session->get(self::USER_SESSION_KEY);
+
+        return $verificator->getRemainingAttempts($userId);
+    }
 }

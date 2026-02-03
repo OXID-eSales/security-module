@@ -45,4 +45,9 @@ readonly class OTPValidator implements OTPValidatorInterface
             throw new TimeExpiredException();
         }
     }
+
+    public function getMaxAttempts(): int
+    {
+        return self::MAX_ATTEMPTS;
+    }
 }

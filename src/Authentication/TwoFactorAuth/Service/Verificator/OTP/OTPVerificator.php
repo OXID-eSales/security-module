@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\Verificator\OTP;
 
 use OxidEsales\Eshop\Core\Config;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\AttemptLimitExceededException;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\InvalidCodeException;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository\UserRepositoryInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\Verificator\OTP\Generator\OTPGeneratorInterface;
@@ -42,6 +43,10 @@ class OTPVerificator implements VerificatorAdapterInterface
             $this->otpValidator->validateCode($otpData->getCode(), $inputCode);
         } catch (InvalidCodeException $e) {
             $this->userRepository->updateAttempts($userId, $otpData->getAttempts() + 1);
+            if ($this->getRemainingAttempts($userId) === 0) {
+                throw new AttemptLimitExceededException();
+            }
+
             throw $e;
         }
 
@@ -56,5 +61,13 @@ class OTPVerificator implements VerificatorAdapterInterface
     public function getVerificationUrl(): string
     {
         return $this->config->getShopHomeUrl() . 'cl=twofactorauth';
+    }
+
+    public function getRemainingAttempts(string $userId): int
+    {
+        $otpData = $this->userRepository->getUserOTPData($userId);
+        $maxAttempts = $this->otpValidator->getMaxAttempts();
+
+        return max(0, $maxAttempts - $otpData->getAttempts());
     }
 }
