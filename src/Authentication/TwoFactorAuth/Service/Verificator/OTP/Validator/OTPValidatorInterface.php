@@ -15,7 +15,7 @@ interface OTPValidatorInterface
     /**
      * @throws InvalidCodeException
      */
-    public function validateCode(?string $userCode, string $inputCode): void;
+    public function validateCode(#[\SensitiveParameter] ?string $userCode, #[\SensitiveParameter] string $inputCode): void;
 
     public function checkLoginAttempts(int $attempts): void;
 

@@ -43,7 +43,6 @@ $aModule = [
     'controllers' => [
         'captcha' => \OxidEsales\SecurityModule\Captcha\Controller\CaptchaController::class,
         'password' => \OxidEsales\SecurityModule\PasswordPolicy\Controller\PasswordAjaxController::class,
-        'oauth' => \OxidEsales\SecurityModule\Authentication\OAuth2\Controller\OAuthController::class,
     ],
     'templates'   => [
     ],

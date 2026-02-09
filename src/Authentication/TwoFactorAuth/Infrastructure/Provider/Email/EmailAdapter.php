@@ -24,7 +24,7 @@ class EmailAdapter implements NotifierAdapterInterface
         return 'email';
     }
 
-    public function notify(string $recipient, string $code): void
+    public function notify(string $recipient, #[\SensitiveParameter] string $code): void
     {
         //todo: replayto is same as recipient
         $emailModel = $this->emailFactory->create();

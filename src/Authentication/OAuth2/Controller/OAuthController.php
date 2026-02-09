@@ -8,45 +8,43 @@
 namespace OxidEsales\SecurityModule\Authentication\OAuth2\Controller;
 
 use OxidEsales\Eshop\Application\Controller\FrontendController;
-use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\SecurityModule\Authentication\OAuth2\Service\ProviderCollectorInterface;
-use OxidEsales\SecurityModule\Authentication\OAuth2\Service\UserServiceInterface;
-use OxidEsales\SecurityModule\Authentication\Session\SessionKeys;
+use OxidEsales\Eshop\Core\Utils;
+use OxidEsales\SecurityModule\Authentication\OAuth2\Service\AuthenticationServiceInterface;
+use OxidEsales\SecurityModule\Authentication\OAuth2\Transput\OAuthRequestInterface;
+use OxidEsales\SecurityModule\Authentication\Service\InternalRedirectServiceInterface;
 
 class OAuthController extends FrontendController
 {
+    public function __construct(
+        private readonly AuthenticationServiceInterface $authenticationService,
+        private readonly OAuthRequestInterface $oauthRequest,
+        private readonly InternalRedirectServiceInterface $redirectService,
+        private readonly Utils $utils,
+    ) {
+        parent::__construct();
+    }
+
     public function login(): void
     {
-        $providerName = $_GET['provider'] ?? '';
+        $authorizationUrl = $this->authenticationService->getAuthorizationUrl(
+            $this->oauthRequest->getProvider()
+        );
 
-        $providerCollector = $this->getService(ProviderCollectorInterface::class);
-
-        $provider = $providerCollector->getProvider($providerName);
-
-        Registry::getUtils()->redirect($provider->getAuthorizationUrl());
+        $this->utils->redirect($authorizationUrl);
     }
 
     public function redirect(): void
     {
-        $providerName = $_GET['provider'] ?? '';
-
-        $provider = $this
-            ->getService(ProviderCollectorInterface::class)
-            ->getProvider($providerName);
-
-        $accessToken = $provider->getAccessToken($_GET['code']);
-
-        $userDTO = $provider->getUserInfo($accessToken);
-
-        $this
-            ->getService(UserServiceInterface::class)
-            ->login($userDTO);
-
-        $redirectUrl = Registry::getSession()->getVariable(SessionKeys::AUTH_REDIRECT_URL);
-        if (!$redirectUrl) {
-            $redirectUrl = Registry::getConfig()->getShopHomeUrl();
+        if ($this->oauthRequest->hasError()) {
+            $this->utils->redirect($this->redirectService->getRedirectUrl(), false);
+            return;
         }
 
-        Registry::getUtils()->redirect($redirectUrl, false);
+        $this->authenticationService->handleCallback(
+            $this->oauthRequest->getProvider(),
+            $this->oauthRequest->getCode()
+        );
+
+        $this->utils->redirect($this->redirectService->getRedirectUrl(), false);
     }
 }

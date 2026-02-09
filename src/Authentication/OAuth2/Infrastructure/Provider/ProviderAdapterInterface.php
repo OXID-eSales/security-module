@@ -31,7 +31,7 @@ interface ProviderAdapterInterface
     /**
      * Exchange the authorization code for an access token.
      */
-    public function getAccessToken(string $code): AccessTokenInterface;
+    public function getAccessToken(#[\SensitiveParameter] string $code): AccessTokenInterface;
 
     /**
      * Fetch user information (claims) from the provider using the access token.

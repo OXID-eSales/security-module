@@ -47,7 +47,7 @@ class GoogleAdapter implements ProviderAdapterInterface
         return $this->provider->getAuthorizationUrl($options);
     }
 
-    public function getAccessToken(string $code): AccessTokenInterface
+    public function getAccessToken(#[\SensitiveParameter] string $code): AccessTokenInterface
     {
         return $this->provider->getAccessToken('authorization_code', [
             'code' => $code,

@@ -17,3 +17,7 @@ services:
     arguments:
       $providers: !tagged 'security.oauth.tag.provider'
 
+  OxidEsales\SecurityModule\Authentication\OAuth2\Service\AuthenticationServiceInterface:
+    class: OxidEsales\SecurityModule\Authentication\OAuth2\Service\AuthenticationService
+    public: true
+

@@ -11,7 +11,7 @@ interface VerificatorAdapterInterface
 {
     public function getName(): string;
 
-    public function validateCode(string $userId, string $inputCode): void;
+    public function validateCode(string $userId, #[\SensitiveParameter] string $inputCode): void;
 
     public function generate(string $userId): string;
 

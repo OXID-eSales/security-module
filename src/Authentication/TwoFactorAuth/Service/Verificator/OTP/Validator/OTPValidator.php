@@ -18,7 +18,7 @@ readonly class OTPValidator implements OTPValidatorInterface
 {
     private const MAX_ATTEMPTS = 5;
 
-    public function validateCode(?string $userCode, string $inputCode): void
+    public function validateCode(#[\SensitiveParameter] ?string $userCode, #[\SensitiveParameter] string $inputCode): void
     {
         if (!$userCode || empty($inputCode)) {
             throw new InvalidCodeException();

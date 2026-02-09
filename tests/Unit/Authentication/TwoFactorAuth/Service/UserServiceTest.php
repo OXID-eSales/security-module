@@ -10,9 +10,9 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Tests\Unit\Authentication\TwoFactorAuth\Service;
 
 use OxidEsales\Eshop\Application\Model\User;
-use OxidEsales\Eshop\Core\Config;
 use OxidEsales\Eshop\Core\Utils;
 use OxidEsales\EshopCommunity\Internal\Framework\Session\SessionInterface;
+use OxidEsales\SecurityModule\Authentication\Service\InternalRedirectServiceInterface;
 use OxidEsales\SecurityModule\Authentication\Session\SessionKeys;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\UserFactoryInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\AuthorizeService;
@@ -84,7 +84,7 @@ class UserServiceTest extends TestCase
     {
         $userId = uniqid();
         $userName = uniqid();
-        $shopHomeUrl = uniqid();
+        $redirectUrl = uniqid();
 
         $sessionStub = $this->createStub(SessionInterface::class);
         $sessionStub->method('get')
@@ -110,19 +110,19 @@ class UserServiceTest extends TestCase
         $userFactoryStub = $this->createStub(UserFactoryInterface::class);
         $userFactoryStub->method('create')->willReturn($userSpy);
 
-        $configStub = $this->createStub(Config::class);
-        $configStub->method('getShopHomeUrl')->willReturn($shopHomeUrl);
+        $redirectServiceStub = $this->createStub(InternalRedirectServiceInterface::class);
+        $redirectServiceStub->method('getRedirectUrl')->willReturn($redirectUrl);
 
         $utilsSpy = $this->createMock(Utils::class);
         $utilsSpy->expects($this->once())
             ->method('redirect')
-            ->with($shopHomeUrl, false);
+            ->with($redirectUrl, false);
 
         $sut = $this->getSut(
             userFactory: $userFactoryStub,
             session: $sessionStub,
             utils: $utilsSpy,
-            config: $configStub,
+            redirectService: $redirectServiceStub,
         );
 
         $sut->finalizeLogin();
@@ -151,113 +151,21 @@ class UserServiceTest extends TestCase
         $userFactoryStub = $this->createStub(UserFactoryInterface::class);
         $userFactoryStub->method('create')->willReturn($userStub);
 
-        $configStub = $this->createStub(Config::class);
-        $configStub->method('getShopHomeUrl')->willReturn(uniqid());
-
         $utilsStub = $this->createStub(Utils::class);
 
         $sut = $this->getSut(
             userFactory: $userFactoryStub,
             session: $sessionSpy,
             utils: $utilsStub,
-            config: $configStub,
         );
 
         $sut->finalizeLogin();
     }
 
-    public function testFinalizeLoginRedirectsToStoredUrlWhenInternal(): void
+    public function testFinalizeLoginRedirectsToUrlFromRedirectService(): void
     {
         $userId = uniqid();
-        $shopUrl = uniqid();
-        $storedUrl = $shopUrl . uniqid();
-
-        $sessionStub = $this->createStub(SessionInterface::class);
-        $sessionStub->method('get')
-            ->willReturnCallback(function ($key) use ($userId, $storedUrl) {
-                if ($key === AuthorizeService::USER_SESSION_KEY) {
-                    return $userId;
-                }
-                if ($key === SessionKeys::AUTH_REDIRECT_URL) {
-                    return $storedUrl;
-                }
-                return null;
-            });
-
-        $userStub = $this->createStub(User::class);
-        $userStub->method('getFieldData')->willReturn(uniqid());
-
-        $userFactoryStub = $this->createStub(UserFactoryInterface::class);
-        $userFactoryStub->method('create')->willReturn($userStub);
-
-        $configStub = $this->createStub(Config::class);
-        $configStub->method('getShopUrl')->willReturn($shopUrl);
-        $configStub->method('getSslShopUrl')->willReturn($shopUrl);
-        $configStub->method('getShopHomeUrl')->willReturn($shopUrl);
-
-        $utilsSpy = $this->createMock(Utils::class);
-        $utilsSpy->expects($this->once())
-            ->method('redirect')
-            ->with($storedUrl, false);
-
-        $sut = $this->getSut(
-            userFactory: $userFactoryStub,
-            session: $sessionStub,
-            utils: $utilsSpy,
-            config: $configStub,
-        );
-
-        $sut->finalizeLogin();
-    }
-
-    public function testFinalizeLoginRedirectsToShopHomeWhenStoredUrlIsExternal(): void
-    {
-        $userId = uniqid();
-        $shopUrl = uniqid();
-        $externalUrl = uniqid();
-
-        $sessionStub = $this->createStub(SessionInterface::class);
-        $sessionStub->method('get')
-            ->willReturnCallback(function ($key) use ($userId, $externalUrl) {
-                if ($key === AuthorizeService::USER_SESSION_KEY) {
-                    return $userId;
-                }
-                if ($key === SessionKeys::AUTH_REDIRECT_URL) {
-                    return $externalUrl;
-                }
-                return null;
-            });
-
-        $userStub = $this->createStub(User::class);
-        $userStub->method('getFieldData')->willReturn('user@example.com');
-
-        $userFactoryStub = $this->createStub(UserFactoryInterface::class);
-        $userFactoryStub->method('create')->willReturn($userStub);
-
-        $configStub = $this->createStub(Config::class);
-        $configStub->method('getShopUrl')->willReturn($shopUrl);
-        $configStub->method('getSslShopUrl')->willReturn($shopUrl);
-        $configStub->method('getShopHomeUrl')->willReturn($shopUrl);
-
-        $utilsSpy = $this->createMock(Utils::class);
-        $utilsSpy->expects($this->once())
-            ->method('redirect')
-            ->with($shopUrl, false);
-
-        $sut = $this->getSut(
-            userFactory: $userFactoryStub,
-            session: $sessionStub,
-            utils: $utilsSpy,
-            config: $configStub,
-        );
-
-        $sut->finalizeLogin();
-    }
-
-    public function testFinalizeLoginRedirectsToShopHomeWhenNoStoredUrl(): void
-    {
-        $userId = uniqid();
-        $shopHomeUrl = uniqid();
+        $redirectUrl = uniqid();
 
         $sessionStub = $this->createStub(SessionInterface::class);
         $sessionStub->method('get')
@@ -269,24 +177,24 @@ class UserServiceTest extends TestCase
             });
 
         $userStub = $this->createStub(User::class);
-        $userStub->method('getFieldData')->willReturn('user@example.com');
+        $userStub->method('getFieldData')->willReturn(uniqid());
 
         $userFactoryStub = $this->createStub(UserFactoryInterface::class);
         $userFactoryStub->method('create')->willReturn($userStub);
 
-        $configStub = $this->createStub(Config::class);
-        $configStub->method('getShopHomeUrl')->willReturn($shopHomeUrl);
+        $redirectServiceStub = $this->createStub(InternalRedirectServiceInterface::class);
+        $redirectServiceStub->method('getRedirectUrl')->willReturn($redirectUrl);
 
         $utilsSpy = $this->createMock(Utils::class);
         $utilsSpy->expects($this->once())
             ->method('redirect')
-            ->with($shopHomeUrl, false);
+            ->with($redirectUrl, false);
 
         $sut = $this->getSut(
             userFactory: $userFactoryStub,
             session: $sessionStub,
             utils: $utilsSpy,
-            config: $configStub,
+            redirectService: $redirectServiceStub,
         );
 
         $sut->finalizeLogin();
@@ -297,14 +205,14 @@ class UserServiceTest extends TestCase
         UserFactoryInterface $userFactory = null,
         SessionInterface $session = null,
         Utils $utils = null,
-        Config $config = null,
+        InternalRedirectServiceInterface $redirectService = null,
     ): UserServiceInterface {
         return new UserService(
             authorizeService: $authorizeService ?? $this->createStub(AuthorizeServiceInterface::class),
             userFactory: $userFactory ?? $this->createStub(UserFactoryInterface::class),
             session: $session ?? $this->createStub(SessionInterface::class),
             utils: $utils ?? $this->createStub(Utils::class),
-            config: $config ?? $this->createStub(Config::class),
+            redirectService: $redirectService ?? $this->createStub(InternalRedirectServiceInterface::class),
         );
     }
 }

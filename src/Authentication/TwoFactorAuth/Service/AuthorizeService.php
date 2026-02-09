@@ -26,7 +26,7 @@ class AuthorizeService implements AuthorizeServiceInterface
     ) {
     }
 
-    public function validate(string $inputCode): void
+    public function validate(#[\SensitiveParameter] string $inputCode): void
     {
         $activeVerificator = $this->moduleSettings->getTwoFactorAuthType();
 
@@ -83,4 +83,5 @@ class AuthorizeService implements AuthorizeServiceInterface
 
         return $verificator->getRemainingAttempts($userId);
     }
+
 }

@@ -1,0 +1,10 @@
+services:
+  _defaults:
+    autowire: true
+    public: false
+    bind:
+      OxidEsales\Eshop\Core\Config: '@=service("OxidEsales\\SecurityModule\\Core\\Registry").getConfig()'
+
+  OxidEsales\SecurityModule\Authentication\Service\InternalRedirectServiceInterface:
+    class: OxidEsales\SecurityModule\Authentication\Service\InternalRedirectService
+    public: true

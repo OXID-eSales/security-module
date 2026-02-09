@@ -32,7 +32,7 @@ class OTPVerificator implements VerificatorAdapterInterface
         return 'otp';
     }
 
-    public function validateCode(string $userId, string $inputCode): void
+    public function validateCode(string $userId, #[\SensitiveParameter] string $inputCode): void
     {
         $otpData = $this->userRepository->getUserOTPData($userId);
 
@@ -66,8 +66,7 @@ class OTPVerificator implements VerificatorAdapterInterface
     public function getRemainingAttempts(string $userId): int
     {
         $otpData = $this->userRepository->getUserOTPData($userId);
-        $maxAttempts = $this->otpValidator->getMaxAttempts();
 
-        return max(0, $maxAttempts - $otpData->getAttempts());
+        return max(0, $this->otpValidator->getMaxAttempts() - $otpData->getAttempts());
     }
 }

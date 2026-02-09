@@ -11,5 +11,5 @@ interface NotifierAdapterInterface
 {
     public function getName(): string;
 
-    public function notify(string $recipient, string $code): void;
+    public function notify(string $recipient, #[\SensitiveParameter] string $code): void;
 }

@@ -29,7 +29,7 @@ use OxidEsales\SecurityModule\Shared\Core\InputValidator;
  */
 class User extends User_parent
 {
-    public function checkValues($sLogin, $sPassword, $sPassword2, $aInvAddress, $aDelAddress): void
+    public function checkValues($sLogin, #[\SensitiveParameter] $sPassword, #[\SensitiveParameter] $sPassword2, $aInvAddress, $aDelAddress): void
     {
         if ($this->isCaptchaEnabled() && $this->shouldValidateCaptcha()) {
             /** @var InputValidator $oInputValidator */
@@ -59,7 +59,7 @@ class User extends User_parent
     /**
      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      */
-    public function login($userName, $password, $setSessionCookie = false): bool
+    public function login($userName, #[\SensitiveParameter] $password, $setSessionCookie = false): bool
     {
         if ($this->isAdmin()) {
             return parent::login($userName, $password, $setSessionCookie);
@@ -81,7 +81,7 @@ class User extends User_parent
     }
 
     /** @phpstan-ignore missingType.return (inherited from parent without return type) */
-    protected function onLogin($userName, $password)
+    protected function onLogin($userName, #[\SensitiveParameter] $password)
     {
         parent::onLogin($userName, $password);
 
