@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Tests\Unit\Authentication\OAuth2\Service;
 
+use OxidEsales\Eshop\Core\Config;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Facade\ModuleSettingService;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Service\ModuleSettingsService;
 use OxidEsales\SecurityModule\Core\Module;
@@ -25,13 +26,11 @@ class ModuleSettingsServiceTest extends TestCase
             self::prepareBooleanSetting('isFacebookLoginEnabled', ModuleSettingsService::FACEBOOK_LOGIN_ENABLED, false),
             self::prepareStringTestItem('getFacebookClientId', ModuleSettingsService::FACEBOOK_CLIENT_ID),
             self::prepareStringTestItem('getFacebookClientSecret', ModuleSettingsService::FACEBOOK_CLIENT_SECRET),
-            self::prepareStringTestItem('getFacebookRedirectUrl', ModuleSettingsService::FACEBOOK_REDIRECT_URL),
 
             self::prepareBooleanSetting('isGoogleLoginEnabled', ModuleSettingsService::GOOGLE_LOGIN_ENABLED, true),
             self::prepareBooleanSetting('isGoogleLoginEnabled', ModuleSettingsService::GOOGLE_LOGIN_ENABLED, false),
             self::prepareStringTestItem('getGoogleClientId', ModuleSettingsService::GOOGLE_CLIENT_ID),
             self::prepareStringTestItem('getGoogleClientSecret', ModuleSettingsService::GOOGLE_CLIENT_SECRET),
-            self::prepareStringTestItem('getGoogleRedirectUrl', ModuleSettingsService::GOOGLE_REDIRECT_URL),
         ];
     }
 
@@ -44,7 +43,9 @@ class ModuleSettingsServiceTest extends TestCase
             Module::MODULE_ID
         )->willReturn($mockValue);
 
-        $sut = new ModuleSettingsService($mssMock);
+        $configMock = $this->createMock(Config::class);
+
+        $sut = new ModuleSettingsService($mssMock, $configMock);
         $this->assertSame($expectedValue, $sut->$method());
     }
 
@@ -94,7 +95,72 @@ class ModuleSettingsServiceTest extends TestCase
             ->method('saveBoolean')
             ->with($key, $value, Module::MODULE_ID);
 
-        $sut = new ModuleSettingsService($mssMock);
+        $configMock = $this->createMock(Config::class);
+
+        $sut = new ModuleSettingsService($mssMock, $configMock);
         $sut->$method($value);
+    }
+
+    public static function redirectUrlDataProvider(): array
+    {
+        return [
+            'facebook' => [
+                'method' => 'getFacebookRedirectUrl',
+                'settingKey' => ModuleSettingsService::FACEBOOK_REDIRECT_URL,
+                'provider' => 'facebook',
+            ],
+            'google' => [
+                'method' => 'getGoogleRedirectUrl',
+                'settingKey' => ModuleSettingsService::GOOGLE_REDIRECT_URL,
+                'provider' => 'google',
+            ],
+        ];
+    }
+
+    #[DataProvider('redirectUrlDataProvider')]
+    public function testRedirectUrlIsGeneratedFromConfig(
+        string $method,
+        string $settingKey,
+        string $provider
+    ): void {
+        $shopUrl = 'https://myshop.com/';
+        $expectedUrl = $shopUrl . 'index.php?cl=oauth&fnc=redirect&provider=' . $provider;
+
+        $configMock = $this->createMock(Config::class);
+        $configMock->method('getShopUrl')->willReturn($shopUrl);
+
+        $mssMock = $this->createPartialMock(ModuleSettingService::class, ['getString', 'saveString']);
+        $mssMock->method('getString')
+            ->with($settingKey, Module::MODULE_ID)
+            ->willReturn(new UnicodeString('old-value'));
+        $mssMock->expects($this->once())
+            ->method('saveString')
+            ->with($settingKey, $expectedUrl, Module::MODULE_ID);
+
+        $sut = new ModuleSettingsService($mssMock, $configMock);
+        $this->assertSame($expectedUrl, $sut->$method());
+    }
+
+    #[DataProvider('redirectUrlDataProvider')]
+    public function testRedirectUrlSkipsSaveWhenUnchanged(
+        string $method,
+        string $settingKey,
+        string $provider
+    ): void {
+        $shopUrl = 'https://myshop.com/';
+        $expectedUrl = $shopUrl . 'index.php?cl=oauth&fnc=redirect&provider=' . $provider;
+
+        $configMock = $this->createMock(Config::class);
+        $configMock->method('getShopUrl')->willReturn($shopUrl);
+
+        $mssMock = $this->createPartialMock(ModuleSettingService::class, ['getString', 'saveString']);
+        $mssMock->method('getString')
+            ->with($settingKey, Module::MODULE_ID)
+            ->willReturn(new UnicodeString($expectedUrl));
+        $mssMock->expects($this->never())
+            ->method('saveString');
+
+        $sut = new ModuleSettingsService($mssMock, $configMock);
+        $this->assertSame($expectedUrl, $sut->$method());
     }
 }

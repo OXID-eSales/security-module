@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Authentication\OAuth2\Service;
 
+use OxidEsales\Eshop\Core\Config;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Facade\ModuleSettingServiceInterface;
 use OxidEsales\SecurityModule\Core\Module;
 
@@ -24,7 +25,8 @@ class ModuleSettingsService implements ModuleSettingsServiceInterface
     public const GOOGLE_REDIRECT_URL = 'oeSecurityGoogleRedirectUrl';
 
     public function __construct(
-        private readonly ModuleSettingServiceInterface $moduleSettingService
+        private readonly ModuleSettingServiceInterface $moduleSettingService,
+        private readonly Config $config
     ) {
     }
 
@@ -50,7 +52,7 @@ class ModuleSettingsService implements ModuleSettingsServiceInterface
 
     public function getFacebookRedirectUrl(): string
     {
-        return $this->getStringValue(self::FACEBOOK_REDIRECT_URL);
+        return $this->generateRedirectUrl('facebook', self::FACEBOOK_REDIRECT_URL);
     }
 
     public function isGoogleLoginEnabled(): bool
@@ -75,7 +77,19 @@ class ModuleSettingsService implements ModuleSettingsServiceInterface
 
     public function getGoogleRedirectUrl(): string
     {
-        return $this->getStringValue(self::GOOGLE_REDIRECT_URL);
+        return $this->generateRedirectUrl('google', self::GOOGLE_REDIRECT_URL);
+    }
+
+    private function generateRedirectUrl(string $provider, string $settingKey): string
+    {
+        $url = $this->config->getShopUrl() . 'index.php?cl=oauth&fnc=redirect&provider=' . $provider;
+
+        $storedValue = $this->getStringValue($settingKey);
+        if ($storedValue !== $url) {
+            $this->moduleSettingService->saveString($settingKey, $url, Module::MODULE_ID);
+        }
+
+        return $url;
     }
 
     private function getStringValue(string $key): string

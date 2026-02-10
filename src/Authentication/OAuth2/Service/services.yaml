@@ -2,6 +2,8 @@ services:
   _defaults:
     autowire: true
     public: false
+    bind:
+      OxidEsales\Eshop\Core\Config: '@=service("OxidEsales\\SecurityModule\\Core\\Registry").getConfig()'
 
   OxidEsales\SecurityModule\Authentication\OAuth2\Service\ModuleSettingsServiceInterface:
     class: OxidEsales\SecurityModule\Authentication\OAuth2\Service\ModuleSettingsService

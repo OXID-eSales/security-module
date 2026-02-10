@@ -9,7 +9,6 @@
  * Metadata version
  */
 
-use OxidEsales\SecurityModule\Authentication\OAuth2\Service\ModuleSettingsService;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\ModuleSettingsService as TwoFactorAuthModuleSettings;
 use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsService as PasswordPolicyModuleSettings;
 use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsService as CaptchaModuleSettings;
