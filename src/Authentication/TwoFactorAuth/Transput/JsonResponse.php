@@ -29,6 +29,8 @@ class JsonResponse implements JsonResponseInterface
     {
         $this->utils->setHeader('HTTP/1.1 ' . $this->statusCode);
         $this->utils->setHeader('Content-Type: application/json');
-        $this->utils->showMessageAndExit(json_encode($data));
+
+        $response = (string) json_encode($data);
+        $this->utils->showMessageAndExit($response);
     }
 }

@@ -92,5 +92,4 @@ class AuthorizeService implements AuthorizeServiceInterface
 
         return $verificator->getRemainingAttempts($userId);
     }
-
 }

@@ -114,7 +114,7 @@ class OAuthControllerTest extends TestCase
         Utils $utils = null,
     ): OAuthController {
         return new OAuthController(
-            authenticationService: $authenticationService ?? $this->createStub(AuthenticationServiceInterface::class),
+            authService: $authenticationService ?? $this->createStub(AuthenticationServiceInterface::class),
             oauthRequest: $oauthRequest ?? $this->createStub(OAuthRequestInterface::class),
             redirectService: $redirectService ?? $this->createStub(InternalRedirectServiceInterface::class),
             utils: $utils ?? $this->createStub(Utils::class),

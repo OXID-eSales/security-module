@@ -16,7 +16,7 @@ use OxidEsales\SecurityModule\Authentication\Service\InternalRedirectServiceInte
 class OAuthController extends FrontendController
 {
     public function __construct(
-        private readonly AuthenticationServiceInterface $authenticationService,
+        private readonly AuthenticationServiceInterface $authService,
         private readonly OAuthRequestInterface $oauthRequest,
         private readonly InternalRedirectServiceInterface $redirectService,
         private readonly Utils $utils,
@@ -26,7 +26,7 @@ class OAuthController extends FrontendController
 
     public function login(): void
     {
-        $authorizationUrl = $this->authenticationService->getAuthorizationUrl(
+        $authorizationUrl = $this->authService->getAuthorizationUrl(
             $this->oauthRequest->getProvider()
         );
 
@@ -40,7 +40,7 @@ class OAuthController extends FrontendController
             return;
         }
 
-        $this->authenticationService->handleCallback(
+        $this->authService->handleCallback(
             $this->oauthRequest->getProvider(),
             $this->oauthRequest->getCode()
         );

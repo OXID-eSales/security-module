@@ -29,8 +29,13 @@ use OxidEsales\SecurityModule\Shared\Core\InputValidator;
  */
 class User extends User_parent
 {
-    public function checkValues($sLogin, #[\SensitiveParameter] $sPassword, #[\SensitiveParameter] $sPassword2, $aInvAddress, $aDelAddress): void
-    {
+    public function checkValues(
+        $sLogin,
+        #[\SensitiveParameter] $sPassword,
+        #[\SensitiveParameter] $sPassword2,
+        $aInvAddress,
+        $aDelAddress
+    ): void {
         if ($this->isCaptchaEnabled() && $this->shouldValidateCaptcha()) {
             /** @var InputValidator $oInputValidator */
             $oInputValidator = Registry::getInputValidator();
