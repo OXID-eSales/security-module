@@ -15,6 +15,7 @@ use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\OTPValidati
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\AuthorizeServiceInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\UserServiceInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Transput\AuthCodeRequestInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Transput\JsonResponseInterface;
 
 class TwoFactorAuthController extends FrontendController
 {
@@ -31,6 +32,7 @@ class TwoFactorAuthController extends FrontendController
         private readonly UserServiceInterface $userService,
         private readonly AuthCodeRequestInterface $authCodeRequest,
         private readonly UtilsView $utilsView,
+        private readonly JsonResponseInterface $jsonResponse,
     ) {
         parent::__construct();
     }
@@ -52,6 +54,12 @@ class TwoFactorAuthController extends FrontendController
 
     public function resendCode(): void
     {
-        $this->authService->generate();
+        $success = $this->authService->resend();
+
+        if (!$success) {
+            $this->jsonResponse->setStatusCode(429);
+        }
+
+        $this->jsonResponse->send(['success' => $success]);
     }
 }

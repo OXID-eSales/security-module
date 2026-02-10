@@ -15,6 +15,7 @@ use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\InvalidCode
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\AuthorizeServiceInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\UserServiceInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Transput\AuthCodeRequestInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Transput\JsonResponseInterface;
 use PHPUnit\Framework\TestCase;
 
 class TwoFactorAuthControllerTest extends TestCase
@@ -115,14 +116,46 @@ class TwoFactorAuthControllerTest extends TestCase
         $controller->handleOTP();
     }
 
-    public function testResendCodeCallsGenerate(): void
+    public function testResendCodeSendsSuccessResponse(): void
     {
         $authServiceMock = $this->createMock(AuthorizeServiceInterface::class);
         $authServiceMock->expects($this->once())
-            ->method('generate');
+            ->method('resend')
+            ->willReturn(true);
+
+        $jsonResponseMock = $this->createMock(JsonResponseInterface::class);
+        $jsonResponseMock->expects($this->never())
+            ->method('setStatusCode');
+        $jsonResponseMock->expects($this->once())
+            ->method('send')
+            ->with(['success' => true]);
 
         $controller = $this->getSut(
             authService: $authServiceMock,
+            jsonResponse: $jsonResponseMock,
+        );
+
+        $controller->resendCode();
+    }
+
+    public function testResendCodeSends429WhenCooldownActive(): void
+    {
+        $authServiceMock = $this->createMock(AuthorizeServiceInterface::class);
+        $authServiceMock->expects($this->once())
+            ->method('resend')
+            ->willReturn(false);
+
+        $jsonResponseMock = $this->createMock(JsonResponseInterface::class);
+        $jsonResponseMock->expects($this->once())
+            ->method('setStatusCode')
+            ->with(429);
+        $jsonResponseMock->expects($this->once())
+            ->method('send')
+            ->with(['success' => false]);
+
+        $controller = $this->getSut(
+            authService: $authServiceMock,
+            jsonResponse: $jsonResponseMock,
         );
 
         $controller->resendCode();
@@ -133,12 +166,14 @@ class TwoFactorAuthControllerTest extends TestCase
         UserServiceInterface $userService = null,
         AuthCodeRequestInterface $authCodeRequest = null,
         UtilsView $utilsView = null,
+        JsonResponseInterface $jsonResponse = null,
     ): TwoFactorAuthController {
         return new TwoFactorAuthController(
             authService: $authService ?? $this->createStub(AuthorizeServiceInterface::class),
             userService: $userService ?? $this->createStub(UserServiceInterface::class),
             authCodeRequest: $authCodeRequest ?? $this->createStub(AuthCodeRequestInterface::class),
             utilsView: $utilsView ?? $this->createStub(UtilsView::class),
+            jsonResponse: $jsonResponse ?? $this->createStub(JsonResponseInterface::class),
         );
     }
 }

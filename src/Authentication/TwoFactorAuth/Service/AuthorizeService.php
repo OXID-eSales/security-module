@@ -48,16 +48,25 @@ class AuthorizeService implements AuthorizeServiceInterface
         );
 
         $userId = $this->session->get(self::USER_SESSION_KEY);
-        if (!$this->resendOTPService->canSend($userId)) {
-            return;
-        }
 
         $OTPCode = $verificator->generate($userId);
 
         $user = $this->userRepository->getUserOTPData($userId);
         $notifier = $this->notifierCollector->getNotifier('email');
         $notifier->notify($user->getEmail(), $OTPCode);
+    }
+
+    public function resend(): bool
+    {
+        $userId = $this->session->get(self::USER_SESSION_KEY);
+        if (!$this->resendOTPService->canSend($userId)) {
+            return false;
+        }
+
+        $this->generate();
         $this->resendOTPService->markAsSent($userId);
+
+        return true;
     }
 
     public function getVerificationUrl(): string

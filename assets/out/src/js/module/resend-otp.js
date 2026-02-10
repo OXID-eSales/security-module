@@ -48,10 +48,15 @@ export class ResendOtp {
         this.lock(this.textSending);
 
         try {
-            await fetch(this.url, {
+            const response = await fetch(this.url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' }
             });
+
+            if (!response.ok) {
+                this.unlock();
+                return;
+            }
 
             const until = Date.now() + this.cooldownSeconds * 1000;
             this.storeUntil(until);
