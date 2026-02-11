@@ -64,4 +64,11 @@ class ViewConfig extends ViewConfig_parent
     {
         return $this->getService(AuthorizeServiceInterface::class)->getRemainingAttempts();
     }
+
+    public function isExternalAuthUser(): bool
+    {
+        $user = $this->getUser();
+
+        return $user && (bool) $user->getFieldData('oesmexternalauth');
+    }
 }

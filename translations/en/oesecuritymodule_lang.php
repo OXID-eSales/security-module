@@ -56,4 +56,7 @@ $aLang = [
 
     'OE_SECURITY_REMAINING_ATTEMPTS' => 'Remaining attempts',
     'OE_SECURITY_ENTER_CODE'         => 'Verification code',
+
+    'OE_SECURITY_EXTERNAL_AUTH_PASSWORD_INFO' => 'You are signed in with an external provider. Password management is not available for this account.',
+    'OE_SECURITY_RESET_PASSWORD'              => 'Reset password',
 ];

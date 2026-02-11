@@ -41,9 +41,10 @@ class UserRepository implements UserRepositoryInterface
     {
         $userModel = $this->userFactory->create();
         $userModel->assign([
-            'OXFNAME'    => $userDTO->getFirstName(),
-            'OXLNAME'    => $userDTO->getLastName(),
-            'OXUSERNAME' => $userDTO->getEmail(),
+            'OXFNAME'          => $userDTO->getFirstName(),
+            'OXLNAME'          => $userDTO->getLastName(),
+            'OXUSERNAME'       => $userDTO->getEmail(),
+            'OESMEXTERNALAUTH' => 1,
         ]);
         $userModel->setPassword($this->passwordGenerator->generatePasswordForOAuthUser());
         $userModel->createUser();

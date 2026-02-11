@@ -56,4 +56,7 @@ $aLang = [
 
     'OE_SECURITY_REMAINING_ATTEMPTS' => 'Verbleibende Versuche',
     'OE_SECURITY_ENTER_CODE'         => 'Bestätigungscode',
+
+    'OE_SECURITY_EXTERNAL_AUTH_PASSWORD_INFO' => 'Sie sind mit einem externen Anbieter angemeldet. Die Passwortverwaltung ist für dieses Konto nicht verfügbar.',
+    'OE_SECURITY_RESET_PASSWORD'              => 'Passwort zurücksetzen',
 ];

@@ -106,9 +106,10 @@ class UserRepositoryTest extends TestCase
 
         $userModel = $this->createMock(UserModel::class);
         $userModel->method('assign')->with([
-            'OXFNAME'    => $firstName,
-            'OXLNAME'    => $lastName,
-            'OXUSERNAME' => $username,
+            'OXFNAME'          => $firstName,
+            'OXLNAME'          => $lastName,
+            'OXUSERNAME'       => $username,
+            'OESMEXTERNALAUTH' => 1,
         ]);
         $userModel->method('setPassword')->with($password);
 
