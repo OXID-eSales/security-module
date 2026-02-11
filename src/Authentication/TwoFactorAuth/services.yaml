@@ -3,4 +3,3 @@ imports:
   - { resource: Service/services.yaml }
   - { resource: Transput/services.yaml }
   - { resource: Controller/services.yaml }
-  - { resource: Subscriber/services.yaml }

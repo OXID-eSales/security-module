@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Tests\Integration\Authentication\OAuth2\Infrastructure\Factory;
 
 use League\OAuth2\Client\Provider\FacebookUser;
+use League\OAuth2\Client\Provider\GoogleUser;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Infrastructure\Factory\OAuth2UserDTOFactory;
 use PHPUnit\Framework\TestCase;
 
@@ -29,6 +30,26 @@ class OAuth2UserDTOFactoryTest extends TestCase
         $sut = new OAuth2UserDTOFactory();
 
         $result = $sut->createFromFacebookUser($facebookUserStub);
+
+        $this->assertSame($expectedFirstName, $result->getFirstName());
+        $this->assertSame($expectedLastName, $result->getLastName());
+        $this->assertSame($expectedEmail, $result->getEmail());
+    }
+
+    public function testCreateFromGoogleUser(): void
+    {
+        $expectedFirstName = uniqid();
+        $expectedLastName = uniqid();
+        $expectedEmail = uniqid();
+
+        $googleUserStub = $this->createStub(GoogleUser::class);
+        $googleUserStub->method('getFirstName')->willReturn($expectedFirstName);
+        $googleUserStub->method('getLastName')->willReturn($expectedLastName);
+        $googleUserStub->method('getEmail')->willReturn($expectedEmail);
+
+        $sut = new OAuth2UserDTOFactory();
+
+        $result = $sut->createFromGoogleUser($googleUserStub);
 
         $this->assertSame($expectedFirstName, $result->getFirstName());
         $this->assertSame($expectedLastName, $result->getLastName());

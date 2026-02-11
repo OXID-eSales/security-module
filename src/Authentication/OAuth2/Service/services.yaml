@@ -2,6 +2,8 @@ services:
   _defaults:
     autowire: true
     public: false
+    bind:
+      OxidEsales\Eshop\Core\Config: '@=service("OxidEsales\\SecurityModule\\Core\\Registry").getConfig()'
 
   OxidEsales\SecurityModule\Authentication\OAuth2\Service\ModuleSettingsServiceInterface:
     class: OxidEsales\SecurityModule\Authentication\OAuth2\Service\ModuleSettingsService
@@ -16,4 +18,8 @@ services:
     public: true
     arguments:
       $providers: !tagged 'security.oauth.tag.provider'
+
+  OxidEsales\SecurityModule\Authentication\OAuth2\Service\AuthenticationServiceInterface:
+    class: OxidEsales\SecurityModule\Authentication\OAuth2\Service\AuthenticationService
+    public: true
 

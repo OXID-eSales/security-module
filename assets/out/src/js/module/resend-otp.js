@@ -10,7 +10,7 @@ export class ResendOtp {
             submitButtonId = 'auth_submit',
             attemptsDisplayId = 'remaining-attempts',
             codeInputId = 'auth_code',
-            maxAttempts = 5
+            maxAttempts = 5,
         } = options;
 
         this.btn = button;
@@ -18,10 +18,14 @@ export class ResendOtp {
         this.submitBtn = document.getElementById(submitButtonId);
         this.attemptsDisplay = document.getElementById(attemptsDisplayId);
         this.codeInput = document.getElementById(codeInputId);
-        this.maxAttempts = maxAttempts;
 
         this.cooldownSeconds = Number(button.dataset.cooldown || 60);
+        this.maxAttempts = maxAttempts;
         this.url = button.dataset.url;
+        this.textDefault = button.dataset.textDefault;
+        this.textSending = button.dataset.textSending;
+        this.textError = button.dataset.textError;
+        this.textCountdown = button.dataset.textCountdown;
         this.storageKey = `otp_resend_until_${this.url}`;
 
         this.timer = null;
@@ -39,16 +43,20 @@ export class ResendOtp {
     }
 
     async resend() {
-        console.log('Resend OTP code requested');
         if (this.btn.disabled) return;
 
-        this.lock('Sending…');
+        this.lock(this.textSending);
 
         try {
-            await fetch(this.url, {
+            const response = await fetch(this.url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' }
             });
+
+            if (!response.ok) {
+                this.unlock();
+                return;
+            }
 
             const until = Date.now() + this.cooldownSeconds * 1000;
             this.storeUntil(until);
@@ -59,7 +67,7 @@ export class ResendOtp {
         } catch (e) {
             console.error(e);
             this.unlock();
-            this.setHint('Could not resend code.');
+            this.setHint(this.textError);
         }
     }
 
@@ -90,7 +98,6 @@ export class ResendOtp {
 
     startCooldown(until) {
         clearInterval(this.timer);
-        console.log(`Starting OTP resend cooldown until ${new Date(until).toISOString()}`);
         const tick = () => {
             const remaining = Math.ceil((until - Date.now()) / 1000);
 
@@ -99,7 +106,7 @@ export class ResendOtp {
                 this.unlock();
                 clearInterval(this.timer);
             } else {
-                this.lock(`Resend in ${remaining}s`);
+                this.lock(this.textCountdown.replace('%d', remaining));
             }
         };
 
@@ -114,7 +121,7 @@ export class ResendOtp {
 
     unlock() {
         this.btn.disabled = false;
-        this.btn.textContent = 'Resend code';
+        this.btn.textContent = this.textDefault;
     }
 
     setHint(text) {
@@ -134,7 +141,6 @@ export class ResendOtp {
     }
 
     restoreOnRefresh() {
-        console.log('Restoring OTP resend cooldown if needed');
         const until = this.getStoredUntil();
         if (until && until > Date.now()) {
             this.startCooldown(until);

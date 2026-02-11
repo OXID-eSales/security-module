@@ -8,36 +8,43 @@
 namespace OxidEsales\SecurityModule\Authentication\OAuth2\Controller;
 
 use OxidEsales\Eshop\Application\Controller\FrontendController;
-use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\SecurityModule\Authentication\OAuth2\Service\ProviderCollectorInterface;
-use OxidEsales\SecurityModule\Authentication\OAuth2\Service\UserServiceInterface;
+use OxidEsales\Eshop\Core\Utils;
+use OxidEsales\SecurityModule\Authentication\OAuth2\Service\AuthenticationServiceInterface;
+use OxidEsales\SecurityModule\Authentication\OAuth2\Transput\OAuthRequestInterface;
+use OxidEsales\SecurityModule\Authentication\Service\InternalRedirectServiceInterface;
 
 class OAuthController extends FrontendController
 {
+    public function __construct(
+        private readonly AuthenticationServiceInterface $authService,
+        private readonly OAuthRequestInterface $oauthRequest,
+        private readonly InternalRedirectServiceInterface $redirectService,
+        private readonly Utils $utils,
+    ) {
+        parent::__construct();
+    }
+
     public function login(): void
     {
-        $providerCollector = $this->getService(ProviderCollectorInterface::class);
+        $authorizationUrl = $this->authService->getAuthorizationUrl(
+            $this->oauthRequest->getProvider()
+        );
 
-        $provider = $providerCollector->getProvider($_GET['provider']);
-
-        Registry::getUtils()->redirect($provider->getAuthorizationUrl());
+        $this->utils->redirect($authorizationUrl);
     }
 
     public function redirect(): void
     {
-        //todo: get provider dynamically
-        $provider = $this
-            ->getService(ProviderCollectorInterface::class)
-            ->getProvider('google');
+        if ($this->oauthRequest->hasError()) {
+            $this->utils->redirect($this->redirectService->getRedirectUrl(), false);
+            return;
+        }
 
-        $accessToken = $provider->getAccessToken($_GET['code']);
+        $this->authService->handleCallback(
+            $this->oauthRequest->getProvider(),
+            $this->oauthRequest->getCode()
+        );
 
-        $userDTO = $provider->getUserInfo($accessToken);
-
-        $this
-            ->getService(UserServiceInterface::class)
-            ->login($userDTO);
-
-        Registry::getUtils()->redirect('');
+        $this->utils->redirect($this->redirectService->getRedirectUrl(), false);
     }
 }

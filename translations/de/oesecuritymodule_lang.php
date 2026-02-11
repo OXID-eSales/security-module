@@ -45,7 +45,10 @@ $aLang = [
     'TWO_FACTOR_AUTHENTICATION_TITLE'       => 'Zwei-Faktor-Authentifizierung',
     'TWO_FACTOR_AUTHENTICATION_DESCRIPTION' => 'Ein Code wurde an Ihre E-Mail-Adresse gesendet. Bitte geben Sie ihn unten ein, um fortzufahren.',
 
-    'RESEND_CODE' => 'Code erneut senden',
+    'RESEND_CODE'           => 'Code erneut senden',
+    'RESEND_CODE_SENDING'   => 'Wird gesendet…',
+    'RESEND_CODE_ERROR'     => 'Code konnte nicht erneut gesendet werden.',
+    'RESEND_CODE_COUNTDOWN' => 'Erneut senden in %ds',
 
     'ERROR_INVALID_CODE'           => 'Der Bestätigungscode ist ungültig. Bitte versuchen Sie es erneut.',
     'ERROR_CODE_TIME_EXPIRED'      => 'Der Bestätigungscode ist abgelaufen. Bitte fordern Sie einen neuen Code an.',

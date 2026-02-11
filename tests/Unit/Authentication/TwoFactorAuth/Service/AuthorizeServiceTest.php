@@ -141,9 +141,6 @@ class AuthorizeServiceTest extends TestCase
             ->method('notify')
             ->with($userEmail, $generatedCode);
 
-        $resendOTPStub = $this->createStub(ResendOTPServiceInterface::class);
-        $resendOTPStub->method('canSend')->willReturn(true);
-
         $userStub = $this->createStub(UserInterface::class);
         $userStub->method('getEmail')->willReturn($userEmail);
 
@@ -174,7 +171,6 @@ class AuthorizeServiceTest extends TestCase
             moduleSettings: $settingsStub,
             verifyCollector: $collectorStub,
             notifierCollector: $notifierCollectorStub,
-            resendOTPService: $resendOTPStub,
             userRepository: $userRepositoryStub,
             session: $sessionStub
         );
@@ -182,7 +178,7 @@ class AuthorizeServiceTest extends TestCase
         $sut->generate();
     }
 
-    public function testGenerateSendsOtpAndMarksAsSent(): void
+    public function testResendSendsOtpAndMarksAsSent(): void
     {
         $userEmail = 'user@example.com';
 
@@ -223,21 +219,11 @@ class AuthorizeServiceTest extends TestCase
             session: $sessionStub
         );
 
-        $sut->generate();
+        $this->assertTrue($sut->resend());
     }
 
-    public function testGenerateDoesNothingWhenCannotSend(): void
+    public function testResendReturnsFalseWhenCooldownActive(): void
     {
-        $verificatorMock = $this->createMock(VerificatorAdapterInterface::class);
-        $verificatorMock
-            ->expects($this->never())
-            ->method('generate');
-
-        $notifierMock = $this->createMock(NotifierAdapterInterface::class);
-        $notifierMock
-            ->expects($this->never())
-            ->method('notify');
-
         $resendOTPMock = $this->createMock(ResendOTPServiceInterface::class);
         $resendOTPMock
             ->method('canSend')
@@ -246,35 +232,17 @@ class AuthorizeServiceTest extends TestCase
             ->expects($this->never())
             ->method('markAsSent');
 
-        $settingsStub = $this->createStub(ModuleSettingsServiceInterface::class);
-        $settingsStub
-            ->method('getTwoFactorAuthType')
-            ->willReturn('otp');
-
-        $collectorStub = $this->createStub(VerificationCollectorServiceInterface::class);
-        $collectorStub
-            ->method('getVerificator')
-            ->willReturn($verificatorMock);
-
-        $notifierCollectorStub = $this->createStub(NotifierCollectorInterface::class);
-        $notifierCollectorStub
-            ->method('getNotifier')
-            ->willReturn($notifierMock);
-
         $sessionStub = $this->createStub(SessionInterface::class);
         $sessionStub
             ->method('get')
             ->willReturn(uniqid());
 
         $sut = $this->getSut(
-            moduleSettings: $settingsStub,
-            verifyCollector: $collectorStub,
-            notifierCollector: $notifierCollectorStub,
             resendOTPService: $resendOTPMock,
             session: $sessionStub
         );
 
-        $sut->generate();
+        $this->assertFalse($sut->resend());
     }
 
     public function testGetRemainingAttemptsReturnsValueFromVerificator(): void

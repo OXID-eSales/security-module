@@ -16,8 +16,6 @@ class AuthorizeService implements AuthorizeServiceInterface
 {
     public const USER_SESSION_KEY = 'pending_authorized_user';
 
-    public const OTP_TARGET_URL = 'otp_target_url';
-
     public function __construct(
         private ModuleSettingsServiceInterface $moduleSettings,
         private VerificationCollectorServiceInterface $verifyCollector,
@@ -28,7 +26,7 @@ class AuthorizeService implements AuthorizeServiceInterface
     ) {
     }
 
-    public function validate(string $inputCode): void
+    public function validate(#[\SensitiveParameter] string $inputCode): void
     {
         $activeVerificator = $this->moduleSettings->getTwoFactorAuthType();
 
@@ -50,16 +48,25 @@ class AuthorizeService implements AuthorizeServiceInterface
         );
 
         $userId = $this->session->get(self::USER_SESSION_KEY);
-        if (!$this->resendOTPService->canSend($userId)) {
-            return;
-        }
 
         $OTPCode = $verificator->generate($userId);
 
         $user = $this->userRepository->getUserOTPData($userId);
         $notifier = $this->notifierCollector->getNotifier('email');
         $notifier->notify($user->getEmail(), $OTPCode);
+    }
+
+    public function resend(): bool
+    {
+        $userId = $this->session->get(self::USER_SESSION_KEY);
+        if (!$this->resendOTPService->canSend($userId)) {
+            return false;
+        }
+
+        $this->generate();
         $this->resendOTPService->markAsSent($userId);
+
+        return true;
     }
 
     public function getVerificationUrl(): string

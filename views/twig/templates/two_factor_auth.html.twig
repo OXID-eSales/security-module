@@ -46,6 +46,10 @@
                                             type="button"
                                             data-cooldown="60"
                                             data-url="{{ seo_url({ ident: oViewConf.getSelfLink()|cat("cl=twofactorauth&fnc=resendCode") }) }}"
+                                            data-text-default="{{ translate({ ident: "RESEND_CODE" }) }}"
+                                            data-text-sending="{{ translate({ ident: "RESEND_CODE_SENDING" }) }}"
+                                            data-text-error="{{ translate({ ident: "RESEND_CODE_ERROR" }) }}"
+                                            data-text-countdown="{{ translate({ ident: "RESEND_CODE_COUNTDOWN" }) }}"
                                         >{{ translate({ ident: "RESEND_CODE" }) }}</button>
                                     </div>
 

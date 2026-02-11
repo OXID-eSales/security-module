@@ -45,7 +45,10 @@ $aLang = [
     'TWO_FACTOR_AUTHENTICATION_TITLE'       => 'Two Factor Authentication',
     'TWO_FACTOR_AUTHENTICATION_DESCRIPTION' => 'Code has been sent to your email. Please enter it below to proceed.',
 
-    'RESEND_CODE' => 'Resend Code',
+    'RESEND_CODE'           => 'Resend Code',
+    'RESEND_CODE_SENDING'   => 'Sending…',
+    'RESEND_CODE_ERROR'     => 'Could not resend code.',
+    'RESEND_CODE_COUNTDOWN' => 'Resend in %ds',
 
     'ERROR_INVALID_CODE'           => 'The verification code is invalid. Please try again.',
     'ERROR_CODE_TIME_EXPIRED'      => 'The verification code has expired. Please request a new code.',
