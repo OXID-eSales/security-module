@@ -18,4 +18,6 @@ interface UserServiceInterface
      * @throws UserBlockedException If the user is blocked.
      */
     public function login(OAuth2UserDTOInterface $auth2UserDTO): void;
+
+    public function removeExternalAuthFlag(): void;
 }

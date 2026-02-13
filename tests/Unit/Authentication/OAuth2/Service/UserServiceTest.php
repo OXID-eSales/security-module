@@ -115,6 +115,42 @@ class UserServiceTest extends TestCase
         $sut->login($oAuth2UserStub);
     }
 
+    public function testRemoveExternalAuthFlag(): void
+    {
+        $userId = uniqid();
+
+        $sessionStub = $this->createStub(SessionInterface::class);
+        $sessionStub->method('get')->with('usr')->willReturn($userId);
+
+        $userRepositoryMock = $this->createMock(UserRepositoryInterface::class);
+        $userRepositoryMock->expects($this->once())
+            ->method('removeExternalAuthFlag')
+            ->with($userId);
+
+        $sut = $this->getSut(
+            userRepository: $userRepositoryMock,
+            session: $sessionStub
+        );
+
+        $sut->removeExternalAuthFlag();
+    }
+
+    public function testRemoveExternalAuthFlagSkipsWhenNoUserInSession(): void
+    {
+        $sessionStub = $this->createStub(SessionInterface::class);
+        $sessionStub->method('get')->with('usr')->willReturn(null);
+
+        $userRepositoryMock = $this->createMock(UserRepositoryInterface::class);
+        $userRepositoryMock->expects($this->never())->method('removeExternalAuthFlag');
+
+        $sut = $this->getSut(
+            userRepository: $userRepositoryMock,
+            session: $sessionStub
+        );
+
+        $sut->removeExternalAuthFlag();
+    }
+
     private function getSut(
         UserRepositoryInterface $userRepository = null,
         SessionInterface $session = null,

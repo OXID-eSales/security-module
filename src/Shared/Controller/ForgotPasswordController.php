@@ -9,9 +9,9 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Shared\Controller;
 
-use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\SecurityModule\Authentication\OAuth2\Service\UserServiceInterface;
 use OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface;
 use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface;
 
@@ -47,12 +47,8 @@ class ForgotPasswordController extends ForgotPasswordController_parent
         $result = parent::updatePassword();
 
         if ($result === 'forgotpwd?success=1') {
-            $userId = Registry::getSession()->getVariable('usr');
-            $user = oxNew(User::class);
-            if ($userId && $user->load($userId) && $user->getFieldData('oesmexternalauth')) {
-                $user->assign(['OESMEXTERNALAUTH' => 0]);
-                $user->save();
-            }
+            $this->getService(UserServiceInterface::class)
+                ->removeExternalAuthFlag();
         }
 
         return $result;
