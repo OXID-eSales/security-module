@@ -29,5 +29,5 @@ class_alias(
 
 class_alias(
     \OxidEsales\Eshop\Application\Controller\ForgotPasswordController::class,
-    \OxidEsales\SecurityModule\Captcha\Shop\ForgotPasswordController_parent::class
+    \OxidEsales\SecurityModule\Shared\Controller\ForgotPasswordController_parent::class
 );

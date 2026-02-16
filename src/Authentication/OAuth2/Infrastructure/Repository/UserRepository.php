@@ -37,13 +37,26 @@ class UserRepository implements UserRepositoryInterface
         return $this->userDTOFactory->createFromModel($userModel);
     }
 
+    public function removeExternalAuthFlag(string $userId): void
+    {
+        $userModel = $this->userFactory->create();
+
+        if (!$userModel->load($userId)) {
+            throw new UserNotFoundException();
+        }
+
+        $userModel->assign(['OESMEXTERNALAUTH' => 0]);
+        $userModel->save();
+    }
+
     public function createUser(OAuth2UserDTOInterface $userDTO): UserDTOInterface
     {
         $userModel = $this->userFactory->create();
         $userModel->assign([
-            'OXFNAME'    => $userDTO->getFirstName(),
-            'OXLNAME'    => $userDTO->getLastName(),
-            'OXUSERNAME' => $userDTO->getEmail(),
+            'OXFNAME'          => $userDTO->getFirstName(),
+            'OXLNAME'          => $userDTO->getLastName(),
+            'OXUSERNAME'       => $userDTO->getEmail(),
+            'OESMEXTERNALAUTH' => 1,
         ]);
         $userModel->setPassword($this->passwordGenerator->generatePasswordForOAuthUser());
         $userModel->createUser();

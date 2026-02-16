@@ -19,6 +19,8 @@ final class Version20251128093245 extends AbstractMigration
         $this->addSql('ALTER TABLE `oxuser` ADD column `OESMOTPCODE` VARCHAR(128) default NULL COMMENT "OTP code"');
         $this->addSql('ALTER TABLE `oxuser` ADD column `OESMOTPEXPTIME` DATETIME default NULL COMMENT "OTP code expiration time"');
         $this->addSql('ALTER TABLE `oxuser` ADD column `OESMOTPATTEMPTS` INT NOT NULL default 0 COMMENT "OTP code attempts"');
+        $this->addSql('ALTER TABLE `oxuser` ADD column `OESMOTPLASTSENT` DATETIME default NULL COMMENT "Last OTP sent timestamp"');
+        $this->addSql('ALTER TABLE `oxuser` ADD column `OESMEXTERNALAUTH` TINYINT(1) NOT NULL default 0 COMMENT "User registered via external authentication"');
     }
 
     public function down(Schema $schema): void

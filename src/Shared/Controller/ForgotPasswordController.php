@@ -7,13 +7,18 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\SecurityModule\Captcha\Shop;
+namespace OxidEsales\SecurityModule\Shared\Controller;
 
 use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\SecurityModule\Authentication\OAuth2\Service\UserServiceInterface;
 use OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface;
 use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface;
 
+/**
+ * @mixin \OxidEsales\Eshop\Application\Controller\ForgotPasswordController
+ * @eshopExtension
+ */
 class ForgotPasswordController extends ForgotPasswordController_parent
 {
     public function forgotPassword(): ?bool
@@ -35,5 +40,17 @@ class ForgotPasswordController extends ForgotPasswordController_parent
         }
 
         return parent::forgotPassword();
+    }
+
+    public function updatePassword()
+    {
+        $result = parent::updatePassword();
+
+        if ($result === 'forgotpwd?success=1') {
+            $this->getService(UserServiceInterface::class)
+                ->removeExternalAuthFlag();
+        }
+
+        return $result;
     }
 }

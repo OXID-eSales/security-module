@@ -18,5 +18,10 @@ interface UserRepositoryInterface
      */
     public function getUserByEmail(string $username): UserDTOInterface;
 
+    /**
+     * @throws UserNotFoundException
+     */
+    public function removeExternalAuthFlag(string $userId): void;
+
     public function createUser(OAuth2UserDTOInterface $userDTO): UserDTOInterface;
 }

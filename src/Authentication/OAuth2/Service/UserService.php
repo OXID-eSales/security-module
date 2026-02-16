@@ -42,4 +42,12 @@ readonly class UserService implements UserServiceInterface
 
         $this->session->set('usr', $userDTO->getId());
     }
+
+    public function removeExternalAuthFlag(): void
+    {
+        $userId = $this->session->get('usr');
+        if ($userId) {
+            $this->userRepository->removeExternalAuthFlag((string)$userId);
+        }
+    }
 }

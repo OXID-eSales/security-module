@@ -90,6 +90,40 @@ class UserRepositoryTest extends TestCase
         $repository->getUserByEmail($username);
     }
 
+    public function testRemoveExternalAuthFlag(): void
+    {
+        $userId = uniqid();
+
+        $userModelMock = $this->createMock(UserModel::class);
+        $userModelMock->method('load')->with($userId)->willReturn(true);
+        $userModelMock->expects($this->once())->method('assign')->with(['OESMEXTERNALAUTH' => 0]);
+        $userModelMock->expects($this->once())->method('save');
+
+        $userFactoryStub = $this->createStub(UserFactoryInterface::class);
+        $userFactoryStub->method('create')->willReturn($userModelMock);
+
+        $repository = $this->getSut(userFactory: $userFactoryStub);
+
+        $repository->removeExternalAuthFlag($userId);
+    }
+
+    public function testRemoveExternalAuthFlagThrowsExceptionIfUserNotFound(): void
+    {
+        $userId = uniqid();
+
+        $userModelStub = $this->createStub(UserModel::class);
+        $userModelStub->method('load')->willReturn(false);
+
+        $userFactoryStub = $this->createStub(UserFactoryInterface::class);
+        $userFactoryStub->method('create')->willReturn($userModelStub);
+
+        $repository = $this->getSut(userFactory: $userFactoryStub);
+
+        $this->expectException(UserNotFoundException::class);
+
+        $repository->removeExternalAuthFlag($userId);
+    }
+
     public function testCreateUser(): void
     {
         $firstName = uniqid();
@@ -106,9 +140,10 @@ class UserRepositoryTest extends TestCase
 
         $userModel = $this->createMock(UserModel::class);
         $userModel->method('assign')->with([
-            'OXFNAME'    => $firstName,
-            'OXLNAME'    => $lastName,
-            'OXUSERNAME' => $username,
+            'OXFNAME'          => $firstName,
+            'OXLNAME'          => $lastName,
+            'OXUSERNAME'       => $username,
+            'OESMEXTERNALAUTH' => 1,
         ]);
         $userModel->method('setPassword')->with($password);
 
