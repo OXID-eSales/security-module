@@ -12,6 +12,7 @@ namespace OxidEsales\SecurityModule\Shared\Model;
 use OxidEsales\Eshop\Core\Exception\InputException;
 use OxidEsales\Eshop\Core\Exception\UserException;
 use OxidEsales\Eshop\Core\Registry;
+// use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAServiceInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\UserServiceInterface;
 use OxidEsales\SecurityModule\Captcha\Captcha\Image\Exception\CaptchaValidateException as ImageCaptchaException;
 use OxidEsales\SecurityModule\Captcha\Captcha\HoneyPot\Exception\CaptchaValidateException as HoneyPotCaptchaException;
@@ -107,6 +108,14 @@ class User extends User_parent
         }
 
         $userService->handleLogin($userId);
+
+//        $settingsService = $this->getService(TwoFASettingsServiceInterface::class);
+//        if ($settingsService->isTwoFactorAuthEnabled() && !$this->isAdmin()) {
+//            $authentication = $this->getService(TwoFAServiceInterface::class);
+//            if ($authentication->hasPendingChallenge($userId)) {
+//                $authentication->triggerChallenge($userId);
+//            }
+//        }
     }
 
     private function isCaptchaEnabled(): bool
