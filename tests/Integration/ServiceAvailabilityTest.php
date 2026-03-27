@@ -1,0 +1,46 @@
+<?php
+
+/**
+ * Copyright © OXID eSales AG. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
+declare(strict_types=1);
+
+namespace OxidEsales\SecurityModule\Tests\Integration;
+
+use OxidEsales\EshopCommunity\Internal\Container\ContainerBuilderFactory;
+use OxidEsales\EshopCommunity\Tests\Integration\IntegrationTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
+final class ServiceAvailabilityTest extends IntegrationTestCase
+{
+    private static ContainerInterface $cachedContainer;
+
+    public static function setUpBeforeClass(): void
+    {
+        $containerBuilder = (new ContainerBuilderFactory())->create();
+        $container = $containerBuilder->getContainer();
+        foreach ($container->getDefinitions() as $definition) {
+            $definition->setPublic(true);
+        }
+        $container->compile(true);
+
+        self::$cachedContainer = $container;
+    }
+
+    #[DataProvider('serviceAvailabilityDataProvider')]
+    public function testServicesAvailable(string $serviceId): void
+    {
+        self::assertIsObject(self::$cachedContainer->get($serviceId));
+    }
+
+    public static function serviceAvailabilityDataProvider(): array
+    {
+        return [
+            [\OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Factory\TwoFAServiceFactoryInterface::class],
+            [\OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAServiceInterface::class],
+        ];
+    }
+}

@@ -1,0 +1,13 @@
+services:
+  _defaults:
+    autowire: true
+    public: false
+
+  OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Factory\TwoFAServiceFactoryInterface:
+    class: OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Factory\TwoFAServiceFactory
+    arguments:
+      $implementations:
+        otp: '@OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\OTPService'
+
+  OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAServiceInterface:
+    factory: ['@OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Factory\TwoFAServiceFactoryInterface', 'create']

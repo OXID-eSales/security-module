@@ -3,3 +3,5 @@ imports:
   - { resource: Service/services.yaml }
   - { resource: Transput/services.yaml }
   - { resource: Controller/services.yaml }
+  - { resource: Factory/services.yaml }
+  - { resource: OTP/services.yaml }
