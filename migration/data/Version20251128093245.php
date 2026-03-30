@@ -12,6 +12,7 @@ namespace OxidEsales\SecurityModule\Migrations;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
+// todo-critical: remove this
 final class Version20251128093245 extends AbstractMigration
 {
     public function up(Schema $schema): void
