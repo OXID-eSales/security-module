@@ -13,5 +13,9 @@ interface TwoFAServiceInterface
 
     public function triggerChallenge(string $userId): void;
 
-    public function clearChallenge(): void;
+    public function invalidateChallenge(string $userId): void;
+
+    public function verify(string $userId, #[\SensitiveParameter] string $code): void;
+
+    public function resend(string $userId): void;
 }
