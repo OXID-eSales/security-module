@@ -9,7 +9,7 @@ namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service;
 
 interface TwoFAServiceInterface
 {
-    public function hasPendingChallenge(string $userId): bool;
+    public function isVerified(string $userId): bool;
 
     public function triggerChallenge(string $userId): void;
 

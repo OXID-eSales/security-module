@@ -112,7 +112,7 @@ class User extends User_parent
 //        $settingsService = $this->getService(TwoFASettingsServiceInterface::class);
 //        if ($settingsService->isTwoFactorAuthEnabled() && !$this->isAdmin()) {
 //            $authentication = $this->getService(TwoFAServiceInterface::class);
-//            if ($authentication->hasPendingChallenge($userId)) {
+//            if (!$authentication->isVerified($userId)) {
 //                $authentication->triggerChallenge($userId);
 //            }
 //        }

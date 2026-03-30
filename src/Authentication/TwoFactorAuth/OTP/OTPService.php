@@ -13,7 +13,7 @@ use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAServiceI
 
 class OTPService implements TwoFAServiceInterface
 {
-    public function hasPendingChallenge(string $userId): bool
+    public function isVerified(string $userId): bool
     {
     }
 
