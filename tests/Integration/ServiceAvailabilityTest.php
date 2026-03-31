@@ -41,6 +41,9 @@ final class ServiceAvailabilityTest extends IntegrationTestCase
         return [
             [\OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Factory\TwoFAServiceFactoryInterface::class],
             [\OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAServiceInterface::class],
+            [\OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Infrastructure\Repository\OtpChallengeStateRepositoryInterface::class],
+            [\OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Notifier\OtpNotifierInterface::class],
+            [\OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Notifier\Factory\OtpNotifierFactoryInterface::class],
         ];
     }
 }
