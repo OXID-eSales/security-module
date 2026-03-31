@@ -20,7 +20,7 @@ interface OtpChallengeStateRepositoryInterface
 
     public function markVerified(string $userId): void;
 
-    public function markResent(string $userId, DateTimeImmutable $expiresAt): void;
+    public function refreshChallengeState(string $userId, string $codeHash, DateTimeImmutable $expiresAt): void;
 
     public function incrementAttempts(string $userId): void;
 

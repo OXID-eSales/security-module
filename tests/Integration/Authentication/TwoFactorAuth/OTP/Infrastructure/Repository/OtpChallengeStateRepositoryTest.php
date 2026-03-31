@@ -101,7 +101,7 @@ class OtpChallengeStateRepositoryTest extends IntegrationTestCase
     }
 
     #[Test]
-    public function markResentUpdatesLastSentAtAndExpiresAt(): void
+    public function refreshChallengeStateUpdatesCodeHashLastSentAtAndExpiresAt(): void
     {
         $sut = $this->getSut();
         $sut->createChallengeState(
@@ -110,12 +110,14 @@ class OtpChallengeStateRepositoryTest extends IntegrationTestCase
             expiresAt: new DateTimeImmutable('+5 minutes'),
         );
 
-        $sut->markResent(
+        $sut->refreshChallengeState(
             userId: $userId,
+            codeHash: $newCodeHash = uniqid(),
             expiresAt: $newExpiresAt = new DateTimeImmutable('+10 minutes'),
         );
 
         $result = $sut->findByUserId($userId);
+        $this->assertSame($newCodeHash, $result->getCodeHash());
         $this->assertGreaterThanOrEqual(
             new DateTimeImmutable('-2 seconds'),
             $result->getLastSentAt()

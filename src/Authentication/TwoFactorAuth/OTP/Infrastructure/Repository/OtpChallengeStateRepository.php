@@ -88,15 +88,17 @@ class OtpChallengeStateRepository implements OtpChallengeStateRepositoryInterfac
         $builder->execute();
     }
 
-    public function markResent(string $userId, DateTimeImmutable $expiresAt): void
+    public function refreshChallengeState(string $userId, string $codeHash, DateTimeImmutable $expiresAt): void
     {
         $builder = $this->queryBuilderFactory->create();
         $builder->update(self::TABLE)
+            ->set('CODE_HASH', ':codeHash')
             ->set('LAST_SENT_AT', ':lastSentAt')
             ->set('EXPIRES_AT', ':expiresAt')
             ->where('OXUSERID = :userId')
             ->setParameters([
                 'userId'     => $userId,
+                'codeHash'   => $codeHash,
                 'lastSentAt' => (new DateTimeImmutable())->format(self::DB_DATETIME_FORMAT),
                 'expiresAt'  => $expiresAt->format(self::DB_DATETIME_FORMAT),
             ]);
