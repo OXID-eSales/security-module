@@ -1,4 +1,6 @@
 imports:
+  - { resource: Infrastructure/Repository/services.yaml }
+  - { resource: Service/services.yaml }
   - { resource: Notifier/services.yaml }
 
 services:
@@ -7,6 +9,3 @@ services:
     public: false
 
   OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\OtpFacade: ~
-
-  OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Infrastructure\Repository\OtpChallengeStateRepositoryInterface:
-    class: OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Infrastructure\Repository\OtpChallengeStateRepository

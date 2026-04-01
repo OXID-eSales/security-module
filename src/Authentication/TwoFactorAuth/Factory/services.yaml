@@ -7,7 +7,7 @@ services:
     class: OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Factory\TwoFAServiceFactory
     arguments:
       $implementations:
-        otp: '@OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\OTPService'
+        otp: '@OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\OtpFacade'
 
   OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAServiceInterface:
     factory: ['@OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Factory\TwoFAServiceFactoryInterface', 'create']

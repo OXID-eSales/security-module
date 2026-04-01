@@ -18,7 +18,7 @@ use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAServiceI
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
-class OTPServiceTest extends TestCase
+class OtpFacadeTest extends TestCase
 {
     #[Test]
     public function isVerifiedReturnsFalseWhenNoChallengeState(): void
