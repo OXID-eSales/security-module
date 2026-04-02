@@ -44,6 +44,8 @@ class OtpFacade implements TwoFAServiceInterface
     {
         $code = $this->codeGenerator->generateCode();
 
+        // todo-critical: check if we can trigger the notification
+
         $this->stateService->createChallengeState($userId, $code);
         $this->notifierFactory->create($userId)->notify($userId, $code);
 
