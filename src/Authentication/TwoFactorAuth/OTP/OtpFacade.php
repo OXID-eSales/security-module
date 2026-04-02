@@ -60,6 +60,7 @@ class OtpFacade implements TwoFAServiceInterface
     public function verify(string $userId, #[\SensitiveParameter] string $code): void
     {
         $this->codeValidator->validateCode($userId, $code);
+        $this->stateService->markVerified($userId);
     }
 
     public function resend(string $userId): void

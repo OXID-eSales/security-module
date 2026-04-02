@@ -119,6 +119,39 @@ class OtpFacadeTest extends TestCase
     }
 
     #[Test]
+    public function verifyMarksChallengAsVerifiedIfValidationOk(): void
+    {
+        $stateServiceSpy = $this->createMock(OtpChallengeStateServiceInterface::class);
+        $stateServiceSpy->expects($this->once())
+            ->method('markVerified')
+            ->with($userId = uniqid());
+
+        $sut = $this->getSut(stateService: $stateServiceSpy);
+
+        $sut->verify(userId: $userId, code: uniqid());
+    }
+
+    #[Test]
+    public function verifyDoesNotMarkVerifiedWhenValidationFails(): void
+    {
+        $codeValidatorStub = $this->createStub(OtpCodeValidatorServiceInterface::class);
+        $codeValidatorStub->method('validateCode')->willThrowException(new InvalidCodeException());
+
+        $stateServiceSpy = $this->createMock(OtpChallengeStateServiceInterface::class);
+        $stateServiceSpy->expects($this->never())
+            ->method('markVerified');
+
+        $sut = $this->getSut(
+            stateService: $stateServiceSpy,
+            codeValidator: $codeValidatorStub,
+        );
+
+        $this->expectException(InvalidCodeException::class);
+
+        $sut->verify(userId: uniqid(), code: uniqid());
+    }
+
+    #[Test]
     public function triggerChallengeGeneratesCodeCreatesStateAndNotifies(): void
     {
         $codeGeneratorStub = $this->createStub(OtpCodeGeneratorServiceInterface::class);
