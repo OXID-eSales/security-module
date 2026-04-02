@@ -1,6 +1,3 @@
-imports:
-  - { resource: Factory/services.yaml }
-
 services:
   _defaults:
     autowire: true

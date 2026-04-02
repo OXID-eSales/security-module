@@ -7,10 +7,10 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\SecurityModule\Tests\Integration\Authentication\TwoFactorAuth\Infrastructure\Provider\Factory;
+namespace OxidEsales\SecurityModule\Tests\Integration\Authentication\TwoFactorAuth\Infrastructure\Factory;
 
 use OxidEsales\Eshop\Core\Email;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Provider\Factory\EmailFactory;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\EmailFactory;
 use PHPUnit\Framework\TestCase;
 
 class EmailFactoryTest extends TestCase

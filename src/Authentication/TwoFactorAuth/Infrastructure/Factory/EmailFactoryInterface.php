@@ -5,7 +5,7 @@
  * See LICENSE file for license details.
  */
 
-namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Provider\Factory;
+namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory;
 
 use OxidEsales\Eshop\Core\Email;
 

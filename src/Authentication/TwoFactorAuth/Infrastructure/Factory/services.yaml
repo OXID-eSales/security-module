@@ -3,5 +3,11 @@ services:
     autowire: true
     public: false
 
-  OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\UserFactoryInterface:
-    class: OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\UserFactory
+  OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\UserModelFactoryInterface:
+    class: OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\UserModelFactory
+
+  OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\NewUserFactoryInterface:
+    class: OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\NewUserFactory
+
+  OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\EmailFactoryInterface:
+    class: OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\EmailFactory
