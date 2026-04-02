@@ -10,16 +10,14 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Tests\Unit\Authentication\TwoFactorAuth\OTP;
 
 use DateTimeImmutable;
-use OxidEsales\Eshop\Core\Utils;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Notifier\Factory\OtpNotifierFactoryInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Notifier\OtpNotifierInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\OtpFacade;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Service\OtpChallengeStateServiceInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Service\OtpCodeGeneratorServiceInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Service\OtpCodeValidatorServiceInterface;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFASettingsInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\DTO\OtpChallengeStateInterface;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAServiceInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\InvalidCodeException;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
@@ -170,20 +168,10 @@ class OtpFacadeTest extends TestCase
         $notifierFactoryStub = $this->createStub(OtpNotifierFactoryInterface::class);
         $notifierFactoryStub->method('create')->willReturn($notifierSpy);
 
-        $settingsStub = $this->createStub(TwoFASettingsInterface::class);
-        $settingsStub->method('getVerificationUrl')->willReturn($verificationUrl = uniqid());
-
-        $utilsSpy = $this->createMock(Utils::class);
-        $utilsSpy->expects($this->once())
-            ->method('redirect')
-            ->with($verificationUrl);
-
         $sut = $this->getSut(
             stateService: $stateServiceSpy,
             codeGenerator: $codeGeneratorStub,
             notifierFactory: $notifierFactoryStub,
-            settings: $settingsStub,
-            utils: $utilsSpy,
         );
 
         $sut->triggerChallenge(userId: $userId);
@@ -194,16 +182,12 @@ class OtpFacadeTest extends TestCase
         OtpCodeValidatorServiceInterface $codeValidator = null,
         OtpCodeGeneratorServiceInterface $codeGenerator = null,
         OtpNotifierFactoryInterface $notifierFactory = null,
-        TwoFASettingsInterface $settings = null,
-        Utils $utils = null,
     ): OtpFacade {
         return new OtpFacade(
             stateService: $stateService ?? $this->createStub(OtpChallengeStateServiceInterface::class),
             codeValidator: $codeValidator ?? $this->createStub(OtpCodeValidatorServiceInterface::class),
             codeGenerator: $codeGenerator ?? $this->createStub(OtpCodeGeneratorServiceInterface::class),
             notifierFactory: $notifierFactory ?? $this->createStub(OtpNotifierFactoryInterface::class),
-            settings: $settings ?? $this->createStub(TwoFASettingsInterface::class),
-            utils: $utils ?? $this->createStub(Utils::class),
         );
     }
 }

@@ -7,7 +7,5 @@ services:
   _defaults:
     autowire: true
     public: false
-    bind:
-      OxidEsales\Eshop\Core\Utils: '@=service("OxidEsales\\SecurityModule\\Core\\Registry").getUtils()'
 
   OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\OtpFacade: ~
