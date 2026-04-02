@@ -3,6 +3,9 @@ services:
     autowire: true
     public: false
 
+  OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository\NewUserRepositoryInterface:
+    class: OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository\NewUserRepository
+
   OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository\UserRepositoryInterface:
     class: OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository\UserRepository
     public: true

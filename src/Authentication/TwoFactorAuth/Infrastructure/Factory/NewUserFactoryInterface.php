@@ -10,14 +10,9 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory;
 
 use OxidEsales\Eshop\Application\Model\User;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\DTO\NewUserInterface;
 
-class UserFactory implements UserFactoryInterface
+interface NewUserFactoryInterface
 {
-    /**
-     * @inheritDoc
-     */
-    public function create(): User
-    {
-        return oxNew(User::class);
-    }
+    public function createFromModel(User $userModel): NewUserInterface;
 }

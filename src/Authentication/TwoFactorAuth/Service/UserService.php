@@ -13,13 +13,13 @@ use OxidEsales\Eshop\Core\Utils;
 use OxidEsales\EshopCommunity\Internal\Framework\Session\SessionInterface;
 use OxidEsales\SecurityModule\Authentication\Service\InternalRedirectServiceInterface;
 use OxidEsales\SecurityModule\Authentication\Session\SessionKeys;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\UserFactoryInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\UserModelFactoryInterface;
 
 readonly class UserService implements UserServiceInterface
 {
     public function __construct(
         private AuthorizeServiceInterface $authorizeService,
-        private UserFactoryInterface $userFactory,
+        private UserModelFactoryInterface $userFactory,
         private SessionInterface $session,
         private Utils $utils,
         private InternalRedirectServiceInterface $redirectService,

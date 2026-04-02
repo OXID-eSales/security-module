@@ -16,7 +16,7 @@ use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
 use OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\UserNotFoundException;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\UserFactoryInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\UserModelFactoryInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository\UserRepository;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository\UserRepositoryInterface;
 use PHPUnit\Framework\TestCase;
@@ -24,12 +24,12 @@ use PHPUnit\Framework\TestCase;
 class UserRepositoryTest extends TestCase
 {
     public function getSut(
-        UserFactoryInterface $userFactory = null,
+        UserModelFactoryInterface $userFactory = null,
         QueryBuilderFactoryInterface $qbFactory = null,
         ContextInterface $context = null,
     ): UserRepositoryInterface {
         return new UserRepository(
-            userFactory: $userFactory ?? $this->createStub(UserFactoryInterface::class),
+            userFactory: $userFactory ?? $this->createStub(UserModelFactoryInterface::class),
             queryBuilderFactory: $qbFactory ?? $this->createStub(QueryBuilderFactoryInterface::class),
             context: $context ?? $this->createStub(ContextInterface::class),
         );
@@ -120,7 +120,7 @@ class UserRepositoryTest extends TestCase
         ]);
         $userModelMock->expects($this->once())->method('save');
 
-        $userFactoryStub = $this->createStub(UserFactoryInterface::class);
+        $userFactoryStub = $this->createStub(UserModelFactoryInterface::class);
         $userFactoryStub->method('create')->willReturn($userModelMock);
 
         $sut = $this->getSut(
@@ -141,7 +141,7 @@ class UserRepositoryTest extends TestCase
         ]);
         $userModelMock->expects($this->once())->method('save');
 
-        $userFactoryStub = $this->createStub(UserFactoryInterface::class);
+        $userFactoryStub = $this->createStub(UserModelFactoryInterface::class);
         $userFactoryStub->method('create')->willReturn($userModelMock);
 
         $sut = $this->getSut(
@@ -165,7 +165,7 @@ class UserRepositoryTest extends TestCase
         ]);
         $userModelMock->expects($this->once())->method('save');
 
-        $userFactoryStub = $this->createStub(UserFactoryInterface::class);
+        $userFactoryStub = $this->createStub(UserModelFactoryInterface::class);
         $userFactoryStub->method('create')->willReturn($userModelMock);
 
         $sut = $this->getSut(
@@ -184,7 +184,7 @@ class UserRepositoryTest extends TestCase
         $userModelMock->expects($this->once())->method('assign');
         $userModelMock->expects($this->once())->method('save');
 
-        $userFactoryStub = $this->createStub(UserFactoryInterface::class);
+        $userFactoryStub = $this->createStub(UserModelFactoryInterface::class);
         $userFactoryStub->method('create')->willReturn($userModelMock);
 
         $sut = $this->getSut(

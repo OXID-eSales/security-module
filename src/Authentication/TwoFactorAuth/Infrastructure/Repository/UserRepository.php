@@ -17,12 +17,12 @@ use OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\DTO\UserInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\DTO\User as UserDTO;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\UserNotFoundException;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\UserFactoryInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\UserModelFactoryInterface;
 
 class UserRepository implements UserRepositoryInterface
 {
     public function __construct(
-        private readonly UserFactoryInterface $userFactory,
+        private readonly UserModelFactoryInterface $userFactory,
         private readonly QueryBuilderFactoryInterface $queryBuilderFactory,
         private readonly ContextInterface $context,
     ) {

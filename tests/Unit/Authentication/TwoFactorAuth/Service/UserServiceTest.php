@@ -14,7 +14,7 @@ use OxidEsales\Eshop\Core\Utils;
 use OxidEsales\EshopCommunity\Internal\Framework\Session\SessionInterface;
 use OxidEsales\SecurityModule\Authentication\Service\InternalRedirectServiceInterface;
 use OxidEsales\SecurityModule\Authentication\Session\SessionKeys;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\UserFactoryInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\UserModelFactoryInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\AuthorizeService;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\AuthorizeServiceInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\UserService;
@@ -107,7 +107,7 @@ class UserServiceTest extends TestCase
             ->method('login')
             ->with($userName, null, false);
 
-        $userFactoryStub = $this->createStub(UserFactoryInterface::class);
+        $userFactoryStub = $this->createStub(UserModelFactoryInterface::class);
         $userFactoryStub->method('create')->willReturn($userSpy);
 
         $redirectServiceStub = $this->createStub(InternalRedirectServiceInterface::class);
@@ -148,7 +148,7 @@ class UserServiceTest extends TestCase
         $userStub = $this->createStub(User::class);
         $userStub->method('getFieldData')->willReturn(uniqid());
 
-        $userFactoryStub = $this->createStub(UserFactoryInterface::class);
+        $userFactoryStub = $this->createStub(UserModelFactoryInterface::class);
         $userFactoryStub->method('create')->willReturn($userStub);
 
         $utilsStub = $this->createStub(Utils::class);
@@ -179,7 +179,7 @@ class UserServiceTest extends TestCase
         $userStub = $this->createStub(User::class);
         $userStub->method('getFieldData')->willReturn(uniqid());
 
-        $userFactoryStub = $this->createStub(UserFactoryInterface::class);
+        $userFactoryStub = $this->createStub(UserModelFactoryInterface::class);
         $userFactoryStub->method('create')->willReturn($userStub);
 
         $redirectServiceStub = $this->createStub(InternalRedirectServiceInterface::class);
@@ -202,14 +202,14 @@ class UserServiceTest extends TestCase
 
     public function getSut(
         AuthorizeServiceInterface $authorizeService = null,
-        UserFactoryInterface $userFactory = null,
+        UserModelFactoryInterface $userFactory = null,
         SessionInterface $session = null,
         Utils $utils = null,
         InternalRedirectServiceInterface $redirectService = null,
     ): UserServiceInterface {
         return new UserService(
             authorizeService: $authorizeService ?? $this->createStub(AuthorizeServiceInterface::class),
-            userFactory: $userFactory ?? $this->createStub(UserFactoryInterface::class),
+            userFactory: $userFactory ?? $this->createStub(UserModelFactoryInterface::class),
             session: $session ?? $this->createStub(SessionInterface::class),
             utils: $utils ?? $this->createStub(Utils::class),
             redirectService: $redirectService ?? $this->createStub(InternalRedirectServiceInterface::class),
