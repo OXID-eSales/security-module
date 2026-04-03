@@ -15,6 +15,9 @@ use OxidEsales\SecurityModule\Authentication\Service\InternalRedirectServiceInte
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\UserModelFactoryInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFASettingsInterface;
 
+/**
+ * todo-high: challenge the idea - session part should go to the separate login state service
+ */
 class TwoFAUserService implements TwoFAUserServiceInterface
 {
     public const USER_SESSION_KEY = 'pending_authorized_user';
@@ -45,6 +48,7 @@ class TwoFAUserService implements TwoFAUserServiceInterface
     {
         $this->session->remove(self::USER_SESSION_KEY);
 
+        // todo-high: looks like it can go to the infrastructure layer
         $user = $this->userFactory->create();
         $user->load($userId);
 
