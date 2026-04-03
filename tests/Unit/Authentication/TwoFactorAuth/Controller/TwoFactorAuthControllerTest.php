@@ -13,107 +13,63 @@ use OxidEsales\Eshop\Core\UtilsView;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Controller\TwoFactorAuthController;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\InvalidCodeException;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\AuthorizeServiceInterface;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\UserServiceInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAServiceInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAUserServiceInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Transput\AuthCodeRequestInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Transput\JsonResponseInterface;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class TwoFactorAuthControllerTest extends TestCase
 {
-    public function testHandleOTPValidatesCodeAndFinalizesLogin(): void
+    #[Test]
+    public function handleOTPVerifiesCodeAndLoginsUser(): void
     {
-        $code = '123456';
+        $userId = uniqid();
+        $code = uniqid();
+
+        $twoFAUserServiceSpy = $this->createMock(TwoFAUserServiceInterface::class);
+        $twoFAUserServiceSpy->method('getPendingUserId')->willReturn($userId);
+        $twoFAUserServiceSpy->expects($this->once())
+            ->method('loginUser')
+            ->with($userId);
 
         $authCodeRequestStub = $this->createStub(AuthCodeRequestInterface::class);
         $authCodeRequestStub->method('getCode')->willReturn($code);
 
-        $authServiceMock = $this->createMock(AuthorizeServiceInterface::class);
-        $authServiceMock->expects($this->once())
-            ->method('validate')
-            ->with($code);
+        $twoFAServiceSpy = $this->createMock(TwoFAServiceInterface::class);
+        $twoFAServiceSpy->expects($this->once())
+            ->method('verify')
+            ->with($userId, $code);
 
-        $userServiceMock = $this->createMock(UserServiceInterface::class);
-        $userServiceMock->expects($this->once())
-            ->method('finalizeLogin');
-
-        $controller = $this->getSut(
-            authService: $authServiceMock,
-            userService: $userServiceMock,
+        $sut = $this->getSut(
+            twoFAService: $twoFAServiceSpy,
+            twoFAUserService: $twoFAUserServiceSpy,
             authCodeRequest: $authCodeRequestStub,
         );
 
-        $result = $controller->handleOTP();
-
-        $this->assertNull($result);
+        $sut->handleOTP();
     }
 
-    public function testHandleOTPDoesNotFinalizeLoginOnValidationFailure(): void
-    {
-        $authCodeRequestStub = $this->createStub(AuthCodeRequestInterface::class);
-        $authCodeRequestStub->method('getCode')->willReturn('invalid');
-
-        $authServiceStub = $this->createStub(AuthorizeServiceInterface::class);
-        $authServiceStub->method('validate')
-            ->willThrowException(new InvalidCodeException());
-
-        $userServiceMock = $this->createMock(UserServiceInterface::class);
-        $userServiceMock->expects($this->never())
-            ->method('finalizeLogin');
-
-        $controller = $this->getSut(
-            authService: $authServiceStub,
-            userService: $userServiceMock,
-            authCodeRequest: $authCodeRequestStub,
-        );
-
-        $result = $controller->handleOTP();
-
-        $this->assertNull($result);
-    }
-
-    public function testHandleOTPDisplaysErrorOnValidationFailure(): void
+    #[Test]
+    public function handleOTPDisplaysErrorOnInvalidCode(): void
     {
         $exception = new InvalidCodeException();
 
-        $authCodeRequestStub = $this->createStub(AuthCodeRequestInterface::class);
-        $authCodeRequestStub->method('getCode')->willReturn('invalid');
+        $twoFAServiceStub = $this->createStub(TwoFAServiceInterface::class);
+        $twoFAServiceStub->method('verify')->willThrowException($exception);
 
-        $authServiceStub = $this->createStub(AuthorizeServiceInterface::class);
-        $authServiceStub->method('validate')
-            ->willThrowException($exception);
-
-        $utilsViewMock = $this->createMock(UtilsView::class);
-        $utilsViewMock->expects($this->once())
+        $utilsViewSpy = $this->createMock(UtilsView::class);
+        $utilsViewSpy->expects($this->once())
             ->method('addErrorToDisplay')
             ->with($exception);
 
-        $controller = $this->getSut(
-            authService: $authServiceStub,
-            authCodeRequest: $authCodeRequestStub,
-            utilsView: $utilsViewMock,
+        $sut = $this->getSut(
+            twoFAService: $twoFAServiceStub,
+            utilsView: $utilsViewSpy,
         );
 
-        $controller->handleOTP();
-    }
-
-    public function testHandleOTPPropagatesNonOTPExceptions(): void
-    {
-        $authCodeRequestStub = $this->createStub(AuthCodeRequestInterface::class);
-        $authCodeRequestStub->method('getCode')->willReturn('123456');
-
-        $authServiceStub = $this->createStub(AuthorizeServiceInterface::class);
-        $authServiceStub->method('validate')
-            ->willThrowException(new \RuntimeException('Unexpected error'));
-
-        $controller = $this->getSut(
-            authService: $authServiceStub,
-            authCodeRequest: $authCodeRequestStub,
-        );
-
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Unexpected error');
-
-        $controller->handleOTP();
+        $sut->handleOTP();
     }
 
     public function testResendCodeSendsSuccessResponse(): void
@@ -162,15 +118,17 @@ class TwoFactorAuthControllerTest extends TestCase
     }
 
     private function getSut(
+        TwoFAServiceInterface $twoFAService = null,
+        TwoFAUserServiceInterface $twoFAUserService = null,
         AuthorizeServiceInterface $authService = null,
-        UserServiceInterface $userService = null,
         AuthCodeRequestInterface $authCodeRequest = null,
         UtilsView $utilsView = null,
         JsonResponseInterface $jsonResponse = null,
     ): TwoFactorAuthController {
         return new TwoFactorAuthController(
+            twoFAService: $twoFAService ?? $this->createStub(TwoFAServiceInterface::class),
+            twoFAUserService: $twoFAUserService ?? $this->createStub(TwoFAUserServiceInterface::class),
             authService: $authService ?? $this->createStub(AuthorizeServiceInterface::class),
-            userService: $userService ?? $this->createStub(UserServiceInterface::class),
             authCodeRequest: $authCodeRequest ?? $this->createStub(AuthCodeRequestInterface::class),
             utilsView: $utilsView ?? $this->createStub(UtilsView::class),
             jsonResponse: $jsonResponse ?? $this->createStub(JsonResponseInterface::class),

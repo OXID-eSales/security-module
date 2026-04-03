@@ -11,9 +11,10 @@ namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Controller;
 
 use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Core\UtilsView;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\OTPValidationException;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\InvalidCodeException;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\AuthorizeServiceInterface;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\UserServiceInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAServiceInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAUserServiceInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Transput\AuthCodeRequestInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Transput\JsonResponseInterface;
 
@@ -28,8 +29,9 @@ class TwoFactorAuthController extends FrontendController
     protected $_sThisTemplate = '@oe_security_module/templates/two_factor_auth';
 
     public function __construct(
+        private readonly TwoFAServiceInterface $twoFAService,
+        private readonly TwoFAUserServiceInterface $twoFAUserService,
         private readonly AuthorizeServiceInterface $authService,
-        private readonly UserServiceInterface $userService,
         private readonly AuthCodeRequestInterface $authCodeRequest,
         private readonly UtilsView $utilsView,
         private readonly JsonResponseInterface $jsonResponse,
@@ -39,13 +41,12 @@ class TwoFactorAuthController extends FrontendController
 
     public function handleOTP(): ?string
     {
-        try {
-            $this->authService->validate(
-                $this->authCodeRequest->getCode()
-            );
+        $userId = $this->twoFAUserService->getPendingUserId();
 
-            $this->userService->finalizeLogin();
-        } catch (OTPValidationException $e) {
+        try {
+            $this->twoFAService->verify($userId, $this->authCodeRequest->getCode());
+            $this->twoFAUserService->loginUser($userId);
+        } catch (InvalidCodeException $e) {
             $this->utilsView->addErrorToDisplay($e);
         }
 

@@ -17,12 +17,15 @@ use OxidEsales\Eshop\Core\Request;
 use OxidEsales\Eshop\Core\Utils;
 use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Facade\ModuleSettingServiceInterface;
+use DateTimeImmutable;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Infrastructure\Repository\OtpChallengeStateRepositoryInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\AuthorizeService;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\ModuleSettingsService;
 use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface as CaptchaSettingsServiceInterface;
 use OxidEsales\SecurityModule\Core\Module;
 use OxidEsales\SecurityModule\Tests\Integration\IntegrationTestCase;
 
+// todo-critical: rework the 2FA part of the test. it changes the real configs on the fly and causing side effects
 class UserTest extends IntegrationTestCase
 {
     private const OTP_USER_NAME = 'user@oxid-esales.com';
@@ -207,31 +210,24 @@ class UserTest extends IntegrationTestCase
         $this->assertEquals($subject->getId(), $sessionUserId);
     }
 
-    public function testLoginWithOTPPassSessionVariableSkipsOTPRedirect(): void
+    public function testLoginWithVerifiedChallengeStateSkipsOTPRedirect(): void
     {
         $this->disableCaptcha();
         $this->enableTwoFactorAuth();
 
-        $subject = oxNew(User::class);
-        $subject->load($this->getOTPUserId());
+        $userId = $this->getOTPUserId();
 
-        Registry::getSession()->setVariable('OTP_PASS', $subject->getId());
+        $stateRepo = $this->get(OtpChallengeStateRepositoryInterface::class);
+        $stateRepo->createChallengeState($userId, 'hash', new DateTimeImmutable('+5 minutes'));
+        $stateRepo->markVerified($userId);
 
         $utilsMock = $this->createMock(Utils::class);
         $utilsMock->expects($this->never())->method('redirect');
         Registry::set(Utils::class, $utilsMock);
 
-        $result = $subject->login(self::OTP_USER_NAME, self::OTP_USER_PASSWORD);
+        $result = oxNew(User::class)->login(self::OTP_USER_NAME, self::OTP_USER_PASSWORD);
 
         $this->assertTrue($result);
-        $this->assertNull(
-            Registry::getSession()->getVariable('OTP_PASS'),
-            'OTP_PASS session variable should be cleared after successful login'
-        );
-        $this->assertNull(
-            Registry::getSession()->getVariable(AuthorizeService::USER_SESSION_KEY),
-            'USER_SESSION_KEY should not be set when OTP was already validated'
-        );
     }
 
     public function testLoginWithOTPPassSessionVariableMismatchTriggersOTPFlow(): void

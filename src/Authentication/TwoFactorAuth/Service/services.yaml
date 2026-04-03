@@ -35,3 +35,7 @@ services:
   OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\ResendOTPServiceInterface:
     class: OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\ResendOTPService
     public: true
+
+  OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAUserServiceInterface:
+    class: OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAUserService
+    public: true

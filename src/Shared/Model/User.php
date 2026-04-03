@@ -12,8 +12,7 @@ namespace OxidEsales\SecurityModule\Shared\Model;
 use OxidEsales\Eshop\Core\Exception\InputException;
 use OxidEsales\Eshop\Core\Exception\UserException;
 use OxidEsales\Eshop\Core\Registry;
-// use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAServiceInterface;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\UserServiceInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAUserServiceInterface;
 use OxidEsales\SecurityModule\Captcha\Captcha\Image\Exception\CaptchaValidateException as ImageCaptchaException;
 use OxidEsales\SecurityModule\Captcha\Captcha\HoneyPot\Exception\CaptchaValidateException as HoneyPotCaptchaException;
 use OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface;
@@ -91,43 +90,20 @@ class User extends User_parent
     {
         parent::onLogin($userName, $password);
 
-        if (!$this->isOTPEnabled() || $this->isAdmin()) {
-            return;
-        }
-
         $userId = $this->getId();
-        if (!$userId) {
-            return;
+        $settingsService = $this->getService(TwoFASettingsServiceInterface::class);
+        if ($userId && $settingsService->isTwoFactorAuthEnabled() && !$this->isAdmin()) {
+            $twoFAUserService = $this->getService(TwoFAUserServiceInterface::class);
+            if (!$twoFAUserService->isChallengeVerified($userId)) {
+                $twoFAUserService->startChallengeForUser($userId);
+            }
         }
-
-        $userService = $this->getService(UserServiceInterface::class);
-        $userSessionKey = Registry::getSession()->getVariable('OTP_PASS');
-        if ($userSessionKey && $userSessionKey === $userId) {
-            $userService->clearOTPSessionVariables();
-            return;
-        }
-
-        $userService->handleLogin($userId);
-
-//        $settingsService = $this->getService(TwoFASettingsServiceInterface::class);
-//        if ($settingsService->isTwoFactorAuthEnabled() && !$this->isAdmin()) {
-//            $authentication = $this->getService(TwoFAServiceInterface::class);
-//            if (!$authentication->isVerified($userId)) {
-//                $authentication->triggerChallenge($userId);
-//            }
-//        }
     }
 
     private function isCaptchaEnabled(): bool
     {
         $settingsService = $this->getService(CaptchaSettingsServiceInterface::class);
         return $settingsService->isCaptchaEnabled() || $settingsService->isHoneyPotCaptchaEnabled();
-    }
-
-    private function isOTPEnabled(): bool
-    {
-        $settingsService = $this->getService(TwoFASettingsServiceInterface::class);
-        return $settingsService->isTwoFactorAuthEnabled();
     }
 
     protected function shouldValidateCaptcha(): bool
