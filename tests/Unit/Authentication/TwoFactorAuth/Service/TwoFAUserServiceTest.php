@@ -9,11 +9,10 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Tests\Unit\Authentication\TwoFactorAuth\Service;
 
-use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Utils;
 use OxidEsales\EshopCommunity\Internal\Framework\Session\SessionInterface;
 use OxidEsales\SecurityModule\Authentication\Service\InternalRedirectServiceInterface;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\UserModelFactoryInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Service\UserLoginAdapterInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAServiceInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAUserService;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFASettingsInterface;
@@ -84,13 +83,10 @@ class TwoFAUserServiceTest extends TestCase
     #[Test]
     public function loginUserLoadsUserLoginsClearsSessionAndRedirects(): void
     {
-        $userSpy = $this->createMock(User::class);
-        $userSpy->expects($this->once())->method('load')->with($userId = uniqid());
-        $userSpy->method('getFieldData')->with('oxusername')->willReturn($username = uniqid());
-        $userSpy->expects($this->once())->method('login')->with($username, null, false);
-
-        $userFactoryStub = $this->createStub(UserModelFactoryInterface::class);
-        $userFactoryStub->method('create')->willReturn($userSpy);
+        $loginAdapterSpy = $this->createMock(UserLoginAdapterInterface::class);
+        $loginAdapterSpy->expects($this->once())
+            ->method('loginUser')
+            ->with($userId = uniqid());
 
         $sessionSpy = $this->createMock(SessionInterface::class);
         $sessionSpy->expects($this->once())
@@ -104,7 +100,7 @@ class TwoFAUserServiceTest extends TestCase
         $utilsSpy->expects($this->once())->method('redirect')->with($redirectUrl, false);
 
         $sut = $this->getSut(
-            userFactory: $userFactoryStub,
+            loginAdapter: $loginAdapterSpy,
             session: $sessionSpy,
             redirectService: $redirectServiceStub,
             utils: $utilsSpy,
@@ -118,7 +114,7 @@ class TwoFAUserServiceTest extends TestCase
         TwoFASettingsInterface $settings = null,
         Utils $utils = null,
         SessionInterface $session = null,
-        UserModelFactoryInterface $userFactory = null,
+        UserLoginAdapterInterface $loginAdapter = null,
         InternalRedirectServiceInterface $redirectService = null,
     ): TwoFAUserService {
         return new TwoFAUserService(
@@ -126,7 +122,7 @@ class TwoFAUserServiceTest extends TestCase
             settings: $settings ?? $this->createStub(TwoFASettingsInterface::class),
             utils: $utils ?? $this->createStub(Utils::class),
             session: $session ?? $this->createStub(SessionInterface::class),
-            userFactory: $userFactory ?? $this->createStub(UserModelFactoryInterface::class),
+            loginAdapter: $loginAdapter ?? $this->createStub(UserLoginAdapterInterface::class),
             redirectService: $redirectService ?? $this->createStub(InternalRedirectServiceInterface::class),
         );
     }

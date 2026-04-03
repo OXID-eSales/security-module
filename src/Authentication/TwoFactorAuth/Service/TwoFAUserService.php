@@ -12,7 +12,7 @@ namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service;
 use OxidEsales\Eshop\Core\Utils;
 use OxidEsales\EshopCommunity\Internal\Framework\Session\SessionInterface;
 use OxidEsales\SecurityModule\Authentication\Service\InternalRedirectServiceInterface;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\UserModelFactoryInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Service\UserLoginAdapterInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFASettingsInterface;
 
 /**
@@ -27,7 +27,7 @@ class TwoFAUserService implements TwoFAUserServiceInterface
         private TwoFASettingsInterface $settings,
         private Utils $utils,
         private SessionInterface $session,
-        private UserModelFactoryInterface $userFactory,
+        private UserLoginAdapterInterface $loginAdapter,
         private InternalRedirectServiceInterface $redirectService,
     ) {
     }
@@ -48,12 +48,7 @@ class TwoFAUserService implements TwoFAUserServiceInterface
     {
         $this->session->remove(self::USER_SESSION_KEY);
 
-        // todo-high: looks like it can go to the infrastructure layer
-        $user = $this->userFactory->create();
-        $user->load($userId);
-
-        /** @phpstan-ignore argument.type (password is null because user already authenticated to come here) */
-        $user->login($user->getFieldData('oxusername'), null, false);
+        $this->loginAdapter->loginUser($userId);
 
         $this->utils->redirect($this->redirectService->getRedirectUrl(), false);
     }
