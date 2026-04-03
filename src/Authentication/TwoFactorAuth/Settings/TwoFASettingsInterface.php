@@ -11,5 +11,9 @@ namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings;
 
 interface TwoFASettingsInterface
 {
+    public function isTwoFactorAuthEnabled(): bool;
+
+    public function getTwoFactorAuthType(): string;
+
     public function getVerificationUrl(): string;
 }

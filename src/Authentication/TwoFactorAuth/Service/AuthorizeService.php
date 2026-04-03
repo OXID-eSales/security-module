@@ -11,13 +11,14 @@ namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service;
 
 use OxidEsales\EshopCommunity\Internal\Framework\Session\SessionInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository\UserRepositoryInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFASettingsInterface;
 
 class AuthorizeService implements AuthorizeServiceInterface
 {
     public const USER_SESSION_KEY = 'pending_authorized_user';
 
     public function __construct(
-        private ModuleSettingsServiceInterface $moduleSettings,
+        private TwoFASettingsInterface $moduleSettings,
         private VerificationCollectorServiceInterface $verifyCollector,
         private NotifierCollectorInterface $notifierCollector,
         private ResendOTPServiceInterface $resendOTPService,

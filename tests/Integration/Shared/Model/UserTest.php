@@ -20,7 +20,7 @@ use OxidEsales\EshopCommunity\Internal\Framework\Module\Facade\ModuleSettingServ
 use DateTimeImmutable;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Infrastructure\Repository\OtpChallengeStateRepositoryInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\AuthorizeService;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\ModuleSettingsService;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFASettings;
 use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface as CaptchaSettingsServiceInterface;
 use OxidEsales\SecurityModule\Core\Module;
 use OxidEsales\SecurityModule\Tests\Integration\IntegrationTestCase;
@@ -212,9 +212,6 @@ class UserTest extends IntegrationTestCase
 
     public function testLoginWithVerifiedChallengeStateSkipsOTPRedirect(): void
     {
-        $this->disableCaptcha();
-        $this->enableTwoFactorAuth();
-
         $userId = $this->getOTPUserId();
 
         $stateRepo = $this->get(OtpChallengeStateRepositoryInterface::class);
@@ -260,12 +257,12 @@ class UserTest extends IntegrationTestCase
     {
         $moduleSettingService = ContainerFacade::get(ModuleSettingServiceInterface::class);
         $moduleSettingService->saveBoolean(
-            ModuleSettingsService::ACTIVE,
+            TwoFASettings::ACTIVE,
             true,
             Module::MODULE_ID
         );
         $moduleSettingService->saveString(
-            ModuleSettingsService::TWO_FACTOR_TYPE,
+            TwoFASettings::TWO_FACTOR_TYPE,
             'otp',
             Module::MODULE_ID
         );
@@ -275,7 +272,7 @@ class UserTest extends IntegrationTestCase
     {
         $moduleSettingService = ContainerFacade::get(ModuleSettingServiceInterface::class);
         $moduleSettingService->saveBoolean(
-            ModuleSettingsService::ACTIVE,
+            TwoFASettings::ACTIVE,
             false,
             Module::MODULE_ID
         );

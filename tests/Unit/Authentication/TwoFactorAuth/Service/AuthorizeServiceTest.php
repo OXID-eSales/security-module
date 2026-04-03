@@ -16,8 +16,8 @@ use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\Verificator
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Provider\NotifierAdapterInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository\UserRepositoryInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\AuthorizeService;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\ModuleSettingsServiceInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\NotifierCollectorInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFASettingsInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\ResendOTPServiceInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\VerificationCollectorServiceInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\Verificator\VerificatorAdapterInterface;
@@ -27,7 +27,7 @@ class AuthorizeServiceTest extends TestCase
 {
     public function testValidateThrowsWhenVerificatorNotFound(): void
     {
-        $settingsStub = $this->createStub(ModuleSettingsServiceInterface::class);
+        $settingsStub = $this->createStub(TwoFASettingsInterface::class);
         $settingsStub
             ->method('getTwoFactorAuthType')
             ->willReturn('unknown');
@@ -62,7 +62,7 @@ class AuthorizeServiceTest extends TestCase
             ->method('validateCode')
             ->willThrowException($exception);
 
-        $settingsStub = $this->createStub(ModuleSettingsServiceInterface::class);
+        $settingsStub = $this->createStub(TwoFASettingsInterface::class);
         $settingsStub
             ->method('getTwoFactorAuthType')
             ->willReturn('otp');
@@ -99,7 +99,7 @@ class AuthorizeServiceTest extends TestCase
             ->method('validateCode')
             ->with($userId, $code);
 
-        $settingsStub = $this->createStub(ModuleSettingsServiceInterface::class);
+        $settingsStub = $this->createStub(TwoFASettingsInterface::class);
         $settingsStub
             ->method('getTwoFactorAuthType')
             ->willReturn('otp');
@@ -147,7 +147,7 @@ class AuthorizeServiceTest extends TestCase
         $userRepositoryStub = $this->createStub(UserRepositoryInterface::class);
         $userRepositoryStub->method('getUserOTPData')->willReturn($userStub);
 
-        $settingsStub = $this->createStub(ModuleSettingsServiceInterface::class);
+        $settingsStub = $this->createStub(TwoFASettingsInterface::class);
         $settingsStub
             ->method('getTwoFactorAuthType')
             ->willReturn('otp');
@@ -194,7 +194,7 @@ class AuthorizeServiceTest extends TestCase
         $userRepositoryStub = $this->createStub(UserRepositoryInterface::class);
         $userRepositoryStub->method('getUserOTPData')->willReturn($userStub);
 
-        $settingsStub = $this->createStub(ModuleSettingsServiceInterface::class);
+        $settingsStub = $this->createStub(TwoFASettingsInterface::class);
         $settingsStub->method('getTwoFactorAuthType')->willReturn('otp');
 
         $collectorStub = $this->createStub(VerificationCollectorServiceInterface::class);
@@ -256,7 +256,7 @@ class AuthorizeServiceTest extends TestCase
             ->with($userId)
             ->willReturn($remainingAttempts);
 
-        $settingsStub = $this->createStub(ModuleSettingsServiceInterface::class);
+        $settingsStub = $this->createStub(TwoFASettingsInterface::class);
         $settingsStub
             ->method('getTwoFactorAuthType')
             ->willReturn('otp');
@@ -282,7 +282,7 @@ class AuthorizeServiceTest extends TestCase
     }
 
     protected function getSut(
-        ModuleSettingsServiceInterface $moduleSettings = null,
+        TwoFASettingsInterface $moduleSettings = null,
         VerificationCollectorServiceInterface $verifyCollector = null,
         NotifierCollectorInterface $notifierCollector = null,
         ResendOTPServiceInterface $resendOTPService = null,
@@ -290,7 +290,7 @@ class AuthorizeServiceTest extends TestCase
         SessionInterface $session = null
     ): AuthorizeService {
         return new AuthorizeService(
-            moduleSettings: $moduleSettings ?? $this->createStub(ModuleSettingsServiceInterface::class),
+            moduleSettings: $moduleSettings ?? $this->createStub(TwoFASettingsInterface::class),
             verifyCollector: $verifyCollector ?? $this->createStub(VerificationCollectorServiceInterface::class),
             notifierCollector: $notifierCollector ?? $this->createStub(NotifierCollectorInterface::class),
             resendOTPService: $resendOTPService ?? $this->createStub(ResendOTPServiceInterface::class),

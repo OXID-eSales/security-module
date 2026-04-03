@@ -8,10 +8,6 @@ services:
     bind:
       OxidEsales\Eshop\Core\Utils: '@=service("OxidEsales\\SecurityModule\\Core\\Registry").getUtils()'
 
-  OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\ModuleSettingsServiceInterface:
-    class: OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\ModuleSettingsService
-    public: true
-
   OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\UserServiceInterface:
     class: OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\UserService
     public: true

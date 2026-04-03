@@ -5,3 +5,4 @@ services:
 
   OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFASettingsInterface:
     class: OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFASettings
+    public: true
