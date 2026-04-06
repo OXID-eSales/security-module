@@ -36,13 +36,12 @@ class JsonResponseTest extends TestCase
     {
         $data = ['status' => 'ok', 'code' => 123];
 
-        $utilsMock = $this->createMock(Utils::class);
-        $utilsMock->method('setHeader');
-        $utilsMock->expects($this->once())
+        $utilsSpy = $this->createMock(Utils::class);
+        $utilsSpy->expects($this->once())
             ->method('showMessageAndExit')
             ->with(json_encode($data));
 
-        $sut = new JsonResponse($utilsMock);
+        $sut = new JsonResponse($utilsSpy);
         $sut->send($data);
     }
 
@@ -57,8 +56,7 @@ class JsonResponseTest extends TestCase
         $utilsMock->method('showMessageAndExit');
 
         $sut = new JsonResponse($utilsMock);
-        $sut->setStatusCode(429);
-        $sut->send([]);
+        $sut->send([], 429);
 
         $this->assertContains('HTTP/1.1 429', $headers);
     }

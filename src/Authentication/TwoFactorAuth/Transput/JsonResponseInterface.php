@@ -9,7 +9,5 @@ namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Transput;
 
 interface JsonResponseInterface
 {
-    public function setStatusCode(int $code): void;
-
-    public function send(array $data): void;
+    public function send(array $data, int $statusCode = 200): void;
 }
