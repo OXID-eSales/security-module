@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Tests\Unit\Authentication\TwoFactorAuth\Exception;
 
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\AttemptLimitExceededException;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\CodeValidationException;
 use PHPUnit\Framework\TestCase;
 
 class AttemptLimitExceededExceptionTest extends TestCase
@@ -18,6 +19,7 @@ class AttemptLimitExceededExceptionTest extends TestCase
     {
         $exception = new AttemptLimitExceededException();
 
+        $this->assertInstanceOf(CodeValidationException::class, $exception);
         $this->assertSame('ERROR_ATTEMPT_LIMIT_EXCEEDED', $exception->getMessage());
     }
 }

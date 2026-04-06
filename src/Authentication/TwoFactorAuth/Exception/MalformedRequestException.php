@@ -9,6 +9,10 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception;
 
-class AuthenticationTypeNotFoundException extends TwoFAException
+class MalformedRequestException extends TwoFAException
 {
+    public function __construct()
+    {
+        parent::__construct('ERROR_MALFORMED_REQUEST');
+    }
 }

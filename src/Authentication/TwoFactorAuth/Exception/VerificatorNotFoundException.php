@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception;
 
-class VerificatorNotFoundException extends \Exception
+class VerificatorNotFoundException extends TwoFAException
 {
     public function __construct()
     {

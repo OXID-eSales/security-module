@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Tests\Unit\Authentication\TwoFactorAuth\Exception;
 
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\CodeValidationException;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\TimeExpiredException;
 use PHPUnit\Framework\TestCase;
 
@@ -18,6 +19,7 @@ class TimeExpiredExceptionTest extends TestCase
     {
         $exception = new TimeExpiredException();
 
+        $this->assertInstanceOf(CodeValidationException::class, $exception);
         $this->assertSame('ERROR_CODE_TIME_EXPIRED', $exception->getMessage());
     }
 }

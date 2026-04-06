@@ -9,8 +9,6 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception;
 
-use OxidEsales\Eshop\Core\Exception\StandardException;
-
-class OTPValidationException extends StandardException
+class CodeValidationException extends TwoFAException
 {
 }

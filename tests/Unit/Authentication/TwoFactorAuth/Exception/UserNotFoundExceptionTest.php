@@ -9,14 +9,14 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Tests\Unit\Authentication\TwoFactorAuth\Exception;
 
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\NotifierNotFoundException;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\TwoFAException;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\UserNotFoundException;
 use PHPUnit\Framework\TestCase;
 
-class NotifierNotFoundExceptionTest extends TestCase
+class UserNotFoundExceptionTest extends TestCase
 {
     public function testException(): void
     {
-        $this->assertInstanceOf(TwoFAException::class, new NotifierNotFoundException());
+        $this->assertInstanceOf(TwoFAException::class, new UserNotFoundException());
     }
 }

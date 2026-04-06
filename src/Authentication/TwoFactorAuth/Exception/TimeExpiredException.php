@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception;
 
-class TimeExpiredException extends OTPValidationException
+class TimeExpiredException extends CodeValidationException
 {
     public function __construct()
     {

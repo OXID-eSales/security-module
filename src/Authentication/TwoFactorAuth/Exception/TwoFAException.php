@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception;
 
-class AuthenticationTypeNotFoundException extends TwoFAException
+use OxidEsales\Eshop\Core\Exception\StandardException;
+
+class TwoFAException extends StandardException
 {
 }

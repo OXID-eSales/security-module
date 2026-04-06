@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Tests\Unit\Authentication\TwoFactorAuth\Exception;
 
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\TwoFAException;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\VerificatorNotFoundException;
 use PHPUnit\Framework\TestCase;
 
@@ -18,6 +19,7 @@ class VerificatorNotFoundExceptionTest extends TestCase
     {
         $exception = new VerificatorNotFoundException();
 
+        $this->assertInstanceOf(TwoFAException::class, $exception);
         $this->assertSame('ERROR_VERIFICATOR_NOT_FOUND', $exception->getMessage());
     }
 }
