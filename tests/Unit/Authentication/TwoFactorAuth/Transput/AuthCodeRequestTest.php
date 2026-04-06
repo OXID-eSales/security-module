@@ -10,79 +10,48 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Tests\Unit\Authentication\TwoFactorAuth\Transput;
 
 use OxidEsales\EshopCommunity\Internal\Framework\Request\RequestInterface;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\InvalidCodeException;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\MalformedRequestException;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Transput\AuthCodeRequest;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Transput\AuthCodeRequestInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class AuthCodeRequestTest extends TestCase
 {
-    public function testGetCodeReturnsValidCode(): void
+    public static function validCodeDataProvider(): \Generator
     {
         $code = uniqid();
-
-        $requestStub = $this->createStub(RequestInterface::class);
-        $requestStub->method('get')->with('auth_code')->willReturn($code);
-
-        $sut = $this->getSut(
-            request: $requestStub,
-        );
-
-        $this->assertSame($code, $sut->getCode());
+        yield 'string code' => ['input' => $code, 'expected' => $code];
+        yield 'empty string' => ['input' => '', 'expected' => ''];
+        yield 'integer code' => ['input' => 123456, 'expected' => '123456'];
     }
 
-    public function testGetCodeThrowsExceptionWhenCodeIsEmpty(): void
+    #[DataProvider('validCodeDataProvider')]
+    public function testGetCodeReturnsCode(mixed $input, string $expected): void
     {
         $requestStub = $this->createStub(RequestInterface::class);
-        $requestStub->method('get')->with('auth_code')->willReturn('');
+        $requestStub->method('get')->with('auth_code')->willReturn($input);
 
-        $sut = $this->getSut(
-            request: $requestStub,
-        );
+        $sut = $this->getSut(request: $requestStub);
 
-        $this->expectException(InvalidCodeException::class);
-
-        $sut->getCode();
+        $this->assertSame($expected, $sut->getCode());
     }
 
-    public function testGetCodeThrowsExceptionWhenCodeIsNull(): void
+    public static function invalidCodeDataProvider(): \Generator
     {
-        $requestStub = $this->createStub(RequestInterface::class);
-        $requestStub->method('get')->with('auth_code')->willReturn(null);
-
-        $sut = $this->getSut(
-            request: $requestStub,
-        );
-
-        $this->expectException(InvalidCodeException::class);
-
-        $sut->getCode();
+        yield 'null' => [null];
+        yield 'array' => [['code']];
     }
 
-    public function testGetCodeThrowsExceptionWhenCodeIsArray(): void
+    #[DataProvider('invalidCodeDataProvider')]
+    public function testGetCodeThrowsExceptionForInvalidInput(mixed $value): void
     {
         $requestStub = $this->createStub(RequestInterface::class);
-        $requestStub->method('get')->with('auth_code')->willReturn(['code']);
+        $requestStub->method('get')->with('auth_code')->willReturn($value);
 
-        $sut = $this->getSut(
-            request: $requestStub,
-        );
+        $sut = $this->getSut(request: $requestStub);
 
-        $this->expectException(InvalidCodeException::class);
-
-        $sut->getCode();
-    }
-
-    public function testGetCodeThrowsExceptionWhenCodeIsInteger(): void
-    {
-        $requestStub = $this->createStub(RequestInterface::class);
-        $requestStub->method('get')->with('auth_code')->willReturn(123456);
-
-        $sut = $this->getSut(
-            request: $requestStub,
-        );
-
-        $this->expectException(InvalidCodeException::class);
+        $this->expectException(MalformedRequestException::class);
 
         $sut->getCode();
     }

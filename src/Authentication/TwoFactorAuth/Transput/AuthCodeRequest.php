@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Transput;
 
 use OxidEsales\EshopCommunity\Internal\Framework\Request\RequestInterface;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\InvalidCodeException;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\MalformedRequestException;
 
 readonly class AuthCodeRequest implements AuthCodeRequestInterface
 {
@@ -21,12 +21,11 @@ readonly class AuthCodeRequest implements AuthCodeRequestInterface
 
     public function getCode(): string
     {
-        $code = $this->request->get('auth_code');
-
-        if (!is_string($code) || $code === '') {
-            throw new InvalidCodeException();
+        $raw = $this->request->get('auth_code');
+        if (!is_string($raw) && !is_int($raw)) {
+            throw new MalformedRequestException();
         }
 
-        return $code;
+        return (string) $raw;
     }
 }

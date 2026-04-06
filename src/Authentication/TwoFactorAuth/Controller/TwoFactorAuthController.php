@@ -42,9 +42,10 @@ class TwoFactorAuthController extends FrontendController
     public function handleOTP(): ?string
     {
         $userId = $this->twoFAUserService->getPendingUserId();
+        $code = $this->authCodeRequest->getCode();
 
         try {
-            $this->twoFAService->verify($userId, $this->authCodeRequest->getCode());
+            $this->twoFAService->verify($userId, $code);
             $this->twoFAUserService->loginUser($userId);
         } catch (InvalidCodeException $e) {
             $this->utilsView->addErrorToDisplay($e);

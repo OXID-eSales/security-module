@@ -7,7 +7,7 @@
 
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service;
 
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\InvalidCodeException;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\CodeValidationException;
 
 interface TwoFAServiceInterface
 {
@@ -18,7 +18,7 @@ interface TwoFAServiceInterface
     public function invalidateChallenge(string $userId): void;
 
     /**
-     * @throws InvalidCodeException
+     * @throws CodeValidationException
      */
     public function verify(string $userId, #[\SensitiveParameter] string $code): void;
 
