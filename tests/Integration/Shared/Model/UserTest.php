@@ -16,16 +16,14 @@ use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
 use OxidEsales\Eshop\Core\Utils;
 use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
-use OxidEsales\EshopCommunity\Internal\Framework\Module\Facade\ModuleSettingServiceInterface;
 use DateTimeImmutable;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Infrastructure\Repository\OtpChallengeStateRepositoryInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\AuthorizeService;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFASettings;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFASettingsInterface;
 use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface as CaptchaSettingsServiceInterface;
-use OxidEsales\SecurityModule\Core\Module;
+use OxidEsales\SecurityModule\Shared\Model\User as SecurityModuleUser;
 use OxidEsales\SecurityModule\Tests\Integration\IntegrationTestCase;
 
-// todo-critical: rework the 2FA part of the test. it changes the real configs on the fly and causing side effects
 class UserTest extends IntegrationTestCase
 {
     private const OTP_USER_NAME = 'user@oxid-esales.com';
@@ -47,12 +45,6 @@ class UserTest extends IntegrationTestCase
         Registry::getSession()->setVariable('captcha_expiration', time() + 60);
     }
 
-    public function tearDown(): void
-    {
-        $this->disableTwoFactorAuth();
-        parent::tearDown();
-    }
-
     public function testCheckValuesWithInvalidCaptcha()
     {
         $this->requestMock
@@ -68,7 +60,7 @@ class UserTest extends IntegrationTestCase
         $message = Registry::getLang()->translateString("ERROR_INVALID_CAPTCHA");
         $this->expectExceptionMessage($message);
 
-        $subject = oxNew(User::class);
+        $subject = $this->createUserMock(captchaEnabled: true, twoFaEnabled: false);
         $subject->checkValues('', '', '', [], []);
     }
 
@@ -87,7 +79,7 @@ class UserTest extends IntegrationTestCase
         $message = Registry::getLang()->translateString("ERROR_EMPTY_CAPTCHA");
         $this->expectExceptionMessage($message);
 
-        $subject = oxNew(User::class);
+        $subject = $this->createUserMock(captchaEnabled: true, twoFaEnabled: false);
         $subject->checkValues('', '', '', [], []);
     }
 
@@ -95,13 +87,17 @@ class UserTest extends IntegrationTestCase
     {
         $this->requestMock
             ->method('getRequestParameter')
-            ->with('captcha')
-            ->willReturn('invalid_captcha');
+            ->willReturnCallback(function ($param) {
+                if ($param === 'captcha') {
+                    return 'invalid_captcha';
+                }
+                return null;
+            });
 
         $this->expectException(UserException::class);
         $this->expectExceptionMessage("ERROR_INVALID_CAPTCHA");
 
-        $subject = oxNew(User::class);
+        $subject = $this->createUserMock(captchaEnabled: true, twoFaEnabled: false);
         $subject->login('', '');
     }
 
@@ -109,20 +105,22 @@ class UserTest extends IntegrationTestCase
     {
         $this->requestMock
             ->method('getRequestParameter')
-            ->with('captcha')
-            ->willReturn('');
+            ->willReturnCallback(function ($param) {
+                if ($param === 'captcha') {
+                    return '';
+                }
+                return null;
+            });
 
         $this->expectException(UserException::class);
         $this->expectExceptionMessage("ERROR_EMPTY_CAPTCHA");
 
-        $subject = oxNew(User::class);
+        $subject = $this->createUserMock(captchaEnabled: true, twoFaEnabled: false);
         $subject->login('', '');
     }
 
     public function testLoginWithValidCaptchaAndValidCredentials(): void
     {
-        $this->disableTwoFactorAuth();
-
         $this->requestMock
             ->method('getRequestParameter')
             ->willReturnCallback(function ($param) {
@@ -132,7 +130,7 @@ class UserTest extends IntegrationTestCase
                 return null;
             });
 
-        $subject = oxNew(User::class);
+        $subject = $this->createUserMock(captchaEnabled: true, twoFaEnabled: false);
         $result = $subject->login(self::OTP_USER_NAME, self::OTP_USER_PASSWORD);
 
         $this->assertTrue($result);
@@ -140,14 +138,11 @@ class UserTest extends IntegrationTestCase
 
     public function testLoginWithOTPEnabledAndValidCredentialsRedirectsToOTP(): void
     {
-        $this->disableCaptcha();
-        $this->enableTwoFactorAuth();
-
         $utilsMock = $this->createMock(Utils::class);
         $utilsMock->expects($this->once())->method('redirect');
         Registry::set(Utils::class, $utilsMock);
 
-        $subject = oxNew(User::class);
+        $subject = $this->createUserMock(captchaEnabled: false, twoFaEnabled: true);
         $subject->login(self::OTP_USER_NAME, self::OTP_USER_PASSWORD);
 
         $this->assertNotNull(
@@ -157,34 +152,25 @@ class UserTest extends IntegrationTestCase
 
     public function testLoginWithOTPEnabledAndInvalidCredentialsThrowsException(): void
     {
-        $this->disableCaptcha();
-        $this->enableTwoFactorAuth();
-
         $this->expectException(UserException::class);
         $this->expectExceptionMessage('ERROR_MESSAGE_USER_NOVALIDLOGIN');
 
-        $subject = oxNew(User::class);
+        $subject = $this->createUserMock(captchaEnabled: false, twoFaEnabled: true);
         $subject->login(self::OTP_USER_NAME, uniqid());
     }
 
     public function testLoginWithOTPEnabledAndNonExistentUserThrowsException(): void
     {
-        $this->disableCaptcha();
-        $this->enableTwoFactorAuth();
-
         $this->expectException(UserException::class);
         $this->expectExceptionMessage('ERROR_MESSAGE_USER_NOVALIDLOGIN');
 
-        $subject = oxNew(User::class);
+        $subject = $this->createUserMock(captchaEnabled: false, twoFaEnabled: true);
         $subject->login('nonexistent@test.com', 'anypassword');
     }
 
     public function testLoginWithOTPDisabledCallsParentLogin(): void
     {
-        $this->disableCaptcha();
-        $this->disableTwoFactorAuth();
-
-        $subject = oxNew(User::class);
+        $subject = $this->createUserMock(captchaEnabled: false, twoFaEnabled: false);
         $result = $subject->login(self::OTP_USER_NAME, self::OTP_USER_PASSWORD);
 
         $this->assertTrue($result);
@@ -195,14 +181,11 @@ class UserTest extends IntegrationTestCase
 
     public function testLoginWithOTPEnabledStoresUserIdInSession(): void
     {
-        $this->disableCaptcha();
-        $this->enableTwoFactorAuth();
-
         $utilsMock = $this->createMock(Utils::class);
         $utilsMock->method('redirect');
         Registry::set(Utils::class, $utilsMock);
 
-        $subject = oxNew(User::class);
+        $subject = $this->createUserMock(captchaEnabled: false, twoFaEnabled: true);
         $subject->login(self::OTP_USER_NAME, self::OTP_USER_PASSWORD);
 
         $sessionUserId = Registry::getSession()->getVariable(AuthorizeService::USER_SESSION_KEY);
@@ -222,16 +205,14 @@ class UserTest extends IntegrationTestCase
         $utilsMock->expects($this->never())->method('redirect');
         Registry::set(Utils::class, $utilsMock);
 
-        $result = oxNew(User::class)->login(self::OTP_USER_NAME, self::OTP_USER_PASSWORD);
+        $subject = $this->createUserMock(captchaEnabled: false, twoFaEnabled: true);
+        $result = $subject->login(self::OTP_USER_NAME, self::OTP_USER_PASSWORD);
 
         $this->assertTrue($result);
     }
 
     public function testLoginWithOTPPassSessionVariableMismatchTriggersOTPFlow(): void
     {
-        $this->disableCaptcha();
-        $this->enableTwoFactorAuth();
-
         $mismatchedUserId = 'different-user-id';
         Registry::getSession()->setVariable('OTP_PASS', $mismatchedUserId);
 
@@ -239,7 +220,7 @@ class UserTest extends IntegrationTestCase
         $utilsMock->method('redirect');
         Registry::set(Utils::class, $utilsMock);
 
-        $subject = oxNew(User::class);
+        $subject = $this->createUserMock(captchaEnabled: false, twoFaEnabled: true);
         $subject->login(self::OTP_USER_NAME, self::OTP_USER_PASSWORD);
 
         $this->assertNotNull(
@@ -253,35 +234,29 @@ class UserTest extends IntegrationTestCase
         );
     }
 
-    private function enableTwoFactorAuth(): void
+    private function createUserMock(bool $captchaEnabled, bool $twoFaEnabled): SecurityModuleUser
     {
-        $moduleSettingService = ContainerFacade::get(ModuleSettingServiceInterface::class);
-        $moduleSettingService->saveBoolean(
-            TwoFASettings::ACTIVE,
-            true,
-            Module::MODULE_ID
-        );
-        $moduleSettingService->saveString(
-            TwoFASettings::TWO_FACTOR_TYPE,
-            'otp',
-            Module::MODULE_ID
-        );
-    }
+        $captchaSettings = $this->createMock(CaptchaSettingsServiceInterface::class);
+        $captchaSettings->method('isCaptchaEnabled')->willReturn($captchaEnabled);
+        $captchaSettings->method('isHoneyPotCaptchaEnabled')->willReturn(false);
 
-    private function disableTwoFactorAuth(): void
-    {
-        $moduleSettingService = ContainerFacade::get(ModuleSettingServiceInterface::class);
-        $moduleSettingService->saveBoolean(
-            TwoFASettings::ACTIVE,
-            false,
-            Module::MODULE_ID
-        );
-    }
+        $twoFaSettings = $this->createMock(TwoFASettingsInterface::class);
+        $twoFaSettings->method('isTwoFactorAuthEnabled')->willReturn($twoFaEnabled);
 
-    private function disableCaptcha(): void
-    {
-        $captchaSettings = ContainerFacade::get(CaptchaSettingsServiceInterface::class);
-        $captchaSettings->saveIsCaptchaEnabled(false);
+        $serviceMocks = [
+            CaptchaSettingsServiceInterface::class => $captchaSettings,
+            TwoFASettingsInterface::class => $twoFaSettings,
+        ];
+
+        /** @var SecurityModuleUser $userMock */
+        $userMock = $this->getMockBuilder(SecurityModuleUser::class)
+            ->onlyMethods(['getService'])
+            ->getMock();
+        $userMock->method('getService')->willReturnCallback(
+            fn(string $id) => $serviceMocks[$id] ?? ContainerFacade::get($id)
+        );
+
+        return $userMock;
     }
 
     private function getOTPUserId(): string
