@@ -17,6 +17,8 @@ use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Service\OtpChalle
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Service\OtpCodeGeneratorServiceInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Service\OtpCodeValidatorServiceInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\DTO\OtpChallengeStateInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Service\OtpSendPolicyServiceInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\ResendCooldownException;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\InvalidCodeException;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -177,17 +179,69 @@ class OtpFacadeTest extends TestCase
         $sut->triggerChallenge(userId: $userId);
     }
 
+    #[Test]
+    public function resendThrowsCooldownExceptionWhenSendNotAllowed(): void
+    {
+        $sendPolicyStub = $this->createStub(OtpSendPolicyServiceInterface::class);
+        $sendPolicyStub->method('canSend')
+            ->with($userId = uniqid())
+            ->willReturn(false);
+
+        $sut = $this->getSut(sendPolicy: $sendPolicyStub);
+
+        $this->expectException(ResendCooldownException::class);
+
+        $sut->resend(userId: $userId);
+    }
+
+    #[Test]
+    public function resendRefreshesStateAndNotifiesWhenAllowed(): void
+    {
+        $sendPolicyStub = $this->createStub(OtpSendPolicyServiceInterface::class);
+        $sendPolicyStub->method('canSend')
+            ->with($userId = uniqid())
+            ->willReturn(true);
+
+        $codeGeneratorStub = $this->createStub(OtpCodeGeneratorServiceInterface::class);
+        $codeGeneratorStub->method('generateCode')
+            ->willReturn($code = uniqid());
+
+        $stateServiceSpy = $this->createMock(OtpChallengeStateServiceInterface::class);
+        $stateServiceSpy->expects($this->once())
+            ->method('refreshChallengeState')
+            ->with($userId, $code);
+
+        $notifierSpy = $this->createMock(OtpNotifierInterface::class);
+        $notifierSpy->expects($this->once())
+            ->method('notify')
+            ->with($userId, $code);
+
+        $notifierFactoryStub = $this->createStub(OtpNotifierFactoryInterface::class);
+        $notifierFactoryStub->method('create')->willReturn($notifierSpy);
+
+        $sut = $this->getSut(
+            stateService: $stateServiceSpy,
+            codeGenerator: $codeGeneratorStub,
+            notifierFactory: $notifierFactoryStub,
+            sendPolicy: $sendPolicyStub,
+        );
+
+        $sut->resend(userId: $userId);
+    }
+
     private function getSut(
         OtpChallengeStateServiceInterface $stateService = null,
         OtpCodeValidatorServiceInterface $codeValidator = null,
         OtpCodeGeneratorServiceInterface $codeGenerator = null,
         OtpNotifierFactoryInterface $notifierFactory = null,
+        OtpSendPolicyServiceInterface $sendPolicy = null,
     ): OtpFacade {
         return new OtpFacade(
             stateService: $stateService ?? $this->createStub(OtpChallengeStateServiceInterface::class),
             codeValidator: $codeValidator ?? $this->createStub(OtpCodeValidatorServiceInterface::class),
             codeGenerator: $codeGenerator ?? $this->createStub(OtpCodeGeneratorServiceInterface::class),
             notifierFactory: $notifierFactory ?? $this->createStub(OtpNotifierFactoryInterface::class),
+            sendPolicy: $sendPolicy ?? $this->createStub(OtpSendPolicyServiceInterface::class),
         );
     }
 }

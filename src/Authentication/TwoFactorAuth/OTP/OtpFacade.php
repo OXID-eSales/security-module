@@ -9,10 +9,12 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP;
 
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\ResendCooldownException;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Notifier\Factory\OtpNotifierFactoryInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Service\OtpChallengeStateServiceInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Service\OtpCodeGeneratorServiceInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Service\OtpCodeValidatorServiceInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Service\OtpSendPolicyServiceInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAServiceInterface;
 
 class OtpFacade implements TwoFAServiceInterface
@@ -22,6 +24,7 @@ class OtpFacade implements TwoFAServiceInterface
         private OtpCodeValidatorServiceInterface $codeValidator,
         private OtpCodeGeneratorServiceInterface $codeGenerator,
         private OtpNotifierFactoryInterface $notifierFactory,
+        private OtpSendPolicyServiceInterface $sendPolicy,
     ) {
     }
 
@@ -59,6 +62,12 @@ class OtpFacade implements TwoFAServiceInterface
 
     public function resend(string $userId): void
     {
-        // todo-critical: implement
+        if (!$this->sendPolicy->canSend($userId)) {
+            throw new ResendCooldownException();
+        }
+
+        $code = $this->codeGenerator->generateCode();
+        $this->stateService->refreshChallengeState($userId, $code);
+        $this->notifierFactory->create($userId)->notify($userId, $code);
     }
 }
