@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Tests\Unit\Authentication\TwoFactorAuth\OTP\Notifier\Email;
 
 use OxidEsales\Eshop\Core\Email;
+use OxidEsales\Eshop\Core\Language;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\DTO\NewUserInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\EmailFactoryInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository\NewUserRepositoryInterface;
@@ -24,6 +25,8 @@ class OtpEmailNotifierTest extends TestCase
     {
         $email = uniqid() . '@example.com';
         $code = uniqid();
+        $subject = uniqid();
+        $bodyTemplate = uniqid() . ' %s';
 
         $userStub = $this->createStub(NewUserInterface::class);
         $userStub->method('getEmail')->willReturn($email);
@@ -34,13 +37,22 @@ class OtpEmailNotifierTest extends TestCase
             ->with($userId = uniqid())
             ->willReturn($userStub);
 
+        $translations = [
+            'OTP_EMAIL_SUBJECT' => $subject,
+            'OTP_EMAIL_BODY'    => $bodyTemplate,
+        ];
+        $languageStub = $this->createStub(Language::class);
+        $languageStub->method('translateString')->willReturnCallback(
+            fn(string $key) => $translations[$key] ?? $key
+        );
+
         $emailModelSpy = $this->createMock(Email::class);
         $emailModelSpy->expects($this->once())
             ->method('sendEmail')
             ->with(
                 $email,
-                'Your verification code',
-                "Your verification code is: {$code}"
+                $subject,
+                sprintf($bodyTemplate, $code)
             );
 
         $emailFactoryStub = $this->createStub(EmailFactoryInterface::class);
@@ -49,6 +61,7 @@ class OtpEmailNotifierTest extends TestCase
         $sut = $this->getSut(
             emailFactory: $emailFactoryStub,
             userRepository: $userRepositoryMock,
+            language: $languageStub,
         );
 
         $sut->notify(userId: $userId, code: $code);
@@ -57,10 +70,12 @@ class OtpEmailNotifierTest extends TestCase
     private function getSut(
         EmailFactoryInterface $emailFactory = null,
         NewUserRepositoryInterface $userRepository = null,
+        Language $language = null,
     ): OtpEmailNotifier {
         return new OtpEmailNotifier(
             emailFactory: $emailFactory ?? $this->createStub(EmailFactoryInterface::class),
             userRepository: $userRepository ?? $this->createStub(NewUserRepositoryInterface::class),
+            language: $language ?? $this->createStub(Language::class),
         );
     }
 }

@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Notifier\Email;
 
+use OxidEsales\Eshop\Core\Language;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\EmailFactoryInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository\NewUserRepositoryInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Notifier\OtpNotifierInterface;
@@ -18,6 +19,7 @@ class OtpEmailNotifier implements OtpNotifierInterface
     public function __construct(
         private EmailFactoryInterface $emailFactory,
         private NewUserRepositoryInterface $userRepository,
+        private Language $language,
     ) {
     }
 
@@ -25,11 +27,10 @@ class OtpEmailNotifier implements OtpNotifierInterface
     {
         $email = $this->userRepository->getUserById($userId)->getEmail();
 
-        // todo-critical: load the translations
         $this->emailFactory->create()->sendEmail(
             $email,
-            'Your verification code',
-            "Your verification code is: {$code}"
+            $this->language->translateString('OTP_EMAIL_SUBJECT'),
+            sprintf($this->language->translateString('OTP_EMAIL_BODY'), $code)
         );
     }
 }

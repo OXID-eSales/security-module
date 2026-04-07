@@ -42,6 +42,9 @@ $aLang = [
 
     'SIGN_IN_PROVIDER' => 'Anmelden mit %s',
 
+    'OTP_EMAIL_SUBJECT' => 'Ihr Verifizierungscode',
+    'OTP_EMAIL_BODY'    => 'Ihr Verifizierungscode lautet: %s',
+
     'TWO_FACTOR_AUTHENTICATION_TITLE'       => 'Zwei-Faktor-Authentifizierung',
     'TWO_FACTOR_AUTHENTICATION_DESCRIPTION' => 'Ein Code wurde an Ihre E-Mail-Adresse gesendet. Bitte geben Sie ihn unten ein, um fortzufahren.',
 
