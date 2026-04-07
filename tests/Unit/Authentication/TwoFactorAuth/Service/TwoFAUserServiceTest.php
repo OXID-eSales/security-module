@@ -83,10 +83,17 @@ class TwoFAUserServiceTest extends TestCase
     #[Test]
     public function loginUserLoadsUserLoginsClearsSessionAndRedirects(): void
     {
+        $userId = uniqid();
+
         $loginAdapterSpy = $this->createMock(UserLoginAdapterInterface::class);
         $loginAdapterSpy->expects($this->once())
             ->method('loginUser')
-            ->with($userId = uniqid());
+            ->with($userId);
+
+        $twoFAServiceSpy = $this->createMock(TwoFAServiceInterface::class);
+        $twoFAServiceSpy->expects($this->once())
+            ->method('invalidateChallenge')
+            ->with($userId);
 
         $sessionSpy = $this->createMock(SessionInterface::class);
         $sessionSpy->expects($this->once())
@@ -100,6 +107,7 @@ class TwoFAUserServiceTest extends TestCase
         $utilsSpy->expects($this->once())->method('redirect')->with($redirectUrl, false);
 
         $sut = $this->getSut(
+            twoFAService: $twoFAServiceSpy,
             loginAdapter: $loginAdapterSpy,
             session: $sessionSpy,
             redirectService: $redirectServiceStub,
