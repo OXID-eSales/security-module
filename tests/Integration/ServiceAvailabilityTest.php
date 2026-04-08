@@ -43,16 +43,27 @@ final class ServiceAvailabilityTest extends IntegrationTestCase
             [\OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Factory\TwoFAServiceFactoryInterface::class],
 
             [\OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAServiceInterface::class],
+            [\OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAUserServiceInterface::class],
+
+            [\OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFASettingsInterface::class],
+
+            [\OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Transput\AuthCodeRequestInterface::class],
+            [\OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Transput\JsonResponseInterface::class],
+
+            [\OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\EmailFactoryInterface::class],
+            [\OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\UserFactoryInterface::class],
+            [\OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\UserModelFactoryInterface::class],
+            [\OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository\UserRepositoryInterface::class],
+            [\OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Service\UserLoginAdapterInterface::class],
 
             [\OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Infrastructure\Repository\OtpChallengeStateRepositoryInterface::class],
             [\OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Service\OtpChallengeStateServiceInterface::class],
             [\OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Service\OtpCodeValidatorServiceInterface::class],
             [\OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Service\OtpCodeGeneratorServiceInterface::class],
             [\OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Service\OtpCodeHasherServiceInterface::class],
-            [\OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFASettingsInterface::class],
+            [\OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Service\OtpSendPolicyServiceInterface::class],
             [\OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Notifier\OtpNotifierInterface::class],
             [\OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Notifier\Factory\OtpNotifierFactoryInterface::class],
-            [\OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Service\OtpSendPolicyServiceInterface::class],
         ];
         // phpcs:enable
     }
