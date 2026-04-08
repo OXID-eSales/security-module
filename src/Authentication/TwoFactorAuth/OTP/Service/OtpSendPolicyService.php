@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Service;
 
 use DateTimeImmutable;
+// phpcs:ignore Generic.Files.LineLength
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Infrastructure\Repository\OtpChallengeStateRepositoryInterface;
 
 class OtpSendPolicyService implements OtpSendPolicyServiceInterface
@@ -17,13 +18,13 @@ class OtpSendPolicyService implements OtpSendPolicyServiceInterface
     private const RESEND_COOLDOWN_SECONDS = 60;
 
     public function __construct(
-        private OtpChallengeStateRepositoryInterface $challengeStateRepository,
+        private OtpChallengeStateRepositoryInterface $stateRepository,
     ) {
     }
 
     public function canSend(string $userId): bool
     {
-        $state = $this->challengeStateRepository->findByUserId($userId);
+        $state = $this->stateRepository->findByUserId($userId);
 
         if ($state === null) {
             return true;

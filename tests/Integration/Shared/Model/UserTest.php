@@ -17,8 +17,9 @@ use OxidEsales\Eshop\Core\Request;
 use OxidEsales\Eshop\Core\Utils;
 use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
 use DateTimeImmutable;
+// phpcs:ignore Generic.Files.LineLength
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Infrastructure\Repository\OtpChallengeStateRepositoryInterface;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\AuthorizeService;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAUserService;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFASettingsInterface;
 use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface as CaptchaSettingsServiceInterface;
 use OxidEsales\SecurityModule\Shared\Model\User as SecurityModuleUser;
@@ -146,7 +147,7 @@ class UserTest extends IntegrationTestCase
         $subject->login(self::OTP_USER_NAME, self::OTP_USER_PASSWORD);
 
         $this->assertNotNull(
-            Registry::getSession()->getVariable(AuthorizeService::USER_SESSION_KEY)
+            Registry::getSession()->getVariable(TwoFAUserService::USER_SESSION_KEY)
         );
     }
 
@@ -175,7 +176,7 @@ class UserTest extends IntegrationTestCase
 
         $this->assertTrue($result);
         $this->assertNull(
-            Registry::getSession()->getVariable(AuthorizeService::USER_SESSION_KEY)
+            Registry::getSession()->getVariable(TwoFAUserService::USER_SESSION_KEY)
         );
     }
 
@@ -188,7 +189,7 @@ class UserTest extends IntegrationTestCase
         $subject = $this->createUserMock(captchaEnabled: false, twoFaEnabled: true);
         $subject->login(self::OTP_USER_NAME, self::OTP_USER_PASSWORD);
 
-        $sessionUserId = Registry::getSession()->getVariable(AuthorizeService::USER_SESSION_KEY);
+        $sessionUserId = Registry::getSession()->getVariable(TwoFAUserService::USER_SESSION_KEY);
         $this->assertNotNull($sessionUserId);
         $this->assertEquals($subject->getId(), $sessionUserId);
     }
@@ -224,7 +225,7 @@ class UserTest extends IntegrationTestCase
         $subject->login(self::OTP_USER_NAME, self::OTP_USER_PASSWORD);
 
         $this->assertNotNull(
-            Registry::getSession()->getVariable(AuthorizeService::USER_SESSION_KEY),
+            Registry::getSession()->getVariable(TwoFAUserService::USER_SESSION_KEY),
             'USER_SESSION_KEY should be set when OTP flow is triggered'
         );
         $this->assertSame(

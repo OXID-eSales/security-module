@@ -10,22 +10,21 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Service;
 
 use DateTimeImmutable;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\{
-    DTO\OtpChallengeStateInterface,
-    Infrastructure\Repository\OtpChallengeStateRepositoryInterface,
-};
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\DTO\OtpChallengeStateInterface;
+// phpcs:ignore Generic.Files.LineLength
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Infrastructure\Repository\OtpChallengeStateRepositoryInterface;
 
 class OtpChallengeStateService implements OtpChallengeStateServiceInterface
 {
     public function __construct(
-        private OtpChallengeStateRepositoryInterface $challengeStateRepository,
+        private OtpChallengeStateRepositoryInterface $stateRepository,
         private OtpCodeHasherServiceInterface $codeHasher,
     ) {
     }
 
     public function getChallengeState(string $userId): ?OtpChallengeStateInterface
     {
-        return $this->challengeStateRepository->findByUserId($userId);
+        return $this->stateRepository->findByUserId($userId);
     }
 
     public function createChallengeState(string $userId, #[\SensitiveParameter] string $code): void
@@ -34,7 +33,7 @@ class OtpChallengeStateService implements OtpChallengeStateServiceInterface
         $expiresAt = new DateTimeImmutable('+5 minutes');
         $codeHash = $this->codeHasher->hash($code);
 
-        $this->challengeStateRepository->createChallengeState($userId, $codeHash, $expiresAt);
+        $this->stateRepository->createChallengeState($userId, $codeHash, $expiresAt);
     }
 
     // todo-high: challenge if we want this second method to exist.
@@ -44,21 +43,21 @@ class OtpChallengeStateService implements OtpChallengeStateServiceInterface
         $expiresAt = new DateTimeImmutable('+5 minutes');
         $codeHash = $this->codeHasher->hash($code);
 
-        $this->challengeStateRepository->refreshChallengeState($userId, $codeHash, $expiresAt);
+        $this->stateRepository->refreshChallengeState($userId, $codeHash, $expiresAt);
     }
 
     public function markVerified(string $userId): void
     {
-        $this->challengeStateRepository->markVerified($userId);
+        $this->stateRepository->markVerified($userId);
     }
 
     public function incrementAttempts(string $userId): void
     {
-        $this->challengeStateRepository->incrementAttempts($userId);
+        $this->stateRepository->incrementAttempts($userId);
     }
 
     public function deleteChallengeState(string $userId): void
     {
-        $this->challengeStateRepository->deleteChallengeState($userId);
+        $this->stateRepository->deleteChallengeState($userId);
     }
 }

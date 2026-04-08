@@ -5,21 +5,13 @@
  * See LICENSE file for license details.
  */
 
-namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\DTO;
+declare(strict_types=1);
 
-use DateTimeInterface;
+namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\DTO;
 
 interface UserInterface
 {
-    public function getId(): string;
-
-    public function getCode(): ?string;
-
-    public function getAttempts(): int;
-
-    public function getExpiresAt(): ?DateTimeInterface;
-
-    public function getLastSentAt(): ?DateTimeInterface;
+    public function getUserId(): string;
 
     public function getEmail(): string;
 }

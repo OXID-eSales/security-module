@@ -23,7 +23,8 @@ interface TwoFAServiceInterface
      */
     public function verify(string $userId, #[\SensitiveParameter] string $code): void;
 
-    // todo-low: consider extracting resend to a separate ResendableInterface, not all 2FA methods support it (e.g. TOTP)
+    // todo-low: consider extracting resend to a separate ResendableInterface,
+    // not all 2FA methods support it (e.g. TOTP)
     /** @throws ResendCooldownException */
     public function resend(string $userId): void;
 }

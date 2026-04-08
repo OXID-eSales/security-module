@@ -5,20 +5,15 @@
  * See LICENSE file for license details.
  */
 
+declare(strict_types=1);
+
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository;
 
-use DateTime;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\DTO\UserInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\UserNotFoundException;
 
 interface UserRepositoryInterface
 {
-    public function getUserOTPData(string $userId): UserInterface;
-
-    public function updateAttempts(string $userId, int $attempts): void;
-
-    public function resetCodeFields(string $userId): void;
-
-    public function addOTPtoUser(string $userId, string $otp, DateTime $expiresAt): bool;
-
-    public function markOtpAsSent(string $userId): void;
+    /** @throws UserNotFoundException */
+    public function getUserById(string $userId): UserInterface;
 }

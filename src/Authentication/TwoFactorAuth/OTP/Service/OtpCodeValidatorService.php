@@ -9,11 +9,13 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Service;
 
+// phpcs:ignore Generic.Files.LineLength
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Infrastructure\Repository\OtpChallengeStateRepositoryInterface;
 
 class OtpCodeValidatorService implements OtpCodeValidatorServiceInterface
 {
     public function __construct(
+        /** @phpstan-ignore property.onlyWritten */
         private OtpChallengeStateRepositoryInterface $repository,
     ) {
     }
@@ -22,6 +24,6 @@ class OtpCodeValidatorService implements OtpCodeValidatorServiceInterface
         string $userId,
         #[\SensitiveParameter] string $inputCode
     ): void {
-        // todo-critical: implement
+        // todo-critical: implement, also remove the phpstan-ignore then
     }
 }

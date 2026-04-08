@@ -10,13 +10,13 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Tests\Integration\Authentication\TwoFactorAuth\Infrastructure\Repository;
 
 use OxidEsales\Eshop\Application\Model\User;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\DTO\NewUserInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\DTO\UserInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\UserNotFoundException;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository\NewUserRepositoryInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository\UserRepositoryInterface;
 use OxidEsales\SecurityModule\Tests\Integration\IntegrationTestCase;
 use PHPUnit\Framework\Attributes\Test;
 
-class NewUserRepositoryTest extends IntegrationTestCase
+class UserRepositoryTest extends IntegrationTestCase
 {
     #[Test]
     public function getUserByIdThrowsWhenUserNotFound(): void
@@ -43,13 +43,13 @@ class NewUserRepositoryTest extends IntegrationTestCase
 
         $result = $sut->getUserById(userId: $userId);
 
-        $this->assertInstanceOf(NewUserInterface::class, $result);
+        $this->assertInstanceOf(UserInterface::class, $result);
         $this->assertSame($userId, $result->getUserId());
         $this->assertSame($email, $result->getEmail());
     }
 
-    private function getSut(): NewUserRepositoryInterface
+    private function getSut(): UserRepositoryInterface
     {
-        return $this->get(NewUserRepositoryInterface::class);
+        return $this->get(UserRepositoryInterface::class);
     }
 }

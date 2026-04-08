@@ -11,6 +11,7 @@ namespace OxidEsales\SecurityModule\Tests\Unit\Authentication\TwoFactorAuth\OTP\
 
 use DateTimeImmutable;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\DTO\OtpChallengeStateInterface;
+// phpcs:ignore Generic.Files.LineLength
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Infrastructure\Repository\OtpChallengeStateRepositoryInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Service\OtpChallengeStateService;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Service\OtpCodeHasherServiceInterface;
@@ -125,7 +126,7 @@ class OtpChallengeStateServiceTest extends TestCase
         OtpCodeHasherServiceInterface $hasher = null,
     ): OtpChallengeStateService {
         return new OtpChallengeStateService(
-            challengeStateRepository: $repository ?? $this->createStub(OtpChallengeStateRepositoryInterface::class),
+            stateRepository: $repository ?? $this->createStub(OtpChallengeStateRepositoryInterface::class),
             codeHasher: $hasher ?? $this->createStub(OtpCodeHasherServiceInterface::class),
         );
     }

@@ -11,6 +11,7 @@ namespace OxidEsales\SecurityModule\Tests\Unit\Authentication\TwoFactorAuth\OTP\
 
 use DateTimeImmutable;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\DTO\OtpChallengeStateInterface;
+// phpcs:ignore Generic.Files.LineLength
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Infrastructure\Repository\OtpChallengeStateRepositoryInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Service\OtpSendPolicyService;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Service\OtpSendPolicyServiceInterface;
@@ -29,7 +30,7 @@ class OtpSendPolicyServiceTest extends TestCase
             ->with($userId)
             ->willReturn(null);
 
-        $sut = $this->getSut(challengeStateRepository: $repositoryMock);
+        $sut = $this->getSut(stateRepository: $repositoryMock);
 
         $this->assertTrue($sut->canSend($userId));
     }
@@ -48,7 +49,7 @@ class OtpSendPolicyServiceTest extends TestCase
             ->with($userId)
             ->willReturn($stateStub);
 
-        $sut = $this->getSut(challengeStateRepository: $repositoryMock);
+        $sut = $this->getSut(stateRepository: $repositoryMock);
 
         $this->assertTrue($sut->canSend($userId));
     }
@@ -67,7 +68,7 @@ class OtpSendPolicyServiceTest extends TestCase
             ->with($userId)
             ->willReturn($stateStub);
 
-        $sut = $this->getSut(challengeStateRepository: $repositoryMock);
+        $sut = $this->getSut(stateRepository: $repositoryMock);
 
         $this->assertTrue($sut->canSend($userId));
     }
@@ -86,16 +87,17 @@ class OtpSendPolicyServiceTest extends TestCase
             ->with($userId)
             ->willReturn($stateStub);
 
-        $sut = $this->getSut(challengeStateRepository: $repositoryMock);
+        $sut = $this->getSut(stateRepository: $repositoryMock);
 
         $this->assertFalse($sut->canSend($userId));
     }
 
     private function getSut(
-        OtpChallengeStateRepositoryInterface $challengeStateRepository = null,
+        OtpChallengeStateRepositoryInterface $stateRepository = null,
     ): OtpSendPolicyServiceInterface {
         return new OtpSendPolicyService(
-            challengeStateRepository: $challengeStateRepository ?? $this->createStub(OtpChallengeStateRepositoryInterface::class),
+            stateRepository: $stateRepository
+                ?? $this->createStub(OtpChallengeStateRepositoryInterface::class),
         );
     }
 }

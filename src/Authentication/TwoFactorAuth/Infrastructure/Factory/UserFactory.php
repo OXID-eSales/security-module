@@ -10,14 +10,14 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory;
 
 use OxidEsales\Eshop\Application\Model\User;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\DTO\NewUser;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\DTO\NewUserInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\DTO\User as UserDto;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\DTO\UserInterface;
 
-class NewUserFactory implements NewUserFactoryInterface
+class UserFactory implements UserFactoryInterface
 {
-    public function createFromModel(User $userModel): NewUserInterface
+    public function createFromModel(User $userModel): UserInterface
     {
-        return new NewUser(
+        return new UserDto(
             userId: $userModel->getId(),
             email: $userModel->getFieldData('oxusername'),
         );

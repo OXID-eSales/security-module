@@ -10,12 +10,12 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Tests\Unit\Authentication\TwoFactorAuth\Infrastructure\Factory;
 
 use OxidEsales\Eshop\Application\Model\User;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\NewUserFactory;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\NewUserFactoryInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\UserFactory;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\UserFactoryInterface;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
-class NewUserFactoryTest extends TestCase
+class UserFactoryTest extends TestCase
 {
     #[Test]
     public function createFromModelMapsIdAndEmail(): void
@@ -35,11 +35,11 @@ class NewUserFactoryTest extends TestCase
     #[Test]
     public function implementsInterface(): void
     {
-        $this->assertInstanceOf(NewUserFactoryInterface::class, $this->getSut());
+        $this->assertInstanceOf(UserFactoryInterface::class, $this->getSut());
     }
 
-    private function getSut(): NewUserFactory
+    private function getSut(): UserFactory
     {
-        return new NewUserFactory();
+        return new UserFactory();
     }
 }

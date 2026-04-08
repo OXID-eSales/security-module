@@ -11,9 +11,9 @@ namespace OxidEsales\SecurityModule\Tests\Unit\Authentication\TwoFactorAuth\OTP\
 
 use OxidEsales\Eshop\Core\Email;
 use OxidEsales\Eshop\Core\Language;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\DTO\NewUserInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\DTO\UserInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\EmailFactoryInterface;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository\NewUserRepositoryInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository\UserRepositoryInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Notifier\Email\OtpEmailNotifier;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -28,10 +28,10 @@ class OtpEmailNotifierTest extends TestCase
         $subject = uniqid();
         $bodyTemplate = uniqid() . ' %s';
 
-        $userStub = $this->createStub(NewUserInterface::class);
+        $userStub = $this->createStub(UserInterface::class);
         $userStub->method('getEmail')->willReturn($email);
 
-        $userRepositoryMock = $this->createMock(NewUserRepositoryInterface::class);
+        $userRepositoryMock = $this->createMock(UserRepositoryInterface::class);
         $userRepositoryMock->expects($this->once())
             ->method('getUserById')
             ->with($userId = uniqid())
@@ -69,12 +69,12 @@ class OtpEmailNotifierTest extends TestCase
 
     private function getSut(
         EmailFactoryInterface $emailFactory = null,
-        NewUserRepositoryInterface $userRepository = null,
+        UserRepositoryInterface $userRepository = null,
         Language $language = null,
     ): OtpEmailNotifier {
         return new OtpEmailNotifier(
             emailFactory: $emailFactory ?? $this->createStub(EmailFactoryInterface::class),
-            userRepository: $userRepository ?? $this->createStub(NewUserRepositoryInterface::class),
+            userRepository: $userRepository ?? $this->createStub(UserRepositoryInterface::class),
             language: $language ?? $this->createStub(Language::class),
         );
     }

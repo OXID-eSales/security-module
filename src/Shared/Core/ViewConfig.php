@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Shared\Core;
 
 use OxidEsales\SecurityModule\Authentication\OAuth2\Service\ProviderCollectorInterface;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\AuthorizeServiceInterface;
 use OxidEsales\SecurityModule\Captcha\Captcha\Image\Service\ImageCaptchaService;
 use OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsServiceInterface as PasswordSettingsServiceInterface;
@@ -62,7 +61,8 @@ class ViewConfig extends ViewConfig_parent
 
     public function getRemainingAttempts(): int
     {
-        return $this->getService(AuthorizeServiceInterface::class)->getRemainingAttempts();
+        // todo-critical: implement
+        return 5;
     }
 
     public function isExternalAuthUser(): bool

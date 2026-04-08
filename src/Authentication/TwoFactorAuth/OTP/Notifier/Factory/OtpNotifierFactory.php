@@ -26,9 +26,10 @@ class OtpNotifierFactory implements OtpNotifierFactoryInterface
         return $this->notifiers[$channel] ?? throw new OtpNotifierNotFoundException();
     }
 
+    /** @SuppressWarnings(PHPMD.UnusedFormalParameter) */
     private function getUserChannel(string $userId): string
     {
-        // todo-high-implement: select the notifier by user settings
+        // todo-high-implement: select the notifier by user settings, remove warning suppression also
 
         return 'email';
     }

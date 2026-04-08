@@ -15,6 +15,7 @@ use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Service\OtpChalle
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Service\OtpCodeGeneratorServiceInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Service\OtpCodeValidatorServiceInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Service\OtpSendPolicyServiceInterface;
+use DateTimeImmutable;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAServiceInterface;
 
 class OtpFacade implements TwoFAServiceInterface
@@ -36,7 +37,7 @@ class OtpFacade implements TwoFAServiceInterface
             return false;
         }
 
-        return $state->getExpiresAt() > new \DateTimeImmutable();
+        return $state->getExpiresAt() > new DateTimeImmutable();
     }
 
     public function triggerChallenge(string $userId): void
