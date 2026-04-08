@@ -14,12 +14,11 @@ use OxidEsales\Eshop\Core\Exception\InputException;
 use OxidEsales\Eshop\Core\Exception\UserException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
-use OxidEsales\Eshop\Core\Utils;
+use Generator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
-use DateTimeImmutable;
 // phpcs:ignore Generic.Files.LineLength
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Infrastructure\Repository\OtpChallengeStateRepositoryInterface;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAUserService;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAUserServiceInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFASettingsInterface;
 use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface as CaptchaSettingsServiceInterface;
 use OxidEsales\SecurityModule\Shared\Model\User as SecurityModuleUser;
@@ -27,8 +26,8 @@ use OxidEsales\SecurityModule\Tests\Integration\IntegrationTestCase;
 
 class UserTest extends IntegrationTestCase
 {
-    private const OTP_USER_NAME = 'user@oxid-esales.com';
-    private const OTP_USER_PASSWORD = 'useruser';
+    private const TWO_FA_USER_NAME = 'user@oxid-esales.com';
+    private const TWO_FA_USER_PASSWORD = 'useruser';
 
     protected Request $requestMock;
 
@@ -61,8 +60,11 @@ class UserTest extends IntegrationTestCase
         $message = Registry::getLang()->translateString("ERROR_INVALID_CAPTCHA");
         $this->expectExceptionMessage($message);
 
-        $subject = $this->createUserMock(captchaEnabled: true, twoFaEnabled: false);
-        $subject->checkValues('', '', '', [], []);
+        $captchaSettings = $this->createStub(CaptchaSettingsServiceInterface::class);
+        $captchaSettings->method('isCaptchaEnabled')->willReturn(true);
+
+        $sut = $this->getSut([CaptchaSettingsServiceInterface::class => $captchaSettings]);
+        $sut->checkValues('', '', '', [], []);
     }
 
     public function testCheckValuesWithEmptyCaptcha()
@@ -80,8 +82,11 @@ class UserTest extends IntegrationTestCase
         $message = Registry::getLang()->translateString("ERROR_EMPTY_CAPTCHA");
         $this->expectExceptionMessage($message);
 
-        $subject = $this->createUserMock(captchaEnabled: true, twoFaEnabled: false);
-        $subject->checkValues('', '', '', [], []);
+        $captchaSettings = $this->createStub(CaptchaSettingsServiceInterface::class);
+        $captchaSettings->method('isCaptchaEnabled')->willReturn(true);
+
+        $sut = $this->getSut([CaptchaSettingsServiceInterface::class => $captchaSettings]);
+        $sut->checkValues('', '', '', [], []);
     }
 
     public function testLoginWithInvalidCaptcha()
@@ -98,8 +103,11 @@ class UserTest extends IntegrationTestCase
         $this->expectException(UserException::class);
         $this->expectExceptionMessage("ERROR_INVALID_CAPTCHA");
 
-        $subject = $this->createUserMock(captchaEnabled: true, twoFaEnabled: false);
-        $subject->login('', '');
+        $captchaSettings = $this->createStub(CaptchaSettingsServiceInterface::class);
+        $captchaSettings->method('isCaptchaEnabled')->willReturn(true);
+
+        $sut = $this->getSut([CaptchaSettingsServiceInterface::class => $captchaSettings]);
+        $sut->login('', '');
     }
 
     public function testLoginWithEmptyCaptcha()
@@ -116,8 +124,11 @@ class UserTest extends IntegrationTestCase
         $this->expectException(UserException::class);
         $this->expectExceptionMessage("ERROR_EMPTY_CAPTCHA");
 
-        $subject = $this->createUserMock(captchaEnabled: true, twoFaEnabled: false);
-        $subject->login('', '');
+        $captchaSettings = $this->createStub(CaptchaSettingsServiceInterface::class);
+        $captchaSettings->method('isCaptchaEnabled')->willReturn(true);
+
+        $sut = $this->getSut([CaptchaSettingsServiceInterface::class => $captchaSettings]);
+        $sut->login('', '');
     }
 
     public function testLoginWithValidCaptchaAndValidCredentials(): void
@@ -131,139 +142,174 @@ class UserTest extends IntegrationTestCase
                 return null;
             });
 
-        $subject = $this->createUserMock(captchaEnabled: true, twoFaEnabled: false);
-        $result = $subject->login(self::OTP_USER_NAME, self::OTP_USER_PASSWORD);
+        $captchaSettings = $this->createStub(CaptchaSettingsServiceInterface::class);
+        $captchaSettings->method('isCaptchaEnabled')->willReturn(true);
+
+        $sut = $this->getSut([CaptchaSettingsServiceInterface::class => $captchaSettings]);
+        $result = $sut->login(self::TWO_FA_USER_NAME, self::TWO_FA_USER_PASSWORD);
 
         $this->assertTrue($result);
     }
 
-    public function testLoginWithOTPEnabledAndValidCredentialsRedirectsToOTP(): void
+    public function testLoginWith2FAEnabledAndUnverifiedChallengeTriggersChallenge(): void
     {
-        $utilsMock = $this->createMock(Utils::class);
-        $utilsMock->expects($this->once())->method('redirect');
-        Registry::set(Utils::class, $utilsMock);
+        $userId = $this->getTwoFAUserId();
 
-        $subject = $this->createUserMock(captchaEnabled: false, twoFaEnabled: true);
-        $subject->login(self::OTP_USER_NAME, self::OTP_USER_PASSWORD);
+        $twoFaSettings = $this->createStub(TwoFASettingsInterface::class);
+        $twoFaSettings->method('isTwoFactorAuthEnabled')->willReturn(true);
 
-        $this->assertNotNull(
-            Registry::getSession()->getVariable(TwoFAUserService::USER_SESSION_KEY)
-        );
-    }
+        $userServiceSpy = $this->createMock(TwoFAUserServiceInterface::class);
+        $userServiceSpy->method('isChallengeVerified')
+            ->with($userId)
+            ->willReturn(false);
+        $userServiceSpy->expects($this->once())
+            ->method('startChallengeForUser')
+            ->with($userId);
 
-    public function testLoginWithOTPEnabledAndInvalidCredentialsThrowsException(): void
-    {
-        $this->expectException(UserException::class);
-        $this->expectExceptionMessage('ERROR_MESSAGE_USER_NOVALIDLOGIN');
-
-        $subject = $this->createUserMock(captchaEnabled: false, twoFaEnabled: true);
-        $subject->login(self::OTP_USER_NAME, uniqid());
-    }
-
-    public function testLoginWithOTPEnabledAndNonExistentUserThrowsException(): void
-    {
-        $this->expectException(UserException::class);
-        $this->expectExceptionMessage('ERROR_MESSAGE_USER_NOVALIDLOGIN');
-
-        $subject = $this->createUserMock(captchaEnabled: false, twoFaEnabled: true);
-        $subject->login('nonexistent@test.com', 'anypassword');
-    }
-
-    public function testLoginWithOTPDisabledCallsParentLogin(): void
-    {
-        $subject = $this->createUserMock(captchaEnabled: false, twoFaEnabled: false);
-        $result = $subject->login(self::OTP_USER_NAME, self::OTP_USER_PASSWORD);
-
-        $this->assertTrue($result);
-        $this->assertNull(
-            Registry::getSession()->getVariable(TwoFAUserService::USER_SESSION_KEY)
-        );
-    }
-
-    public function testLoginWithOTPEnabledStoresUserIdInSession(): void
-    {
-        $utilsMock = $this->createMock(Utils::class);
-        $utilsMock->method('redirect');
-        Registry::set(Utils::class, $utilsMock);
-
-        $subject = $this->createUserMock(captchaEnabled: false, twoFaEnabled: true);
-        $subject->login(self::OTP_USER_NAME, self::OTP_USER_PASSWORD);
-
-        $sessionUserId = Registry::getSession()->getVariable(TwoFAUserService::USER_SESSION_KEY);
-        $this->assertNotNull($sessionUserId);
-        $this->assertEquals($subject->getId(), $sessionUserId);
-    }
-
-    public function testLoginWithVerifiedChallengeStateSkipsOTPRedirect(): void
-    {
-        $userId = $this->getOTPUserId();
-
-        $stateRepo = $this->get(OtpChallengeStateRepositoryInterface::class);
-        $stateRepo->createChallengeState($userId, 'hash', new DateTimeImmutable('+5 minutes'));
-        $stateRepo->markVerified($userId);
-
-        $utilsMock = $this->createMock(Utils::class);
-        $utilsMock->expects($this->never())->method('redirect');
-        Registry::set(Utils::class, $utilsMock);
-
-        $subject = $this->createUserMock(captchaEnabled: false, twoFaEnabled: true);
-        $result = $subject->login(self::OTP_USER_NAME, self::OTP_USER_PASSWORD);
-
-        $this->assertTrue($result);
-    }
-
-    public function testLoginWithOTPPassSessionVariableMismatchTriggersOTPFlow(): void
-    {
-        $mismatchedUserId = 'different-user-id';
-        Registry::getSession()->setVariable('OTP_PASS', $mismatchedUserId);
-
-        $utilsMock = $this->createMock(Utils::class);
-        $utilsMock->method('redirect');
-        Registry::set(Utils::class, $utilsMock);
-
-        $subject = $this->createUserMock(captchaEnabled: false, twoFaEnabled: true);
-        $subject->login(self::OTP_USER_NAME, self::OTP_USER_PASSWORD);
-
-        $this->assertNotNull(
-            Registry::getSession()->getVariable(TwoFAUserService::USER_SESSION_KEY),
-            'USER_SESSION_KEY should be set when OTP flow is triggered'
-        );
-        $this->assertSame(
-            $mismatchedUserId,
-            Registry::getSession()->getVariable('OTP_PASS'),
-            'OTP_PASS should NOT be cleared when user ID does not match'
-        );
-    }
-
-    private function createUserMock(bool $captchaEnabled, bool $twoFaEnabled): SecurityModuleUser
-    {
-        $captchaSettings = $this->createMock(CaptchaSettingsServiceInterface::class);
-        $captchaSettings->method('isCaptchaEnabled')->willReturn($captchaEnabled);
-        $captchaSettings->method('isHoneyPotCaptchaEnabled')->willReturn(false);
-
-        $twoFaSettings = $this->createMock(TwoFASettingsInterface::class);
-        $twoFaSettings->method('isTwoFactorAuthEnabled')->willReturn($twoFaEnabled);
-
-        $serviceMocks = [
-            CaptchaSettingsServiceInterface::class => $captchaSettings,
+        $sut = $this->getSut([
             TwoFASettingsInterface::class => $twoFaSettings,
-        ];
+            TwoFAUserServiceInterface::class => $userServiceSpy
+        ]);
+        $sut->login(self::TWO_FA_USER_NAME, self::TWO_FA_USER_PASSWORD);
+    }
 
-        /** @var SecurityModuleUser $userMock */
-        $userMock = $this->getMockBuilder(SecurityModuleUser::class)
+    public function testLoginWith2FAEnabledAndVerifiedChallengeNOTTriggeringChallengeAndLogins(): void
+    {
+        $userId = $this->getTwoFAUserId();
+
+        $twoFaSettings = $this->createStub(TwoFASettingsInterface::class);
+        $twoFaSettings->method('isTwoFactorAuthEnabled')->willReturn(true);
+
+        $userServiceSpy = $this->createMock(TwoFAUserServiceInterface::class);
+        $userServiceSpy->method('isChallengeVerified')
+            ->with($userId)
+            ->willReturn(true);
+        $userServiceSpy->expects($this->never())
+            ->method('startChallengeForUser');
+
+        $sut = $this->getSut([
+            TwoFASettingsInterface::class => $twoFaSettings,
+            TwoFAUserServiceInterface::class => $userServiceSpy
+        ]);
+
+        $result = $sut->login(self::TWO_FA_USER_NAME, self::TWO_FA_USER_PASSWORD);
+        $this->assertTrue($result);
+    }
+
+    public function testLoginWithoutPasswordOnLoadedUserWith2FAEnabledAndChallengeVerifiedLogsUserIn(): void
+    {
+        $userId = $this->getTwoFAUserId();
+
+        $twoFaSettings = $this->createStub(TwoFASettingsInterface::class);
+        $twoFaSettings->method('isTwoFactorAuthEnabled')->willReturn(true);
+
+        $userServiceMock = $this->createMock(TwoFAUserServiceInterface::class);
+        $userServiceMock->method('isChallengeVerified')->with($userId)->willReturn(true);
+
+        $sut = $this->getSut([
+            TwoFASettingsInterface::class => $twoFaSettings,
+            TwoFAUserServiceInterface::class => $userServiceMock,
+        ]);
+        $sut->load($userId);
+
+        $result = $sut->login(self::TWO_FA_USER_NAME, null);
+        $this->assertTrue($result);
+    }
+
+    public function testLoginWithoutPasswordOnLoadedUserWith2FAEnabledAndChallengeNotVerifiedNOTLogsUserIn(): void
+    {
+        $userId = $this->getTwoFAUserId();
+
+        $twoFaSettings = $this->createStub(TwoFASettingsInterface::class);
+        $twoFaSettings->method('isTwoFactorAuthEnabled')->willReturn(true);
+
+        $userServiceSpy = $this->createMock(TwoFAUserServiceInterface::class);
+        $userServiceSpy->method('isChallengeVerified')->with($userId)->willReturn(false);
+        $userServiceSpy->expects($this->once())
+            ->method('startChallengeForUser')
+            ->with($userId);
+
+        $sut = $this->getSut([
+            TwoFASettingsInterface::class => $twoFaSettings,
+            TwoFAUserServiceInterface::class => $userServiceSpy,
+        ]);
+        $sut->load($userId);
+
+        $sut->login(self::TWO_FA_USER_NAME, null);
+    }
+
+    #[DataProvider('invalidLoginDataProvider')]
+    public function testLoginWith2FAEnabledAndBadCredentialsThrowsException(
+        string $username,
+        string $password
+    ): void {
+        $this->expectException(UserException::class);
+        $this->expectExceptionMessage('ERROR_MESSAGE_USER_NOVALIDLOGIN');
+
+        $twoFaSettings = $this->createStub(TwoFASettingsInterface::class);
+        $twoFaSettings->method('isTwoFactorAuthEnabled')->willReturn(true);
+
+        $sut = $this->getSut([TwoFASettingsInterface::class => $twoFaSettings]);
+        $sut->login($username, $password);
+    }
+
+    public static function invalidLoginDataProvider(): Generator
+    {
+        yield 'invalid password' => [self::TWO_FA_USER_NAME, uniqid()];
+        yield 'nonexistent user' => ['nonexistent@test.com', 'anypassword'];
+    }
+
+    public function testLoginWith2FADisabledDoesntTouch2FA(): void
+    {
+        $twoFaSettings = $this->createStub(TwoFASettingsInterface::class);
+        $twoFaSettings->method('isTwoFactorAuthEnabled')->willReturn(false);
+
+        $userServiceSpy = $this->createMock(TwoFAUserServiceInterface::class);
+        $userServiceSpy->expects($this->never())
+            ->method('isChallengeVerified');
+        $userServiceSpy->expects($this->never())
+            ->method('startChallengeForUser');
+
+        $sut = $this->getSut([
+            TwoFASettingsInterface::class => $twoFaSettings,
+            TwoFAUserServiceInterface::class => $userServiceSpy
+        ]);
+
+        $result = $sut->login(self::TWO_FA_USER_NAME, self::TWO_FA_USER_PASSWORD);
+        $this->assertTrue($result);
+    }
+
+    private function getSut(array $serviceOverrides = []): SecurityModuleUser
+    {
+        $captchaDefault = $this->createStub(CaptchaSettingsServiceInterface::class);
+        $captchaDefault->method('isCaptchaEnabled')->willReturn(false);
+
+        $twoFaDefault = $this->createStub(TwoFASettingsInterface::class);
+        $twoFaDefault->method('isTwoFactorAuthEnabled')->willReturn(false);
+
+        $services = array_merge(
+            [
+                CaptchaSettingsServiceInterface::class => $captchaDefault,
+                TwoFASettingsInterface::class => $twoFaDefault,
+            ],
+            $serviceOverrides
+        );
+
+        /** @var SecurityModuleUser $sut */
+        $sut = $this->getMockBuilder(SecurityModuleUser::class)
             ->onlyMethods(['getService'])
             ->getMock();
-        $userMock->method('getService')->willReturnCallback(
-            fn(string $id) => $serviceMocks[$id] ?? ContainerFacade::get($id)
+        $sut->method('getService')->willReturnCallback(
+            fn(string $id) => $services[$id] ?? ContainerFacade::get($id)
         );
 
-        return $userMock;
+        return $sut;
     }
 
-    private function getOTPUserId(): string
+    private function getTwoFAUserId(): string
     {
         $user = oxNew(User::class);
-        $user->load($user->getIdByUserName(self::OTP_USER_NAME));
+        $user->load($user->getIdByUserName(self::TWO_FA_USER_NAME));
         return $user->getId();
     }
 }
