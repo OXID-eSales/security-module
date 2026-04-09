@@ -1,0 +1,18 @@
+{# todo-critical: remove if we go with separate Security section #}
+{% extends 'page/account/dashboard.html.twig' %}
+
+{% block account_dashboard_password_title %}{{ translate({ ident: "OE_SECURITY_PASSWORD_AND_SECURITY" }) }}{% endblock %}
+
+{% block account_dashboard_items %}
+    {{ parent() }}
+    <div class="col mb-3">
+        <div class="card card-lg h-100">
+            <h2 class="h4 card-header card-title">{{ translate({ ident: "OE_SECURITY_SECURITY_TITLE" }) }}</h2>
+            <div class="card-body">
+                <a class="btn btn-outline-primary stretched-link" href="{{ seo_url({ ident: oViewConf.getSslSelfLink() ~ "cl=account_security" }) }}">
+                    {{ translate({ ident: "MORE" }) }}
+                </a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

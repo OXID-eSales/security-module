@@ -13,6 +13,7 @@ use OxidEsales\SecurityModule\Authentication\OAuth2\Service\ProviderCollectorInt
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAResendableInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAServiceInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAUserServiceInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAUserSettingsServiceInterface;
 use OxidEsales\SecurityModule\Captcha\Captcha\Image\Service\ImageCaptchaService;
 use OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsServiceInterface as PasswordSettingsServiceInterface;
@@ -82,6 +83,16 @@ class ViewConfig extends ViewConfig_parent
 
         $userId = $this->getService(TwoFAUserServiceInterface::class)->getPendingUserId();
         return $twoFAService->getCooldownRemaining($userId);
+    }
+
+    public function isTwoFAEnabled(): bool
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return false;
+        }
+
+        return $this->getService(TwoFAUserSettingsServiceInterface::class)->isEnabledForUser($user->getId());
     }
 
     public function isExternalAuthUser(): bool

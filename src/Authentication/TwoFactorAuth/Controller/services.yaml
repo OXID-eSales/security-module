@@ -9,3 +9,8 @@ services:
     public: true
     tags:
         - { name: 'oxid.view_controller', controller_key: 'twofactorauth' }
+
+  OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Controller\AccountSecurityController:
+    public: true
+    tags:
+        - { name: 'oxid.view_controller', controller_key: 'account_security' }

@@ -1,0 +1,27 @@
+<div class="card card-lg mt-4">
+    <div class="card-body">
+        <h2 class="h5">{{ translate({ ident: "OE_SECURITY_TWO_FACTOR_SETTINGS_TITLE" }) }}</h2>
+        <p>{{ translate({ ident: "OE_SECURITY_TWO_FACTOR_SETTINGS_DESCRIPTION" }) }}</p>
+        <form action="{{ oViewConf.getSelfLink()|raw }}" method="post">
+            {{ oViewConf.getHiddenSid()|raw }}
+            <input type="hidden" name="cl" value="account_security">
+            <input type="hidden" name="fnc" value="saveTwoFactorAuth">
+            <div class="form-check form-switch mb-3">
+                <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="twofa_enabled"
+                    name="twofa_enabled"
+                    value="1"
+                    {% if oViewConf.isTwoFAEnabled() %}checked{% endif %}
+                >
+                <label class="form-check-label" for="twofa_enabled">
+                    {{ translate({ ident: "OE_SECURITY_TWO_FACTOR_ENABLE" }) }}
+                </label>
+            </div>
+            <button type="submit" class="btn btn-primary btn-responsive">
+                {{ translate({ ident: "SAVE" }) }}
+            </button>
+        </form>
+    </div>
+</div>

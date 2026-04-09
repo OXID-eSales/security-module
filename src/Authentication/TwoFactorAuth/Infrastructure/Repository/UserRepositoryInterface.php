@@ -16,4 +16,7 @@ interface UserRepositoryInterface
 {
     /** @throws UserNotFoundException */
     public function getUserById(string $userId): UserInterface;
+
+    /** @throws UserNotFoundException */
+    public function setTwoFAEnabled(string $userId, bool $enabled): void;
 }

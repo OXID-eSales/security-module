@@ -32,4 +32,16 @@ class UserRepository implements UserRepositoryInterface
 
         return $this->userDtoFactory->createFromModel($userModel);
     }
+
+    public function setTwoFAEnabled(string $userId, bool $enabled): void
+    {
+        $userModel = $this->userFactory->create();
+
+        if (!$userModel->load($userId)) {
+            throw new UserNotFoundException();
+        }
+
+        $userModel->assign(['oe2faenabled' => (int) $enabled]);
+        $userModel->save();
+    }
 }

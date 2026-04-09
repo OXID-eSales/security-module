@@ -1,0 +1,15 @@
+{# todo-critical: remove if we go with separate Security section #}
+{% extends 'page/account/inc/account_menu.html.twig' %}
+
+{% block account_menu_password_item %}
+    <a class="dropdown-item{% if active_link == "password" %} active{% endif %}"
+       href="{{ seo_url({ ident: oViewConf.getSslSelfLink() ~ "cl=account_password" }) }}"
+       title="{{ translate({ ident: "OE_SECURITY_PASSWORD_AND_SECURITY" }) }}">{{ translate({ ident: "OE_SECURITY_PASSWORD_AND_SECURITY" }) }}</a>
+{% endblock %}
+
+{% block account_menu %}
+    {{ parent() }}
+    <a class="dropdown-item{% if active_link == "security" %} active{% endif %}"
+       href="{{ seo_url({ ident: oViewConf.getSslSelfLink() ~ "cl=account_security" }) }}"
+       title="{{ translate({ ident: "OE_SECURITY_SECURITY_TITLE" }) }}">{{ translate({ ident: "OE_SECURITY_SECURITY_TITLE" }) }}</a>
+{% endblock %}
