@@ -10,6 +10,7 @@ export class ResendOtp {
             submitButtonId = 'auth_submit',
             attemptsDisplayId = 'remaining-attempts',
             codeInputId = 'auth_code',
+            // todo-high: use attempts from resend request response
             maxAttempts = 5,
         } = options;
 
@@ -19,6 +20,7 @@ export class ResendOtp {
         this.attemptsDisplay = document.getElementById(attemptsDisplayId);
         this.codeInput = document.getElementById(codeInputId);
 
+        // todo-low: add admin setting for cooldown seconds
         this.cooldownSeconds = Number(button.dataset.cooldown || 60);
         this.maxAttempts = maxAttempts;
         this.url = button.dataset.url;

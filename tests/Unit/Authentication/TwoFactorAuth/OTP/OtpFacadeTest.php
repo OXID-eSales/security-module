@@ -229,6 +229,54 @@ class OtpFacadeTest extends TestCase
         $sut->resend(userId: $userId);
     }
 
+    #[Test]
+    public function getRemainingAttemptsReturnsMaxWhenNoChallengeState(): void
+    {
+        $stateServiceStub = $this->createStub(OtpChallengeStateServiceInterface::class);
+        $stateServiceStub->method('getChallengeState')->willReturn(null);
+
+        $codeValidatorStub = $this->createStub(OtpCodeValidatorServiceInterface::class);
+        $codeValidatorStub->method('getMaxAttempts')->willReturn(5);
+
+        $sut = $this->getSut(stateService: $stateServiceStub, codeValidator: $codeValidatorStub);
+
+        $this->assertSame(5, $sut->getRemainingAttempts(uniqid()));
+    }
+
+    #[Test]
+    public function getRemainingAttemptsSubtractsCurrentAttempts(): void
+    {
+        $stateStub = $this->createStub(OtpChallengeStateInterface::class);
+        $stateStub->method('getAttempts')->willReturn(3);
+
+        $stateServiceStub = $this->createStub(OtpChallengeStateServiceInterface::class);
+        $stateServiceStub->method('getChallengeState')->willReturn($stateStub);
+
+        $codeValidatorStub = $this->createStub(OtpCodeValidatorServiceInterface::class);
+        $codeValidatorStub->method('getMaxAttempts')->willReturn(5);
+
+        $sut = $this->getSut(stateService: $stateServiceStub, codeValidator: $codeValidatorStub);
+
+        $this->assertSame(2, $sut->getRemainingAttempts(uniqid()));
+    }
+
+    #[Test]
+    public function getRemainingAttemptsReturnsZeroWhenAttemptsExceedMax(): void
+    {
+        $stateStub = $this->createStub(OtpChallengeStateInterface::class);
+        $stateStub->method('getAttempts')->willReturn(7);
+
+        $stateServiceStub = $this->createStub(OtpChallengeStateServiceInterface::class);
+        $stateServiceStub->method('getChallengeState')->willReturn($stateStub);
+
+        $codeValidatorStub = $this->createStub(OtpCodeValidatorServiceInterface::class);
+        $codeValidatorStub->method('getMaxAttempts')->willReturn(5);
+
+        $sut = $this->getSut(stateService: $stateServiceStub, codeValidator: $codeValidatorStub);
+
+        $this->assertSame(0, $sut->getRemainingAttempts(uniqid()));
+    }
+
     private function getSut(
         OtpChallengeStateServiceInterface $stateService = null,
         OtpCodeValidatorServiceInterface $codeValidator = null,

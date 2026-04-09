@@ -9,14 +9,20 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Service;
 
+use DateTimeImmutable;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\AttemptLimitExceededException;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\InvalidCodeException;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\TimeExpiredException;
 // phpcs:ignore Generic.Files.LineLength
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Infrastructure\Repository\OtpChallengeStateRepositoryInterface;
 
 class OtpCodeValidatorService implements OtpCodeValidatorServiceInterface
 {
+    private const MAX_ATTEMPTS = 5;
+
     public function __construct(
-        /** @phpstan-ignore property.onlyWritten */
         private OtpChallengeStateRepositoryInterface $repository,
+        private OtpCodeHasherServiceInterface $codeHasher,
     ) {
     }
 
@@ -24,6 +30,31 @@ class OtpCodeValidatorService implements OtpCodeValidatorServiceInterface
         string $userId,
         #[\SensitiveParameter] string $inputCode
     ): void {
-        // todo-critical: implement, also remove the phpstan-ignore then
+        $state = $this->repository->findByUserId($userId);
+
+        if ($state === null) {
+            throw new InvalidCodeException();
+        }
+
+        if ($state->getAttempts() >= self::MAX_ATTEMPTS) {
+            throw new AttemptLimitExceededException();
+        }
+
+        if (new DateTimeImmutable() > $state->getExpiresAt()) {
+            throw new TimeExpiredException();
+        }
+
+        if ($this->codeHasher->hash($inputCode) !== $state->getCodeHash()) {
+            $this->repository->incrementAttempts($userId);
+            if (($state->getAttempts() + 1) >= self::MAX_ATTEMPTS) {
+                throw new AttemptLimitExceededException();
+            }
+            throw new InvalidCodeException();
+        }
+    }
+
+    public function getMaxAttempts(): int
+    {
+        return self::MAX_ATTEMPTS;
     }
 }

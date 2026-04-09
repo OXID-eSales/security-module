@@ -9,16 +9,17 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP;
 
+use DateTimeImmutable;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\ResendCooldownException;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Notifier\Factory\OtpNotifierFactoryInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Service\OtpChallengeStateServiceInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Service\OtpCodeGeneratorServiceInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Service\OtpCodeValidatorServiceInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Service\OtpSendPolicyServiceInterface;
-use DateTimeImmutable;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAResendableInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAServiceInterface;
 
-class OtpFacade implements TwoFAServiceInterface
+class OtpFacade implements TwoFAServiceInterface, TwoFAResendableInterface
 {
     public function __construct(
         private OtpChallengeStateServiceInterface $stateService,
@@ -70,5 +71,13 @@ class OtpFacade implements TwoFAServiceInterface
         $code = $this->codeGenerator->generateCode();
         $this->stateService->refreshChallengeState($userId, $code);
         $this->notifierFactory->create($userId)->notify($userId, $code);
+    }
+
+    public function getRemainingAttempts(string $userId): int
+    {
+        $state = $this->stateService->getChallengeState($userId);
+        $attempts = $state?->getAttempts() ?? 0;
+
+        return max(0, $this->codeValidator->getMaxAttempts() - $attempts);
     }
 }

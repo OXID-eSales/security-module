@@ -13,6 +13,7 @@ use OxidEsales\Eshop\Core\UtilsView;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Controller\TwoFactorAuthController;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\InvalidCodeException;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\ResendCooldownException;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAResendableInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAServiceInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAUserServiceInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Transput\AuthCodeRequestInterface;
@@ -79,7 +80,10 @@ class TwoFactorAuthControllerTest extends TestCase
         $twoFAUserServiceStub->method('getPendingUserId')
             ->willReturn($userId = uniqid());
 
-        $twoFAServiceSpy = $this->createMock(TwoFAServiceInterface::class);
+        $twoFAServiceSpy = $this->createMockForIntersectionOfInterfaces([
+            TwoFAServiceInterface::class,
+            TwoFAResendableInterface::class,
+        ]);
         $twoFAServiceSpy->expects($this->once())
             ->method('resend')
             ->with($userId);
@@ -87,7 +91,7 @@ class TwoFactorAuthControllerTest extends TestCase
         $jsonResponseSpy = $this->createMock(JsonResponseInterface::class);
         $jsonResponseSpy->expects($this->once())
             ->method('send')
-            ->with(['success' => true], 200);
+            ->with(['success' => true]);
 
         $this->getSut(
             twoFAService: $twoFAServiceSpy,
@@ -103,7 +107,10 @@ class TwoFactorAuthControllerTest extends TestCase
         $twoFAUserServiceStub->method('getPendingUserId')
             ->willReturn($userId = uniqid());
 
-        $twoFAServiceStub = $this->createMock(TwoFAServiceInterface::class);
+        $twoFAServiceStub = $this->createMockForIntersectionOfInterfaces([
+            TwoFAServiceInterface::class,
+            TwoFAResendableInterface::class,
+        ]);
         $twoFAServiceStub->expects($this->once())
             ->method('resend')
             ->with($userId)
@@ -117,6 +124,20 @@ class TwoFactorAuthControllerTest extends TestCase
         $this->getSut(
             twoFAService: $twoFAServiceStub,
             twoFAUserService: $twoFAUserServiceStub,
+            jsonResponse: $jsonResponseSpy,
+        )->resendCode();
+    }
+
+    #[Test]
+    public function resendCodeSends405WhenServiceIsNotResendable(): void
+    {
+        $jsonResponseSpy = $this->createMock(JsonResponseInterface::class);
+        $jsonResponseSpy->expects($this->once())
+            ->method('send')
+            ->with(['success' => false], 405);
+
+        $this->getSut(
+            twoFAService: $this->createStub(TwoFAServiceInterface::class),
             jsonResponse: $jsonResponseSpy,
         )->resendCode();
     }

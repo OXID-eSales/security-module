@@ -20,4 +20,6 @@ interface OtpCodeValidatorServiceInterface
         string $userId,
         #[\SensitiveParameter] string $inputCode
     ): void;
+
+    public function getMaxAttempts(): int;
 }
