@@ -14,6 +14,7 @@ class User implements UserInterface
     public function __construct(
         private string $userId,
         private string $email,
+        private bool $twoFAEnabled,
     ) {
     }
 
@@ -25,5 +26,10 @@ class User implements UserInterface
     public function getEmail(): string
     {
         return $this->email;
+    }
+
+    public function isTwoFAEnabled(): bool
+    {
+        return $this->twoFAEnabled;
     }
 }

@@ -19,7 +19,6 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
 // phpcs:ignore Generic.Files.LineLength
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAUserServiceInterface;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFASettingsInterface;
 use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface as CaptchaSettingsServiceInterface;
 use OxidEsales\SecurityModule\Shared\Model\User as SecurityModuleUser;
 use OxidEsales\SecurityModule\Tests\Integration\IntegrationTestCase;
@@ -63,7 +62,9 @@ class UserTest extends IntegrationTestCase
         $captchaSettings = $this->createStub(CaptchaSettingsServiceInterface::class);
         $captchaSettings->method('isCaptchaEnabled')->willReturn(true);
 
-        $sut = $this->getSut([CaptchaSettingsServiceInterface::class => $captchaSettings]);
+        $sut = $this->getSut([
+            CaptchaSettingsServiceInterface::class => $captchaSettings,
+        ]);
         $sut->checkValues('', '', '', [], []);
     }
 
@@ -85,7 +86,9 @@ class UserTest extends IntegrationTestCase
         $captchaSettings = $this->createStub(CaptchaSettingsServiceInterface::class);
         $captchaSettings->method('isCaptchaEnabled')->willReturn(true);
 
-        $sut = $this->getSut([CaptchaSettingsServiceInterface::class => $captchaSettings]);
+        $sut = $this->getSut([
+            CaptchaSettingsServiceInterface::class => $captchaSettings,
+        ]);
         $sut->checkValues('', '', '', [], []);
     }
 
@@ -106,7 +109,9 @@ class UserTest extends IntegrationTestCase
         $captchaSettings = $this->createStub(CaptchaSettingsServiceInterface::class);
         $captchaSettings->method('isCaptchaEnabled')->willReturn(true);
 
-        $sut = $this->getSut([CaptchaSettingsServiceInterface::class => $captchaSettings]);
+        $sut = $this->getSut([
+            CaptchaSettingsServiceInterface::class => $captchaSettings,
+        ]);
         $sut->login('', '');
     }
 
@@ -127,7 +132,9 @@ class UserTest extends IntegrationTestCase
         $captchaSettings = $this->createStub(CaptchaSettingsServiceInterface::class);
         $captchaSettings->method('isCaptchaEnabled')->willReturn(true);
 
-        $sut = $this->getSut([CaptchaSettingsServiceInterface::class => $captchaSettings]);
+        $sut = $this->getSut([
+            CaptchaSettingsServiceInterface::class => $captchaSettings,
+        ]);
         $sut->login('', '');
     }
 
@@ -145,7 +152,9 @@ class UserTest extends IntegrationTestCase
         $captchaSettings = $this->createStub(CaptchaSettingsServiceInterface::class);
         $captchaSettings->method('isCaptchaEnabled')->willReturn(true);
 
-        $sut = $this->getSut([CaptchaSettingsServiceInterface::class => $captchaSettings]);
+        $sut = $this->getSut([
+            CaptchaSettingsServiceInterface::class => $captchaSettings,
+        ]);
         $result = $sut->login(self::TWO_FA_USER_NAME, self::TWO_FA_USER_PASSWORD);
 
         $this->assertTrue($result);
@@ -155,20 +164,15 @@ class UserTest extends IntegrationTestCase
     {
         $userId = $this->getTwoFAUserId();
 
-        $twoFaSettings = $this->createStub(TwoFASettingsInterface::class);
-        $twoFaSettings->method('isTwoFactorAuthEnabled')->willReturn(true);
-
         $userServiceSpy = $this->createMock(TwoFAUserServiceInterface::class);
-        $userServiceSpy->method('isChallengeVerified')
-            ->with($userId)
-            ->willReturn(false);
+        $userServiceSpy->method('isTwoFARequired')->with($userId)->willReturn(true);
+        $userServiceSpy->method('isChallengeVerified')->with($userId)->willReturn(false);
         $userServiceSpy->expects($this->once())
             ->method('startChallengeForUser')
             ->with($userId);
 
         $sut = $this->getSut([
-            TwoFASettingsInterface::class => $twoFaSettings,
-            TwoFAUserServiceInterface::class => $userServiceSpy
+            TwoFAUserServiceInterface::class => $userServiceSpy,
         ]);
         $sut->login(self::TWO_FA_USER_NAME, self::TWO_FA_USER_PASSWORD);
     }
@@ -177,19 +181,13 @@ class UserTest extends IntegrationTestCase
     {
         $userId = $this->getTwoFAUserId();
 
-        $twoFaSettings = $this->createStub(TwoFASettingsInterface::class);
-        $twoFaSettings->method('isTwoFactorAuthEnabled')->willReturn(true);
-
         $userServiceSpy = $this->createMock(TwoFAUserServiceInterface::class);
-        $userServiceSpy->method('isChallengeVerified')
-            ->with($userId)
-            ->willReturn(true);
-        $userServiceSpy->expects($this->never())
-            ->method('startChallengeForUser');
+        $userServiceSpy->method('isTwoFARequired')->with($userId)->willReturn(true);
+        $userServiceSpy->method('isChallengeVerified')->with($userId)->willReturn(true);
+        $userServiceSpy->expects($this->never())->method('startChallengeForUser');
 
         $sut = $this->getSut([
-            TwoFASettingsInterface::class => $twoFaSettings,
-            TwoFAUserServiceInterface::class => $userServiceSpy
+            TwoFAUserServiceInterface::class => $userServiceSpy,
         ]);
 
         $result = $sut->login(self::TWO_FA_USER_NAME, self::TWO_FA_USER_PASSWORD);
@@ -200,14 +198,11 @@ class UserTest extends IntegrationTestCase
     {
         $userId = $this->getTwoFAUserId();
 
-        $twoFaSettings = $this->createStub(TwoFASettingsInterface::class);
-        $twoFaSettings->method('isTwoFactorAuthEnabled')->willReturn(true);
-
         $userServiceMock = $this->createMock(TwoFAUserServiceInterface::class);
+        $userServiceMock->method('isTwoFARequired')->with($userId)->willReturn(true);
         $userServiceMock->method('isChallengeVerified')->with($userId)->willReturn(true);
 
         $sut = $this->getSut([
-            TwoFASettingsInterface::class => $twoFaSettings,
             TwoFAUserServiceInterface::class => $userServiceMock,
         ]);
         $sut->load($userId);
@@ -216,21 +211,18 @@ class UserTest extends IntegrationTestCase
         $this->assertTrue($result);
     }
 
-    public function testLoginWithoutPasswordOnLoadedUserWith2FAEnabledAndChallengeNotVerifiedNOTLogsUserIn(): void
+    public function testLoginWithoutPasswordOnLoadedUserWith2FAEnabledAndChallengeNotVerifiedTriggersChallenge(): void
     {
         $userId = $this->getTwoFAUserId();
 
-        $twoFaSettings = $this->createStub(TwoFASettingsInterface::class);
-        $twoFaSettings->method('isTwoFactorAuthEnabled')->willReturn(true);
-
         $userServiceSpy = $this->createMock(TwoFAUserServiceInterface::class);
+        $userServiceSpy->method('isTwoFARequired')->with($userId)->willReturn(true);
         $userServiceSpy->method('isChallengeVerified')->with($userId)->willReturn(false);
         $userServiceSpy->expects($this->once())
             ->method('startChallengeForUser')
             ->with($userId);
 
         $sut = $this->getSut([
-            TwoFASettingsInterface::class => $twoFaSettings,
             TwoFAUserServiceInterface::class => $userServiceSpy,
         ]);
         $sut->load($userId);
@@ -246,10 +238,7 @@ class UserTest extends IntegrationTestCase
         $this->expectException(UserException::class);
         $this->expectExceptionMessage('ERROR_MESSAGE_USER_NOVALIDLOGIN');
 
-        $twoFaSettings = $this->createStub(TwoFASettingsInterface::class);
-        $twoFaSettings->method('isTwoFactorAuthEnabled')->willReturn(true);
-
-        $sut = $this->getSut([TwoFASettingsInterface::class => $twoFaSettings]);
+        $sut = $this->getSut();
         $sut->login($username, $password);
     }
 
@@ -259,20 +248,17 @@ class UserTest extends IntegrationTestCase
         yield 'nonexistent user' => ['nonexistent@test.com', 'anypassword'];
     }
 
-    public function testLoginWith2FADisabledDoesntTouch2FA(): void
+    public function testLogin2FANotRequiredDoesntTouchChallengeAndJustLogins(): void
     {
-        $twoFaSettings = $this->createStub(TwoFASettingsInterface::class);
-        $twoFaSettings->method('isTwoFactorAuthEnabled')->willReturn(false);
+        $userId = $this->getTwoFAUserId();
 
         $userServiceSpy = $this->createMock(TwoFAUserServiceInterface::class);
-        $userServiceSpy->expects($this->never())
-            ->method('isChallengeVerified');
-        $userServiceSpy->expects($this->never())
-            ->method('startChallengeForUser');
+        $userServiceSpy->method('isTwoFARequired')->with($userId)->willReturn(false);
+        $userServiceSpy->expects($this->never())->method('isChallengeVerified');
+        $userServiceSpy->expects($this->never())->method('startChallengeForUser');
 
         $sut = $this->getSut([
-            TwoFASettingsInterface::class => $twoFaSettings,
-            TwoFAUserServiceInterface::class => $userServiceSpy
+            TwoFAUserServiceInterface::class => $userServiceSpy,
         ]);
 
         $result = $sut->login(self::TWO_FA_USER_NAME, self::TWO_FA_USER_PASSWORD);
@@ -281,16 +267,16 @@ class UserTest extends IntegrationTestCase
 
     private function getSut(array $serviceOverrides = []): SecurityModuleUser
     {
-        $captchaDefault = $this->createStub(CaptchaSettingsServiceInterface::class);
-        $captchaDefault->method('isCaptchaEnabled')->willReturn(false);
-
-        $twoFaDefault = $this->createStub(TwoFASettingsInterface::class);
-        $twoFaDefault->method('isTwoFactorAuthEnabled')->willReturn(false);
-
         $services = array_merge(
             [
-                CaptchaSettingsServiceInterface::class => $captchaDefault,
-                TwoFASettingsInterface::class => $twoFaDefault,
+                CaptchaSettingsServiceInterface::class => $this->createConfiguredStub(
+                    CaptchaSettingsServiceInterface::class,
+                    ['isCaptchaEnabled' => false]
+                ),
+                TwoFAUserServiceInterface::class => $this->createConfiguredStub(
+                    TwoFAUserServiceInterface::class,
+                    ['isTwoFARequired' => false]
+                ),
             ],
             $serviceOverrides
         );

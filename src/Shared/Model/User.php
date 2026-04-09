@@ -13,7 +13,6 @@ use OxidEsales\Eshop\Core\Exception\InputException;
 use OxidEsales\Eshop\Core\Exception\UserException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAUserServiceInterface;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFASettingsInterface;
 use OxidEsales\SecurityModule\Captcha\Captcha\Image\Exception\CaptchaValidateException as ImageCaptchaException;
 use OxidEsales\SecurityModule\Captcha\Captcha\HoneyPot\Exception\CaptchaValidateException as HoneyPotCaptchaException;
 use OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface;
@@ -90,10 +89,9 @@ class User extends User_parent
         parent::onLogin($userName, $password);
 
         $userId = $this->getId();
-        $settingsService = $this->getService(TwoFASettingsInterface::class);
-        if ($userId && $settingsService->isTwoFactorAuthEnabled() && !$this->isAdmin()) {
+        if ($userId && !$this->isAdmin()) {
             $twoFAUserService = $this->getService(TwoFAUserServiceInterface::class);
-            if (!$twoFAUserService->isChallengeVerified($userId)) {
+            if ($twoFAUserService->isTwoFARequired($userId) && !$twoFAUserService->isChallengeVerified($userId)) {
                 $twoFAUserService->startChallengeForUser($userId);
             }
         }

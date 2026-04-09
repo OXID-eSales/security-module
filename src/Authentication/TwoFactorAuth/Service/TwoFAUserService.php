@@ -12,6 +12,7 @@ namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service;
 use OxidEsales\Eshop\Core\Utils;
 use OxidEsales\EshopCommunity\Internal\Framework\Session\SessionInterface;
 use OxidEsales\SecurityModule\Authentication\Service\InternalRedirectServiceInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository\UserRepositoryInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Service\UserLoginAdapterInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFASettingsInterface;
 
@@ -29,6 +30,7 @@ class TwoFAUserService implements TwoFAUserServiceInterface
         private SessionInterface $session,
         private UserLoginAdapterInterface $loginAdapter,
         private InternalRedirectServiceInterface $redirectService,
+        private UserRepositoryInterface $userRepository,
     ) {
     }
 
@@ -57,5 +59,15 @@ class TwoFAUserService implements TwoFAUserServiceInterface
     public function isChallengeVerified(string $userId): bool
     {
         return $this->twoFAService->isVerified($userId);
+    }
+
+    public function isTwoFARequired(string $userId): bool
+    {
+        if (!$this->settings->isTwoFactorAuthEnabled()) {
+            return false;
+        }
+
+        $user = $this->userRepository->getUserById($userId);
+        return $user->isTwoFAEnabled();
     }
 }

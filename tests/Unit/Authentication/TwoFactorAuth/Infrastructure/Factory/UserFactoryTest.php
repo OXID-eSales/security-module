@@ -18,18 +18,23 @@ use PHPUnit\Framework\TestCase;
 class UserFactoryTest extends TestCase
 {
     #[Test]
-    public function createFromModelMapsIdAndEmail(): void
+    public function createFromModelMapsAllProperties(): void
     {
+        $twoFAEnabledRaw = random_int(0, 1);
+
         $userModelStub = $this->createStub(User::class);
         $userModelStub->method('getId')->willReturn($userId = uniqid());
-        $userModelStub->method('getFieldData')->with('oxusername')->willReturn($email = uniqid());
+        $userModelStub->method('getFieldData')
+            ->willReturnMap([
+                ['oxusername', $email = uniqid()],
+                ['oe2faenabled', $twoFAEnabledRaw],
+            ]);
 
-        $sut = $this->getSut();
-
-        $result = $sut->createFromModel(userModel: $userModelStub);
+        $result = $this->getSut()->createFromModel(userModel: $userModelStub);
 
         $this->assertSame($userId, $result->getUserId());
         $this->assertSame($email, $result->getEmail());
+        $this->assertSame((bool) $twoFAEnabledRaw, $result->isTwoFAEnabled());
     }
 
     #[Test]

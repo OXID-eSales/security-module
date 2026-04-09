@@ -12,10 +12,14 @@ namespace OxidEsales\SecurityModule\Tests\Unit\Authentication\TwoFactorAuth\Serv
 use OxidEsales\Eshop\Core\Utils;
 use OxidEsales\EshopCommunity\Internal\Framework\Session\SessionInterface;
 use OxidEsales\SecurityModule\Authentication\Service\InternalRedirectServiceInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\DTO\UserInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository\UserRepositoryInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Service\UserLoginAdapterInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAServiceInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAUserService;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFASettingsInterface;
+use Generator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
@@ -81,6 +85,48 @@ class TwoFAUserServiceTest extends TestCase
     }
 
     #[Test]
+    #[DataProvider('isTwoFARequiredDataProvider')]
+    public function isTwoFARequired(bool $shopSettingEnabled, bool $userTwoFAEnabled, bool $expected): void
+    {
+        $settingsStub = $this->createStub(TwoFASettingsInterface::class);
+        $settingsStub->method('isTwoFactorAuthEnabled')->willReturn($shopSettingEnabled);
+
+        $userStub = $this->createStub(UserInterface::class);
+        $userStub->method('isTwoFAEnabled')->willReturn($userTwoFAEnabled);
+
+        $repositoryStub = $this->createStub(UserRepositoryInterface::class);
+        $repositoryStub->method('getUserById')->willReturn($userStub);
+
+        $sut = $this->getSut(settings: $settingsStub, userRepository: $repositoryStub);
+
+        $this->assertSame($expected, $sut->isTwoFARequired(uniqid()));
+    }
+
+    public static function isTwoFARequiredDataProvider(): Generator
+    {
+        yield 'shop setting disabled, user has it disabled' => [
+            'shopSettingEnabled' => false,
+            'userTwoFAEnabled' => false,
+            'expected' => false,
+        ];
+        yield 'shop setting disabled, user has it enabled' => [
+            'shopSettingEnabled' => false,
+            'userTwoFAEnabled' => true,
+            'expected' => false,
+        ];
+        yield 'shop setting enabled, user has it disabled' => [
+            'shopSettingEnabled' => true,
+            'userTwoFAEnabled' => false,
+            'expected' => false,
+        ];
+        yield 'shop setting enabled, user has it enabled' => [
+            'shopSettingEnabled' => true,
+            'userTwoFAEnabled' => true,
+            'expected' => true,
+        ];
+    }
+
+    #[Test]
     public function loginUserLoadsUserLoginsClearsSessionAndRedirects(): void
     {
         $userId = uniqid();
@@ -124,6 +170,7 @@ class TwoFAUserServiceTest extends TestCase
         SessionInterface $session = null,
         UserLoginAdapterInterface $loginAdapter = null,
         InternalRedirectServiceInterface $redirectService = null,
+        UserRepositoryInterface $userRepository = null,
     ): TwoFAUserService {
         return new TwoFAUserService(
             twoFAService: $twoFAService ?? $this->createStub(TwoFAServiceInterface::class),
@@ -132,6 +179,7 @@ class TwoFAUserServiceTest extends TestCase
             session: $session ?? $this->createStub(SessionInterface::class),
             loginAdapter: $loginAdapter ?? $this->createStub(UserLoginAdapterInterface::class),
             redirectService: $redirectService ?? $this->createStub(InternalRedirectServiceInterface::class),
+            userRepository: $userRepository ?? $this->createStub(UserRepositoryInterface::class),
         );
     }
 }

@@ -22,10 +22,12 @@ class UserTest extends TestCase
         $sut = new User(
             userId: $userId = uniqid(),
             email: $email = uniqid(),
+            twoFAEnabled: $twoFAEnabled = (bool) random_int(0, 1),
         );
 
         $this->assertInstanceOf(UserInterface::class, $sut);
         $this->assertSame($userId, $sut->getUserId());
         $this->assertSame($email, $sut->getEmail());
+        $this->assertSame($twoFAEnabled, $sut->isTwoFAEnabled());
     }
 }

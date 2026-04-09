@@ -20,6 +20,7 @@ class UserFactory implements UserFactoryInterface
         return new UserDto(
             userId: $userModel->getId(),
             email: $userModel->getFieldData('oxusername'),
+            twoFAEnabled: (bool) $userModel->getFieldData('oe2faenabled'),
         );
     }
 }

@@ -14,4 +14,6 @@ interface UserInterface
     public function getUserId(): string;
 
     public function getEmail(): string;
+
+    public function isTwoFAEnabled(): bool;
 }
