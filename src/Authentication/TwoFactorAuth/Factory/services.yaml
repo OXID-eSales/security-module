@@ -11,3 +11,4 @@ services:
 
   OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAServiceInterface:
     factory: ['@OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Factory\TwoFAServiceFactoryInterface', 'create']
+    public: true

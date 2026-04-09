@@ -17,4 +17,6 @@ interface TwoFAResendableInterface
     public function resend(string $userId): void;
 
     public function getRemainingAttempts(string $userId): int;
+
+    public function getCooldownRemaining(string $userId): int;
 }

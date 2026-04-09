@@ -45,6 +45,7 @@
                                             class="btn btn-link btn-sm px-0"
                                             type="button"
                                             data-cooldown="60"
+                                            data-cooldown-remaining="{{ oViewConf.getResendCooldownRemaining() }}"
                                             data-url="{{ seo_url({ ident: oViewConf.getSelfLink()|cat("cl=twofactorauth&fnc=resendCode") }) }}"
                                             data-text-default="{{ translate({ ident: "RESEND_CODE" }) }}"
                                             data-text-sending="{{ translate({ ident: "RESEND_CODE_SENDING" }) }}"

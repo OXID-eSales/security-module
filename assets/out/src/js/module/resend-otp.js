@@ -10,8 +10,6 @@ export class ResendOtp {
             submitButtonId = 'auth_submit',
             attemptsDisplayId = 'remaining-attempts',
             codeInputId = 'auth_code',
-            // todo-high: use attempts from resend request response
-            maxAttempts = 5,
         } = options;
 
         this.btn = button;
@@ -20,9 +18,7 @@ export class ResendOtp {
         this.attemptsDisplay = document.getElementById(attemptsDisplayId);
         this.codeInput = document.getElementById(codeInputId);
 
-        // todo-low: add admin setting for cooldown seconds
         this.cooldownSeconds = Number(button.dataset.cooldown || 60);
-        this.maxAttempts = maxAttempts;
         this.url = button.dataset.url;
         this.textDefault = button.dataset.textDefault;
         this.textSending = button.dataset.textSending;
@@ -55,16 +51,24 @@ export class ResendOtp {
                 headers: { 'Content-Type': 'application/json' }
             });
 
-            if (!response.ok) {
-                this.unlock();
+            if (response.status === 429) {
+                const until = Date.now() + this.cooldownSeconds * 1000;
+                this.storeUntil(until);
+                this.startCooldown(until);
                 return;
             }
 
+            if (!response.ok) {
+                this.unlock();
+                this.setHint(this.textError);
+                return;
+            }
+
+            const data = await response.json();
             const until = Date.now() + this.cooldownSeconds * 1000;
             this.storeUntil(until);
             this.startCooldown(until);
-
-            this.resetAttempts();
+            this.resetAttempts(data.remainingAttempts);
 
         } catch (e) {
             console.error(e);
@@ -73,9 +77,9 @@ export class ResendOtp {
         }
     }
 
-    resetAttempts() {
+    resetAttempts(count) {
         if (this.attemptsDisplay) {
-            this.attemptsDisplay.textContent = this.maxAttempts;
+            this.attemptsDisplay.textContent = count;
         }
         this.enableSubmit();
     }
@@ -143,8 +147,16 @@ export class ResendOtp {
     }
 
     restoreOnRefresh() {
-        const until = this.getStoredUntil();
-        if (until && until > Date.now()) {
+        const stored = this.getStoredUntil();
+        if (stored && stored > Date.now()) {
+            this.startCooldown(stored);
+            return;
+        }
+
+        const serverRemaining = Number(this.btn.dataset.cooldownRemaining || 0);
+        if (serverRemaining > 0) {
+            const until = Date.now() + serverRemaining * 1000;
+            this.storeUntil(until);
             this.startCooldown(until);
         }
     }

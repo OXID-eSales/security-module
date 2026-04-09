@@ -10,6 +10,9 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Shared\Core;
 
 use OxidEsales\SecurityModule\Authentication\OAuth2\Service\ProviderCollectorInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAResendableInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAServiceInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAUserServiceInterface;
 use OxidEsales\SecurityModule\Captcha\Captcha\Image\Service\ImageCaptchaService;
 use OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsServiceInterface as PasswordSettingsServiceInterface;
@@ -61,8 +64,24 @@ class ViewConfig extends ViewConfig_parent
 
     public function getRemainingAttempts(): int
     {
-        // todo-critical: implement
-        return 5;
+        $twoFAService = $this->getService(TwoFAServiceInterface::class);
+        if (!$twoFAService instanceof TwoFAResendableInterface) {
+            return 0;
+        }
+
+        $userId = $this->getService(TwoFAUserServiceInterface::class)->getPendingUserId();
+        return $twoFAService->getRemainingAttempts($userId);
+    }
+
+    public function getResendCooldownRemaining(): int
+    {
+        $twoFAService = $this->getService(TwoFAServiceInterface::class);
+        if (!$twoFAService instanceof TwoFAResendableInterface) {
+            return 0;
+        }
+
+        $userId = $this->getService(TwoFAUserServiceInterface::class)->getPendingUserId();
+        return $twoFAService->getCooldownRemaining($userId);
     }
 
     public function isExternalAuthUser(): bool

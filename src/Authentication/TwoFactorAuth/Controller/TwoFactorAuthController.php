@@ -11,7 +11,7 @@ namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Controller;
 
 use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Core\UtilsView;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\InvalidCodeException;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\CodeValidationException;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\ResendCooldownException;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAResendableInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAServiceInterface;
@@ -47,7 +47,7 @@ class TwoFactorAuthController extends FrontendController
         try {
             $this->twoFAService->verify($userId, $code);
             $this->twoFAUserService->loginUser($userId);
-        } catch (InvalidCodeException $e) {
+        } catch (CodeValidationException $e) {
             $this->utilsView->addErrorToDisplay($e);
         }
 
@@ -64,15 +64,12 @@ class TwoFactorAuthController extends FrontendController
         $userId = $this->twoFAUserService->getPendingUserId();
         try {
             $this->twoFAService->resend($userId);
-            $this->jsonResponse->send(['success' => true]);
+            $this->jsonResponse->send([
+                'success' => true,
+                'remainingAttempts' => $this->twoFAService->getRemainingAttempts($userId),
+            ]);
         } catch (ResendCooldownException) {
             $this->jsonResponse->send(['success' => false], 429);
         }
-    }
-
-    public function render()
-    {
-        // todo-high: send attempts left for the user
-        return parent::render();
     }
 }

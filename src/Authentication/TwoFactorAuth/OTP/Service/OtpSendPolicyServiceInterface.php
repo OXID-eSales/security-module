@@ -10,4 +10,6 @@ namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Service;
 interface OtpSendPolicyServiceInterface
 {
     public function canSend(string $userId): bool;
+
+    public function getCooldownRemaining(string $userId): int;
 }

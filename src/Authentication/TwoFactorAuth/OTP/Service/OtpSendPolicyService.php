@@ -24,19 +24,24 @@ class OtpSendPolicyService implements OtpSendPolicyServiceInterface
 
     public function canSend(string $userId): bool
     {
+        return $this->getCooldownRemaining($userId) === 0;
+    }
+
+    public function getCooldownRemaining(string $userId): int
+    {
         $state = $this->stateRepository->findByUserId($userId);
 
         if ($state === null) {
-            return true;
+            return 0;
         }
 
         $lastSentAt = $state->getLastSentAt();
         if ($lastSentAt === null) {
-            return true;
+            return 0;
         }
 
         $elapsed = (new DateTimeImmutable())->getTimestamp() - $lastSentAt->getTimestamp();
 
-        return $elapsed >= self::RESEND_COOLDOWN_SECONDS;
+        return max(0, self::RESEND_COOLDOWN_SECONDS - $elapsed);
     }
 }

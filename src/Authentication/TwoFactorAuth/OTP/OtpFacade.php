@@ -80,4 +80,9 @@ class OtpFacade implements TwoFAServiceInterface, TwoFAResendableInterface
 
         return max(0, $this->codeValidator->getMaxAttempts() - $attempts);
     }
+
+    public function getCooldownRemaining(string $userId): int
+    {
+        return $this->sendPolicy->getCooldownRemaining($userId);
+    }
 }

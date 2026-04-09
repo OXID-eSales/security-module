@@ -87,11 +87,14 @@ class TwoFactorAuthControllerTest extends TestCase
         $twoFAServiceSpy->expects($this->once())
             ->method('resend')
             ->with($userId);
+        $twoFAServiceSpy->method('getRemainingAttempts')
+            ->with($userId)
+            ->willReturn($remaining = 3);
 
         $jsonResponseSpy = $this->createMock(JsonResponseInterface::class);
         $jsonResponseSpy->expects($this->once())
             ->method('send')
-            ->with(['success' => true]);
+            ->with(['success' => true, 'remainingAttempts' => $remaining]);
 
         $this->getSut(
             twoFAService: $twoFAServiceSpy,

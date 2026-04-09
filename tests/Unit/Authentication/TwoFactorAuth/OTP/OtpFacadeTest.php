@@ -261,6 +261,17 @@ class OtpFacadeTest extends TestCase
     }
 
     #[Test]
+    public function getCooldownRemainingDelegatesToSendPolicy(): void
+    {
+        $sendPolicyMock = $this->createMock(OtpSendPolicyServiceInterface::class);
+        $sendPolicyMock->method('getCooldownRemaining')
+            ->with($userId = uniqid())
+            ->willReturn(42);
+
+        $this->assertSame(42, $this->getSut(sendPolicy: $sendPolicyMock)->getCooldownRemaining($userId));
+    }
+
+    #[Test]
     public function getRemainingAttemptsReturnsZeroWhenAttemptsExceedMax(): void
     {
         $stateStub = $this->createStub(OtpChallengeStateInterface::class);

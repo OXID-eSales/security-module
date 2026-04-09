@@ -92,6 +92,69 @@ class OtpSendPolicyServiceTest extends TestCase
         $this->assertFalse($sut->canSend($userId));
     }
 
+    #[Test]
+    public function getCooldownRemainingReturnsZeroWhenNoStateExists(): void
+    {
+        $userId = uniqid();
+
+        $repositoryMock = $this->createMock(OtpChallengeStateRepositoryInterface::class);
+        $repositoryMock->method('findByUserId')
+            ->with($userId)
+            ->willReturn(null);
+
+        $this->assertSame(0, $this->getSut(stateRepository: $repositoryMock)->getCooldownRemaining($userId));
+    }
+
+    #[Test]
+    public function getCooldownRemainingReturnsZeroWhenLastSentAtIsNull(): void
+    {
+        $userId = uniqid();
+
+        $stateStub = $this->createStub(OtpChallengeStateInterface::class);
+        $stateStub->method('getLastSentAt')->willReturn(null);
+
+        $repositoryMock = $this->createMock(OtpChallengeStateRepositoryInterface::class);
+        $repositoryMock->method('findByUserId')
+            ->with($userId)
+            ->willReturn($stateStub);
+
+        $this->assertSame(0, $this->getSut(stateRepository: $repositoryMock)->getCooldownRemaining($userId));
+    }
+
+    #[Test]
+    public function getCooldownRemainingReturnsZeroWhenCooldownHasPassed(): void
+    {
+        $userId = uniqid();
+
+        $stateStub = $this->createStub(OtpChallengeStateInterface::class);
+        $stateStub->method('getLastSentAt')->willReturn(new DateTimeImmutable('-61 seconds'));
+
+        $repositoryMock = $this->createMock(OtpChallengeStateRepositoryInterface::class);
+        $repositoryMock->method('findByUserId')
+            ->with($userId)
+            ->willReturn($stateStub);
+
+        $this->assertSame(0, $this->getSut(stateRepository: $repositoryMock)->getCooldownRemaining($userId));
+    }
+
+    #[Test]
+    public function getCooldownRemainingReturnsRemainingSecondsWhenCooldownIsActive(): void
+    {
+        $userId = uniqid();
+
+        $stateStub = $this->createStub(OtpChallengeStateInterface::class);
+        $stateStub->method('getLastSentAt')->willReturn(new DateTimeImmutable('-30 seconds'));
+
+        $repositoryMock = $this->createMock(OtpChallengeStateRepositoryInterface::class);
+        $repositoryMock->method('findByUserId')
+            ->with($userId)
+            ->willReturn($stateStub);
+
+        $sut = $this->getSut(stateRepository: $repositoryMock);
+
+        $this->assertEqualsWithDelta(30, $sut->getCooldownRemaining($userId), 1);
+    }
+
     private function getSut(
         OtpChallengeStateRepositoryInterface $stateRepository = null,
     ): OtpSendPolicyServiceInterface {
