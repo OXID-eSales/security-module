@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings;
 
-interface TwoFASettingsInterface
+interface TwoFAShopSettingsInterface
 {
     public function isTwoFactorAuthEnabled(): bool;
 

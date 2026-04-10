@@ -12,12 +12,11 @@ namespace OxidEsales\SecurityModule\Tests\Unit\Authentication\TwoFactorAuth\Serv
 use OxidEsales\Eshop\Core\Utils;
 use OxidEsales\EshopCommunity\Internal\Framework\Session\SessionInterface;
 use OxidEsales\SecurityModule\Authentication\Service\InternalRedirectServiceInterface;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\DTO\UserInterface;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository\UserRepositoryInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Service\UserLoginAdapterInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFAUserSettingsInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAServiceInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAUserService;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFASettingsInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFAShopSettingsInterface;
 use Generator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -40,7 +39,7 @@ class TwoFAUserServiceTest extends TestCase
             ->method('triggerChallenge')
             ->with($userId);
 
-        $settingsStub = $this->createStub(TwoFASettingsInterface::class);
+        $settingsStub = $this->createStub(TwoFAShopSettingsInterface::class);
         $settingsStub->method('getVerificationUrl')->willReturn($verificationUrl = uniqid());
 
         $utilsSpy = $this->createMock(Utils::class);
@@ -86,18 +85,15 @@ class TwoFAUserServiceTest extends TestCase
 
     #[Test]
     #[DataProvider('isTwoFARequiredDataProvider')]
-    public function isTwoFARequired(bool $shopSettingEnabled, bool $userTwoFAEnabled, bool $expected): void
+    public function isTwoFARequired(bool $shopSettingEnabled, bool $userSettingEnabled, bool $expected): void
     {
-        $settingsStub = $this->createStub(TwoFASettingsInterface::class);
-        $settingsStub->method('isTwoFactorAuthEnabled')->willReturn($shopSettingEnabled);
+        $shopSettingsStub = $this->createStub(TwoFAShopSettingsInterface::class);
+        $shopSettingsStub->method('isTwoFactorAuthEnabled')->willReturn($shopSettingEnabled);
 
-        $userStub = $this->createStub(UserInterface::class);
-        $userStub->method('isTwoFAEnabled')->willReturn($userTwoFAEnabled);
+        $userSettingsStub = $this->createStub(TwoFAUserSettingsInterface::class);
+        $userSettingsStub->method('isEnabledForUser')->willReturn($userSettingEnabled);
 
-        $repositoryStub = $this->createStub(UserRepositoryInterface::class);
-        $repositoryStub->method('getUserById')->willReturn($userStub);
-
-        $sut = $this->getSut(settings: $settingsStub, userRepository: $repositoryStub);
+        $sut = $this->getSut(settings: $shopSettingsStub, userSettings: $userSettingsStub);
 
         $this->assertSame($expected, $sut->isTwoFARequired(uniqid()));
     }
@@ -106,22 +102,22 @@ class TwoFAUserServiceTest extends TestCase
     {
         yield 'shop setting disabled, user has it disabled' => [
             'shopSettingEnabled' => false,
-            'userTwoFAEnabled' => false,
+            'userSettingEnabled' => false,
             'expected' => false,
         ];
         yield 'shop setting disabled, user has it enabled' => [
             'shopSettingEnabled' => false,
-            'userTwoFAEnabled' => true,
+            'userSettingEnabled' => true,
             'expected' => false,
         ];
         yield 'shop setting enabled, user has it disabled' => [
             'shopSettingEnabled' => true,
-            'userTwoFAEnabled' => false,
+            'userSettingEnabled' => false,
             'expected' => false,
         ];
         yield 'shop setting enabled, user has it enabled' => [
             'shopSettingEnabled' => true,
-            'userTwoFAEnabled' => true,
+            'userSettingEnabled' => true,
             'expected' => true,
         ];
     }
@@ -165,21 +161,21 @@ class TwoFAUserServiceTest extends TestCase
 
     private function getSut(
         TwoFAServiceInterface $twoFAService = null,
-        TwoFASettingsInterface $settings = null,
+        TwoFAShopSettingsInterface $settings = null,
         Utils $utils = null,
         SessionInterface $session = null,
         UserLoginAdapterInterface $loginAdapter = null,
         InternalRedirectServiceInterface $redirectService = null,
-        UserRepositoryInterface $userRepository = null,
+        TwoFAUserSettingsInterface $userSettings = null,
     ): TwoFAUserService {
         return new TwoFAUserService(
             twoFAService: $twoFAService ?? $this->createStub(TwoFAServiceInterface::class),
-            settings: $settings ?? $this->createStub(TwoFASettingsInterface::class),
+            settings: $settings ?? $this->createStub(TwoFAShopSettingsInterface::class),
             utils: $utils ?? $this->createStub(Utils::class),
             session: $session ?? $this->createStub(SessionInterface::class),
             loginAdapter: $loginAdapter ?? $this->createStub(UserLoginAdapterInterface::class),
             redirectService: $redirectService ?? $this->createStub(InternalRedirectServiceInterface::class),
-            userRepository: $userRepository ?? $this->createStub(UserRepositoryInterface::class),
+            userSettings: $userSettings ?? $this->createStub(TwoFAUserSettingsInterface::class),
         );
     }
 }

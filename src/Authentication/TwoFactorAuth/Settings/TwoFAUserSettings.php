@@ -7,11 +7,11 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service;
+namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings;
 
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository\UserRepositoryInterface;
 
-class TwoFAUserSettingsService implements TwoFAUserSettingsServiceInterface
+class TwoFAUserSettings implements TwoFAUserSettingsInterface
 {
     public function __construct(
         private UserRepositoryInterface $userRepository,

@@ -45,7 +45,7 @@ final class ServiceAvailabilityTest extends IntegrationTestCase
             [\OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAServiceInterface::class],
             [\OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAUserServiceInterface::class],
 
-            [\OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFASettingsInterface::class],
+            [\OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFAShopSettingsInterface::class],
 
             [\OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Transput\AuthCodeRequestInterface::class],
             [\OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Transput\JsonResponseInterface::class],

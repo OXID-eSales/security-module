@@ -12,9 +12,9 @@ namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service;
 use OxidEsales\Eshop\Core\Utils;
 use OxidEsales\EshopCommunity\Internal\Framework\Session\SessionInterface;
 use OxidEsales\SecurityModule\Authentication\Service\InternalRedirectServiceInterface;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository\UserRepositoryInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Service\UserLoginAdapterInterface;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFASettingsInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFAShopSettingsInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFAUserSettingsInterface;
 
 /**
  * todo-high: challenge the idea - session part should go to the separate login state service
@@ -25,12 +25,12 @@ class TwoFAUserService implements TwoFAUserServiceInterface
 
     public function __construct(
         private TwoFAServiceInterface $twoFAService,
-        private TwoFASettingsInterface $settings,
+        private TwoFAShopSettingsInterface $settings,
         private Utils $utils,
         private SessionInterface $session,
         private UserLoginAdapterInterface $loginAdapter,
         private InternalRedirectServiceInterface $redirectService,
-        private UserRepositoryInterface $userRepository,
+        private TwoFAUserSettingsInterface $userSettings,
     ) {
     }
 
@@ -67,7 +67,6 @@ class TwoFAUserService implements TwoFAUserServiceInterface
             return false;
         }
 
-        $user = $this->userRepository->getUserById($userId);
-        return $user->isTwoFAEnabled();
+        return $this->userSettings->isEnabledForUser($userId);
     }
 }

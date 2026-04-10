@@ -9,7 +9,7 @@
  * Metadata version
  */
 
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFASettings as TwoFactorAuthModuleSettings;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFAShopSettings as TwoFactorAuthModuleSettings;
 use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsService as PasswordPolicyModuleSettings;
 use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsService as CaptchaModuleSettings;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Service\ModuleSettingsService as OAuthModuleSettings;
@@ -171,6 +171,7 @@ $aModule = [
             'value' => false
         ],
         [
+            //todo-high: should be moved to the user settings (near by 2FA turning on switch)
             'group' => 'two_factor_auth',
             'name'  => TwoFactorAuthModuleSettings::TWO_FACTOR_TYPE,
             'type'  => 'select',

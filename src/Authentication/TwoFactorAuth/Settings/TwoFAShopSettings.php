@@ -13,7 +13,7 @@ use OxidEsales\Eshop\Core\Config;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Facade\ModuleSettingServiceInterface;
 use OxidEsales\SecurityModule\Core\Module;
 
-class TwoFASettings implements TwoFASettingsInterface
+class TwoFAShopSettings implements TwoFAShopSettingsInterface
 {
     public const ACTIVE = 'oeSecurityTwoFactorAuthEnabled';
 

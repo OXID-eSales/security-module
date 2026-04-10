@@ -3,6 +3,10 @@ services:
     autowire: true
     public: false
 
-  OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFASettingsInterface:
-    class: OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFASettings
+  OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFAShopSettingsInterface:
+    class: OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFAShopSettings
+    public: true
+
+  OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFAUserSettingsInterface:
+    class: OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFAUserSettings
     public: true

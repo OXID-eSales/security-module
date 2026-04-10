@@ -7,11 +7,11 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service;
+namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings;
 
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\UserNotFoundException;
 
-interface TwoFAUserSettingsServiceInterface
+interface TwoFAUserSettingsInterface
 {
     /** @throws UserNotFoundException */
     public function isEnabledForUser(string $userId): bool;

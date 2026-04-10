@@ -13,7 +13,7 @@ use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\Authenticat
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Factory\TwoFAServiceFactory;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Factory\TwoFAServiceFactoryInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAServiceInterface;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFASettingsInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFAShopSettingsInterface;
 use PHPUnit\Framework\TestCase;
 
 class TwoFAServiceFactoryTest extends TestCase
@@ -23,7 +23,7 @@ class TwoFAServiceFactoryTest extends TestCase
         $otpServiceStub = $this->createStub(TwoFAServiceInterface::class);
         $totpServiceStub = $this->createStub(TwoFAServiceInterface::class);
 
-        $settingsStub = $this->createStub(TwoFASettingsInterface::class);
+        $settingsStub = $this->createStub(TwoFAShopSettingsInterface::class);
         $settingsStub->method('getTwoFactorAuthType')->willReturn('otp');
 
         $sut = $this->getSut(
@@ -36,7 +36,7 @@ class TwoFAServiceFactoryTest extends TestCase
 
     public function testCreateThrowsForUnknownType(): void
     {
-        $settingsStub = $this->createStub(TwoFASettingsInterface::class);
+        $settingsStub = $this->createStub(TwoFAShopSettingsInterface::class);
         $settingsStub->method('getTwoFactorAuthType')->willReturn('unknown');
 
         $sut = $this->getSut(
@@ -48,11 +48,11 @@ class TwoFAServiceFactoryTest extends TestCase
     }
 
     private function getSut(
-        TwoFASettingsInterface $settings = null,
+        TwoFAShopSettingsInterface $settings = null,
         array $implementations = [],
     ): TwoFAServiceFactoryInterface {
         return new TwoFAServiceFactory(
-            settings: $settings ?? $this->createStub(TwoFASettingsInterface::class),
+            settings: $settings ?? $this->createStub(TwoFAShopSettingsInterface::class),
             implementations: $implementations,
         );
     }

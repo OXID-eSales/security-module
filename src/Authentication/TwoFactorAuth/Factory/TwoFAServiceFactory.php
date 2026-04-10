@@ -11,12 +11,12 @@ namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Factory;
 
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\AuthenticationTypeNotFoundException;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAServiceInterface;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFASettingsInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFAShopSettingsInterface;
 
 class TwoFAServiceFactory implements TwoFAServiceFactoryInterface
 {
     public function __construct(
-        private TwoFASettingsInterface $settings,
+        private TwoFAShopSettingsInterface $settings,
         private array $implementations,
     ) {
     }

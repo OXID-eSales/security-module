@@ -9,6 +9,3 @@ services:
     class: OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAUserService
     public: true
 
-  OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAUserSettingsServiceInterface:
-    class: OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAUserSettingsService
-    public: true

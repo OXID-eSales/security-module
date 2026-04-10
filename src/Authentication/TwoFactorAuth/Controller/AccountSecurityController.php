@@ -11,7 +11,7 @@ namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Controller;
 
 use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAUserSettingsServiceInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFAUserSettingsInterface;
 
 class AccountSecurityController extends FrontendController
 {
@@ -22,7 +22,7 @@ class AccountSecurityController extends FrontendController
     protected $_sThisTemplate = '@oe_security_module/templates/account_security';
 
     public function __construct(
-        private readonly TwoFAUserSettingsServiceInterface $userSettingsService,
+        private readonly TwoFAUserSettingsInterface $userSettingsService,
     ) {
         parent::__construct();
     }
