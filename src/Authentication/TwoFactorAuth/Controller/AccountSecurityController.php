@@ -9,11 +9,11 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Controller;
 
-use OxidEsales\Eshop\Application\Controller\FrontendController;
+use OxidEsales\Eshop\Application\Controller\AccountController;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFAUserSettingsInterface;
 
-class AccountSecurityController extends FrontendController
+class AccountSecurityController extends AccountController
 {
     /**
      * @var string
