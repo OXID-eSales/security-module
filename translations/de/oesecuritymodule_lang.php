@@ -63,7 +63,6 @@ $aLang = [
     'OE_SECURITY_EXTERNAL_AUTH_PASSWORD_INFO' => 'Sie sind mit einem externen Anbieter angemeldet. Die Passwortverwaltung ist für dieses Konto nicht verfügbar.',
     'OE_SECURITY_RESET_PASSWORD'              => 'Passwort zurücksetzen',
 
-    'OE_SECURITY_PASSWORD_AND_SECURITY'           => 'Passwort & Sicherheit',
     'OE_SECURITY_SECURITY_TITLE'                  => 'Sicherheit',
     'OE_SECURITY_TWO_FACTOR_SETTINGS_TITLE'       => 'Zwei-Faktor-Authentifizierung',
     'OE_SECURITY_TWO_FACTOR_SETTINGS_DESCRIPTION' => 'Fügen Sie Ihrem Konto eine zusätzliche Sicherheitsebene hinzu. Wenn aktiviert, müssen Sie bei jeder Anmeldung einen Bestätigungscode eingeben, der an Ihre E-Mail gesendet wird.',

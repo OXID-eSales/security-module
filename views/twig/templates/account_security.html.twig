@@ -1,4 +1,3 @@
-{# todo-critical: remove if we go with Password & Security #}
 {% capture append = "oxidBlock_content" %}
     <div class="container-xxl py-5">
         <div class="row">
@@ -10,7 +9,7 @@
             </div>
         </div>
 
-        {% include '@oe_security_module/form/two_factor_auth_settings.html.twig' with { formController: 'account_security' } %}
+        {% include '@oe_security_module/form/two_factor_auth_settings.html.twig' %}
     </div>
 {% endcapture %}
 

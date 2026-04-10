@@ -13,7 +13,6 @@ use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAUserSettingsServiceInterface;
 
-// todo-critical: remove if we go with Change Password extension
 class AccountSecurityController extends FrontendController
 {
     /**

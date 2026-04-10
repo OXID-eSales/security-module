@@ -63,7 +63,6 @@ $aLang = [
     'OE_SECURITY_EXTERNAL_AUTH_PASSWORD_INFO' => 'You are signed in with an external provider. Password management is not available for this account.',
     'OE_SECURITY_RESET_PASSWORD'              => 'Reset password',
 
-    'OE_SECURITY_PASSWORD_AND_SECURITY'           => 'Password & Security',
     'OE_SECURITY_SECURITY_TITLE'                  => 'Security',
     'OE_SECURITY_TWO_FACTOR_SETTINGS_TITLE'       => 'Two-Factor Authentication',
     'OE_SECURITY_TWO_FACTOR_SETTINGS_DESCRIPTION' => 'Add an extra layer of security to your account. When enabled, you will need to enter a verification code sent to your email each time you log in.',
