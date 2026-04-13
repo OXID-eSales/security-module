@@ -13,7 +13,7 @@
                     id="twofa_enabled"
                     name="twofa_enabled"
                     value="1"
-                    {% if oViewConf.isTwoFAEnabled() %}checked{% endif %}
+                    {% if twoFAEnabledForUser %}checked{% endif %}
                 >
                 <label class="form-check-label" for="twofa_enabled">
                     {{ translate({ ident: "OE_SECURITY_TWO_FACTOR_ENABLE" }) }}

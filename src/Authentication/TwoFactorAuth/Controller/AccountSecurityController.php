@@ -15,16 +15,22 @@ use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFAUserSet
 
 class AccountSecurityController extends AccountController
 {
-    /**
-     * @var string
-     * @SuppressWarnings("PHPMD.CamelCasePropertyName")
-     */
-    protected $_sThisTemplate = '@oe_security_module/templates/account_security';
-
     public function __construct(
         private readonly TwoFAUserSettingsInterface $userSettingsService,
     ) {
+        $this->setTemplateName('@oe_security_module/templates/account_security');
         parent::__construct();
+    }
+
+    public function render(): string
+    {
+        $parentResult = parent::render();
+
+        $user = $this->getUser();
+
+        $this->addTplParam('twoFAEnabledForUser', $this->userSettingsService->isEnabledForUser($user->getId()));
+
+        return $parentResult;
     }
 
     public function saveTwoFactorAuth(): void
@@ -34,17 +40,7 @@ class AccountSecurityController extends AccountController
             return;
         }
 
-        $enabled = (bool) Registry::getRequest()->getRequestParameter('twofa_enabled');
+        $enabled = (bool)Registry::getRequest()->getRequestParameter('twofa_enabled');
         $this->userSettingsService->setEnabledForUser($user->getId(), $enabled);
-    }
-
-    public function isTwoFAEnabled(): bool
-    {
-        $user = $this->getUser();
-        if (!$user) {
-            return false;
-        }
-
-        return $this->userSettingsService->isEnabledForUser($user->getId());
     }
 }
