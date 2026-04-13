@@ -35,24 +35,26 @@
                                         <label for="auth_code" class="req">{{ translate({ ident: "OE_SECURITY_ENTER_CODE" }) }}</label>
                                     </div>
 
-                                    <div class="mb-3 d-flex justify-content-between align-items-center">
-                                        <small class="text-muted">
-                                            {{ translate({ ident: "OE_SECURITY_REMAINING_ATTEMPTS" }) }}:
-                                            <strong id="remaining-attempts">{{ oViewConf.getRemainingAttempts() }}</strong>
-                                        </small>
-                                        <button
-                                            id="resend-btn"
-                                            class="btn btn-link btn-sm px-0"
-                                            type="button"
-                                            data-cooldown="60"
-                                            data-cooldown-remaining="{{ oViewConf.getResendCooldownRemaining() }}"
-                                            data-url="{{ seo_url({ ident: oViewConf.getSelfLink()|cat("cl=twofactorauth&fnc=resendCode") }) }}"
-                                            data-text-default="{{ translate({ ident: "RESEND_CODE" }) }}"
-                                            data-text-sending="{{ translate({ ident: "RESEND_CODE_SENDING" }) }}"
-                                            data-text-error="{{ translate({ ident: "RESEND_CODE_ERROR" }) }}"
-                                            data-text-countdown="{{ translate({ ident: "RESEND_CODE_COUNTDOWN" }) }}"
-                                        >{{ translate({ ident: "RESEND_CODE" }) }}</button>
-                                    </div>
+                                    {% if resendable %}
+                                        <div class="mb-3 d-flex justify-content-between align-items-center">
+                                            <small class="text-muted">
+                                                {{ translate({ ident: "OE_SECURITY_REMAINING_ATTEMPTS" }) }}:
+                                                <strong id="remaining-attempts">{{ remainingAttempts }}</strong>
+                                            </small>
+                                            <button
+                                                id="resend-btn"
+                                                class="btn btn-link btn-sm px-0"
+                                                type="button"
+                                                data-cooldown="60"
+                                                data-cooldown-remaining="{{ resendCooldownRemaining }}"
+                                                data-url="{{ seo_url({ ident: oViewConf.getSelfLink()|cat("cl=twofactorauth&fnc=resendCode") }) }}"
+                                                data-text-default="{{ translate({ ident: "RESEND_CODE" }) }}"
+                                                data-text-sending="{{ translate({ ident: "RESEND_CODE_SENDING" }) }}"
+                                                data-text-error="{{ translate({ ident: "RESEND_CODE_ERROR" }) }}"
+                                                data-text-countdown="{{ translate({ ident: "RESEND_CODE_COUNTDOWN" }) }}"
+                                            >{{ translate({ ident: "RESEND_CODE" }) }}</button>
+                                        </div>
+                                    {% endif %}
 
                                     <p id="resend-hint" class="small text-muted" aria-live="polite"></p>
 

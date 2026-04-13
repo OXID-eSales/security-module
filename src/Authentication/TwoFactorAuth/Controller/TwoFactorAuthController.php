@@ -39,6 +39,22 @@ class TwoFactorAuthController extends FrontendController
         parent::__construct();
     }
 
+    public function render(): string
+    {
+        parent::render();
+
+        $isResendable = $this->twoFAService instanceof TwoFAResendableInterface;
+        $this->addTplParam('resendable', $isResendable);
+
+        if ($isResendable) {
+            $userId = $this->twoFAUserService->getPendingUserId();
+            $this->addTplParam('remainingAttempts', $this->twoFAService->getRemainingAttempts($userId));
+            $this->addTplParam('resendCooldownRemaining', $this->twoFAService->getCooldownRemaining($userId));
+        }
+
+        return $this->_sThisTemplate;
+    }
+
     public function handleOTP(): ?string
     {
         $userId = $this->twoFAUserService->getPendingUserId();

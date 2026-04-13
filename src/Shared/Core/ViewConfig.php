@@ -9,11 +9,6 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Shared\Core;
 
-use OxidEsales\SecurityModule\Authentication\OAuth2\Service\ProviderCollectorInterface;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAResendableInterface;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAServiceInterface;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAUserServiceInterface;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAUserSettingsServiceInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFAShopSettingsInterface;
 use OxidEsales\SecurityModule\Captcha\Captcha\Image\Service\ImageCaptchaService;
 use OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface;
@@ -55,30 +50,6 @@ class ViewConfig extends ViewConfig_parent
         $images = $this->getService(CaptchaServiceInterface::class)->generate();
 
         return 'data:image/jpeg;base64,' . base64_encode($images[ImageCaptchaService::CAPTCHA_NAME]);
-    }
-
-    // todo-critical: move to controller
-    public function getRemainingAttempts(): int
-    {
-        $twoFAService = $this->getService(TwoFAServiceInterface::class);
-        if (!$twoFAService instanceof TwoFAResendableInterface) {
-            return 0;
-        }
-
-        $userId = $this->getService(TwoFAUserServiceInterface::class)->getPendingUserId();
-        return $twoFAService->getRemainingAttempts($userId);
-    }
-
-    // todo-critical: move to controller
-    public function getResendCooldownRemaining(): int
-    {
-        $twoFAService = $this->getService(TwoFAServiceInterface::class);
-        if (!$twoFAService instanceof TwoFAResendableInterface) {
-            return 0;
-        }
-
-        $userId = $this->getService(TwoFAUserServiceInterface::class)->getPendingUserId();
-        return $twoFAService->getCooldownRemaining($userId);
     }
 
     // todo-high: questionable if we want this method here at all, its just for one template - controller instead?
