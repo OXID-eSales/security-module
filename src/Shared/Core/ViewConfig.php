@@ -14,6 +14,7 @@ use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAResendab
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAServiceInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAUserServiceInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAUserSettingsServiceInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFAShopSettingsInterface;
 use OxidEsales\SecurityModule\Captcha\Captcha\Image\Service\ImageCaptchaService;
 use OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsServiceInterface as PasswordSettingsServiceInterface;
@@ -56,13 +57,7 @@ class ViewConfig extends ViewConfig_parent
         return 'data:image/jpeg;base64,' . base64_encode($images[ImageCaptchaService::CAPTCHA_NAME]);
     }
 
-    public function getActiveProviders(): iterable
-    {
-        $providers = $this->getService(ProviderCollectorInterface::class)->getProviders();
-
-        return array_filter($providers, fn($provider) => $provider->isActive());
-    }
-
+    // todo-critical: move to controller
     public function getRemainingAttempts(): int
     {
         $twoFAService = $this->getService(TwoFAServiceInterface::class);
@@ -74,6 +69,7 @@ class ViewConfig extends ViewConfig_parent
         return $twoFAService->getRemainingAttempts($userId);
     }
 
+    // todo-critical: move to controller
     public function getResendCooldownRemaining(): int
     {
         $twoFAService = $this->getService(TwoFAServiceInterface::class);
@@ -85,14 +81,10 @@ class ViewConfig extends ViewConfig_parent
         return $twoFAService->getCooldownRemaining($userId);
     }
 
-    public function isTwoFAEnabled(): bool
+    // todo-high: questionable if we want this method here at all, its just for one template - controller instead?
+    public function isTwoFAEnabledForShop(): bool
     {
-        $user = $this->getUser();
-        if (!$user) {
-            return false;
-        }
-
-        return $this->getService(TwoFAUserSettingsServiceInterface::class)->isEnabledForUser($user->getId());
+        return $this->getService(TwoFAShopSettingsInterface::class)->isTwoFactorAuthEnabled();
     }
 
     public function isExternalAuthUser(): bool
