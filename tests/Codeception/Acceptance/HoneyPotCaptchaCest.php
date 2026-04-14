@@ -33,6 +33,7 @@ class HoneyPotCaptchaCest extends BaseCest
     public function _before(AcceptanceTester $I): void
     {
         $this->setCaptchaState(false);
+        $this->setHoneyPotCaptchaState(true);
         $this->setPasswordState(false);
     }
 

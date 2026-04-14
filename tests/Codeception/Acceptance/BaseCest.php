@@ -14,9 +14,10 @@ use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Facade\ModuleSettingServiceInterface;
 use OxidEsales\SecurityModule\Authentication\OAuth2\Service\ModuleSettingsServiceInterface
     as OAuthModuleSettingsServiceInterface;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFASettings;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFAShopSettings;
 use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface as CaptchaSettingsServiceInterface;
 use OxidEsales\SecurityModule\Core\Module;
+use OxidEsales\SecurityModule\Tests\Codeception\Support\AcceptanceTester;
 use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsServiceInterface as PasswordSettingsServiceInterface;
 
 abstract class BaseCest
@@ -41,12 +42,27 @@ abstract class BaseCest
         ContainerFacade::get(CaptchaSettingsServiceInterface::class)->saveIsCaptchaEnabled($state);
     }
 
+    protected function setHoneyPotCaptchaState(bool $state)
+    {
+        ContainerFacade::get(CaptchaSettingsServiceInterface::class)->saveIsHoneyPotCaptchaEnabled($state);
+    }
+
     protected function setTwoFactorAuthState(bool $state)
     {
         ContainerFacade::get(ModuleSettingServiceInterface::class)->saveBoolean(
-            TwoFASettings::ACTIVE,
+            TwoFAShopSettings::ACTIVE,
             $state,
             Module::MODULE_ID
+        );
+    }
+
+    protected function setUserTwoFAState(AcceptanceTester $I, bool $state): void
+    {
+        $userData = $this->getExistingUserData();
+        $I->updateInDatabase(
+            'oxuser',
+            ['OE2FAENABLED' => (int) $state],
+            ['OXID' => $userData['userId']]
         );
     }
 

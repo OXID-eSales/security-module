@@ -27,8 +27,9 @@ class AccountSecurityController extends AccountController
         $parentResult = parent::render();
 
         $user = $this->getUser();
-
-        $this->addTplParam('twoFAEnabledForUser', $this->userSettingsService->isEnabledForUser($user->getId()));
+        if ($user) {
+            $this->addTplParam('twoFAEnabledForUser', $this->userSettingsService->isEnabledForUser($user->getId()));
+        }
 
         return $parentResult;
     }

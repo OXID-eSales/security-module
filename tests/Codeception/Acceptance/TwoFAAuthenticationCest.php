@@ -23,47 +23,195 @@ use OxidEsales\SecurityModule\Tests\Codeception\Support\AcceptanceTester;
 class TwoFAAuthenticationCest extends BaseCest
 {
     private string $otpInput = '#auth_code';
-    private string $otpSubmitBtn = '#auth_submit';
-    private string $otpResendBtn = 'RESEND_CODE';
+    private string $twofaCheckbox = '#twofa_enabled';
 
     public function _before(AcceptanceTester $I): void
     {
         $this->setCaptchaState(false);
         $this->setPasswordState(false);
         $this->setTwoFactorAuthState(true);
+        $this->setUserTwoFAState($I, false);
     }
 
-    public function testRedirectToOTPAfterLogin(AcceptanceTester $I): void
+    public function testEnablingTwoFAViaSettingsTriggersOtpOnNextLogin(AcceptanceTester $I): void
     {
         $userData = $this->getExistingUserData();
+        $userLoginPage = new UserLogin($I);
 
+        $I->amOnPage($userLoginPage->URL);
+        $userAccountPage = $userLoginPage->login($userData['userLoginName'], $userData['userPassword']);
+        $I->waitForPageLoad();
+
+        $I->amOnPage('?cl=account_security');
+        $I->waitForPageLoad();
+        $I->checkOption($this->twofaCheckbox);
+        $I->click(Translator::translate('SAVE'));
+        $I->waitForPageLoad();
+
+        $userAccountPage->logoutUserInAccountPage();
+        $I->waitForPageLoad();
+
+        $I->amOnPage($userLoginPage->URL);
+        $userLoginPage->login($userData['userLoginName'], $userData['userPassword']);
+        $I->waitForPageLoad();
+
+        $I->seeElement($this->otpInput);
+    }
+
+    public function testLoginOtpBehaviourChangesWithUserTwoFASetting(AcceptanceTester $I): void
+    {
+        $userData = $this->getExistingUserData();
+        $userLoginPage = new UserLogin($I);
+
+        $this->setUserTwoFAState($I, true);
+
+        $I->amOnPage($userLoginPage->URL);
+        $userLoginPage->login($userData['userLoginName'], $userData['userPassword']);
+        $I->waitForPageLoad();
+        $I->seeElement($this->otpInput);
+
+        $this->setUserTwoFAState($I, false);
+
+        $I->amOnPage($userLoginPage->URL);
+        $userLoginPage->login($userData['userLoginName'], $userData['userPassword']);
+        $I->waitForPageLoad();
+        $I->dontSeeElement($this->otpInput);
+    }
+
+    public function testSettingsPageReflectsTwoFAState(AcceptanceTester $I): void
+    {
+        $userData = $this->getExistingUserData();
+        $userLoginPage = new UserLogin($I);
+
+        $I->amOnPage($userLoginPage->URL);
+        $userLoginPage->login($userData['userLoginName'], $userData['userPassword']);
+        $I->waitForPageLoad();
+
+        $I->amOnPage('?cl=account_security');
+        $I->waitForPageLoad();
+        $I->dontSeeCheckboxIsChecked($this->twofaCheckbox);
+
+        $I->checkOption($this->twofaCheckbox);
+        $I->click(Translator::translate('SAVE'));
+        $I->waitForPageLoad();
+
+        $I->amOnPage('?cl=account_security');
+        $I->waitForPageLoad();
+        $I->seeCheckboxIsChecked($this->twofaCheckbox);
+
+        $I->uncheckOption($this->twofaCheckbox);
+        $I->click(Translator::translate('SAVE'));
+        $I->waitForPageLoad();
+
+        $I->amOnPage('?cl=account_security');
+        $I->waitForPageLoad();
+        $I->dontSeeCheckboxIsChecked($this->twofaCheckbox);
+    }
+
+    public function testUnauthenticatedAccessToAccountSecurityRedirectsToLogin(AcceptanceTester $I): void
+    {
+        $I->amOnPage('?cl=account_security');
+        $I->waitForPageLoad();
+
+        $I->see(Translator::translate('LOGIN'));
+        $I->dontSeeElement($this->twofaCheckbox);
+    }
+
+    public function testShopLevelTwoFADisabledOverridesUserSetting(AcceptanceTester $I): void
+    {
+        $this->setUserTwoFAState($I, true);
+        $this->setTwoFactorAuthState(false);
+
+        $userData = $this->getExistingUserData();
         $userLoginPage = new UserLogin($I);
         $I->amOnPage($userLoginPage->URL);
-        $I->see(Translator::translate('LOGIN'));
-
         $userLoginPage->login($userData['userLoginName'], $userData['userPassword']);
-
         $I->waitForPageLoad();
-        $I->seeElement($this->otpInput);
-        $I->seeElement($this->otpSubmitBtn);
-        $I->see(Translator::translate($this->otpResendBtn));
+
+        $I->dontSeeElement($this->otpInput);
     }
 
-    public function testRedirectToOTPOnLoginBox(AcceptanceTester $I): void
+    public function testInvalidCodeShowsError(AcceptanceTester $I): void
     {
+        $this->setUserTwoFAState($I, true);
 
         $userData = $this->getExistingUserData();
-
-        $homePage = $I->openShop();
-        $accountMenu = $homePage->openAccountMenu();
-        $I->waitForText(Translator::translate('FORGOT_PASSWORD'));
-        $I->retryFillField($accountMenu->userLoginName, $userData['userLoginName']);
-        $I->retryFillField($accountMenu->userLoginPassword, $userData['userPassword']);
-        $I->retryClick($accountMenu->userLoginButton);
-
+        $userLoginPage = new UserLogin($I);
+        $I->amOnPage($userLoginPage->URL);
+        $userLoginPage->login($userData['userLoginName'], $userData['userPassword']);
         $I->waitForPageLoad();
-        $I->seeElement($this->otpInput);
-        $I->seeElement($this->otpSubmitBtn);
-        $I->see(Translator::translate($this->otpResendBtn));
+
+        $I->fillField($this->otpInput, '000000');
+        $I->click('#auth_submit');
+        $I->waitForPageLoad();
+
+        $I->see(Translator::translate('ERROR_INVALID_CODE'));
+    }
+
+    public function testWrongCodeDecreasesRemainingAttemptsAndShowsError(AcceptanceTester $I): void
+    {
+        $this->setUserTwoFAState($I, true);
+
+        $userData = $this->getExistingUserData();
+        $userLoginPage = new UserLogin($I);
+        $I->amOnPage($userLoginPage->URL);
+        $userLoginPage->login($userData['userLoginName'], $userData['userPassword']);
+        $I->waitForPageLoad();
+
+        $attemptsBefore = (int) $I->grabTextFrom('#remaining-attempts');
+
+        $I->fillField($this->otpInput, '000000');
+        $I->click('#auth_submit');
+        $I->waitForPageLoad();
+
+        $I->see(Translator::translate('ERROR_INVALID_CODE'));
+        $I->see((string) ($attemptsBefore - 1), '#remaining-attempts');
+    }
+
+    public function testResendButtonIsDisabledOnOtpPageLoad(AcceptanceTester $I): void
+    {
+        $this->setUserTwoFAState($I, true);
+
+        $userData = $this->getExistingUserData();
+        $userLoginPage = new UserLogin($I);
+        $I->amOnPage($userLoginPage->URL);
+        $userLoginPage->login($userData['userLoginName'], $userData['userPassword']);
+        $I->waitForPageLoad();
+
+        // A code was just sent at login, so the server-driven cooldown should disable the button
+        $I->waitForJS("return document.getElementById('resend-btn').disabled === true", 5);
+        $I->seeElement('#resend-btn[disabled]');
+    }
+
+    public function testResendButtonShowsCountdownAfterClick(AcceptanceTester $I): void
+    {
+        $this->setUserTwoFAState($I, true);
+
+        $userData = $this->getExistingUserData();
+        $userLoginPage = new UserLogin($I);
+        $I->amOnPage($userLoginPage->URL);
+        $userLoginPage->login($userData['userLoginName'], $userData['userPassword']);
+        $I->waitForPageLoad();
+
+        // Backdate LAST_SENT_AT so the server reports zero remaining cooldown
+        $I->updateInDatabase(
+            'oesm_2fa_otp',
+            ['LAST_SENT_AT' => date('Y-m-d H:i:s', strtotime('-2 minutes'))],
+            ['OXUSERID' => $userData['userId']]
+        );
+
+        // Clear stored cooldown from localStorage so JS reads from the (now zero) server value
+        $I->executeJS("localStorage.clear()");
+        $I->reloadPage();
+        $I->waitForPageLoad();
+
+        $I->seeElement('#resend-btn:not([disabled])');
+
+        $I->click('#resend-btn');
+
+        $I->waitForJS(
+            "return document.getElementById('resend-btn').textContent.includes('Resend in')",
+            30
+        );
     }
 }
