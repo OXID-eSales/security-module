@@ -67,4 +67,5 @@ $aLang = [
     'OE_SECURITY_TWO_FACTOR_SETTINGS_TITLE'       => 'Two-Factor Authentication',
     'OE_SECURITY_TWO_FACTOR_SETTINGS_DESCRIPTION' => 'Add an extra layer of security to your account. When enabled, you will need to enter a verification code sent to your email each time you log in.',
     'OE_SECURITY_TWO_FACTOR_ENABLE'               => 'Enable two-factor authentication',
+    'OE_SECURITY_TWO_FA_SETTINGS_SAVED'           => 'Two-factor authentication settings have been saved.',
 ];

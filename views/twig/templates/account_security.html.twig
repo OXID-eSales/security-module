@@ -1,4 +1,7 @@
 {% capture append = "oxidBlock_content" %}
+    {% if twoFASaved %}
+        <div class="alert alert-success">{{ translate({ ident: "OE_SECURITY_TWO_FA_SETTINGS_SAVED" }) }}</div>
+    {% endif %}
     <div class="container-xxl py-5">
         <div class="row">
             <h1 class="h3 page-header col pl-0 ml-3">

@@ -43,10 +43,9 @@ class TwoFactorAuthController extends FrontendController
     {
         parent::render();
 
-        $isResendable = $this->twoFAService instanceof TwoFAResendableInterface;
-        $this->addTplParam('resendable', $isResendable);
+        $this->addTplParam('resendable', $this->twoFAService instanceof TwoFAResendableInterface);
 
-        if ($isResendable) {
+        if ($this->twoFAService instanceof TwoFAResendableInterface) {
             $userId = $this->twoFAUserService->getPendingUserId();
             $this->addTplParam('remainingAttempts', $this->twoFAService->getRemainingAttempts($userId));
             $this->addTplParam('resendCooldownRemaining', $this->twoFAService->getCooldownRemaining($userId));

@@ -15,6 +15,8 @@ use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFAUserSet
 
 class AccountSecurityController extends AccountController
 {
+    private bool $twoFASaved = false;
+
     public function __construct(
         private readonly TwoFAUserSettingsInterface $userSettingsService,
     ) {
@@ -29,6 +31,7 @@ class AccountSecurityController extends AccountController
         $user = $this->getUser();
         if ($user) {
             $this->addTplParam('twoFAEnabledForUser', $this->userSettingsService->isEnabledForUser($user->getId()));
+            $this->addTplParam('twoFASaved', $this->twoFASaved);
         }
 
         return $parentResult;
@@ -43,5 +46,6 @@ class AccountSecurityController extends AccountController
 
         $enabled = (bool)Registry::getRequest()->getRequestParameter('twofa_enabled');
         $this->userSettingsService->setEnabledForUser($user->getId(), $enabled);
+        $this->twoFASaved = true;
     }
 }

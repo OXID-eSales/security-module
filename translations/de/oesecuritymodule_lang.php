@@ -67,4 +67,5 @@ $aLang = [
     'OE_SECURITY_TWO_FACTOR_SETTINGS_TITLE'       => 'Zwei-Faktor-Authentifizierung',
     'OE_SECURITY_TWO_FACTOR_SETTINGS_DESCRIPTION' => 'Fügen Sie Ihrem Konto eine zusätzliche Sicherheitsebene hinzu. Wenn aktiviert, müssen Sie bei jeder Anmeldung einen Bestätigungscode eingeben, der an Ihre E-Mail gesendet wird.',
     'OE_SECURITY_TWO_FACTOR_ENABLE'               => 'Zwei-Faktor-Authentifizierung aktivieren',
+    'OE_SECURITY_TWO_FA_SETTINGS_SAVED'           => 'Die Einstellungen für die Zwei-Faktor-Authentifizierung wurden gespeichert.',
 ];

@@ -51,6 +51,37 @@ class AccountSecurityControllerTest extends IntegrationTestCase
         yield 'user has 2FA disabled' => ['userSettingEnabled' => false];
     }
 
+    #[Test]
+    public function renderSetsTwoFASavedFalseByDefault(): void
+    {
+        $userId = uniqid();
+
+        $userStub = $this->createStub(User::class);
+        $userStub->method('getId')->willReturn($userId);
+
+        $sut = $this->getSut();
+        $sut->method('getUser')->willReturn($userStub);
+        $sut->render();
+
+        $this->assertFalse($sut->getViewDataElement('twoFASaved'));
+    }
+
+    #[Test]
+    public function renderSetsTwoFASavedTrueAfterSave(): void
+    {
+        $userId = uniqid();
+
+        $userStub = $this->createStub(User::class);
+        $userStub->method('getId')->willReturn($userId);
+
+        $sut = $this->getSut();
+        $sut->method('getUser')->willReturn($userStub);
+        $sut->saveTwoFactorAuth();
+        $sut->render();
+
+        $this->assertTrue($sut->getViewDataElement('twoFASaved'));
+    }
+
     private function getSut(
         TwoFAUserSettingsInterface $userSettingsService = null,
     ): AccountSecurityController {
