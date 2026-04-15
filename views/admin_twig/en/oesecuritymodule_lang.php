@@ -27,18 +27,6 @@ $aLang = [
     'SHOP_MODULE_oeSecurityCaptchaLifeTime_15min' => '15 min',
     'SHOP_MODULE_oeSecurityCaptchaLifeTime_30min' => '30 min',
 
-    'SHOP_MODULE_GROUP_oauth'                   => 'OAuth2',
-    'SHOP_MODULE_oeSecurityFacebookEnabled'     => 'Enable Facebook OAuth2 login',
-    'SHOP_MODULE_oeSecurityFacebookClientId'    => 'Facebook client id',
-    'SHOP_MODULE_oeSecurityFacebookSecret'      => 'Facebook client secret',
-    'SHOP_MODULE_oeSecurityFacebookRedirectUrl'      => 'Facebook redirect URL (auto-generated)',
-    'HELP_SHOP_MODULE_oeSecurityFacebookRedirectUrl' => 'This URL is auto-generated from your shop URL. Copy it to your Facebook App settings.',
-    'SHOP_MODULE_oeSecurityGoogleEnabled'      => 'Enable login with Google',
-    'SHOP_MODULE_oeSecurityGoogleClientId'    => 'Google client id',
-    'SHOP_MODULE_oeSecurityGoogleSecret'      => 'Google client secret',
-    'SHOP_MODULE_oeSecurityGoogleRedirectUrl'      => 'Google redirect URL (auto-generated)',
-    'HELP_SHOP_MODULE_oeSecurityGoogleRedirectUrl' => 'This URL is auto-generated from your shop URL. Copy it to your Google App settings.',
-
     'SHOP_MODULE_GROUP_two_factor_auth'            => 'Two Factor Authentication',
     'SHOP_MODULE_oeSecurityTwoFactorAuthEnabled'   => 'Enable Two Factor Authentication',
     'SHOP_MODULE_oeSecurityTwoFactorAuthType'      => 'Two Factor Authentication type',

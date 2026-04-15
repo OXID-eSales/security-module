@@ -1,7 +1,0 @@
-services:
-  _defaults:
-    autowire: true
-    public: false
-
-  OxidEsales\SecurityModule\Shared\Service\PasswordGeneratorServiceInterface:
-    class: OxidEsales\SecurityModule\Shared\Service\PasswordGeneratorService

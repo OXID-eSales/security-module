@@ -1,5 +1,4 @@
 imports:
-  - { resource: OAuth2/services.yaml }
   - { resource: TwoFactorAuth/services.yaml }
   - { resource: Subscriber/services.yaml }
   - { resource: Service/services.yaml }

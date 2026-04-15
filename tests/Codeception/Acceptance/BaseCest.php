@@ -12,8 +12,6 @@ namespace OxidEsales\SecurityModule\Tests\Codeception\Acceptance;
 use Codeception\Util\Fixtures;
 use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Facade\ModuleSettingServiceInterface;
-use OxidEsales\SecurityModule\Authentication\OAuth2\Service\ModuleSettingsServiceInterface
-    as OAuthModuleSettingsServiceInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFAShopSettings;
 use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface as CaptchaSettingsServiceInterface;
 use OxidEsales\SecurityModule\Core\Module;
@@ -64,12 +62,5 @@ abstract class BaseCest
             ['OE2FAENABLED' => (int) $state],
             ['OXID' => $userData['userId']]
         );
-    }
-
-    protected function setProviderState(bool $state)
-    {
-        $moduleSettings = ContainerFacade::get(OAuthModuleSettingsServiceInterface::class);
-        $moduleSettings->saveFacebookEnabled($state);
-        $moduleSettings->saveGoogleEnabled($state);
     }
 }

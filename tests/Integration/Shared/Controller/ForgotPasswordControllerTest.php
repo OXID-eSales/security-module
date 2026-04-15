@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Tests\Integration\Shared\Controller;
 
 use OxidEsales\Eshop\Application\Controller\ForgotPasswordController;
-use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
 use OxidEsales\Eshop\Core\UtilsView;
@@ -125,113 +124,5 @@ class ForgotPasswordControllerTest extends IntegrationTestCase
 
         $subject = oxNew(ForgotPasswordController::class);
         $subject->forgotPassword();
-    }
-
-    public function testUpdatePasswordClearsExternalAuthFlagOnSuccess(): void
-    {
-        $userId = uniqid();
-        $user = $this->createTestUser($userId);
-
-        $this->assertEquals(1, (int) $user->getFieldData('oesmexternalauth'));
-
-        $updateKey = $user->getFieldData('oxupdatekey');
-        $shopId = $user->getFieldData('oxshopid');
-        $uid = md5($user->getId() . $shopId . $updateKey);
-
-        $password = uniqid();
-
-        $requestMock = $this->getMockBuilder(Request::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['getRequestParameter', 'getRequestEscapedParameter'])
-            ->getMock();
-
-        $requestMock->method('getRequestParameter')
-            ->willReturnCallback(function ($param) use ($password) {
-                return match ($param) {
-                    'password_new', 'password_new_confirm' => $password,
-                    default => null,
-                };
-            });
-
-        $requestMock->method('getRequestEscapedParameter')
-            ->willReturnCallback(function ($param) use ($uid) {
-                return match ($param) {
-                    'uid' => $uid,
-                    default => null,
-                };
-            });
-
-        Registry::set(Request::class, $requestMock);
-
-        $subject = oxNew(ForgotPasswordController::class);
-        $result = $subject->updatePassword();
-
-        $this->assertSame('forgotpwd?success=1', $result);
-
-        $updatedUser = oxNew(User::class);
-        $updatedUser->load($userId);
-        $this->assertEquals(0, (int) $updatedUser->getFieldData('oesmexternalauth'));
-    }
-
-    public function testUpdatePasswordKeepsExternalAuthFlagOnFailure(): void
-    {
-        $userId = uniqid();
-        $this->createTestUser($userId);
-        $password = uniqid();
-
-        $requestMock = $this->getMockBuilder(Request::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['getRequestParameter', 'getRequestEscapedParameter'])
-            ->getMock();
-
-        $requestMock->method('getRequestParameter')
-            ->willReturnCallback(function ($param) use ($password) {
-                return match ($param) {
-                    'password_new', 'password_new_confirm' => $password,
-                    default => null,
-                };
-            });
-
-        $requestMock->method('getRequestEscapedParameter')
-            ->willReturnCallback(function ($param) {
-                return match ($param) {
-                    'uid' => 'invalid_uid',
-                    default => null,
-                };
-            });
-
-        Registry::set(Request::class, $requestMock);
-
-        $subject = oxNew(ForgotPasswordController::class);
-        $result = $subject->updatePassword();
-
-        $this->assertNotSame('forgotpwd?success=1', $result);
-
-        $unchangedUser = oxNew(User::class);
-        $unchangedUser->load($userId);
-        $this->assertEquals(1, (int) $unchangedUser->getFieldData('oesmexternalauth'));
-    }
-
-    /**
-     * Helper method to create the test user.
-     *
-     * @return \OxidEsales\Eshop\Application\Model\User
-     */
-    protected function createTestUser(string $userId)
-    {
-        $user = oxNew(User::class);
-        $user->setId($userId);
-        $user->assign([
-            'oxactive'            => 1,
-            'b2bparentid'         => '',
-            'b2brightdirectorder' => 1,
-            'oxpassword'          => uniqid(),
-            'oesmexternalauth'    => 1,
-        ]);
-
-        $user->save();
-        $user->setUpdateKey();
-
-        return $user;
     }
 }

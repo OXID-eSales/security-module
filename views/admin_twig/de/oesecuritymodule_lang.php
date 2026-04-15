@@ -27,18 +27,6 @@ $aLang = [
     'SHOP_MODULE_oeSecurityCaptchaLifeTime_15min' => '15 min',
     'SHOP_MODULE_oeSecurityCaptchaLifeTime_30min' => '30 min',
 
-    'SHOP_MODULE_GROUP_oauth'                   => 'OAuth2',
-    'SHOP_MODULE_oeSecurityFacebookEnabled'     => 'Facebook OAuth2 Login aktivieren',
-    'SHOP_MODULE_oeSecurityFacebookClientId'    => 'Facebook Client-ID',
-    'SHOP_MODULE_oeSecurityFacebookSecret'      => 'Facebook Secret',
-    'SHOP_MODULE_oeSecurityFacebookRedirectUrl'      => 'Facebook Weiterleitungs-URL (automatisch generiert)',
-    'HELP_SHOP_MODULE_oeSecurityFacebookRedirectUrl' => 'Diese URL wird automatisch aus Ihrer Shop-URL generiert. Kopieren Sie sie in Ihre Facebook-App-Einstellungen.',
-    'SHOP_MODULE_oeSecurityGoogleEnabled'      => 'Google OAuth2 Login aktivieren',
-    'SHOP_MODULE_oeSecurityGoogleClientId'    => 'Google Client-ID',
-    'SHOP_MODULE_oeSecurityGoogleSecret'      => 'Google Secret',
-    'SHOP_MODULE_oeSecurityGoogleRedirectUrl'      => 'Google Weiterleitungs-URL (automatisch generiert)',
-    'HELP_SHOP_MODULE_oeSecurityGoogleRedirectUrl' => 'Diese URL wird automatisch aus Ihrer Shop-URL generiert. Kopieren Sie sie in Ihre Google-App-Einstellungen.',
-
     'SHOP_MODULE_GROUP_two_factor_auth'            => 'Zwei-Faktor-Authentifizierung',
     'SHOP_MODULE_oeSecurityTwoFactorAuthEnabled'   => 'Zwei-Faktor-Authentifizierung aktivieren',
     'SHOP_MODULE_oeSecurityTwoFactorAuthType'      => 'Art der Zwei-Faktor-Authentifizierung',
