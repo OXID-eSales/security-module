@@ -14,6 +14,7 @@ use OxidEsales\Eshop\Application\Controller\AccountController;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Controller\AccountSecurityController;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFAUserSettingsInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Transput\UserSettingsUpdateRequestInterface;
 use OxidEsales\SecurityModule\Tests\Integration\IntegrationTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -52,42 +53,76 @@ class AccountSecurityControllerTest extends IntegrationTestCase
     }
 
     #[Test]
-    public function renderSetsTwoFASavedFalseByDefault(): void
+    public function renderDoesNotSetParamsWhenUserIsNull(): void
     {
-        $userId = uniqid();
+        $userSettingsSpy = $this->createMock(TwoFAUserSettingsInterface::class);
+        $userSettingsSpy->expects($this->never())->method('isEnabledForUser');
 
-        $userStub = $this->createStub(User::class);
-        $userStub->method('getId')->willReturn($userId);
-
-        $sut = $this->getSut();
-        $sut->method('getUser')->willReturn($userStub);
+        $sut = $this->getSut(userSettingsService: $userSettingsSpy);
+        $sut->method('getUser')->willReturn(null);
         $sut->render();
 
-        $this->assertFalse($sut->getViewDataElement('twoFASaved'));
+        $this->assertNull($sut->getViewDataElement('twoFAEnabledForUser'));
     }
 
     #[Test]
-    public function renderSetsTwoFASavedTrueAfterSave(): void
+    #[DataProvider('saveTwoFactorAuthDataProvider')]
+    public function saveTwoFactorAuthPassesRequestValueToUserSettings(bool $twoFAEnabled): void
     {
         $userId = uniqid();
 
         $userStub = $this->createStub(User::class);
         $userStub->method('getId')->willReturn($userId);
 
-        $sut = $this->getSut();
+        $updateRequestStub = $this->createStub(UserSettingsUpdateRequestInterface::class);
+        $updateRequestStub->method('isTwoFAEnabled')
+            ->willReturn($twoFAEnabled);
+
+        $userSettingsSpy = $this->createMock(TwoFAUserSettingsInterface::class);
+        $userSettingsSpy->expects($this->once())
+            ->method('setEnabledForUser')
+            ->with($userId, $twoFAEnabled);
+
+        $sut = $this->getSut(
+            userSettingsService: $userSettingsSpy,
+            updateRequest: $updateRequestStub,
+        );
         $sut->method('getUser')->willReturn($userStub);
         $sut->saveTwoFactorAuth();
-        $sut->render();
 
         $this->assertTrue($sut->getViewDataElement('twoFASaved'));
     }
 
+    #[Test]
+    public function saveTwoFactorAuthDoesNothingWhenUserIsNull(): void
+    {
+        $userSettingsSpy = $this->createMock(TwoFAUserSettingsInterface::class);
+        $userSettingsSpy->expects($this->never())->method('setEnabledForUser');
+
+        $sut = $this->getSut(userSettingsService: $userSettingsSpy);
+        $sut->method('getUser')->willReturn(null);
+        $sut->saveTwoFactorAuth();
+
+        $this->assertNull($sut->getViewDataElement('twoFASaved'));
+    }
+
+    public static function saveTwoFactorAuthDataProvider(): Generator
+    {
+        yield 'enable 2FA' => ['twoFAEnabled' => true];
+        yield 'disable 2FA' => ['twoFAEnabled' => false];
+    }
+
     private function getSut(
         TwoFAUserSettingsInterface $userSettingsService = null,
+        UserSettingsUpdateRequestInterface $updateRequest = null,
     ): AccountSecurityController {
+        $userSettingsService ??= $this->createStub(TwoFAUserSettingsInterface::class);
+        $updateRequest ??= $this->createStub(UserSettingsUpdateRequestInterface::class);
+
         return $this->getMockBuilder(AccountSecurityController::class)
             ->setConstructorArgs([
-                'userSettingsService' => $userSettingsService ?? $this->createStub(TwoFAUserSettingsInterface::class),
+                'userSettingsService' => $userSettingsService,
+                'settingUpdateRequest' => $updateRequest,
             ])
             ->onlyMethods(['getUser'])
             ->getMock();

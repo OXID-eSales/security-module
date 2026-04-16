@@ -10,15 +10,14 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Controller;
 
 use OxidEsales\Eshop\Application\Controller\AccountController;
-use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFAUserSettingsInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Transput\UserSettingsUpdateRequestInterface;
 
 class AccountSecurityController extends AccountController
 {
-    private bool $twoFASaved = false;
-
     public function __construct(
         private readonly TwoFAUserSettingsInterface $userSettingsService,
+        private readonly UserSettingsUpdateRequestInterface $settingUpdateRequest,
     ) {
         $this->setTemplateName('@oe_security_module/templates/account_security');
         parent::__construct();
@@ -31,7 +30,6 @@ class AccountSecurityController extends AccountController
         $user = $this->getUser();
         if ($user) {
             $this->addTplParam('twoFAEnabledForUser', $this->userSettingsService->isEnabledForUser($user->getId()));
-            $this->addTplParam('twoFASaved', $this->twoFASaved);
         }
 
         return $parentResult;
@@ -44,8 +42,11 @@ class AccountSecurityController extends AccountController
             return;
         }
 
-        $enabled = (bool)Registry::getRequest()->getRequestParameter('twofa_enabled');
-        $this->userSettingsService->setEnabledForUser($user->getId(), $enabled);
-        $this->twoFASaved = true;
+        $this->userSettingsService->setEnabledForUser(
+            $user->getId(),
+            $this->settingUpdateRequest->isTwoFAEnabled()
+        );
+
+        $this->addTplParam('twoFASaved', true);
     }
 }

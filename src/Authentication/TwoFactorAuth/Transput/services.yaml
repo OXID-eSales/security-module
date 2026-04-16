@@ -12,3 +12,7 @@ services:
   OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Transput\JsonResponseInterface:
     class: OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Transput\JsonResponse
     public: true
+
+  OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Transput\UserSettingsUpdateRequestInterface:
+    class: OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Transput\UserSettingsUpdateRequest
+    public: true
