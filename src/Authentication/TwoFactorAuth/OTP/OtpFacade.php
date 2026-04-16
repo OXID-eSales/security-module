@@ -43,10 +43,11 @@ class OtpFacade implements TwoFAServiceInterface, TwoFAResendableInterface
 
     public function triggerChallenge(string $userId): void
     {
+        if (!$this->sendPolicy->canSend($userId)) {
+            return;
+        }
+
         $code = $this->codeGenerator->generateCode();
-
-        // todo-critical: check if we can trigger the notification
-
         $this->stateService->createChallengeState($userId, $code);
         $this->notifierFactory->create($userId)->notify($userId, $code);
     }

@@ -154,6 +154,9 @@ class OtpFacadeTest extends TestCase
     #[Test]
     public function triggerChallengeGeneratesCodeCreatesStateAndNotifies(): void
     {
+        $sendPolicyStub = $this->createStub(OtpSendPolicyServiceInterface::class);
+        $sendPolicyStub->method('canSend')->willReturn(true);
+
         $codeGeneratorStub = $this->createStub(OtpCodeGeneratorServiceInterface::class);
         $codeGeneratorStub->method('generateCode')->willReturn($code = uniqid());
 
@@ -174,9 +177,31 @@ class OtpFacadeTest extends TestCase
             stateService: $stateServiceSpy,
             codeGenerator: $codeGeneratorStub,
             notifierFactory: $notifierFactoryStub,
+            sendPolicy: $sendPolicyStub,
         );
 
         $sut->triggerChallenge(userId: $userId);
+    }
+
+    #[Test]
+    public function triggerChallengeDoesNothingWhenCooldownActive(): void
+    {
+        $sendPolicyStub = $this->createStub(OtpSendPolicyServiceInterface::class);
+        $sendPolicyStub->method('canSend')->willReturn(false);
+
+        $stateServiceSpy = $this->createMock(OtpChallengeStateServiceInterface::class);
+        $stateServiceSpy->expects($this->never())->method('createChallengeState');
+
+        $notifierFactorySpy = $this->createMock(OtpNotifierFactoryInterface::class);
+        $notifierFactorySpy->expects($this->never())->method('create');
+
+        $sut = $this->getSut(
+            stateService: $stateServiceSpy,
+            notifierFactory: $notifierFactorySpy,
+            sendPolicy: $sendPolicyStub,
+        );
+
+        $sut->triggerChallenge(userId: uniqid());
     }
 
     #[Test]
