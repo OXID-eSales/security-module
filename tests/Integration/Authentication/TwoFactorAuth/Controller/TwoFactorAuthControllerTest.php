@@ -24,14 +24,14 @@ use PHPUnit\Framework\MockObject\MockObject;
 class TwoFactorAuthControllerTest extends IntegrationTestCase
 {
     #[Test]
-    public function renderSetsResendableFalseWhenServiceIsNotResendable(): void
+    public function renderDoesNotSetResendableWhenServiceIsNotResendable(): void
     {
         $sut = $this->getSut(
             twoFAService: $this->createStub(TwoFAServiceInterface::class),
         );
         $sut->render();
 
-        $this->assertFalse($sut->getViewDataElement('resendable'));
+        $this->assertNull($sut->getViewDataElement('resendable'));
     }
 
     #[Test]
