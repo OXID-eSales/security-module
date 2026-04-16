@@ -13,7 +13,7 @@ use Codeception\Util\Fixtures;
 use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
 use OxidEsales\EshopCommunity\Internal\Framework\Module\Facade\ModuleSettingServiceInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFAShopSettings;
-use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface as CaptchaSettingsServiceInterface;
+use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsService as CaptchaModuleSettingsService;
 use OxidEsales\SecurityModule\Core\Module;
 use OxidEsales\SecurityModule\Tests\Codeception\Support\AcceptanceTester;
 use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsServiceInterface as PasswordSettingsServiceInterface;
@@ -35,14 +35,16 @@ abstract class BaseCest
         ContainerFacade::get(PasswordSettingsServiceInterface::class)->saveIsPasswordPolicyEnabled($state);
     }
 
-    protected function setCaptchaState(bool $state)
+    protected function setCaptchaState(bool $state): void
     {
-        ContainerFacade::get(CaptchaSettingsServiceInterface::class)->saveIsCaptchaEnabled($state);
+        ContainerFacade::get(ModuleSettingServiceInterface::class)
+            ->saveBoolean(CaptchaModuleSettingsService::CAPTCHA_ENABLE, $state, Module::MODULE_ID);
     }
 
-    protected function setHoneyPotCaptchaState(bool $state)
+    protected function setHoneyPotCaptchaState(bool $state): void
     {
-        ContainerFacade::get(CaptchaSettingsServiceInterface::class)->saveIsHoneyPotCaptchaEnabled($state);
+        ContainerFacade::get(ModuleSettingServiceInterface::class)
+            ->saveBoolean(CaptchaModuleSettingsService::HONEYPOT_CAPTCHA_ENABLE, $state, Module::MODULE_ID);
     }
 
     protected function setTwoFactorAuthState(bool $state)

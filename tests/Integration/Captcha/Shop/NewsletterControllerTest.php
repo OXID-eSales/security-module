@@ -9,13 +9,15 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Tests\Integration\Captcha\Shop;
 
-use OxidEsales\Eshop\Application\Controller\NewsletterController;
+use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
 use OxidEsales\Eshop\Core\UtilsView;
 use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
 use OxidEsales\EshopCommunity\Tests\Integration\IntegrationTestCase;
+use OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface;
 use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface;
+use OxidEsales\SecurityModule\Captcha\Shop\NewsletterController as ModuleNewsletterController;
 
 class NewsletterControllerTest extends IntegrationTestCase
 {
@@ -25,9 +27,6 @@ class NewsletterControllerTest extends IntegrationTestCase
     public function setUp(): void
     {
         parent::setUp();
-
-        $moduleSettings = ContainerFacade::get(ModuleSettingsServiceInterface::class);
-        $moduleSettings->saveIsCaptchaEnabled(true);
 
         $this->utilsViewMock = $this->getMockBuilder(UtilsView::class)
             ->disableOriginalConstructor()
@@ -41,8 +40,6 @@ class NewsletterControllerTest extends IntegrationTestCase
 
         Registry::set(UtilsView::class, $this->utilsViewMock);
         Registry::set(Request::class, $this->requestMock);
-        Registry::getSession()->setVariable('captcha', 'valid_captcha');
-        Registry::getSession()->setVariable('captcha_expiration', time() + 60);
     }
 
     public function testSendWithValidCaptcha()
@@ -50,9 +47,6 @@ class NewsletterControllerTest extends IntegrationTestCase
         $this->requestMock
             ->method('getRequestParameter')
             ->willReturnCallback(function ($param) {
-                if ($param === 'captcha') {
-                    return 'valid_captcha';
-                }
                 if ($param === 'lastname_confirm') {
                     return '';
                 }
@@ -66,62 +60,73 @@ class NewsletterControllerTest extends IntegrationTestCase
                 $this->assertNotEquals('ERROR_INVALID_CAPTCHA', $message);
             });
 
-        $subject = oxNew(NewsletterController::class);
+        $subject = $this->getSut();
         $subject->send();
     }
 
     public function testSendWithInvalidCaptcha()
     {
-        $this->requestMock
-            ->method('getRequestParameter')
-            ->with('captcha')
-            ->willReturn('invalid_captcha');
-
         $this->utilsViewMock
             ->expects($this->once())
             ->method('addErrorToDisplay')
             ->with('ERROR_INVALID_CAPTCHA');
 
-        $subject = oxNew(NewsletterController::class);
+        $captchaService = $this->createMock(CaptchaServiceInterface::class);
+        $captchaService->method('validate')->willThrowException(new StandardException('ERROR_INVALID_CAPTCHA'));
+
+        $subject = $this->getSut([CaptchaServiceInterface::class => $captchaService]);
         $subject->send();
     }
 
     public function testSendWithEmptyCaptcha()
     {
-        $this->requestMock
-            ->method('getRequestParameter')
-            ->with('captcha')
-            ->willReturn('');
-
         $this->utilsViewMock
             ->expects($this->once())
             ->method('addErrorToDisplay')
             ->with('ERROR_EMPTY_CAPTCHA');
 
-        $subject = oxNew(NewsletterController::class);
+        $captchaService = $this->createMock(CaptchaServiceInterface::class);
+        $captchaService->method('validate')->willThrowException(new StandardException('ERROR_EMPTY_CAPTCHA'));
+
+        $subject = $this->getSut([CaptchaServiceInterface::class => $captchaService]);
         $subject->send();
     }
 
     public function testSendWithInvalidHoneyPotCaptcha()
     {
-        $this->requestMock
-            ->method('getRequestParameter')
-            ->willReturnCallback(function ($param) {
-                if ($param === 'captcha') {
-                    return 'valid_captcha';
-                }
-                if ($param === 'lastname_confirm') {
-                    return 'some-text';
-                }
-                return '';
-            });
-
         $this->utilsViewMock
             ->expects($this->once())
             ->method('addErrorToDisplay')
             ->with('FORM_VALIDATION_FAILED');
 
-        $subject = oxNew(NewsletterController::class);
+        $captchaService = $this->createMock(CaptchaServiceInterface::class);
+        $captchaService->method('validate')->willThrowException(new StandardException('FORM_VALIDATION_FAILED'));
+
+        $subject = $this->getSut([CaptchaServiceInterface::class => $captchaService]);
         $subject->send();
+    }
+
+    private function getSut(array $serviceOverrides = []): ModuleNewsletterController
+    {
+        $services = array_merge(
+            [
+                ModuleSettingsServiceInterface::class => $this->createConfiguredStub(
+                    ModuleSettingsServiceInterface::class,
+                    ['isCaptchaEnabled' => true]
+                ),
+                CaptchaServiceInterface::class => $this->createStub(CaptchaServiceInterface::class),
+            ],
+            $serviceOverrides
+        );
+
+        /** @var ModuleNewsletterController $sut */
+        $sut = $this->getMockBuilder(ModuleNewsletterController::class)
+            ->onlyMethods(['getService'])
+            ->getMock();
+        $sut->method('getService')->willReturnCallback(
+            fn(string $id) => $services[$id] ?? ContainerFacade::get($id)
+        );
+
+        return $sut;
     }
 }

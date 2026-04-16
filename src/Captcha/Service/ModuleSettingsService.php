@@ -37,19 +37,9 @@ class ModuleSettingsService implements ModuleSettingsServiceInterface
         return $this->moduleSettingService->getBoolean(self::CAPTCHA_ENABLE, Module::MODULE_ID);
     }
 
-    public function saveIsCaptchaEnabled(bool $value): void
-    {
-        $this->moduleSettingService->saveBoolean(self::CAPTCHA_ENABLE, $value, Module::MODULE_ID);
-    }
-
     public function isHoneyPotCaptchaEnabled(): bool
     {
         return $this->moduleSettingService->getBoolean(self::HONEYPOT_CAPTCHA_ENABLE, Module::MODULE_ID);
-    }
-
-    public function saveIsHoneyPotCaptchaEnabled(bool $value): void
-    {
-        $this->moduleSettingService->saveBoolean(self::HONEYPOT_CAPTCHA_ENABLE, $value, Module::MODULE_ID);
     }
 
     public function getCaptchaLifeTime(): string

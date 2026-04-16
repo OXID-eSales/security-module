@@ -9,14 +9,15 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Tests\Integration\Shared\Controller;
 
-use OxidEsales\Eshop\Application\Controller\ForgotPasswordController;
+use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
 use OxidEsales\Eshop\Core\UtilsView;
 use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
-use OxidEsales\SecurityModule\Tests\Integration\IntegrationTestCase;
+use OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface;
 use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface;
-use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsServiceInterface as PasswordSettingsServiceInterface;
+use OxidEsales\SecurityModule\Shared\Controller\ForgotPasswordController as ModuleForgotPasswordController;
+use OxidEsales\SecurityModule\Tests\Integration\IntegrationTestCase;
 
 class ForgotPasswordControllerTest extends IntegrationTestCase
 {
@@ -26,12 +27,6 @@ class ForgotPasswordControllerTest extends IntegrationTestCase
     public function setUp(): void
     {
         parent::setUp();
-
-        $moduleSettings = ContainerFacade::get(ModuleSettingsServiceInterface::class);
-        $moduleSettings->saveIsCaptchaEnabled(true);
-
-        $passwordSettings = ContainerFacade::get(PasswordSettingsServiceInterface::class);
-        $passwordSettings->saveIsPasswordPolicyEnabled(false);
 
         $this->utilsViewMock = $this->getMockBuilder(UtilsView::class)
             ->disableOriginalConstructor()
@@ -45,8 +40,6 @@ class ForgotPasswordControllerTest extends IntegrationTestCase
 
         Registry::set(UtilsView::class, $this->utilsViewMock);
         Registry::set(Request::class, $this->requestMock);
-        Registry::getSession()->setVariable('captcha', 'valid_captcha');
-        Registry::getSession()->setVariable('captcha_expiration', time() + 60);
     }
 
     public function testForgotPasswordWithValidCaptcha()
@@ -54,9 +47,6 @@ class ForgotPasswordControllerTest extends IntegrationTestCase
         $this->requestMock
             ->method('getRequestParameter')
             ->willReturnCallback(function ($param) {
-                if ($param === 'captcha') {
-                    return 'valid_captcha';
-                }
                 return '';
             });
 
@@ -67,62 +57,73 @@ class ForgotPasswordControllerTest extends IntegrationTestCase
                 $this->assertNotEquals('ERROR_INVALID_CAPTCHA', $message);
             });
 
-        $subject = oxNew(ForgotPasswordController::class);
+        $subject = $this->getSut();
         $subject->forgotPassword();
     }
 
     public function testForgotPasswordWithInvalidCaptcha()
     {
-        $this->requestMock
-            ->method('getRequestParameter')
-            ->with('captcha')
-            ->willReturn('invalid_captcha');
-
         $this->utilsViewMock
             ->expects($this->once())
             ->method('addErrorToDisplay')
             ->with('ERROR_INVALID_CAPTCHA');
 
-        $subject = oxNew(ForgotPasswordController::class);
+        $captchaService = $this->createMock(CaptchaServiceInterface::class);
+        $captchaService->method('validate')->willThrowException(new StandardException('ERROR_INVALID_CAPTCHA'));
+
+        $subject = $this->getSut([CaptchaServiceInterface::class => $captchaService]);
         $subject->forgotPassword();
     }
 
     public function testForgotPasswordWithInvalidHoneyPotCaptcha()
     {
-        $this->requestMock
-            ->method('getRequestParameter')
-            ->willReturnCallback(function ($param) {
-                if ($param === 'captcha') {
-                    return 'valid_captcha';
-                }
-                if ($param === 'lastname_confirm') {
-                    return 'some-text';
-                }
-                return '';
-            });
-
         $this->utilsViewMock
             ->expects($this->once())
             ->method('addErrorToDisplay')
             ->with('FORM_VALIDATION_FAILED');
 
-        $subject = oxNew(ForgotPasswordController::class);
+        $captchaService = $this->createMock(CaptchaServiceInterface::class);
+        $captchaService->method('validate')->willThrowException(new StandardException('FORM_VALIDATION_FAILED'));
+
+        $subject = $this->getSut([CaptchaServiceInterface::class => $captchaService]);
         $subject->forgotPassword();
     }
 
     public function testForgotPasswordWithEmptyCaptcha()
     {
-        $this->requestMock
-            ->method('getRequestParameter')
-            ->with('captcha')
-            ->willReturn('');
-
         $this->utilsViewMock
             ->expects($this->once())
             ->method('addErrorToDisplay')
             ->with('ERROR_EMPTY_CAPTCHA');
 
-        $subject = oxNew(ForgotPasswordController::class);
+        $captchaService = $this->createMock(CaptchaServiceInterface::class);
+        $captchaService->method('validate')->willThrowException(new StandardException('ERROR_EMPTY_CAPTCHA'));
+
+        $subject = $this->getSut([CaptchaServiceInterface::class => $captchaService]);
         $subject->forgotPassword();
+    }
+
+    private function getSut(array $serviceOverrides = []): ModuleForgotPasswordController
+    {
+        $services = array_merge(
+            [
+                ModuleSettingsServiceInterface::class => $this->createConfiguredStub(
+                    ModuleSettingsServiceInterface::class,
+                    ['isCaptchaEnabled' => true]
+                ),
+                CaptchaServiceInterface::class => $this->createStub(CaptchaServiceInterface::class),
+            ],
+            $serviceOverrides
+        );
+
+        /** @var ModuleForgotPasswordController $sut */
+        $sut = $this->getMockBuilder(ModuleForgotPasswordController::class)
+            ->onlyMethods(['getService'])
+            ->getMock();
+        $sut->method('getService')->willReturnCallback(
+            fn(string $id) => $services[$id] ?? ContainerFacade::get($id)
+        );
+
+        return $sut;
     }
 }

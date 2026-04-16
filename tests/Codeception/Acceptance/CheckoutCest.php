@@ -50,9 +50,9 @@ class CheckoutCest extends BaseCest
 
     private function ensureCorrectCaptchaSettings(AcceptanceTester $I): void
     {
-        /** @var CaptchaSettingsServiceInterface $captchaSettings */
+        $this->setCaptchaState(false);
+
         $captchaSettings = ContainerFacade::get(CaptchaSettingsServiceInterface::class);
-        $captchaSettings->saveIsCaptchaEnabled(false);
         $I->assertTrue($captchaSettings->isHoneyPotCaptchaEnabled());
     }
 }
