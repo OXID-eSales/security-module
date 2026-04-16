@@ -54,7 +54,7 @@ class TwoFactorAuthController extends FrontendController
         return $this->_sThisTemplate;
     }
 
-    public function handleOTP(): ?string
+    public function verifyCode(): ?string
     {
         $userId = $this->twoFAUserService->getPendingUserId();
         $code = $this->authCodeRequest->getCode();

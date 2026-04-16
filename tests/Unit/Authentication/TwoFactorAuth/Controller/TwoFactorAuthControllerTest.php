@@ -24,7 +24,7 @@ use PHPUnit\Framework\TestCase;
 class TwoFactorAuthControllerTest extends TestCase
 {
     #[Test]
-    public function handleOTPVerifiesCodeAndLoginsUser(): void
+    public function verifyCodeVerifiesCodeAndLoginsUser(): void
     {
         $userId = uniqid();
         $code = uniqid();
@@ -49,11 +49,11 @@ class TwoFactorAuthControllerTest extends TestCase
             authCodeRequest: $authCodeRequestStub,
         );
 
-        $sut->handleOTP();
+        $sut->verifyCode();
     }
 
     #[Test]
-    public function handleOTPDisplaysErrorOnInvalidCode(): void
+    public function verifyCodeDisplaysErrorOnInvalidCode(): void
     {
         $exception = new InvalidCodeException();
 
@@ -70,7 +70,7 @@ class TwoFactorAuthControllerTest extends TestCase
             utilsView: $utilsViewSpy,
         );
 
-        $sut->handleOTP();
+        $sut->verifyCode();
     }
 
     #[Test]
