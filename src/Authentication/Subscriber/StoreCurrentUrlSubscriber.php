@@ -13,7 +13,7 @@ use OxidEsales\Eshop\Core\Config;
 use OxidEsales\Eshop\Core\Request;
 use OxidEsales\EshopCommunity\Internal\Framework\Session\SessionInterface;
 use OxidEsales\EshopCommunity\Internal\Transition\ShopEvents\ViewRenderedEvent;
-use OxidEsales\SecurityModule\Authentication\Session\SessionKeys;
+use OxidEsales\SecurityModule\Authentication\Service\InternalRedirectService;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 readonly class StoreCurrentUrlSubscriber implements EventSubscriberInterface
@@ -63,7 +63,7 @@ readonly class StoreCurrentUrlSubscriber implements EventSubscriberInterface
 
         $currentUrl = $this->getCurrentPageUrl();
         if ($currentUrl) {
-            $this->session->set(SessionKeys::AUTH_REDIRECT_URL, $currentUrl);
+            $this->session->set(InternalRedirectService::AUTH_REDIRECT_URL, $currentUrl);
         }
     }
 

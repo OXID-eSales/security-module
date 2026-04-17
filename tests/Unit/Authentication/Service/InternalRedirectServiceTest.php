@@ -12,7 +12,6 @@ namespace OxidEsales\SecurityModule\Tests\Unit\Authentication\Service;
 use OxidEsales\Eshop\Core\Config;
 use OxidEsales\EshopCommunity\Internal\Framework\Session\SessionInterface;
 use OxidEsales\SecurityModule\Authentication\Service\InternalRedirectService;
-use OxidEsales\SecurityModule\Authentication\Session\SessionKeys;
 use PHPUnit\Framework\TestCase;
 
 class InternalRedirectServiceTest extends TestCase
@@ -24,7 +23,7 @@ class InternalRedirectServiceTest extends TestCase
 
         $sessionStub = $this->createStub(SessionInterface::class);
         $sessionStub->method('get')
-            ->with(SessionKeys::AUTH_REDIRECT_URL)
+            ->with(InternalRedirectService::AUTH_REDIRECT_URL)
             ->willReturn($storedUrl);
 
         $configStub = $this->createStub(Config::class);
@@ -44,7 +43,7 @@ class InternalRedirectServiceTest extends TestCase
 
         $sessionStub = $this->createStub(SessionInterface::class);
         $sessionStub->method('get')
-            ->with(SessionKeys::AUTH_REDIRECT_URL)
+            ->with(InternalRedirectService::AUTH_REDIRECT_URL)
             ->willReturn($storedUrl);
 
         $configStub = $this->createStub(Config::class);
@@ -64,7 +63,7 @@ class InternalRedirectServiceTest extends TestCase
 
         $sessionStub = $this->createStub(SessionInterface::class);
         $sessionStub->method('get')
-            ->with(SessionKeys::AUTH_REDIRECT_URL)
+            ->with(InternalRedirectService::AUTH_REDIRECT_URL)
             ->willReturn($externalUrl);
 
         $configStub = $this->createStub(Config::class);
@@ -83,7 +82,7 @@ class InternalRedirectServiceTest extends TestCase
 
         $sessionStub = $this->createStub(SessionInterface::class);
         $sessionStub->method('get')
-            ->with(SessionKeys::AUTH_REDIRECT_URL)
+            ->with(InternalRedirectService::AUTH_REDIRECT_URL)
             ->willReturn(null);
 
         $configStub = $this->createStub(Config::class);
@@ -100,7 +99,7 @@ class InternalRedirectServiceTest extends TestCase
 
         $sessionStub = $this->createStub(SessionInterface::class);
         $sessionStub->method('get')
-            ->with(SessionKeys::AUTH_REDIRECT_URL)
+            ->with(InternalRedirectService::AUTH_REDIRECT_URL)
             ->willReturn('');
 
         $configStub = $this->createStub(Config::class);

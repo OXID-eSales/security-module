@@ -15,7 +15,7 @@ use OxidEsales\Eshop\Core\Request;
 use OxidEsales\EshopCommunity\Application\Controller\FrontendController;
 use OxidEsales\EshopCommunity\Internal\Framework\Session\SessionInterface;
 use OxidEsales\EshopCommunity\Internal\Transition\ShopEvents\ViewRenderedEvent;
-use OxidEsales\SecurityModule\Authentication\Session\SessionKeys;
+use OxidEsales\SecurityModule\Authentication\Service\InternalRedirectService;
 use OxidEsales\SecurityModule\Authentication\Subscriber\StoreCurrentUrlSubscriber;
 use PHPUnit\Framework\TestCase;
 
@@ -47,7 +47,7 @@ class StoreCurrentUrlSubscriberTest extends TestCase
         $sessionMock = $this->createMock(SessionInterface::class);
         $sessionMock->expects($this->once())
             ->method('set')
-            ->with(SessionKeys::AUTH_REDIRECT_URL, $currentUrl);
+            ->with(InternalRedirectService::AUTH_REDIRECT_URL, $currentUrl);
 
         $sut = $this->getSut(
             session: $sessionMock,
@@ -259,7 +259,7 @@ class StoreCurrentUrlSubscriberTest extends TestCase
         $sessionMock = $this->createMock(SessionInterface::class);
         $sessionMock->expects($this->once())
             ->method('set')
-            ->with(SessionKeys::AUTH_REDIRECT_URL, $currentUrl);
+            ->with(InternalRedirectService::AUTH_REDIRECT_URL, $currentUrl);
 
         $sut = $this->getSut(
             session: $sessionMock,

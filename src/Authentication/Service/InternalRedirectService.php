@@ -11,10 +11,10 @@ namespace OxidEsales\SecurityModule\Authentication\Service;
 
 use OxidEsales\Eshop\Core\Config;
 use OxidEsales\EshopCommunity\Internal\Framework\Session\SessionInterface;
-use OxidEsales\SecurityModule\Authentication\Session\SessionKeys;
 
 readonly class InternalRedirectService implements InternalRedirectServiceInterface
 {
+    public const AUTH_REDIRECT_URL = 'otp_target_url';
     public function __construct(
         private SessionInterface $session,
         private Config $config,
@@ -23,7 +23,7 @@ readonly class InternalRedirectService implements InternalRedirectServiceInterfa
 
     public function getRedirectUrl(): string
     {
-        $storedUrl = $this->session->get(SessionKeys::AUTH_REDIRECT_URL);
+        $storedUrl = $this->session->get(self::AUTH_REDIRECT_URL);
 
         if ($storedUrl && $this->isInternalUrl($storedUrl)) {
             return $storedUrl;
