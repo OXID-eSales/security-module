@@ -14,7 +14,7 @@ use OxidEsales\EshopCommunity\Internal\Framework\Form\Form;
 use OxidEsales\EshopCommunity\Internal\Framework\Form\FormInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\FormConfiguration\FormConfigurationInterface;
 
-class ContactFormDecorator
+class ContactFormDecorator implements ContactFormBridgeInterface
 {
     public function __construct(
         private ContactFormBridgeInterface $contactFormBridge,
