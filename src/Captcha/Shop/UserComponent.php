@@ -14,6 +14,10 @@ use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface;
 use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface;
 
+/**
+ * @mixin \OxidEsales\Eshop\Application\Component\UserComponent
+ * @eshopExtension
+ */
 class UserComponent extends UserComponent_parent
 {
     public function login()
