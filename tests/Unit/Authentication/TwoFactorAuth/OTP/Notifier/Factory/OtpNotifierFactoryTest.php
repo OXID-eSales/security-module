@@ -29,7 +29,7 @@ class OtpNotifierFactoryTest extends TestCase
     }
 
     #[Test]
-    public function createThrowsWhenChannelNotRegistered(): void
+    public function createThrowsExceptionWhenChannelNotRegistered(): void
     {
         $sut = $this->getSut(notifiers: []);
 

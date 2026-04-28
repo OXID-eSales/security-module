@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Tests\Unit\Authentication\TwoFactorAuth\OTP\Notifier\Email;
 
 use OxidEsales\Eshop\Core\Email;
-use OxidEsales\Eshop\Core\Language;
+use OxidEsales\EshopCommunity\Internal\Transition\Adapter\ShopAdapterInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\DTO\UserInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\EmailFactoryInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository\UserRepositoryInterface;
@@ -41,8 +41,8 @@ class OtpEmailNotifierTest extends TestCase
             'OTP_EMAIL_SUBJECT' => $subject,
             'OTP_EMAIL_BODY'    => $bodyTemplate,
         ];
-        $languageStub = $this->createStub(Language::class);
-        $languageStub->method('translateString')->willReturnCallback(
+        $shopAdapterMock = $this->createMock(ShopAdapterInterface::class);
+        $shopAdapterMock->method('translateString')->willReturnCallback(
             fn(string $key) => $translations[$key] ?? $key
         );
 
@@ -61,7 +61,7 @@ class OtpEmailNotifierTest extends TestCase
         $sut = $this->getSut(
             emailFactory: $emailFactoryStub,
             userRepository: $userRepositoryMock,
-            language: $languageStub,
+            shopAdapter: $shopAdapterMock,
         );
 
         $sut->notify(userId: $userId, code: $code);
@@ -70,12 +70,12 @@ class OtpEmailNotifierTest extends TestCase
     private function getSut(
         EmailFactoryInterface $emailFactory = null,
         UserRepositoryInterface $userRepository = null,
-        Language $language = null,
+        ShopAdapterInterface $shopAdapter = null,
     ): OtpEmailNotifier {
         return new OtpEmailNotifier(
             emailFactory: $emailFactory ?? $this->createStub(EmailFactoryInterface::class),
             userRepository: $userRepository ?? $this->createStub(UserRepositoryInterface::class),
-            language: $language ?? $this->createStub(Language::class),
+            shopAdapter: $shopAdapter ?? $this->createStub(ShopAdapterInterface::class),
         );
     }
 }

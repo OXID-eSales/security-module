@@ -22,6 +22,8 @@ use OxidEsales\SecurityModule\Tests\Codeception\Support\AcceptanceTester;
  */
 class TwoFAAuthenticationCest extends BaseCest
 {
+    private const ACCOUNT_SECURITY_PAGE = '?cl=oesm_account_security';
+
     private string $otpInput = '#auth_code';
     private string $twofaCheckbox = '#twofa_enabled';
 
@@ -42,7 +44,7 @@ class TwoFAAuthenticationCest extends BaseCest
         $userAccountPage = $userLoginPage->login($userData['userLoginName'], $userData['userPassword']);
         $I->waitForPageLoad();
 
-        $I->amOnPage('?cl=account_security');
+        $I->amOnPage(self::ACCOUNT_SECURITY_PAGE);
         $I->waitForPageLoad();
         $I->checkOption($this->twofaCheckbox);
         $I->click(Translator::translate('SAVE'));
@@ -87,7 +89,7 @@ class TwoFAAuthenticationCest extends BaseCest
         $userLoginPage->login($userData['userLoginName'], $userData['userPassword']);
         $I->waitForPageLoad();
 
-        $I->amOnPage('?cl=account_security');
+        $I->amOnPage(self::ACCOUNT_SECURITY_PAGE);
         $I->waitForPageLoad();
         $I->dontSeeCheckboxIsChecked($this->twofaCheckbox);
 
@@ -95,7 +97,7 @@ class TwoFAAuthenticationCest extends BaseCest
         $I->click(Translator::translate('SAVE'));
         $I->waitForPageLoad();
 
-        $I->amOnPage('?cl=account_security');
+        $I->amOnPage(self::ACCOUNT_SECURITY_PAGE);
         $I->waitForPageLoad();
         $I->seeCheckboxIsChecked($this->twofaCheckbox);
 
@@ -103,14 +105,14 @@ class TwoFAAuthenticationCest extends BaseCest
         $I->click(Translator::translate('SAVE'));
         $I->waitForPageLoad();
 
-        $I->amOnPage('?cl=account_security');
+        $I->amOnPage(self::ACCOUNT_SECURITY_PAGE);
         $I->waitForPageLoad();
         $I->dontSeeCheckboxIsChecked($this->twofaCheckbox);
     }
 
     public function testUnauthenticatedAccessToAccountSecurityRedirectsToLogin(AcceptanceTester $I): void
     {
-        $I->amOnPage('?cl=account_security');
+        $I->amOnPage(self::ACCOUNT_SECURITY_PAGE);
         $I->waitForPageLoad();
 
         $I->see(Translator::translate('LOGIN'));

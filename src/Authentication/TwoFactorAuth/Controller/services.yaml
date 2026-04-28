@@ -4,13 +4,15 @@ services:
     public: false
     bind:
       OxidEsales\Eshop\Core\UtilsView: '@=service("OxidEsales\\SecurityModule\\Core\\Registry").getUtilsView()'
+      OxidEsales\Eshop\Core\Utils: '@=service("OxidEsales\\SecurityModule\\Core\\Registry").getUtils()'
+      OxidEsales\Eshop\Core\Config: '@=service("OxidEsales\\SecurityModule\\Core\\Registry").getConfig()'
 
   OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Controller\TwoFactorAuthController:
     public: true
     tags:
-        - { name: 'oxid.view_controller', controller_key: 'twofactorauth' }
+        - { name: 'oxid.view_controller', controller_key: 'oesm_twofactorauth' }
 
   OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Controller\AccountSecurityController:
     public: true
     tags:
-        - { name: 'oxid.view_controller', controller_key: 'account_security' }
+        - { name: 'oxid.view_controller', controller_key: 'oesm_account_security' }

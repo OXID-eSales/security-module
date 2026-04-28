@@ -23,12 +23,12 @@ class UserSettingsUpdateRequestTest extends TestCase
     #[DataProvider('isTwoFAEnabledDataProvider')]
     public function isTwoFAEnabled(mixed $requestValue, bool $expected): void
     {
-        $requestStub = $this->createStub(RequestInterface::class);
-        $requestStub->method('get')
+        $requestMock = $this->createMock(RequestInterface::class);
+        $requestMock->method('get')
             ->with('twofa_enabled')
             ->willReturn($requestValue);
 
-        $sut = $this->getSut(request: $requestStub);
+        $sut = $this->getSut(request: $requestMock);
 
         $this->assertSame($expected, $sut->isTwoFAEnabled());
     }

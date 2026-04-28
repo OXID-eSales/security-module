@@ -68,7 +68,7 @@ class User extends User_parent
             return parent::login($userName, $password, $setSessionCookie);
         }
 
-        if ($this->isCaptchaEnabled()) {
+        if ($password !== null && $this->isCaptchaEnabled()) {
             $captchaService = $this->getService(CaptchaServiceInterface::class);
 
             try {

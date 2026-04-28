@@ -10,9 +10,12 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Controller;
 
 use OxidEsales\Eshop\Application\Controller\FrontendController;
+use OxidEsales\Eshop\Core\Config;
+use OxidEsales\Eshop\Core\Utils;
 use OxidEsales\Eshop\Core\UtilsView;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\CodeValidationException;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\ResendCooldownException;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\SessionExpiredException;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAResendableInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAServiceInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAUserServiceInterface;
@@ -35,6 +38,8 @@ class TwoFactorAuthController extends FrontendController
         private readonly AuthCodeRequestInterface $authCodeRequest,
         private readonly UtilsView $utilsView,
         private readonly JsonResponseInterface $jsonResponse,
+        private readonly Utils $utils,
+        private readonly Config $config,
     ) {
         parent::__construct();
     }
@@ -43,10 +48,17 @@ class TwoFactorAuthController extends FrontendController
     {
         parent::render();
 
+        $userId = $this->twoFAUserService->getPendingUserId();
+
+        if (!$userId) {
+            $this->utilsView->addErrorToDisplay(new SessionExpiredException());
+            $this->utils->redirect($this->config->getShopHomeUrl(), false);
+
+            return $this->_sThisTemplate;
+        }
+
         if ($this->twoFAService instanceof TwoFAResendableInterface) {
             $this->addTplParam('resendable', true);
-
-            $userId = $this->twoFAUserService->getPendingUserId();
             $this->addTplParam('remainingAttempts', $this->twoFAService->getRemainingAttempts($userId));
             $this->addTplParam('resendCooldownRemaining', $this->twoFAService->getCooldownRemaining($userId));
         }
@@ -57,6 +69,11 @@ class TwoFactorAuthController extends FrontendController
     public function verifyCode(): ?string
     {
         $userId = $this->twoFAUserService->getPendingUserId();
+        if ($userId === null) {
+            $this->utilsView->addErrorToDisplay(new SessionExpiredException());
+            return null;
+        }
+
         $code = $this->authCodeRequest->getCode();
 
         try {
@@ -77,6 +94,11 @@ class TwoFactorAuthController extends FrontendController
         }
 
         $userId = $this->twoFAUserService->getPendingUserId();
+        if ($userId === null) {
+            $this->jsonResponse->send(['success' => false], 401);
+            return;
+        }
+
         try {
             $this->twoFAService->resend($userId);
             $this->jsonResponse->send([

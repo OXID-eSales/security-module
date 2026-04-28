@@ -11,11 +11,13 @@ namespace OxidEsales\SecurityModule\Tests\Unit\Authentication\TwoFactorAuth\Tran
 
 use OxidEsales\Eshop\Core\Utils;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Transput\JsonResponse;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class JsonResponseTest extends TestCase
 {
-    public function testSendSetsCorrectHeaders(): void
+    #[Test]
+    public function sendSetsCorrectHeaders(): void
     {
         $utilsMock = $this->createMock(Utils::class);
 
@@ -25,14 +27,14 @@ class JsonResponseTest extends TestCase
         });
         $utilsMock->method('showMessageAndExit');
 
-        $sut = new JsonResponse($utilsMock);
-        $sut->send(['key' => 'value']);
+        $this->getSut($utilsMock)->send(['key' => 'value']);
 
         $this->assertContains('HTTP/1.1 200', $headers);
         $this->assertContains('Content-Type: application/json', $headers);
     }
 
-    public function testSendOutputsJsonEncodedData(): void
+    #[Test]
+    public function sendOutputsJsonEncodedData(): void
     {
         $data = ['status' => 'ok', 'code' => 123];
 
@@ -41,11 +43,11 @@ class JsonResponseTest extends TestCase
             ->method('showMessageAndExit')
             ->with(json_encode($data));
 
-        $sut = new JsonResponse($utilsSpy);
-        $sut->send($data);
+        $this->getSut($utilsSpy)->send($data);
     }
 
-    public function testSendWithCustomStatusCode(): void
+    #[Test]
+    public function sendWithCustomStatusCode(): void
     {
         $utilsMock = $this->createMock(Utils::class);
 
@@ -55,9 +57,13 @@ class JsonResponseTest extends TestCase
         });
         $utilsMock->method('showMessageAndExit');
 
-        $sut = new JsonResponse($utilsMock);
-        $sut->send([], 429);
+        $this->getSut($utilsMock)->send([], 429);
 
         $this->assertContains('HTTP/1.1 429', $headers);
+    }
+
+    private function getSut(Utils $utils): JsonResponse
+    {
+        return new JsonResponse($utils);
     }
 }

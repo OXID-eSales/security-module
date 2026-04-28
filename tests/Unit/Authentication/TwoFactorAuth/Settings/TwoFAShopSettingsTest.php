@@ -23,12 +23,12 @@ class TwoFAShopSettingsTest extends TestCase
     #[Test]
     public function isTwoFactorAuthEnabledReturnsTrueWhenEnabled(): void
     {
-        $moduleSettingServiceStub = $this->createStub(ModuleSettingServiceInterface::class);
-        $moduleSettingServiceStub->method('getBoolean')
+        $moduleSettingServiceMock = $this->createMock(ModuleSettingServiceInterface::class);
+        $moduleSettingServiceMock->method('getBoolean')
             ->with(TwoFAShopSettings::ACTIVE, Module::MODULE_ID)
             ->willReturn(true);
 
-        $sut = $this->getSut(moduleSettingService: $moduleSettingServiceStub);
+        $sut = $this->getSut(moduleSettingService: $moduleSettingServiceMock);
 
         $this->assertTrue($sut->isTwoFactorAuthEnabled());
     }
@@ -36,12 +36,12 @@ class TwoFAShopSettingsTest extends TestCase
     #[Test]
     public function isTwoFactorAuthEnabledReturnsFalseWhenDisabled(): void
     {
-        $moduleSettingServiceStub = $this->createStub(ModuleSettingServiceInterface::class);
-        $moduleSettingServiceStub->method('getBoolean')
+        $moduleSettingServiceMock = $this->createMock(ModuleSettingServiceInterface::class);
+        $moduleSettingServiceMock->method('getBoolean')
             ->with(TwoFAShopSettings::ACTIVE, Module::MODULE_ID)
             ->willReturn(false);
 
-        $sut = $this->getSut(moduleSettingService: $moduleSettingServiceStub);
+        $sut = $this->getSut(moduleSettingService: $moduleSettingServiceMock);
 
         $this->assertFalse($sut->isTwoFactorAuthEnabled());
     }
@@ -50,12 +50,12 @@ class TwoFAShopSettingsTest extends TestCase
     public function getTwoFactorAuthTypeReturnsConfiguredType(): void
     {
         $type = uniqid();
-        $moduleSettingServiceStub = $this->createStub(ModuleSettingServiceInterface::class);
-        $moduleSettingServiceStub->method('getString')
+        $moduleSettingServiceMock = $this->createMock(ModuleSettingServiceInterface::class);
+        $moduleSettingServiceMock->method('getString')
             ->with(TwoFAShopSettings::TWO_FACTOR_TYPE, Module::MODULE_ID)
             ->willReturn(new UnicodeString($type));
 
-        $sut = $this->getSut(moduleSettingService: $moduleSettingServiceStub);
+        $sut = $this->getSut(moduleSettingService: $moduleSettingServiceMock);
 
         $this->assertSame($type, $sut->getTwoFactorAuthType());
     }
@@ -68,7 +68,7 @@ class TwoFAShopSettingsTest extends TestCase
 
         $sut = $this->getSut(config: $configStub);
 
-        $this->assertSame($homeUrl . 'cl=twofactorauth', $sut->getVerificationUrl());
+        $this->assertSame($homeUrl . 'cl=oesm_twofactorauth', $sut->getVerificationUrl());
     }
 
     #[Test]

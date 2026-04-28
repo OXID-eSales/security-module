@@ -44,7 +44,7 @@ class OtpCodeValidatorService implements OtpCodeValidatorServiceInterface
             throw new TimeExpiredException();
         }
 
-        if ($this->codeHasher->hash($inputCode) !== $state->getCodeHash()) {
+        if (!hash_equals($state->getCodeHash(), $this->codeHasher->hash($inputCode))) {
             $this->repository->incrementAttempts($userId);
             if (($state->getAttempts() + 1) >= self::MAX_ATTEMPTS) {
                 throw new AttemptLimitExceededException();

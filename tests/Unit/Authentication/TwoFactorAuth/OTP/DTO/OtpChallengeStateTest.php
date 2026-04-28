@@ -11,13 +11,15 @@ namespace OxidEsales\SecurityModule\Tests\Unit\Authentication\TwoFactorAuth\OTP\
 
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\DTO\OtpChallengeState;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\DTO\OtpChallengeStateInterface;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class OtpChallengeStateTest extends TestCase
 {
-    public function testInitializeAndReadProperties(): void
+    #[Test]
+    public function initializeAndReadProperties(): void
     {
-        $sut = new OtpChallengeState(
+        $sut = $this->getSut(
             userId: $userId = uniqid(),
             codeHash: $codeHash = uniqid(),
             attempts: $attempts = rand(),
@@ -35,18 +37,30 @@ class OtpChallengeStateTest extends TestCase
         $this->assertSame($verifiedAt, $sut->getVerifiedAt());
     }
 
-    public function testLastSentAtAndVerifiedAtAreNullable(): void
+    #[Test]
+    public function lastSentAtAndVerifiedAtAreNullable(): void
     {
-        $sut = new OtpChallengeState(
-            userId: uniqid(),
-            codeHash: uniqid(),
-            attempts: 0,
-            lastSentAt: null,
-            expiresAt: new \DateTimeImmutable(),
-            verifiedAt: null,
-        );
+        $sut = $this->getSut(lastSentAt: null, verifiedAt: null);
 
         $this->assertNull($sut->getLastSentAt());
         $this->assertNull($sut->getVerifiedAt());
+    }
+
+    private function getSut(
+        string $userId = 'user_id',
+        string $codeHash = 'code_hash',
+        int $attempts = 0,
+        ?\DateTimeImmutable $lastSentAt = null,
+        ?\DateTimeImmutable $expiresAt = null,
+        ?\DateTimeImmutable $verifiedAt = null,
+    ): OtpChallengeState {
+        return new OtpChallengeState(
+            userId: $userId,
+            codeHash: $codeHash,
+            attempts: $attempts,
+            lastSentAt: $lastSentAt,
+            expiresAt: $expiresAt ?? new \DateTimeImmutable(),
+            verifiedAt: $verifiedAt,
+        );
     }
 }

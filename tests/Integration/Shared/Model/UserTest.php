@@ -181,6 +181,31 @@ class UserTest extends IntegrationTestCase
         $this->assertTrue($result);
     }
 
+    public function testLoginWithNullPasswordSkipsCaptchaEvenWhenEnabled(): void
+    {
+        $userId = $this->getTwoFAUserId();
+
+        $captchaSettings = $this->createStub(CaptchaSettingsServiceInterface::class);
+        $captchaSettings->method('isCaptchaEnabled')->willReturn(true);
+
+        $captchaServiceMock = $this->createMock(CaptchaServiceInterface::class);
+        $captchaServiceMock->expects($this->never())->method('validate');
+
+        $userServiceMock = $this->createMock(TwoFAUserServiceInterface::class);
+        $userServiceMock->method('isTwoFARequired')->with($userId)->willReturn(true);
+        $userServiceMock->method('isChallengeVerified')->with($userId)->willReturn(true);
+
+        $sut = $this->getSut([
+            CaptchaSettingsServiceInterface::class => $captchaSettings,
+            CaptchaServiceInterface::class => $captchaServiceMock,
+            TwoFAUserServiceInterface::class => $userServiceMock,
+        ]);
+        $sut->load($userId);
+
+        $result = $sut->login(self::TWO_FA_USER_NAME, null);
+        $this->assertTrue($result);
+    }
+
     public function testLoginWithoutPasswordOnLoadedUserWith2FAEnabledAndChallengeNotVerifiedTriggersChallenge(): void
     {
         $userId = $this->getTwoFAUserId();

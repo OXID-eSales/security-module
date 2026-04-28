@@ -14,11 +14,13 @@ use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Factory\TwoFAServiceF
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Factory\TwoFAServiceFactoryInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAServiceInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFAShopSettingsInterface;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class TwoFAServiceFactoryTest extends TestCase
 {
-    public function testCreateReturnsServiceMatchingConfiguredType(): void
+    #[Test]
+    public function createReturnsServiceMatchingConfiguredType(): void
     {
         $otpServiceStub = $this->createStub(TwoFAServiceInterface::class);
         $totpServiceStub = $this->createStub(TwoFAServiceInterface::class);
@@ -34,7 +36,8 @@ class TwoFAServiceFactoryTest extends TestCase
         $this->assertSame($otpServiceStub, $sut->create());
     }
 
-    public function testCreateThrowsForUnknownType(): void
+    #[Test]
+    public function createThrowsExceptionForUnknownType(): void
     {
         $settingsStub = $this->createStub(TwoFAShopSettingsInterface::class);
         $settingsStub->method('getTwoFactorAuthType')->willReturn('unknown');

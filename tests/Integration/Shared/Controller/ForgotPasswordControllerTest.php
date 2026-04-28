@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Tests\Integration\Shared\Controller;
 
+use Generator;
 use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
@@ -18,6 +19,8 @@ use OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface;
 use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface;
 use OxidEsales\SecurityModule\Shared\Controller\ForgotPasswordController as ModuleForgotPasswordController;
 use OxidEsales\SecurityModule\Tests\Integration\IntegrationTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 
 class ForgotPasswordControllerTest extends IntegrationTestCase
 {
@@ -42,7 +45,8 @@ class ForgotPasswordControllerTest extends IntegrationTestCase
         Registry::set(Request::class, $this->requestMock);
     }
 
-    public function testForgotPasswordWithValidCaptcha()
+    #[Test]
+    public function forgotPasswordWithValidCaptcha(): void
     {
         $this->requestMock
             ->method('getRequestParameter')
@@ -61,46 +65,27 @@ class ForgotPasswordControllerTest extends IntegrationTestCase
         $subject->forgotPassword();
     }
 
-    public function testForgotPasswordWithInvalidCaptcha()
+    #[Test]
+    #[DataProvider('forgotPasswordExceptionCasesDataProvider')]
+    public function forgotPasswordDisplaysErrorOnCaptchaException(string $errorCode): void
     {
         $this->utilsViewMock
             ->expects($this->once())
             ->method('addErrorToDisplay')
-            ->with('ERROR_INVALID_CAPTCHA');
+            ->with($errorCode);
 
         $captchaService = $this->createMock(CaptchaServiceInterface::class);
-        $captchaService->method('validate')->willThrowException(new StandardException('ERROR_INVALID_CAPTCHA'));
+        $captchaService->method('validate')->willThrowException(new StandardException($errorCode));
 
         $subject = $this->getSut([CaptchaServiceInterface::class => $captchaService]);
         $subject->forgotPassword();
     }
 
-    public function testForgotPasswordWithInvalidHoneyPotCaptcha()
+    public static function forgotPasswordExceptionCasesDataProvider(): Generator
     {
-        $this->utilsViewMock
-            ->expects($this->once())
-            ->method('addErrorToDisplay')
-            ->with('FORM_VALIDATION_FAILED');
-
-        $captchaService = $this->createMock(CaptchaServiceInterface::class);
-        $captchaService->method('validate')->willThrowException(new StandardException('FORM_VALIDATION_FAILED'));
-
-        $subject = $this->getSut([CaptchaServiceInterface::class => $captchaService]);
-        $subject->forgotPassword();
-    }
-
-    public function testForgotPasswordWithEmptyCaptcha()
-    {
-        $this->utilsViewMock
-            ->expects($this->once())
-            ->method('addErrorToDisplay')
-            ->with('ERROR_EMPTY_CAPTCHA');
-
-        $captchaService = $this->createMock(CaptchaServiceInterface::class);
-        $captchaService->method('validate')->willThrowException(new StandardException('ERROR_EMPTY_CAPTCHA'));
-
-        $subject = $this->getSut([CaptchaServiceInterface::class => $captchaService]);
-        $subject->forgotPassword();
+        yield 'invalid captcha' => ['ERROR_INVALID_CAPTCHA'];
+        yield 'honey pot captcha' => ['FORM_VALIDATION_FAILED'];
+        yield 'empty captcha' => ['ERROR_EMPTY_CAPTCHA'];
     }
 
     private function getSut(array $serviceOverrides = []): ModuleForgotPasswordController

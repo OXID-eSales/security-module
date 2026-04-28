@@ -19,7 +19,7 @@ use PHPUnit\Framework\Attributes\Test;
 class UserRepositoryTest extends IntegrationTestCase
 {
     #[Test]
-    public function getUserByIdThrowsWhenUserNotFound(): void
+    public function getUserByIdThrowsExceptionWhenUserNotFound(): void
     {
         $sut = $this->getSut();
 

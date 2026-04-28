@@ -19,7 +19,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 readonly class StoreCurrentUrlSubscriber implements EventSubscriberInterface
 {
     private const EXCLUDED_CONTROLLERS = [
-        'twofactorauth',
+        'oesm_twofactorauth',
         'oauth',
     ];
 

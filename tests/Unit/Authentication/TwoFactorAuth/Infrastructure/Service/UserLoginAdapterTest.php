@@ -20,13 +20,13 @@ class UserLoginAdapterTest extends TestCase
     #[Test]
     public function loginUserLoadsAndLoginsUser(): void
     {
-        $userSpy = $this->createMock(User::class);
-        $userSpy->expects($this->once())->method('load')->with($userId = uniqid());
-        $userSpy->method('getFieldData')->with('oxusername')->willReturn($username = uniqid());
-        $userSpy->expects($this->once())->method('login')->with($username, null, false);
+        $userMock = $this->createMock(User::class);
+        $userMock->expects($this->once())->method('load')->with($userId = uniqid());
+        $userMock->method('getFieldData')->with('oxusername')->willReturn($username = uniqid());
+        $userMock->expects($this->once())->method('login')->with($username, null, false);
 
         $userFactoryStub = $this->createStub(UserModelFactoryInterface::class);
-        $userFactoryStub->method('create')->willReturn($userSpy);
+        $userFactoryStub->method('create')->willReturn($userMock);
 
         $sut = $this->getSut(userFactory: $userFactoryStub);
 

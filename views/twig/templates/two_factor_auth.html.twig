@@ -12,7 +12,7 @@
                         <form action="{{ oViewConf.getSelfLink()|raw }}" name="two_factor_auth" method="post" role="form" class="needs-validation" novalidate>
                             <div class="hidden">
                                 {{ oViewConf.getHiddenSid()|raw }}
-                                <input type="hidden" name="cl" value="twofactorauth">
+                                <input type="hidden" name="cl" value="oesm_twofactorauth">
                                 <input type="hidden" name="fnc" value="verifyCode">
                             </div>
 
@@ -47,7 +47,7 @@
                                                 type="button"
                                                 data-cooldown="60"
                                                 data-cooldown-remaining="{{ resendCooldownRemaining }}"
-                                                data-url="{{ seo_url({ ident: oViewConf.getSelfLink()|cat("cl=twofactorauth&fnc=resendCode") }) }}"
+                                                data-url="{{ seo_url({ ident: oViewConf.getSelfLink()|cat("cl=oesm_twofactorauth&fnc=resendCode") }) }}"
                                                 data-text-default="{{ translate({ ident: "RESEND_CODE" }) }}"
                                                 data-text-sending="{{ translate({ ident: "RESEND_CODE_SENDING" }) }}"
                                                 data-text-error="{{ translate({ ident: "RESEND_CODE_ERROR" }) }}"

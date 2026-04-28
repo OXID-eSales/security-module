@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Tests\Integration\Authentication\TwoFactorAuth\Controller;
 
+use OxidEsales\Eshop\Core\Config;
+use OxidEsales\Eshop\Core\Utils;
 use OxidEsales\Eshop\Core\UtilsView;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Controller\TwoFactorAuthController;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAResendableInterface;
@@ -42,16 +44,16 @@ class TwoFactorAuthControllerTest extends IntegrationTestCase
         $twoFAUserServiceStub = $this->createStub(TwoFAUserServiceInterface::class);
         $twoFAUserServiceStub->method('getPendingUserId')->willReturn($userId);
 
-        /** @var TwoFAServiceInterface&TwoFAResendableInterface&MockObject $twoFAServiceStub */
-        $twoFAServiceStub = $this->createMockForIntersectionOfInterfaces([
+        /** @var TwoFAServiceInterface&TwoFAResendableInterface&MockObject $twoFAServiceMock */
+        $twoFAServiceMock = $this->createMockForIntersectionOfInterfaces([
             TwoFAServiceInterface::class,
             TwoFAResendableInterface::class,
         ]);
-        $twoFAServiceStub->method('getRemainingAttempts')->with($userId)->willReturn($remaining = random_int(1, 5));
-        $twoFAServiceStub->method('getCooldownRemaining')->with($userId)->willReturn($cooldown = random_int(0, 30));
+        $twoFAServiceMock->method('getRemainingAttempts')->with($userId)->willReturn($remaining = random_int(1, 5));
+        $twoFAServiceMock->method('getCooldownRemaining')->with($userId)->willReturn($cooldown = random_int(0, 30));
 
         $sut = $this->getSut(
-            twoFAService: $twoFAServiceStub,
+            twoFAService: $twoFAServiceMock,
             twoFAUserService: $twoFAUserServiceStub,
         );
         $sut->render();
@@ -67,6 +69,8 @@ class TwoFactorAuthControllerTest extends IntegrationTestCase
         AuthCodeRequestInterface $authCodeRequest = null,
         UtilsView $utilsView = null,
         JsonResponseInterface $jsonResponse = null,
+        Utils $utils = null,
+        Config $config = null,
     ): TwoFactorAuthController {
         return new TwoFactorAuthController(
             twoFAService: $twoFAService ?? $this->createStub(TwoFAServiceInterface::class),
@@ -74,6 +78,8 @@ class TwoFactorAuthControllerTest extends IntegrationTestCase
             authCodeRequest: $authCodeRequest ?? $this->createStub(AuthCodeRequestInterface::class),
             utilsView: $utilsView ?? $this->createStub(UtilsView::class),
             jsonResponse: $jsonResponse ?? $this->createStub(JsonResponseInterface::class),
+            utils: $utils ?? $this->createStub(Utils::class),
+            config: $config ?? $this->createStub(Config::class),
         );
     }
 }

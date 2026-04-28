@@ -27,7 +27,7 @@ class OtpChallengeStateRepository implements OtpChallengeStateRepositoryInterfac
     public function findByUserId(string $userId): ?OtpChallengeStateInterface
     {
         $builder = $this->queryBuilderFactory->create();
-        $builder->select('*')
+        $builder->select('OXUSERID', 'CODE_HASH', 'ATTEMPTS', 'LAST_SENT_AT', 'EXPIRES_AT', 'VERIFIED_AT')
             ->from(self::TABLE)
             ->where('OXUSERID = :userId')
             ->setParameter('userId', $userId);

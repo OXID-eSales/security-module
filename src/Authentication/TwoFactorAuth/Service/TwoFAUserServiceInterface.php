@@ -13,7 +13,7 @@ interface TwoFAUserServiceInterface
 {
     public function startChallengeForUser(string $userId): void;
 
-    public function getPendingUserId(): string;
+    public function getPendingUserId(): ?string;
 
     public function loginUser(string $userId): void;
 

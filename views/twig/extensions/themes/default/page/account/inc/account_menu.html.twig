@@ -3,6 +3,6 @@
 {% block account_menu %}
     {{ parent() }}
     <a class="dropdown-item{% if active_link == "security" %} active{% endif %}"
-       href="{{ seo_url({ ident: oViewConf.getSslSelfLink() ~ "cl=account_security" }) }}"
+       href="{{ seo_url({ ident: oViewConf.getSslSelfLink() ~ "cl=oesm_account_security" }) }}"
        title="{{ translate({ ident: "OE_SECURITY_SECURITY_TITLE" }) }}">{{ translate({ ident: "OE_SECURITY_SECURITY_TITLE" }) }}</a>
 {% endblock %}

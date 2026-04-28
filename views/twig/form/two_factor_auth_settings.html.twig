@@ -4,7 +4,7 @@
         <p>{{ translate({ ident: "OE_SECURITY_TWO_FACTOR_SETTINGS_DESCRIPTION" }) }}</p>
         <form action="{{ oViewConf.getSelfLink()|raw }}" method="post">
             {{ oViewConf.getHiddenSid()|raw }}
-            <input type="hidden" name="cl" value="account_security">
+            <input type="hidden" name="cl" value="oesm_account_security">
             <input type="hidden" name="fnc" value="saveTwoFactorAuth">
             <div class="form-check form-switch mb-3">
                 <input

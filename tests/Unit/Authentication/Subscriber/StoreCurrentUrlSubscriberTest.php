@@ -100,7 +100,7 @@ class StoreCurrentUrlSubscriberTest extends TestCase
     public function testOnViewRenderedSkipsTwoFactorAuthController(): void
     {
         $viewStub = $this->createStub(FrontendController::class);
-        $viewStub->method('getClassKey')->willReturn('twofactorauth');
+        $viewStub->method('getClassKey')->willReturn('oesm_twofactorauth');
 
         $configStub = $this->createStub(Config::class);
         $configStub->method('isAdmin')->willReturn(false);

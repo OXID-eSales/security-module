@@ -39,6 +39,6 @@ class TwoFAShopSettings implements TwoFAShopSettingsInterface
 
     public function getVerificationUrl(): string
     {
-        return $this->config->getShopHomeUrl() . 'cl=twofactorauth';
+        return $this->config->getShopHomeUrl() . 'cl=oesm_twofactorauth';
     }
 }

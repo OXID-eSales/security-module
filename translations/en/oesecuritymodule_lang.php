@@ -56,6 +56,7 @@ $aLang = [
     'ERROR_INVALID_CODE'           => 'The verification code is invalid. Please try again.',
     'ERROR_CODE_TIME_EXPIRED'      => 'The verification code has expired. Please request a new code.',
     'ERROR_ATTEMPT_LIMIT_EXCEEDED' => 'Too many failed attempts. Please request a new code.',
+    'ERROR_SESSION_EXPIRED'        => 'Your session has expired. Please log in again.',
 
     'OE_SECURITY_REMAINING_ATTEMPTS' => 'Remaining attempts',
     'OE_SECURITY_ENTER_CODE'         => 'Verification code',

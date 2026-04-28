@@ -41,7 +41,7 @@ class TwoFAUserService implements TwoFAUserServiceInterface
         $this->utils->redirect($this->settings->getVerificationUrl());
     }
 
-    public function getPendingUserId(): string
+    public function getPendingUserId(): ?string
     {
         return $this->session->get(self::USER_SESSION_KEY);
     }

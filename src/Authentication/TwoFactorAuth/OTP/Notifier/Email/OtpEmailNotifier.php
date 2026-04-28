@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Notifier\Email;
 
-use OxidEsales\Eshop\Core\Language;
+use OxidEsales\EshopCommunity\Internal\Transition\Adapter\ShopAdapterInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\EmailFactoryInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository\UserRepositoryInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Notifier\OtpNotifierInterface;
@@ -19,7 +19,7 @@ class OtpEmailNotifier implements OtpNotifierInterface
     public function __construct(
         private EmailFactoryInterface $emailFactory,
         private UserRepositoryInterface $userRepository,
-        private Language $language,
+        private ShopAdapterInterface $shopAdapter,
     ) {
     }
 
@@ -27,11 +27,8 @@ class OtpEmailNotifier implements OtpNotifierInterface
     {
         $email = $this->userRepository->getUserById($userId)->getEmail();
 
-        /** @var string $subject */
-        $subject = $this->language->translateString('OTP_EMAIL_SUBJECT');
-
-        /** @var string $bodyTemplate */
-        $bodyTemplate = $this->language->translateString('OTP_EMAIL_BODY');
+        $subject = $this->shopAdapter->translateString('OTP_EMAIL_SUBJECT');
+        $bodyTemplate = $this->shopAdapter->translateString('OTP_EMAIL_BODY');
 
         $this->emailFactory->create()->sendEmail($email, $subject, sprintf($bodyTemplate, $code));
     }

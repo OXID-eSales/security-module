@@ -9,10 +9,13 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Tests\Unit\Authentication\TwoFactorAuth\Controller;
 
+use OxidEsales\Eshop\Core\Config;
+use OxidEsales\Eshop\Core\Utils;
 use OxidEsales\Eshop\Core\UtilsView;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Controller\TwoFactorAuthController;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\InvalidCodeException;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\ResendCooldownException;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\SessionExpiredException;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAResendableInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAServiceInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAUserServiceInterface;
@@ -53,9 +56,31 @@ class TwoFactorAuthControllerTest extends TestCase
     }
 
     #[Test]
+    public function verifyCodeDisplaysSessionExpiredErrorWhenNoUserId(): void
+    {
+        $twoFAUserServiceStub = $this->createStub(TwoFAUserServiceInterface::class);
+        $twoFAUserServiceStub->method('getPendingUserId')->willReturn(null);
+
+        $utilsViewSpy = $this->createMock(UtilsView::class);
+        $utilsViewSpy->expects($this->once())
+            ->method('addErrorToDisplay')
+            ->with($this->isInstanceOf(SessionExpiredException::class));
+
+        $sut = $this->getSut(
+            twoFAUserService: $twoFAUserServiceStub,
+            utilsView: $utilsViewSpy,
+        );
+
+        $sut->verifyCode();
+    }
+
+    #[Test]
     public function verifyCodeDisplaysErrorOnInvalidCode(): void
     {
         $exception = new InvalidCodeException();
+
+        $twoFAUserServiceStub = $this->createStub(TwoFAUserServiceInterface::class);
+        $twoFAUserServiceStub->method('getPendingUserId')->willReturn(uniqid());
 
         $twoFAServiceStub = $this->createStub(TwoFAServiceInterface::class);
         $twoFAServiceStub->method('verify')->willThrowException($exception);
@@ -67,6 +92,7 @@ class TwoFactorAuthControllerTest extends TestCase
 
         $sut = $this->getSut(
             twoFAService: $twoFAServiceStub,
+            twoFAUserService: $twoFAUserServiceStub,
             utilsView: $utilsViewSpy,
         );
 
@@ -151,6 +177,8 @@ class TwoFactorAuthControllerTest extends TestCase
         AuthCodeRequestInterface $authCodeRequest = null,
         UtilsView $utilsView = null,
         JsonResponseInterface $jsonResponse = null,
+        Utils $utils = null,
+        Config $config = null,
     ): TwoFactorAuthController {
         return new TwoFactorAuthController(
             twoFAService: $twoFAService ?? $this->createStub(TwoFAServiceInterface::class),
@@ -158,6 +186,8 @@ class TwoFactorAuthControllerTest extends TestCase
             authCodeRequest: $authCodeRequest ?? $this->createStub(AuthCodeRequestInterface::class),
             utilsView: $utilsView ?? $this->createStub(UtilsView::class),
             jsonResponse: $jsonResponse ?? $this->createStub(JsonResponseInterface::class),
+            utils: $utils ?? $this->createStub(Utils::class),
+            config: $config ?? $this->createStub(Config::class),
         );
     }
 }
