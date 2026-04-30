@@ -10,11 +10,12 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Tests\Unit\Captcha\Infrastructure;
 
 use OxidEsales\SecurityModule\Captcha\Infrastructure\LanguageWrapper;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use OxidEsales\Eshop\Core\Language;
 
-#[CoversClass(LanguageWrapper::class)]
+/**
+ * @covers \OxidEsales\SecurityModule\Captcha\Infrastructure\LanguageWrapper
+ */
 class LanguageWrapperTest extends TestCase
 {
     public function testGetCurrentLanguageAbbr(): void

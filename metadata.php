@@ -27,11 +27,12 @@ $aModule = [
         'de' => 'Werkzeuge zum Schutz Ihres Shops und zur Sicherung von Kundenkonten.'
     ],
     'thumbnail'   => 'logo.png',
-    'version'     => '2.0.0',
+    'version'     => '2.1.0',
     'author'      => 'OXID eSales AG',
     'url'         => 'https://github.com/OXID-eSales/security-module',
     'email'       => 'info@oxid-esales.com',
     'extend'      => [
+        \OxidEsales\Eshop\Application\Component\UserComponent::class => \OxidEsales\SecurityModule\Captcha\Shop\UserComponent::class,
         \OxidEsales\Eshop\Application\Controller\NewsletterController::class => \OxidEsales\SecurityModule\Captcha\Shop\NewsletterController::class,
         \OxidEsales\Eshop\Application\Controller\ForgotPasswordController::class => \OxidEsales\SecurityModule\Shared\Controller\ForgotPasswordController::class,
         \OxidEsales\Eshop\Application\Model\User::class => \OxidEsales\SecurityModule\Shared\Model\User::class,

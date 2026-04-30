@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Tests\Integration\Shared\Model;
 
 use OxidEsales\Eshop\Application\Model\User;
-use OxidEsales\Eshop\Core\Exception\InputException;
 use OxidEsales\Eshop\Core\Exception\UserException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
@@ -18,9 +17,6 @@ use Generator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAUserServiceInterface;
-use OxidEsales\SecurityModule\Captcha\Captcha\Image\Exception\CaptchaValidateException as ImageCaptchaException;
-use OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface;
-use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface as CaptchaSettingsServiceInterface;
 use OxidEsales\SecurityModule\Shared\Model\User as SecurityModuleUser;
 use OxidEsales\SecurityModule\Tests\Integration\IntegrationTestCase;
 
@@ -41,93 +37,6 @@ class UserTest extends IntegrationTestCase
             ->getMock();
 
         Registry::set(Request::class, $this->requestMock);
-    }
-
-    public function testCheckValuesWithInvalidCaptcha()
-    {
-        $this->expectException(InputException::class);
-        $message = Registry::getLang()->translateString("ERROR_INVALID_CAPTCHA");
-        $this->expectExceptionMessage($message);
-
-        $captchaSettings = $this->createStub(CaptchaSettingsServiceInterface::class);
-        $captchaSettings->method('isCaptchaEnabled')->willReturn(true);
-
-        $captchaService = $this->createMock(CaptchaServiceInterface::class);
-        $captchaService->method('validate')->willThrowException(new ImageCaptchaException('ERROR_INVALID_CAPTCHA'));
-
-        $sut = $this->getSut([
-            CaptchaSettingsServiceInterface::class => $captchaSettings,
-            CaptchaServiceInterface::class => $captchaService,
-        ]);
-        $sut->checkValues('', '', '', [], []);
-    }
-
-    public function testCheckValuesWithEmptyCaptcha()
-    {
-        $this->expectException(InputException::class);
-        $message = Registry::getLang()->translateString("ERROR_EMPTY_CAPTCHA");
-        $this->expectExceptionMessage($message);
-
-        $captchaSettings = $this->createStub(CaptchaSettingsServiceInterface::class);
-        $captchaSettings->method('isCaptchaEnabled')->willReturn(true);
-
-        $captchaService = $this->createMock(CaptchaServiceInterface::class);
-        $captchaService->method('validate')->willThrowException(new ImageCaptchaException('ERROR_EMPTY_CAPTCHA'));
-
-        $sut = $this->getSut([
-            CaptchaSettingsServiceInterface::class => $captchaSettings,
-            CaptchaServiceInterface::class => $captchaService,
-        ]);
-        $sut->checkValues('', '', '', [], []);
-    }
-
-    public function testLoginWithInvalidCaptcha()
-    {
-        $this->expectException(UserException::class);
-        $this->expectExceptionMessage("ERROR_INVALID_CAPTCHA");
-
-        $captchaSettings = $this->createStub(CaptchaSettingsServiceInterface::class);
-        $captchaSettings->method('isCaptchaEnabled')->willReturn(true);
-
-        $captchaService = $this->createMock(CaptchaServiceInterface::class);
-        $captchaService->method('validate')->willThrowException(new ImageCaptchaException('ERROR_INVALID_CAPTCHA'));
-
-        $sut = $this->getSut([
-            CaptchaSettingsServiceInterface::class => $captchaSettings,
-            CaptchaServiceInterface::class => $captchaService,
-        ]);
-        $sut->login('', '');
-    }
-
-    public function testLoginWithEmptyCaptcha()
-    {
-        $this->expectException(UserException::class);
-        $this->expectExceptionMessage("ERROR_EMPTY_CAPTCHA");
-
-        $captchaSettings = $this->createStub(CaptchaSettingsServiceInterface::class);
-        $captchaSettings->method('isCaptchaEnabled')->willReturn(true);
-
-        $captchaService = $this->createMock(CaptchaServiceInterface::class);
-        $captchaService->method('validate')->willThrowException(new ImageCaptchaException('ERROR_EMPTY_CAPTCHA'));
-
-        $sut = $this->getSut([
-            CaptchaSettingsServiceInterface::class => $captchaSettings,
-            CaptchaServiceInterface::class => $captchaService,
-        ]);
-        $sut->login('', '');
-    }
-
-    public function testLoginWithValidCaptchaAndValidCredentials(): void
-    {
-        $captchaSettings = $this->createStub(CaptchaSettingsServiceInterface::class);
-        $captchaSettings->method('isCaptchaEnabled')->willReturn(true);
-
-        $sut = $this->getSut([
-            CaptchaSettingsServiceInterface::class => $captchaSettings,
-        ]);
-        $result = $sut->login(self::TWO_FA_USER_NAME, self::TWO_FA_USER_PASSWORD);
-
-        $this->assertTrue($result);
     }
 
     public function testLoginWith2FAEnabledAndUnverifiedChallengeTriggersChallenge(): void
@@ -173,31 +82,6 @@ class UserTest extends IntegrationTestCase
         $userServiceMock->method('isChallengeVerified')->with($userId)->willReturn(true);
 
         $sut = $this->getSut([
-            TwoFAUserServiceInterface::class => $userServiceMock,
-        ]);
-        $sut->load($userId);
-
-        $result = $sut->login(self::TWO_FA_USER_NAME, null);
-        $this->assertTrue($result);
-    }
-
-    public function testLoginWithNullPasswordSkipsCaptchaEvenWhenEnabled(): void
-    {
-        $userId = $this->getTwoFAUserId();
-
-        $captchaSettings = $this->createStub(CaptchaSettingsServiceInterface::class);
-        $captchaSettings->method('isCaptchaEnabled')->willReturn(true);
-
-        $captchaServiceMock = $this->createMock(CaptchaServiceInterface::class);
-        $captchaServiceMock->expects($this->never())->method('validate');
-
-        $userServiceMock = $this->createMock(TwoFAUserServiceInterface::class);
-        $userServiceMock->method('isTwoFARequired')->with($userId)->willReturn(true);
-        $userServiceMock->method('isChallengeVerified')->with($userId)->willReturn(true);
-
-        $sut = $this->getSut([
-            CaptchaSettingsServiceInterface::class => $captchaSettings,
-            CaptchaServiceInterface::class => $captchaServiceMock,
             TwoFAUserServiceInterface::class => $userServiceMock,
         ]);
         $sut->load($userId);
@@ -264,11 +148,6 @@ class UserTest extends IntegrationTestCase
     {
         $services = array_merge(
             [
-                CaptchaSettingsServiceInterface::class => $this->createConfiguredStub(
-                    CaptchaSettingsServiceInterface::class,
-                    ['isCaptchaEnabled' => false]
-                ),
-                CaptchaServiceInterface::class => $this->createStub(CaptchaServiceInterface::class),
                 TwoFAUserServiceInterface::class => $this->createConfiguredStub(
                     TwoFAUserServiceInterface::class,
                     ['isTwoFARequired' => false]
