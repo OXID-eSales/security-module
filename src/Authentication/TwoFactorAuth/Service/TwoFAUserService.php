@@ -12,9 +12,11 @@ namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service;
 use OxidEsales\Eshop\Core\Utils;
 use OxidEsales\EshopCommunity\Internal\Framework\Session\SessionInterface;
 use OxidEsales\SecurityModule\Authentication\Service\InternalRedirectServiceInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\TwoFactorRequiredException;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Service\UserLoginAdapterInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFAShopSettingsInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFAUserSettingsInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * todo-high: challenge the idea - session part should go to the separate login state service
@@ -31,6 +33,7 @@ class TwoFAUserService implements TwoFAUserServiceInterface
         private UserLoginAdapterInterface $loginAdapter,
         private InternalRedirectServiceInterface $redirectService,
         private TwoFAUserSettingsInterface $userSettings,
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -38,7 +41,16 @@ class TwoFAUserService implements TwoFAUserServiceInterface
     {
         $this->session->set(self::USER_SESSION_KEY, $userId);
         $this->twoFAService->triggerChallenge($userId);
-        $this->utils->redirect($this->settings->getVerificationUrl());
+
+        $this->logger->info(
+            'Two-factor authentication required for user',
+            ['userId' => $userId]
+        );
+
+        throw new TwoFactorRequiredException(
+            $userId,
+            $this->settings->getVerificationUrl()
+        );
     }
 
     public function getPendingUserId(): ?string

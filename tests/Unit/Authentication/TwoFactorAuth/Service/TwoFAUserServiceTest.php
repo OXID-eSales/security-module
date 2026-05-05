@@ -12,6 +12,7 @@ namespace OxidEsales\SecurityModule\Tests\Unit\Authentication\TwoFactorAuth\Serv
 use OxidEsales\Eshop\Core\Utils;
 use OxidEsales\EshopCommunity\Internal\Framework\Session\SessionInterface;
 use OxidEsales\SecurityModule\Authentication\Service\InternalRedirectServiceInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\TwoFactorRequiredException;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Service\UserLoginAdapterInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFAUserSettingsInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAServiceInterface;
@@ -21,11 +22,12 @@ use Generator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 
 class TwoFAUserServiceTest extends TestCase
 {
     #[Test]
-    public function startChallengeForUserStoresPendingUserTriggersChallengeAndRedirects(): void
+    public function startChallengeForUserStoresPendingUserTriggersChallengeLogsAndThrows(): void
     {
         $userId = uniqid();
 
@@ -40,19 +42,27 @@ class TwoFAUserServiceTest extends TestCase
             ->with($userId);
 
         $settingsStub = $this->createStub(TwoFAShopSettingsInterface::class);
-        $settingsStub->method('getVerificationUrl')->willReturn($verificationUrl = uniqid());
 
         $utilsSpy = $this->createMock(Utils::class);
-        $utilsSpy->expects($this->once())
-            ->method('redirect')
-            ->with($verificationUrl);
+        $utilsSpy->expects($this->never())->method('redirect');
+
+        $loggerSpy = $this->createMock(LoggerInterface::class);
+        $loggerSpy->expects($this->once())
+            ->method('info')
+            ->with(
+                $this->stringContains('two-factor'),
+                $this->callback(fn(array $context) => ($context['userId'] ?? null) === $userId)
+            );
 
         $sut = $this->getSut(
             twoFAService: $twoFAServiceSpy,
             settings: $settingsStub,
             utils: $utilsSpy,
             session: $sessionSpy,
+            logger: $loggerSpy,
         );
+
+        $this->expectExceptionObject(new TwoFactorRequiredException($userId, uniqid()));
 
         $sut->startChallengeForUser($userId);
     }
@@ -167,6 +177,7 @@ class TwoFAUserServiceTest extends TestCase
         UserLoginAdapterInterface $loginAdapter = null,
         InternalRedirectServiceInterface $redirectService = null,
         TwoFAUserSettingsInterface $userSettings = null,
+        LoggerInterface $logger = null,
     ): TwoFAUserService {
         return new TwoFAUserService(
             twoFAService: $twoFAService ?? $this->createStub(TwoFAServiceInterface::class),
@@ -176,6 +187,7 @@ class TwoFAUserServiceTest extends TestCase
             loginAdapter: $loginAdapter ?? $this->createStub(UserLoginAdapterInterface::class),
             redirectService: $redirectService ?? $this->createStub(InternalRedirectServiceInterface::class),
             userSettings: $userSettings ?? $this->createStub(TwoFAUserSettingsInterface::class),
+            logger: $logger ?? $this->createStub(LoggerInterface::class),
         );
     }
 }

@@ -11,3 +11,7 @@ services:
   OxidEsales\SecurityModule\Core\Registry:
     class: 'OxidEsales\Eshop\Core\Registry'
     public: true
+
+  OxidEsales\Eshop\Core\Utils:
+    factory: ['@OxidEsales\SecurityModule\Core\Registry', 'getUtils']
+    public: true
