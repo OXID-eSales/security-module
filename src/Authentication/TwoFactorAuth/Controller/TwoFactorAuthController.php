@@ -86,6 +86,14 @@ class TwoFactorAuthController extends FrontendController
         return null;
     }
 
+    public function abandonChallenge(): void
+    {
+        $userId = $this->twoFAUserService->getPendingUserId();
+        if ($userId !== null) {
+            $this->twoFAUserService->abandonChallenge($userId);
+        }
+    }
+
     public function resendCode(): void
     {
         if (!$this->twoFAService instanceof TwoFAResendableInterface) {

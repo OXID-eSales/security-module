@@ -17,6 +17,8 @@ interface TwoFAUserServiceInterface
 
     public function loginUser(string $userId): void;
 
+    public function abandonChallenge(string $userId): void;
+
     public function isChallengeVerified(string $userId): bool;
 
     public function isTwoFARequired(string $userId): bool;

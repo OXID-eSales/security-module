@@ -68,6 +68,13 @@ class TwoFAUserService implements TwoFAUserServiceInterface
         $this->utils->redirect($this->redirectService->getRedirectUrl(), false);
     }
 
+    public function abandonChallenge(string $userId): void
+    {
+        $this->session->remove(self::USER_SESSION_KEY);
+        $this->twoFAService->invalidateChallenge($userId);
+        $this->utils->redirect($this->settings->getAccountUrl(), false);
+    }
+
     public function isChallengeVerified(string $userId): bool
     {
         return $this->twoFAService->isVerified($userId);

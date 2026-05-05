@@ -133,6 +133,38 @@ class TwoFAUserServiceTest extends TestCase
     }
 
     #[Test]
+    public function abandonChallengeClearsSessionInvalidatesChallengeAndRedirectsToAccount(): void
+    {
+        $userId = uniqid();
+
+        $sessionSpy = $this->createMock(SessionInterface::class);
+        $sessionSpy->expects($this->once())
+            ->method('remove')
+            ->with(TwoFAUserService::USER_SESSION_KEY);
+
+        $twoFAServiceSpy = $this->createMock(TwoFAServiceInterface::class);
+        $twoFAServiceSpy->expects($this->once())
+            ->method('invalidateChallenge')
+            ->with($userId);
+
+        $settingsStub = $this->createStub(TwoFAShopSettingsInterface::class);
+        $settingsStub->method('getAccountUrl')->willReturn(uniqid());
+
+        $utilsSpy = $this->createMock(Utils::class);
+        $utilsSpy->expects($this->once())
+            ->method('redirect');
+
+        $sut = $this->getSut(
+            twoFAService: $twoFAServiceSpy,
+            settings: $settingsStub,
+            utils: $utilsSpy,
+            session: $sessionSpy,
+        );
+
+        $sut->abandonChallenge($userId);
+    }
+
+    #[Test]
     public function loginUserLoadsUserLoginsClearsSessionAndRedirects(): void
     {
         $userId = uniqid();

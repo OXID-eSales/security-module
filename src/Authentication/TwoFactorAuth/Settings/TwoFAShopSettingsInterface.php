@@ -16,4 +16,6 @@ interface TwoFAShopSettingsInterface
     public function getTwoFactorAuthType(): string;
 
     public function getVerificationUrl(): string;
+
+    public function getAccountUrl(): string;
 }

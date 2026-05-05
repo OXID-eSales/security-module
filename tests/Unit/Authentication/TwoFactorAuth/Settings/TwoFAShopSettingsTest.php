@@ -72,6 +72,17 @@ class TwoFAShopSettingsTest extends TestCase
     }
 
     #[Test]
+    public function getAccountUrlReturnsAccountControllerUrl(): void
+    {
+        $configStub = $this->createStub(Config::class);
+        $configStub->method('getShopHomeUrl')->willReturn($homeUrl = uniqid());
+
+        $sut = $this->getSut(config: $configStub);
+
+        $this->assertSame($homeUrl . 'cl=account', $sut->getAccountUrl());
+    }
+
+    #[Test]
     public function implementsInterface(): void
     {
         $this->assertInstanceOf(TwoFAShopSettingsInterface::class, $this->getSut());
