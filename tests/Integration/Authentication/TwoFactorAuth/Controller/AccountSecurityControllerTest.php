@@ -12,6 +12,8 @@ namespace OxidEsales\SecurityModule\Tests\Integration\Authentication\TwoFactorAu
 use Generator;
 use OxidEsales\Eshop\Application\Controller\AccountController;
 use OxidEsales\Eshop\Application\Model\User;
+use OxidEsales\Eshop\Core\UtilsServer;
+use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Controller\AccountSecurityController;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFAUserSettingsInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Transput\UserSettingsUpdateRequestInterface;
@@ -112,17 +114,53 @@ class AccountSecurityControllerTest extends IntegrationTestCase
         yield 'disable 2FA' => ['twoFAEnabled' => false];
     }
 
+    #[Test]
+    #[DataProvider('saveTwoFactorAuthDataProvider')]
+    public function saveTwoFactorAuthClearsRememberMeCookieOnlyWhenEnabling(bool $twoFAEnabled): void
+    {
+        $shopId = random_int(1, 99);
+
+        $userStub = $this->createStub(User::class);
+        $userStub->method('getId')->willReturn(uniqid());
+
+        $updateRequestStub = $this->createStub(UserSettingsUpdateRequestInterface::class);
+        $updateRequestStub->method('isTwoFAEnabled')->willReturn($twoFAEnabled);
+
+        $contextStub = $this->createStub(BasicContextInterface::class);
+        $contextStub->method('getCurrentShopId')->willReturn($shopId);
+
+        $utilsServerSpy = $this->createMock(UtilsServer::class);
+        $utilsServerSpy->expects($twoFAEnabled ? $this->once() : $this->never())
+            ->method('deleteUserCookie')
+            ->with((string)$shopId);
+
+        $sut = $this->getSut(
+            updateRequest: $updateRequestStub,
+            utilsServer: $utilsServerSpy,
+            context: $contextStub,
+        );
+        $sut->method('getUser')->willReturn($userStub);
+
+        $sut->saveTwoFactorAuth();
+    }
+
     private function getSut(
         TwoFAUserSettingsInterface $userSettingsService = null,
         UserSettingsUpdateRequestInterface $updateRequest = null,
+        UtilsServer $utilsServer = null,
+        BasicContextInterface $context = null,
     ): AccountSecurityController {
         $userSettingsService ??= $this->createStub(TwoFAUserSettingsInterface::class);
         $updateRequest ??= $this->createStub(UserSettingsUpdateRequestInterface::class);
+        $utilsServer ??= $this->createStub(UtilsServer::class);
+        $context ??= $this->createStub(BasicContextInterface::class);
 
         return $this->getMockBuilder(AccountSecurityController::class)
             ->setConstructorArgs([
                 'userSettingsService' => $userSettingsService,
                 'settingUpdateRequest' => $updateRequest,
+                'utilsServer' => $utilsServer,
+                'context' => $context,
             ])
             ->onlyMethods(['getUser'])
             ->getMock();
