@@ -23,6 +23,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 
 class TwoFAUserServiceTest extends TestCase
 {
@@ -197,6 +198,41 @@ class TwoFAUserServiceTest extends TestCase
             redirectService: $redirectServiceStub,
             utils: $utilsSpy,
         );
+
+        $sut->loginUser($userId);
+    }
+
+    #[Test]
+    public function loginUserInvalidatesChallengeEvenWhenAdapterThrows(): void
+    {
+        $userId = uniqid();
+        $adapterException = new RuntimeException('login boom');
+
+        $loginAdapter = $this->createMock(UserLoginAdapterInterface::class);
+        $loginAdapter->method('loginUser')
+            ->willThrowException($adapterException);
+
+        $twoFAServiceSpy = $this->createMock(TwoFAServiceInterface::class);
+        $twoFAServiceSpy->expects($this->once())
+            ->method('invalidateChallenge')
+            ->with($userId);
+
+        $sessionSpy = $this->createMock(SessionInterface::class);
+        $sessionSpy->expects($this->once())
+            ->method('remove')
+            ->with(TwoFAUserService::USER_SESSION_KEY);
+
+        $utilsSpy = $this->createMock(Utils::class);
+        $utilsSpy->expects($this->never())->method('redirect');
+
+        $sut = $this->getSut(
+            twoFAService: $twoFAServiceSpy,
+            loginAdapter: $loginAdapter,
+            session: $sessionSpy,
+            utils: $utilsSpy,
+        );
+
+        $this->expectExceptionObject($adapterException);
 
         $sut->loginUser($userId);
     }

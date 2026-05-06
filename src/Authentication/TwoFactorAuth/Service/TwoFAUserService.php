@@ -62,8 +62,11 @@ class TwoFAUserService implements TwoFAUserServiceInterface
     {
         $this->session->remove(self::USER_SESSION_KEY);
 
-        $this->loginAdapter->loginUser($userId);
-        $this->twoFAService->invalidateChallenge($userId);
+        try {
+            $this->loginAdapter->loginUser($userId);
+        } finally {
+            $this->twoFAService->invalidateChallenge($userId);
+        }
 
         $this->utils->redirect($this->redirectService->getRedirectUrl(), false);
     }
