@@ -36,6 +36,12 @@ class TwoFAAuthenticationCest extends BaseCest
         $this->clearTwoFAOtpState($I);
     }
 
+    private function clearTwoFAOtpState(AcceptanceTester $I): void
+    {
+        $userData = $this->getExistingUserData();
+        $I->deleteFromDatabase('oesm_2fa_otp', ['OXUSERID' => $userData['userId']]);
+    }
+
     public function testEnablingTwoFAViaSettingsTriggersOtpOnNextLogin(AcceptanceTester $I): void
     {
         $userData = $this->getExistingUserData();

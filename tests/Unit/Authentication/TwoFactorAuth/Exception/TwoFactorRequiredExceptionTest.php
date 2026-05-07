@@ -17,8 +17,8 @@ class TwoFactorRequiredExceptionTest extends TestCase
 {
     public function testException(): void
     {
-        $userId = uniqid();
-        $verificationUrl = 'https://shop.example/' . uniqid();
+        $userId = uniqid('user_id');
+        $verificationUrl = uniqid('verification_url');
 
         $exception = new TwoFactorRequiredException($userId, $verificationUrl);
 

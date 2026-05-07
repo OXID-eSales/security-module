@@ -30,7 +30,7 @@ class TwoFAUserServiceTest extends TestCase
     #[Test]
     public function startChallengeForUserStoresPendingUserTriggersChallengeLogsAndThrows(): void
     {
-        $userId = uniqid();
+        $userId = uniqid('user_id');
 
         $sessionSpy = $this->createMock(SessionInterface::class);
         $sessionSpy->expects($this->once())
@@ -42,11 +42,6 @@ class TwoFAUserServiceTest extends TestCase
             ->method('triggerChallenge')
             ->with($userId);
 
-        $settingsStub = $this->createStub(TwoFAShopSettingsInterface::class);
-
-        $utilsSpy = $this->createMock(Utils::class);
-        $utilsSpy->expects($this->never())->method('redirect');
-
         $loggerSpy = $this->createMock(LoggerInterface::class);
         $loggerSpy->expects($this->once())
             ->method('info')
@@ -55,15 +50,19 @@ class TwoFAUserServiceTest extends TestCase
                 $this->callback(fn(array $context) => ($context['userId'] ?? null) === $userId)
             );
 
+        $settingsStub = $this->createConfiguredStub(TwoFAShopSettingsInterface::class, [
+            'getVerificationUrl' => $verificationUrl = uniqid('verification_url'),
+        ]);
+
         $sut = $this->getSut(
             twoFAService: $twoFAServiceSpy,
             settings: $settingsStub,
-            utils: $utilsSpy,
             session: $sessionSpy,
             logger: $loggerSpy,
         );
 
-        $this->expectExceptionObject(new TwoFactorRequiredException($userId, uniqid()));
+        $expectedException = new TwoFactorRequiredException($userId, $verificationUrl);
+        $this->expectExceptionObject($expectedException);
 
         $sut->startChallengeForUser($userId);
     }

@@ -65,10 +65,4 @@ abstract class BaseCest
             ['OXID' => $userData['userId']]
         );
     }
-
-    protected function clearTwoFAOtpState(AcceptanceTester $I): void
-    {
-        $userData = $this->getExistingUserData();
-        $I->deleteFromDatabase('oesm_2fa_otp', ['OXUSERID' => $userData['userId']]);
-    }
 }
