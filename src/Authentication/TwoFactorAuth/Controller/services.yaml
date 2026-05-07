@@ -5,6 +5,7 @@ services:
     bind:
       OxidEsales\Eshop\Core\UtilsView: '@=service("OxidEsales\\SecurityModule\\Core\\Registry").getUtilsView()'
       OxidEsales\Eshop\Core\Utils: '@=service("OxidEsales\\SecurityModule\\Core\\Registry").getUtils()'
+      OxidEsales\Eshop\Core\UtilsServer: '@=service("OxidEsales\\SecurityModule\\Core\\Registry").getUtilsServer()'
       OxidEsales\Eshop\Core\Config: '@=service("OxidEsales\\SecurityModule\\Core\\Registry").getConfig()'
 
   OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Controller\TwoFactorAuthController:

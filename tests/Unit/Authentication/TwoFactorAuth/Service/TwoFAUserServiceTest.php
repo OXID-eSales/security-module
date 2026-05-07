@@ -12,6 +12,7 @@ namespace OxidEsales\SecurityModule\Tests\Unit\Authentication\TwoFactorAuth\Serv
 use OxidEsales\Eshop\Core\Utils;
 use OxidEsales\EshopCommunity\Internal\Framework\Session\SessionInterface;
 use OxidEsales\SecurityModule\Authentication\Service\InternalRedirectServiceInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\TwoFactorRequiredException;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Service\UserLoginAdapterInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFAUserSettingsInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAServiceInterface;
@@ -21,13 +22,15 @@ use Generator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
+use RuntimeException;
 
 class TwoFAUserServiceTest extends TestCase
 {
     #[Test]
-    public function startChallengeForUserStoresPendingUserTriggersChallengeAndRedirects(): void
+    public function startChallengeForUserStoresPendingUserTriggersChallengeLogsAndThrows(): void
     {
-        $userId = uniqid();
+        $userId = uniqid('user_id');
 
         $sessionSpy = $this->createMock(SessionInterface::class);
         $sessionSpy->expects($this->once())
@@ -39,20 +42,27 @@ class TwoFAUserServiceTest extends TestCase
             ->method('triggerChallenge')
             ->with($userId);
 
-        $settingsStub = $this->createStub(TwoFAShopSettingsInterface::class);
-        $settingsStub->method('getVerificationUrl')->willReturn($verificationUrl = uniqid());
+        $loggerSpy = $this->createMock(LoggerInterface::class);
+        $loggerSpy->expects($this->once())
+            ->method('info')
+            ->with(
+                $this->stringContains('two-factor'),
+                $this->callback(fn(array $context) => ($context['userId'] ?? null) === $userId)
+            );
 
-        $utilsSpy = $this->createMock(Utils::class);
-        $utilsSpy->expects($this->once())
-            ->method('redirect')
-            ->with($verificationUrl);
+        $settingsStub = $this->createConfiguredStub(TwoFAShopSettingsInterface::class, [
+            'getVerificationUrl' => $verificationUrl = uniqid('verification_url'),
+        ]);
 
         $sut = $this->getSut(
             twoFAService: $twoFAServiceSpy,
             settings: $settingsStub,
-            utils: $utilsSpy,
             session: $sessionSpy,
+            logger: $loggerSpy,
         );
+
+        $expectedException = new TwoFactorRequiredException($userId, $verificationUrl);
+        $this->expectExceptionObject($expectedException);
 
         $sut->startChallengeForUser($userId);
     }
@@ -123,6 +133,38 @@ class TwoFAUserServiceTest extends TestCase
     }
 
     #[Test]
+    public function abandonChallengeClearsSessionInvalidatesChallengeAndRedirectsToAccount(): void
+    {
+        $userId = uniqid();
+
+        $sessionSpy = $this->createMock(SessionInterface::class);
+        $sessionSpy->expects($this->once())
+            ->method('remove')
+            ->with(TwoFAUserService::USER_SESSION_KEY);
+
+        $twoFAServiceSpy = $this->createMock(TwoFAServiceInterface::class);
+        $twoFAServiceSpy->expects($this->once())
+            ->method('invalidateChallenge')
+            ->with($userId);
+
+        $settingsStub = $this->createStub(TwoFAShopSettingsInterface::class);
+        $settingsStub->method('getAccountUrl')->willReturn(uniqid());
+
+        $utilsSpy = $this->createMock(Utils::class);
+        $utilsSpy->expects($this->once())
+            ->method('redirect');
+
+        $sut = $this->getSut(
+            twoFAService: $twoFAServiceSpy,
+            settings: $settingsStub,
+            utils: $utilsSpy,
+            session: $sessionSpy,
+        );
+
+        $sut->abandonChallenge($userId);
+    }
+
+    #[Test]
     public function loginUserLoadsUserLoginsClearsSessionAndRedirects(): void
     {
         $userId = uniqid();
@@ -159,6 +201,41 @@ class TwoFAUserServiceTest extends TestCase
         $sut->loginUser($userId);
     }
 
+    #[Test]
+    public function loginUserInvalidatesChallengeEvenWhenAdapterThrows(): void
+    {
+        $userId = uniqid();
+        $adapterException = new RuntimeException('login boom');
+
+        $loginAdapter = $this->createMock(UserLoginAdapterInterface::class);
+        $loginAdapter->method('loginUser')
+            ->willThrowException($adapterException);
+
+        $twoFAServiceSpy = $this->createMock(TwoFAServiceInterface::class);
+        $twoFAServiceSpy->expects($this->once())
+            ->method('invalidateChallenge')
+            ->with($userId);
+
+        $sessionSpy = $this->createMock(SessionInterface::class);
+        $sessionSpy->expects($this->once())
+            ->method('remove')
+            ->with(TwoFAUserService::USER_SESSION_KEY);
+
+        $utilsSpy = $this->createMock(Utils::class);
+        $utilsSpy->expects($this->never())->method('redirect');
+
+        $sut = $this->getSut(
+            twoFAService: $twoFAServiceSpy,
+            loginAdapter: $loginAdapter,
+            session: $sessionSpy,
+            utils: $utilsSpy,
+        );
+
+        $this->expectExceptionObject($adapterException);
+
+        $sut->loginUser($userId);
+    }
+
     private function getSut(
         TwoFAServiceInterface $twoFAService = null,
         TwoFAShopSettingsInterface $settings = null,
@@ -167,6 +244,7 @@ class TwoFAUserServiceTest extends TestCase
         UserLoginAdapterInterface $loginAdapter = null,
         InternalRedirectServiceInterface $redirectService = null,
         TwoFAUserSettingsInterface $userSettings = null,
+        LoggerInterface $logger = null,
     ): TwoFAUserService {
         return new TwoFAUserService(
             twoFAService: $twoFAService ?? $this->createStub(TwoFAServiceInterface::class),
@@ -176,6 +254,7 @@ class TwoFAUserServiceTest extends TestCase
             loginAdapter: $loginAdapter ?? $this->createStub(UserLoginAdapterInterface::class),
             redirectService: $redirectService ?? $this->createStub(InternalRedirectServiceInterface::class),
             userSettings: $userSettings ?? $this->createStub(TwoFAUserSettingsInterface::class),
+            logger: $logger ?? $this->createStub(LoggerInterface::class),
         );
     }
 }

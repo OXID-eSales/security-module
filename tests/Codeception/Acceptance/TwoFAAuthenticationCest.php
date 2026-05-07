@@ -33,6 +33,13 @@ class TwoFAAuthenticationCest extends BaseCest
         $this->setPasswordState(false);
         $this->setTwoFactorAuthState(true);
         $this->setUserTwoFAState($I, false);
+        $this->clearTwoFAOtpState($I);
+    }
+
+    private function clearTwoFAOtpState(AcceptanceTester $I): void
+    {
+        $userData = $this->getExistingUserData();
+        $I->deleteFromDatabase('oesm_2fa_otp', ['OXUSERID' => $userData['userId']]);
     }
 
     public function testEnablingTwoFAViaSettingsTriggersOtpOnNextLogin(AcceptanceTester $I): void
@@ -183,6 +190,38 @@ class TwoFAAuthenticationCest extends BaseCest
         // A code was just sent at login, so the server-driven cooldown should disable the button
         $I->waitForJS("return document.getElementById('resend-btn').disabled === true", 5);
         $I->seeElement('#resend-btn[disabled]');
+    }
+
+    public function testAbandonChallengeAfterExhaustedAttempts(AcceptanceTester $I): void
+    {
+        $this->setUserTwoFAState($I, true);
+
+        $userData = $this->getExistingUserData();
+        $userLoginPage = new UserLogin($I);
+        $I->amOnPage($userLoginPage->URL);
+        $userLoginPage->login($userData['userLoginName'], $userData['userPassword']);
+        $I->waitForPageLoad();
+
+        for ($i = 0; $i < 5; $i++) {
+            $I->fillField($this->otpInput, '000000');
+            $I->click('#auth_submit');
+            $I->waitForPageLoad();
+        }
+
+        $I->dontSeeElement($this->otpInput);
+        $I->dontSeeElement('#auth_submit');
+        $I->dontSeeElement('#resend-btn');
+        $I->dontSee(Translator::translate('TWO_FACTOR_AUTHENTICATION_DESCRIPTION'));
+        $I->seeElement('#abandon_challenge_submit');
+        $I->see(Translator::translate('OE_SECURITY_LOG_IN_AGAIN'));
+
+        $I->click('#abandon_challenge_submit');
+        $I->waitForPageLoad();
+
+        $I->dontSeeInDatabase('oesm_2fa_otp', ['OXUSERID' => $userData['userId']]);
+        $I->dontSeeElement('#abandon_challenge_submit');
+        $I->dontSeeElement($this->otpInput);
+        $I->seeInCurrentUrl('cl=account');
     }
 
     public function testResendButtonShowsCountdownAfterClick(AcceptanceTester $I): void

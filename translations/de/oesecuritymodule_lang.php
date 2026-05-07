@@ -55,11 +55,12 @@ $aLang = [
 
     'ERROR_INVALID_CODE'           => 'Der Bestätigungscode ist ungültig. Bitte versuchen Sie es erneut.',
     'ERROR_CODE_TIME_EXPIRED'      => 'Der Bestätigungscode ist abgelaufen. Bitte fordern Sie einen neuen Code an.',
-    'ERROR_ATTEMPT_LIMIT_EXCEEDED' => 'Zu viele fehlgeschlagene Versuche. Bitte fordern Sie einen neuen Code an.',
+    'ERROR_ATTEMPT_LIMIT_EXCEEDED' => 'Zu viele fehlgeschlagene Versuche. Bitte melden Sie sich erneut an.',
     'ERROR_SESSION_EXPIRED'        => 'Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.',
 
     'OE_SECURITY_REMAINING_ATTEMPTS' => 'Verbleibende Versuche',
     'OE_SECURITY_ENTER_CODE'         => 'Bestätigungscode',
+    'OE_SECURITY_LOG_IN_AGAIN'       => 'Erneut anmelden',
 
     'OE_SECURITY_EXTERNAL_AUTH_PASSWORD_INFO' => 'Sie sind mit einem externen Anbieter angemeldet. Die Passwortverwaltung ist für dieses Konto nicht verfügbar.',
     'OE_SECURITY_RESET_PASSWORD'              => 'Passwort zurücksetzen',

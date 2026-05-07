@@ -41,4 +41,9 @@ class TwoFAShopSettings implements TwoFAShopSettingsInterface
     {
         return $this->config->getShopHomeUrl() . 'cl=oesm_twofactorauth';
     }
+
+    public function getAccountUrl(): string
+    {
+        return $this->config->getShopHomeUrl() . 'cl=account';
+    }
 }

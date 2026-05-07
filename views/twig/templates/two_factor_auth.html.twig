@@ -7,65 +7,85 @@
 
                 <div class="card">
                     <div class="card-body">
-                        <p class="mb-4">{{ translate({ ident: "TWO_FACTOR_AUTHENTICATION_DESCRIPTION" }) }}</p>
+                        {% if resendable and remainingAttempts <= 0 %}
+                            <form action="{{ oViewConf.getSelfLink()|raw }}" name="two_factor_auth_abandon" method="post" role="form">
+                                <div class="hidden">
+                                    {{ oViewConf.getHiddenSid()|raw }}
+                                    <input type="hidden" name="cl" value="oesm_twofactorauth">
+                                    <input type="hidden" name="fnc" value="abandonChallenge">
+                                </div>
 
-                        <form action="{{ oViewConf.getSelfLink()|raw }}" name="two_factor_auth" method="post" role="form" class="needs-validation" novalidate>
-                            <div class="hidden">
-                                {{ oViewConf.getHiddenSid()|raw }}
-                                <input type="hidden" name="cl" value="oesm_twofactorauth">
-                                <input type="hidden" name="fnc" value="verifyCode">
-                            </div>
-
-                            <div class="row">
-                                <div class="col-12 col-md-6">
-                                    <div class="mb-3 form-floating">
-                                        <input
-                                            type="text"
-                                            class="form-control"
-                                            id="auth_code"
-                                            name="auth_code"
-                                            value=""
-                                            placeholder=" "
-                                            autocomplete="one-time-code"
-                                            inputmode="numeric"
-                                            maxlength="6"
-                                            required
-                                            autofocus
-                                        >
-                                        <label for="auth_code" class="req">{{ translate({ ident: "OE_SECURITY_ENTER_CODE" }) }}</label>
-                                    </div>
-
-                                    {% if resendable %}
-                                        <div class="mb-3 d-flex justify-content-between align-items-center">
-                                            <small class="text-muted">
-                                                {{ translate({ ident: "OE_SECURITY_REMAINING_ATTEMPTS" }) }}:
-                                                <strong id="remaining-attempts">{{ remainingAttempts }}</strong>
-                                            </small>
-                                            <button
-                                                id="resend-btn"
-                                                class="btn btn-link btn-sm px-0"
-                                                type="button"
-                                                data-cooldown="60"
-                                                data-cooldown-remaining="{{ resendCooldownRemaining }}"
-                                                data-url="{{ seo_url({ ident: oViewConf.getSelfLink()|cat("cl=oesm_twofactorauth&fnc=resendCode") }) }}"
-                                                data-text-default="{{ translate({ ident: "RESEND_CODE" }) }}"
-                                                data-text-sending="{{ translate({ ident: "RESEND_CODE_SENDING" }) }}"
-                                                data-text-error="{{ translate({ ident: "RESEND_CODE_ERROR" }) }}"
-                                                data-text-countdown="{{ translate({ ident: "RESEND_CODE_COUNTDOWN" }) }}"
-                                            >{{ translate({ ident: "RESEND_CODE" }) }}</button>
+                                <div class="row">
+                                    <div class="col-12 col-md-6">
+                                        <div class="mb-3">
+                                            <button type="submit" id="abandon_challenge_submit" class="btn btn-primary btn-responsive">
+                                                {{ translate({ ident: "OE_SECURITY_LOG_IN_AGAIN" }) }}
+                                            </button>
                                         </div>
-                                    {% endif %}
-
-                                    <p id="resend-hint" class="small text-muted" aria-live="polite"></p>
-
-                                    <div class="mb-3">
-                                        <button type="submit" id="auth_submit" class="btn btn-primary btn-responsive">
-                                            {{ translate({ ident: "SUBMIT" }) }}
-                                        </button>
                                     </div>
                                 </div>
-                            </div>
-                        </form>
+                            </form>
+                        {% else %}
+                            <p class="mb-4">{{ translate({ ident: "TWO_FACTOR_AUTHENTICATION_DESCRIPTION" }) }}</p>
+
+                            <form action="{{ oViewConf.getSelfLink()|raw }}" name="two_factor_auth" method="post" role="form" class="needs-validation" novalidate>
+                                <div class="hidden">
+                                    {{ oViewConf.getHiddenSid()|raw }}
+                                    <input type="hidden" name="cl" value="oesm_twofactorauth">
+                                    <input type="hidden" name="fnc" value="verifyCode">
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-12 col-md-6">
+                                        <div class="mb-3 form-floating">
+                                            <input
+                                                type="text"
+                                                class="form-control"
+                                                id="auth_code"
+                                                name="auth_code"
+                                                value=""
+                                                placeholder=" "
+                                                autocomplete="one-time-code"
+                                                inputmode="numeric"
+                                                maxlength="6"
+                                                required
+                                                autofocus
+                                            >
+                                            <label for="auth_code" class="req">{{ translate({ ident: "OE_SECURITY_ENTER_CODE" }) }}</label>
+                                        </div>
+
+                                        {% if resendable %}
+                                            <div class="mb-3 d-flex justify-content-between align-items-center">
+                                                <small class="text-muted">
+                                                    {{ translate({ ident: "OE_SECURITY_REMAINING_ATTEMPTS" }) }}:
+                                                    <strong id="remaining-attempts">{{ remainingAttempts }}</strong>
+                                                </small>
+                                                <button
+                                                    id="resend-btn"
+                                                    class="btn btn-link btn-sm px-0"
+                                                    type="button"
+                                                    data-cooldown="60"
+                                                    data-cooldown-remaining="{{ resendCooldownRemaining }}"
+                                                    data-url="{{ seo_url({ ident: oViewConf.getSelfLink()|cat("cl=oesm_twofactorauth&fnc=resendCode") }) }}"
+                                                    data-text-default="{{ translate({ ident: "RESEND_CODE" }) }}"
+                                                    data-text-sending="{{ translate({ ident: "RESEND_CODE_SENDING" }) }}"
+                                                    data-text-error="{{ translate({ ident: "RESEND_CODE_ERROR" }) }}"
+                                                    data-text-countdown="{{ translate({ ident: "RESEND_CODE_COUNTDOWN" }) }}"
+                                                >{{ translate({ ident: "RESEND_CODE" }) }}</button>
+                                            </div>
+                                        {% endif %}
+
+                                        <p id="resend-hint" class="small text-muted" aria-live="polite"></p>
+
+                                        <div class="mb-3">
+                                            <button type="submit" id="auth_submit" class="btn btn-primary btn-responsive">
+                                                {{ translate({ ident: "SUBMIT" }) }}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        {% endif %}
                     </div>
                 </div>
             </div>

@@ -18,7 +18,7 @@ cd $SCRIPT_PATH/../../ || exit
 make setup
 make addbasicservices
 make file=services/adminer.yml addservice
-make file=services/selenium-chrome.yml addservice
+make file=services/selenium-chrome-126.yml addservice
 make file=services/node.yml addservice
 
 # Configure containers

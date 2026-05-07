@@ -158,6 +158,30 @@ class TwoFactorAuthControllerTest extends TestCase
     }
 
     #[Test]
+    public function abandonChallengeDelegatesToServiceWhenUserIsPending(): void
+    {
+        $userId = uniqid();
+
+        $twoFAUserServiceSpy = $this->createMock(TwoFAUserServiceInterface::class);
+        $twoFAUserServiceSpy->method('getPendingUserId')->willReturn($userId);
+        $twoFAUserServiceSpy->expects($this->once())
+            ->method('abandonChallenge')
+            ->with($userId);
+
+        $this->getSut(twoFAUserService: $twoFAUserServiceSpy)->abandonChallenge();
+    }
+
+    #[Test]
+    public function abandonChallengeDoesNothingWhenNoPendingUser(): void
+    {
+        $twoFAUserServiceSpy = $this->createMock(TwoFAUserServiceInterface::class);
+        $twoFAUserServiceSpy->method('getPendingUserId')->willReturn(null);
+        $twoFAUserServiceSpy->expects($this->never())->method('abandonChallenge');
+
+        $this->getSut(twoFAUserService: $twoFAUserServiceSpy)->abandonChallenge();
+    }
+
+    #[Test]
     public function resendCodeSends405WhenServiceIsNotResendable(): void
     {
         $jsonResponseSpy = $this->createMock(JsonResponseInterface::class);

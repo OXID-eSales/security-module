@@ -12,12 +12,18 @@ namespace OxidEsales\SecurityModule\Tests\Integration\Captcha\Shop;
 use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
+use OxidEsales\Eshop\Core\Utils;
 use OxidEsales\Eshop\Core\UtilsView;
 use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
+use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
+use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Facade\ModuleSettingServiceInterface;
 use OxidEsales\EshopCommunity\Tests\Integration\IntegrationTestCase;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFAShopSettings;
 use OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface;
 use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface;
 use OxidEsales\SecurityModule\Captcha\Shop\UserComponent as SecurityModuleUserComponent;
+use OxidEsales\SecurityModule\Core\Module;
 
 class UserComponentTest extends IntegrationTestCase
 {
@@ -189,6 +195,61 @@ class UserComponentTest extends IntegrationTestCase
                 ['isCaptchaEnabled' => false, 'isHoneyPotCaptchaEnabled' => false]
             ),
         ])->createUser();
+    }
+
+    public function testRedirectsToVerificationUrlOnTwoFactorChallenge(): void
+    {
+        $plainPassword = 'pw-' . uniqid();
+        $username = $this->insertTwoFactorEnabledUser($plainPassword);
+        $this->enableTwoFactorAuthAtShopLevel();
+
+        $this->requestMock->method('getRequestEscapedParameter')->willReturnCallback(
+            fn(string $name) => $name === 'lgn_usr' ? $username : ''
+        );
+        $this->requestMock->method('getRequestParameter')->willReturnCallback(
+            fn(string $name) => $name === 'lgn_pwd' ? $plainPassword : ''
+        );
+
+        $utilsMock = $this->createMock(Utils::class);
+        $utilsMock->expects($this->once())->method('redirect');
+
+        $sut = $this->getSut([
+            Utils::class => $utilsMock,
+            ModuleSettingsServiceInterface::class => $this->createConfiguredStub(
+                ModuleSettingsServiceInterface::class,
+                ['isCaptchaEnabled' => false, 'isHoneyPotCaptchaEnabled' => false]
+            ),
+        ]);
+
+        $this->assertSame('user', $sut->login());
+    }
+
+    private function insertTwoFactorEnabledUser(string $plainPassword): string
+    {
+        $username = 'test-' . uniqid() . '@example.com';
+        $userId = uniqid('uid');
+
+        ContainerFactory::getInstance()
+            ->getContainer()
+            ->get(QueryBuilderFactoryInterface::class)
+            ->create()
+            ->getConnection()
+            ->executeStatement(
+                'INSERT INTO oxuser'
+                . ' (OXID, OXACTIVE, OXSHOPID, OXRIGHTS, OXUSERNAME, OXPASSWORD, OXPASSSALT, OE2FAENABLED)'
+                . ' VALUES (?, 1, 1, "user", ?, ?, "", 1)',
+                [$userId, $username, password_hash($plainPassword, PASSWORD_BCRYPT)]
+            );
+
+        return $username;
+    }
+
+    private function enableTwoFactorAuthAtShopLevel(): void
+    {
+        ContainerFactory::getInstance()
+            ->getContainer()
+            ->get(ModuleSettingServiceInterface::class)
+            ->saveBoolean(TwoFAShopSettings::ACTIVE, true, Module::MODULE_ID);
     }
 
     private function getSut(array $serviceOverrides = []): SecurityModuleUserComponent
