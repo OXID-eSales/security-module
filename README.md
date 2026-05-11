@@ -90,29 +90,6 @@ When enabled, users are required to enter a verification code sent to their emai
 - Enable/Disable Two-Factor Authentication
 - Verification type (currently supports OTP)
 
-### OAuth Social Login
-
-The module supports social login integration, allowing users to authenticate using their existing social media accounts.
-This provides a convenient and secure way for customers to log in without creating a separate password.
-
-#### Supported Providers
-
-**Facebook Login**
-- Enable/Disable Facebook login
-- Facebook Client ID
-- Facebook Client Secret
-- Facebook Redirect URL
-
-**Google Login**
-- Enable/Disable Google login
-- Google Client ID
-- Google Client Secret
-- Google Redirect URL
-
-To configure OAuth providers, you need to create applications in the respective developer consoles
-([Facebook Developers](https://developers.facebook.com/), [Google Cloud Console](https://console.cloud.google.com/))
-and obtain the Client ID and Client Secret credentials.
-
 ### Running the tests and quality tools
 
 Check the "scripts" section in the `composer.json` file for the available commands. Those commands can be executed
