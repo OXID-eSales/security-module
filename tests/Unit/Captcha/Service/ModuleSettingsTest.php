@@ -22,10 +22,10 @@ class ModuleSettingsTest extends TestCase
     #[DataProvider('dataProviderValidate')]
     public function testGetTokenLifetime($value, $expectedValue): void
     {
-        $moduleSettingBridgeMock = $this->getMockBuilder(ModuleSettingServiceInterface::class)->getMock();
-        $moduleSettingBridgeMock->method('getString')->willReturn(new UnicodeString($value));
+        $moduleSettingBridgeStub = $this->createStub(ModuleSettingServiceInterface::class);
+        $moduleSettingBridgeStub->method('getString')->willReturn(new UnicodeString($value));
 
-        $moduleConfiguration = new ModuleSettingsService($moduleSettingBridgeMock);
+        $moduleConfiguration = new ModuleSettingsService($moduleSettingBridgeStub);
 
         $this->assertSame($expectedValue, $moduleConfiguration->getCaptchaLifeTime());
     }

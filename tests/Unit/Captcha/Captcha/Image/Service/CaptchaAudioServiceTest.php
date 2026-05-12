@@ -20,13 +20,13 @@ class CaptchaAudioServiceTest extends TestCase
     #[DataProvider('dataProviderLanguage')]
     public function testGenerateAudio(string $language)
     {
-        $captchaServiceMock = $this->createMock(ImageCaptchaServiceInterface::class);
-        $captchaServiceMock->method('getCaptcha')->willReturn('1234');
+        $captchaServiceStub = $this->createStub(ImageCaptchaServiceInterface::class);
+        $captchaServiceStub->method('getCaptcha')->willReturn('1234');
 
-        $languageWrapperMock = $this->createMock(LanguageWrapperInterface::class);
-        $languageWrapperMock->method('getCurrentLanguageAbbr')->willReturn($language);
+        $languageWrapperStub = $this->createStub(LanguageWrapperInterface::class);
+        $languageWrapperStub->method('getCurrentLanguageAbbr')->willReturn($language);
 
-        $captchaAudioService = $this->getSut($captchaServiceMock, $languageWrapperMock);
+        $captchaAudioService = $this->getSut($captchaServiceStub, $languageWrapperStub);
 
         $result = $captchaAudioService->generate();
 
@@ -36,10 +36,10 @@ class CaptchaAudioServiceTest extends TestCase
 
     public function testGenerateAudioNoCaptcha()
     {
-        $captchaServiceMock = $this->createMock(ImageCaptchaServiceInterface::class);
-        $captchaServiceMock->method('getCaptcha')->willReturn('');
+        $captchaServiceStub = $this->createStub(ImageCaptchaServiceInterface::class);
+        $captchaServiceStub->method('getCaptcha')->willReturn('');
 
-        $captchaAudioService = $this->getSut($captchaServiceMock);
+        $captchaAudioService = $this->getSut($captchaServiceStub);
 
         $result = $captchaAudioService->generate();
 

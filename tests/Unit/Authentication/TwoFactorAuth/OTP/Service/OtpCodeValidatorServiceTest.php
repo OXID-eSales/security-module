@@ -154,10 +154,10 @@ class OtpCodeValidatorServiceTest extends TestCase
         $repositorySpy->method('findByUserId')->willReturn($stateStub);
         $repositorySpy->expects($this->never())->method('incrementAttempts');
 
-        $hasherStub = $this->createStub(OtpCodeHasherServiceInterface::class);
-        $hasherStub->method('hash')->with($inputCode)->willReturn($codeHash);
+        $hasherMock = $this->createMock(OtpCodeHasherServiceInterface::class);
+        $hasherMock->method('hash')->with($inputCode)->willReturn($codeHash);
 
-        $sut = $this->getSut(repository: $repositorySpy, codeHasher: $hasherStub);
+        $sut = $this->getSut(repository: $repositorySpy, codeHasher: $hasherMock);
 
         $sut->validateCode($userId, $inputCode);
 

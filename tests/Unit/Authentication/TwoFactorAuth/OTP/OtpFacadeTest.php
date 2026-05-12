@@ -207,12 +207,12 @@ class OtpFacadeTest extends TestCase
     #[Test]
     public function resendThrowsCooldownExceptionWhenSendNotAllowed(): void
     {
-        $sendPolicyStub = $this->createStub(OtpSendPolicyServiceInterface::class);
-        $sendPolicyStub->method('canSend')
+        $sendPolicyMock = $this->createMock(OtpSendPolicyServiceInterface::class);
+        $sendPolicyMock->method('canSend')
             ->with($userId = uniqid())
             ->willReturn(false);
 
-        $sut = $this->getSut(sendPolicy: $sendPolicyStub);
+        $sut = $this->getSut(sendPolicy: $sendPolicyMock);
 
         $this->expectException(ResendCooldownException::class);
 
@@ -222,8 +222,8 @@ class OtpFacadeTest extends TestCase
     #[Test]
     public function resendRefreshesStateAndNotifiesWhenAllowed(): void
     {
-        $sendPolicyStub = $this->createStub(OtpSendPolicyServiceInterface::class);
-        $sendPolicyStub->method('canSend')
+        $sendPolicyMock = $this->createMock(OtpSendPolicyServiceInterface::class);
+        $sendPolicyMock->method('canSend')
             ->with($userId = uniqid())
             ->willReturn(true);
 
@@ -248,7 +248,7 @@ class OtpFacadeTest extends TestCase
             stateService: $stateServiceSpy,
             codeGenerator: $codeGeneratorStub,
             notifierFactory: $notifierFactoryStub,
-            sendPolicy: $sendPolicyStub,
+            sendPolicy: $sendPolicyMock,
         );
 
         $sut->resend(userId: $userId);

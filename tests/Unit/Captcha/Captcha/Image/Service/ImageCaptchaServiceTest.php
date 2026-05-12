@@ -24,7 +24,7 @@ class ImageCaptchaServiceTest extends TestCase
 {
     public function testGenerateStoresCaptchaInSession(): void
     {
-        $builder = $this->createMock(ImageCaptchaBuilderInterface::class);
+        $builder = $this->createStub(ImageCaptchaBuilderInterface::class);
         $builder->method('getContent')->willReturn(substr(uniqid(), -6));
         $builder->method('build')->willReturn($imgData = uniqid());
 
@@ -38,7 +38,7 @@ class ImageCaptchaServiceTest extends TestCase
         $captchaText = substr(uniqid(), -6);
         $requestMock = $this->mockRequest('captcha', $captchaText);
 
-        $session = $this->createMock(Session::class);
+        $session = $this->createStub(Session::class);
         $session->method('getVariable')->willReturnMap([
             ['captcha', $captchaText],
             ['captcha_expiration', time() + 60]
@@ -55,7 +55,7 @@ class ImageCaptchaServiceTest extends TestCase
         $captchaText = substr(uniqid(), -6);
         $requestMock = $this->mockRequest('captcha', substr(uniqid(), -6));
 
-        $session = $this->createMock(Session::class);
+        $session = $this->createStub(Session::class);
         $session->method('getVariable')->willReturnMap([
             ['captcha', $captchaText],
             ['captcha_expiration', time() + 60]
@@ -75,7 +75,7 @@ class ImageCaptchaServiceTest extends TestCase
         $captchaText = substr(uniqid(), -6);
         $requestMock = $this->mockRequest('captcha', '');
 
-        $session = $this->createMock(Session::class);
+        $session = $this->createStub(Session::class);
         $session->method('getVariable')->willReturnMap([
             ['captcha', $captchaText],
             ['captcha_expiration', time() + 60]
@@ -95,7 +95,7 @@ class ImageCaptchaServiceTest extends TestCase
         $captchaText = substr(uniqid(), -6);
         $requestMock = $this->mockRequest('captcha', $captchaText);
 
-        $session = $this->createMock(Session::class);
+        $session = $this->createStub(Session::class);
         $session->method('getVariable')->willReturnMap([
             ['captcha', $captchaText],
             ['captcha_expiration', 1]
@@ -115,7 +115,7 @@ class ImageCaptchaServiceTest extends TestCase
         $captchaText = substr(uniqid(), -6);
         $requestMock = $this->mockRequest('captcha', $captchaText);
 
-        $session = $this->createMock(Session::class);
+        $session = $this->createStub(Session::class);
         $session->method('getVariable')->willReturnMap([
             ['captcha', $captchaText],
             ['captcha_expiration', 1]

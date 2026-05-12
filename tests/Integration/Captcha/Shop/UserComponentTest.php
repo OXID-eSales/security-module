@@ -24,27 +24,26 @@ use OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface;
 use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface;
 use OxidEsales\SecurityModule\Captcha\Shop\UserComponent as SecurityModuleUserComponent;
 use OxidEsales\SecurityModule\Core\Module;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 
+#[AllowMockObjectsWithoutExpectations]
 class UserComponentTest extends IntegrationTestCase
 {
-    protected UtilsView $utilsViewMock;
+    protected UtilsView $utilsViewSpy;
     protected Request $requestMock;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->utilsViewMock = $this->getMockBuilder(UtilsView::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['addErrorToDisplay'])
-            ->getMock();
+        $this->utilsViewSpy = $this->createMock(UtilsView::class);
 
         $this->requestMock = $this->getMockBuilder(Request::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getRequestParameter', 'getRequestEscapedParameter'])
             ->getMock();
 
-        Registry::set(UtilsView::class, $this->utilsViewMock);
+        Registry::set(UtilsView::class, $this->utilsViewSpy);
         Registry::set(Request::class, $this->requestMock);
     }
 
@@ -53,7 +52,7 @@ class UserComponentTest extends IntegrationTestCase
         $captchaService = $this->createMock(CaptchaServiceInterface::class);
         $captchaService->method('validate')->willThrowException(new StandardException('ERROR_INVALID_CAPTCHA'));
 
-        $this->utilsViewMock
+        $this->utilsViewSpy
             ->expects($this->once())
             ->method('addErrorToDisplay')
             ->with('ERROR_INVALID_CAPTCHA');
@@ -68,7 +67,7 @@ class UserComponentTest extends IntegrationTestCase
         $captchaService = $this->createMock(CaptchaServiceInterface::class);
         $captchaService->method('validate')->willThrowException(new StandardException('ERROR_EMPTY_CAPTCHA'));
 
-        $this->utilsViewMock
+        $this->utilsViewSpy
             ->expects($this->once())
             ->method('addErrorToDisplay')
             ->with('ERROR_EMPTY_CAPTCHA');
@@ -83,7 +82,7 @@ class UserComponentTest extends IntegrationTestCase
         $captchaService = $this->createMock(CaptchaServiceInterface::class);
         $captchaService->method('validate')->willThrowException(new StandardException('FORM_VALIDATION_FAILED'));
 
-        $this->utilsViewMock
+        $this->utilsViewSpy
             ->expects($this->once())
             ->method('addErrorToDisplay')
             ->with('FORM_VALIDATION_FAILED');
@@ -98,7 +97,7 @@ class UserComponentTest extends IntegrationTestCase
         $captchaService = $this->createMock(CaptchaServiceInterface::class);
         $captchaService->method('validate')->willThrowException(new StandardException('ERROR_INVALID_CAPTCHA'));
 
-        $this->utilsViewMock
+        $this->utilsViewSpy
             ->expects($this->once())
             ->method('addErrorToDisplay')
             ->with('ERROR_INVALID_CAPTCHA');
@@ -113,7 +112,7 @@ class UserComponentTest extends IntegrationTestCase
         $captchaService = $this->createMock(CaptchaServiceInterface::class);
         $captchaService->method('validate')->willThrowException(new StandardException('FORM_VALIDATION_FAILED'));
 
-        $this->utilsViewMock
+        $this->utilsViewSpy
             ->expects($this->once())
             ->method('addErrorToDisplay')
             ->with('FORM_VALIDATION_FAILED');
@@ -128,7 +127,7 @@ class UserComponentTest extends IntegrationTestCase
         $this->requestMock->method('getRequestParameter')->willReturn('');
         $this->requestMock->method('getRequestEscapedParameter')->willReturn('');
 
-        $this->utilsViewMock
+        $this->utilsViewSpy
             ->expects($this->any())
             ->method('addErrorToDisplay')
             ->willReturnCallback(function ($message) {
@@ -144,7 +143,7 @@ class UserComponentTest extends IntegrationTestCase
     {
         $this->requestMock->method('getRequestParameter')->willReturn('');
 
-        $this->utilsViewMock
+        $this->utilsViewSpy
             ->expects($this->any())
             ->method('addErrorToDisplay')
             ->willReturnCallback(function ($message) {
@@ -161,7 +160,7 @@ class UserComponentTest extends IntegrationTestCase
         $this->requestMock->method('getRequestParameter')->willReturn('');
         $this->requestMock->method('getRequestEscapedParameter')->willReturn('');
 
-        $this->utilsViewMock
+        $this->utilsViewSpy
             ->expects($this->any())
             ->method('addErrorToDisplay')
             ->willReturnCallback(function ($message) {
@@ -180,7 +179,7 @@ class UserComponentTest extends IntegrationTestCase
 
     public function testCreateUserWithCaptchaDisabledDoesNotValidateCaptcha(): void
     {
-        $this->utilsViewMock
+        $this->utilsViewSpy
             ->expects($this->any())
             ->method('addErrorToDisplay')
             ->willReturnCallback(function ($message) {

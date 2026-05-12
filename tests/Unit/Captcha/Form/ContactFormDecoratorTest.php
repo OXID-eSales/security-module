@@ -19,7 +19,7 @@ class ContactFormDecoratorTest extends TestCase
 {
     public function testGetContactForm(): void
     {
-        $formCaptchaValidator = $this->createMock(ContactFormCaptchaValidatorInterface::class);
+        $formCaptchaValidator = $this->createStub(ContactFormCaptchaValidatorInterface::class);
         $form = $this->createMock(Form::class);
         $form
             ->expects($this->once())
@@ -45,8 +45,8 @@ class ContactFormDecoratorTest extends TestCase
     {
         $expectedMessage = 'Test message';
 
-        $formCaptchaValidator = $this->createMock(ContactFormCaptchaValidatorInterface::class);
-        $form = $this->createMock(Form::class);
+        $formCaptchaValidator = $this->createStub(ContactFormCaptchaValidatorInterface::class);
+        $form = $this->createStub(Form::class);
 
         $contactFormBridge = $this->createMock(ContactFormBridgeInterface::class);
         $contactFormBridge

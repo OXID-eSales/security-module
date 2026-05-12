@@ -19,15 +19,15 @@ class JsonResponseTest extends TestCase
     #[Test]
     public function sendSetsCorrectHeaders(): void
     {
-        $utilsMock = $this->createMock(Utils::class);
+        $utilsStub = $this->createStub(Utils::class);
 
         $headers = [];
-        $utilsMock->method('setHeader')->willReturnCallback(function ($value) use (&$headers) {
+        $utilsStub->method('setHeader')->willReturnCallback(function ($value) use (&$headers) {
             $headers[] = $value;
         });
-        $utilsMock->method('showMessageAndExit');
+        $utilsStub->method('showMessageAndExit');
 
-        $this->getSut($utilsMock)->send(['key' => 'value']);
+        $this->getSut($utilsStub)->send(['key' => 'value']);
 
         $this->assertContains('HTTP/1.1 200', $headers);
         $this->assertContains('Content-Type: application/json', $headers);
@@ -49,15 +49,15 @@ class JsonResponseTest extends TestCase
     #[Test]
     public function sendWithCustomStatusCode(): void
     {
-        $utilsMock = $this->createMock(Utils::class);
+        $utilsStub = $this->createStub(Utils::class);
 
         $headers = [];
-        $utilsMock->method('setHeader')->willReturnCallback(function ($value) use (&$headers) {
+        $utilsStub->method('setHeader')->willReturnCallback(function ($value) use (&$headers) {
             $headers[] = $value;
         });
-        $utilsMock->method('showMessageAndExit');
+        $utilsStub->method('showMessageAndExit');
 
-        $this->getSut($utilsMock)->send([], 429);
+        $this->getSut($utilsStub)->send([], 429);
 
         $this->assertContains('HTTP/1.1 429', $headers);
     }

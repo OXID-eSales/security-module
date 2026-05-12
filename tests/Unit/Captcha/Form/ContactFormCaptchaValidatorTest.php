@@ -32,14 +32,14 @@ class ContactFormCaptchaValidatorTest extends TestCase
             ->method('validate')
             ->with($requestMock);
 
-        $settingsService = $this->createMock(ModuleSettingsServiceInterface::class);
+        $settingsService = $this->createStub(ModuleSettingsServiceInterface::class);
         $settingsService
             ->method('isCaptchaEnabled')
             ->willReturn(true);
 
         $formValidator = new ContactFormCaptchaValidator($captchaServiceMock, $settingsService, $requestMock);
-        $formMock = $this->createMock(FormInterface::class);
-        $this->assertTrue($formValidator->isValid($formMock));
+        $formStub = $this->createStub(FormInterface::class);
+        $this->assertTrue($formValidator->isValid($formStub));
         $this->assertEmpty($formValidator->getErrors());
     }
 
@@ -57,14 +57,14 @@ class ContactFormCaptchaValidatorTest extends TestCase
             ->with($requestMock)
             ->willThrowException(new CaptchaValidateException('ERROR_EMPTY_CAPTCHA'));
 
-        $settingsService = $this->createMock(ModuleSettingsServiceInterface::class);
+        $settingsService = $this->createStub(ModuleSettingsServiceInterface::class);
         $settingsService
             ->method('isCaptchaEnabled')
             ->willReturn(true);
 
         $formValidator = new ContactFormCaptchaValidator($captchaServiceMock, $settingsService, $requestMock);
 
-        $this->assertFalse($formValidator->isValid($this->createMock(FormInterface::class)));
+        $this->assertFalse($formValidator->isValid($this->createStub(FormInterface::class)));
 
         $this->assertEquals(['ERROR_EMPTY_CAPTCHA'], $formValidator->getErrors());
     }
@@ -80,22 +80,22 @@ class ContactFormCaptchaValidatorTest extends TestCase
         $captchaServiceMock->expects($this->never())
             ->method('validate');
 
-        $settingsService = $this->createMock(ModuleSettingsServiceInterface::class);
+        $settingsService = $this->createStub(ModuleSettingsServiceInterface::class);
         $settingsService
             ->method('isCaptchaEnabled')
             ->willReturn(false);
 
         $formValidator = new ContactFormCaptchaValidator($captchaServiceMock, $settingsService, $requestMock);
 
-        $this->assertTrue($formValidator->isValid($this->createMock(FormInterface::class)));
+        $this->assertTrue($formValidator->isValid($this->createStub(FormInterface::class)));
     }
 
     public function testGetErrorsReturnsEmptyArrayInitially(): void
     {
         $formValidator = new ContactFormCaptchaValidator(
-            $this->createMock(CaptchaServiceInterface::class),
-            $this->createMock(ModuleSettingsServiceInterface::class),
-            $this->createMock(Request::class)
+            $this->createStub(CaptchaServiceInterface::class),
+            $this->createStub(ModuleSettingsServiceInterface::class),
+            $this->createStub(Request::class)
         );
 
         $this->assertEmpty($formValidator->getErrors());

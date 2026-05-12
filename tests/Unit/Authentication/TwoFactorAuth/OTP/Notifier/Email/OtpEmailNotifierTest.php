@@ -41,8 +41,8 @@ class OtpEmailNotifierTest extends TestCase
             'OTP_EMAIL_SUBJECT' => $subject,
             'OTP_EMAIL_BODY'    => $bodyTemplate,
         ];
-        $shopAdapterMock = $this->createMock(ShopAdapterInterface::class);
-        $shopAdapterMock->method('translateString')->willReturnCallback(
+        $shopAdapterStub = $this->createStub(ShopAdapterInterface::class);
+        $shopAdapterStub->method('translateString')->willReturnCallback(
             fn(string $key) => $translations[$key] ?? $key
         );
 
@@ -61,7 +61,7 @@ class OtpEmailNotifierTest extends TestCase
         $sut = $this->getSut(
             emailFactory: $emailFactoryStub,
             userRepository: $userRepositoryMock,
-            shopAdapter: $shopAdapterMock,
+            shopAdapter: $shopAdapterStub,
         );
 
         $sut->notify(userId: $userId, code: $code);

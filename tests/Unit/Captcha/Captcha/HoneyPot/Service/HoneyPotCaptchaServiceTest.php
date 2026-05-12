@@ -49,10 +49,7 @@ class HoneyPotCaptchaServiceTest extends TestCase
     {
         $value = uniqid();
 
-        $request = $this
-            ->getMockBuilder(Request::class)
-            ->onlyMethods(['getRequestParameter'])
-            ->getMock();
+        $request = $this->createMock(Request::class);
         $request
             ->method('getRequestParameter')
             ->with(HoneyPotCaptchaService::CAPTCHA_REQUEST_PARAMETER)
@@ -74,10 +71,7 @@ class HoneyPotCaptchaServiceTest extends TestCase
     #[DataProvider('captchaDataProvider')]
     public function testValidationDoesNotThrowsException($requestValue): void
     {
-        $request = $this
-            ->getMockBuilder(Request::class)
-            ->onlyMethods(['getRequestParameter'])
-            ->getMock();
+        $request = $this->createMock(Request::class);
         $request
             ->method('getRequestParameter')
             ->with(HoneyPotCaptchaService::CAPTCHA_REQUEST_PARAMETER)

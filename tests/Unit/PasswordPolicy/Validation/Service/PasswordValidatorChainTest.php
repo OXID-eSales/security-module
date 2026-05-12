@@ -48,19 +48,19 @@ class PasswordValidatorChainTest extends TestCase
 
     public function testValidatorWillThrowAllFailingValidatorExceptions(): void
     {
-        $validator1Mock = $this->createMock(PasswordValidatorInterface::class);
-        $validator1Mock->method('isEnabled')->willReturn(true);
-        $validator1Mock->method('validate')
+        $validator1Stub = $this->createStub(PasswordValidatorInterface::class);
+        $validator1Stub->method('isEnabled')->willReturn(true);
+        $validator1Stub->method('validate')
             ->willThrowException(new PasswordUpperCaseException());
 
-        $validator2Mock = $this->createMock(PasswordValidatorInterface::class);
-        $validator2Mock->method('isEnabled')->willReturn(true);
-        $validator2Mock->method('validate')
+        $validator2Stub = $this->createStub(PasswordValidatorInterface::class);
+        $validator2Stub->method('isEnabled')->willReturn(true);
+        $validator2Stub->method('validate')
             ->willThrowException(new PasswordMinimumLengthException(8));
 
         $passwordValidatorChain = new PasswordValidatorChain([
-            $validator1Mock,
-            $validator2Mock,
+            $validator1Stub,
+            $validator2Stub,
         ]);
 
         try {

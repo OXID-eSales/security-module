@@ -29,10 +29,10 @@ class AuthCodeRequestTest extends TestCase
     #[DataProvider('validCodeDataProvider')]
     public function testGetCodeReturnsCode(mixed $input, string $expected): void
     {
-        $requestStub = $this->createStub(RequestInterface::class);
-        $requestStub->method('get')->with('auth_code')->willReturn($input);
+        $requestMock = $this->createMock(RequestInterface::class);
+        $requestMock->method('get')->with('auth_code')->willReturn($input);
 
-        $sut = $this->getSut(request: $requestStub);
+        $sut = $this->getSut(request: $requestMock);
 
         $this->assertSame($expected, $sut->getCode());
     }
@@ -46,10 +46,10 @@ class AuthCodeRequestTest extends TestCase
     #[DataProvider('invalidCodeDataProvider')]
     public function testGetCodeThrowsExceptionForInvalidInput(mixed $value): void
     {
-        $requestStub = $this->createStub(RequestInterface::class);
-        $requestStub->method('get')->with('auth_code')->willReturn($value);
+        $requestMock = $this->createMock(RequestInterface::class);
+        $requestMock->method('get')->with('auth_code')->willReturn($value);
 
-        $sut = $this->getSut(request: $requestStub);
+        $sut = $this->getSut(request: $requestMock);
 
         $this->expectException(MalformedRequestException::class);
 

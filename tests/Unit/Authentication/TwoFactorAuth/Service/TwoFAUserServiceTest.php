@@ -70,12 +70,12 @@ class TwoFAUserServiceTest extends TestCase
     #[Test]
     public function getPendingUserIdReturnsUserIdFromSession(): void
     {
-        $sessionStub = $this->createStub(SessionInterface::class);
-        $sessionStub->method('get')
+        $sessionMock = $this->createMock(SessionInterface::class);
+        $sessionMock->method('get')
             ->with(TwoFAUserService::USER_SESSION_KEY)
             ->willReturn($userId = uniqid());
 
-        $sut = $this->getSut(session: $sessionStub);
+        $sut = $this->getSut(session: $sessionMock);
 
         $this->assertSame($userId, $sut->getPendingUserId());
     }
@@ -83,12 +83,12 @@ class TwoFAUserServiceTest extends TestCase
     #[Test]
     public function isChallengeVerifiedProxiesToTwoFAService(): void
     {
-        $twoFAServiceStub = $this->createStub(TwoFAServiceInterface::class);
-        $twoFAServiceStub->method('isVerified')
+        $twoFAServiceMock = $this->createMock(TwoFAServiceInterface::class);
+        $twoFAServiceMock->method('isVerified')
             ->with($userId = uniqid())
             ->willReturn($result = (bool) random_int(0, 1));
 
-        $sut = $this->getSut(twoFAService: $twoFAServiceStub);
+        $sut = $this->getSut(twoFAService: $twoFAServiceMock);
 
         $this->assertSame($result, $sut->isChallengeVerified($userId));
     }
@@ -207,7 +207,7 @@ class TwoFAUserServiceTest extends TestCase
         $userId = uniqid();
         $adapterException = new RuntimeException('login boom');
 
-        $loginAdapter = $this->createMock(UserLoginAdapterInterface::class);
+        $loginAdapter = $this->createStub(UserLoginAdapterInterface::class);
         $loginAdapter->method('loginUser')
             ->willThrowException($adapterException);
 

@@ -19,12 +19,12 @@ class RequestTest extends TestCase
     #[DataProvider('dataProviderPassword')]
     public function testGetPasswordRequest($password, $expectedValue): void
     {
-        $requestMock = $this->createPartialMock(ShopRequest::class, ['getRequestParameter']);
-        $requestMock->method('getRequestParameter')->willReturnMap([
+        $requestStub = $this->createStub(ShopRequest::class);
+        $requestStub->method('getRequestParameter')->willReturnMap([
             ['password', null, $password]
         ]);
 
-        $sut = new Request($requestMock);
+        $sut = new Request($requestStub);
         $this->assertSame($expectedValue, $sut->getPassword());
     }
 

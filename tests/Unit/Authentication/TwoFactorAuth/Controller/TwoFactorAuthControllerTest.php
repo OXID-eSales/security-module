@@ -136,11 +136,11 @@ class TwoFactorAuthControllerTest extends TestCase
         $twoFAUserServiceStub->method('getPendingUserId')
             ->willReturn($userId = uniqid());
 
-        $twoFAServiceStub = $this->createMockForIntersectionOfInterfaces([
+        $twoFAServiceSpy = $this->createMockForIntersectionOfInterfaces([
             TwoFAServiceInterface::class,
             TwoFAResendableInterface::class,
         ]);
-        $twoFAServiceStub->expects($this->once())
+        $twoFAServiceSpy->expects($this->once())
             ->method('resend')
             ->with($userId)
             ->willThrowException(new ResendCooldownException());
@@ -151,7 +151,7 @@ class TwoFactorAuthControllerTest extends TestCase
             ->with(['success' => false], 429);
 
         $this->getSut(
-            twoFAService: $twoFAServiceStub,
+            twoFAService: $twoFAServiceSpy,
             twoFAUserService: $twoFAUserServiceStub,
             jsonResponse: $jsonResponseSpy,
         )->resendCode();

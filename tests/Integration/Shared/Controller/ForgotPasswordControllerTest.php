@@ -19,29 +19,28 @@ use OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface;
 use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface;
 use OxidEsales\SecurityModule\Shared\Controller\ForgotPasswordController as ModuleForgotPasswordController;
 use OxidEsales\SecurityModule\Tests\Integration\IntegrationTestCase;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 
+#[AllowMockObjectsWithoutExpectations]
 class ForgotPasswordControllerTest extends IntegrationTestCase
 {
-    protected UtilsView $utilsViewMock;
+    protected UtilsView $utilsViewSpy;
     protected Request $requestMock;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->utilsViewMock = $this->getMockBuilder(UtilsView::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['addErrorToDisplay'])
-            ->getMock();
+        $this->utilsViewSpy = $this->createMock(UtilsView::class);
 
         $this->requestMock = $this->getMockBuilder(Request::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getRequestParameter'])
             ->getMock();
 
-        Registry::set(UtilsView::class, $this->utilsViewMock);
+        Registry::set(UtilsView::class, $this->utilsViewSpy);
         Registry::set(Request::class, $this->requestMock);
     }
 
@@ -54,7 +53,7 @@ class ForgotPasswordControllerTest extends IntegrationTestCase
                 return '';
             });
 
-        $this->utilsViewMock
+        $this->utilsViewSpy
             ->expects($this->any())
             ->method('addErrorToDisplay')
             ->willReturnCallback(function ($message) {
@@ -69,7 +68,7 @@ class ForgotPasswordControllerTest extends IntegrationTestCase
     #[DataProvider('forgotPasswordExceptionCasesDataProvider')]
     public function forgotPasswordDisplaysErrorOnCaptchaException(string $errorCode): void
     {
-        $this->utilsViewMock
+        $this->utilsViewSpy
             ->expects($this->once())
             ->method('addErrorToDisplay')
             ->with($errorCode);

@@ -16,7 +16,9 @@ use OxidEsales\SecurityModule\PasswordPolicy\Transput\RequestInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Transput\ResponseInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordStrengthService;
 use OxidEsales\SecurityModule\PasswordPolicy\Validation\Service\PasswordStrengthServiceInterface;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 
+#[AllowMockObjectsWithoutExpectations]
 class PasswordAjaxControllerTest extends IntegrationTestCase
 {
     public function testPasswordStrength(): void
@@ -24,16 +26,16 @@ class PasswordAjaxControllerTest extends IntegrationTestCase
         $strength = PasswordStrengthService::STRENGTH_STRONG;
 
         $sut = $this->getStub(
-            $this->createMock(RequestInterface::class),
-            $passwordStrengthStub = $this->createMock(PasswordStrengthServiceInterface::class),
-            $responseStub = $this->createMock(ResponseInterface::class),
+            $this->createStub(RequestInterface::class),
+            $passwordStrengthStub = $this->createStub(PasswordStrengthServiceInterface::class),
+            $responseSpy = $this->createMock(ResponseInterface::class),
         );
 
         $passwordStrengthStub
             ->method('estimateStrength')
             ->willReturn($strength);
 
-        $responseStub->expects($this->once())
+        $responseSpy->expects($this->once())
             ->method('responseAsJson')
             ->with([
                 'strength' => $strength,

@@ -12,15 +12,18 @@ namespace OxidEsales\SecurityModule\Tests\Integration\Authentication\TwoFactorAu
 use Generator;
 use OxidEsales\Eshop\Application\Controller\AccountController;
 use OxidEsales\Eshop\Application\Model\User;
+use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\UtilsServer;
 use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Controller\AccountSecurityController;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFAUserSettingsInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Transput\UserSettingsUpdateRequestInterface;
 use OxidEsales\SecurityModule\Tests\Integration\IntegrationTestCase;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 
+#[AllowMockObjectsWithoutExpectations]
 class AccountSecurityControllerTest extends IntegrationTestCase
 {
     #[Test]
@@ -35,13 +38,15 @@ class AccountSecurityControllerTest extends IntegrationTestCase
     {
         $userId = uniqid();
 
-        $userStub = $this->createStub(User::class);
-        $userStub->method('getId')->willReturn($userId);
+        $userStub = $this->createConfiguredStub(User::class, [
+            'getId' => $userId,
+            '__get' => new Field('x'),
+        ]);
 
-        $userSettingsStub = $this->createStub(TwoFAUserSettingsInterface::class);
-        $userSettingsStub->method('isEnabledForUser')->with($userId)->willReturn($userSettingEnabled);
+        $userSettingsMock = $this->createMock(TwoFAUserSettingsInterface::class);
+        $userSettingsMock->method('isEnabledForUser')->with($userId)->willReturn($userSettingEnabled);
 
-        $sut = $this->getSut(userSettingsService: $userSettingsStub);
+        $sut = $this->getSut(userSettingsService: $userSettingsMock);
         $sut->method('getUser')->willReturn($userStub);
         $sut->render();
 

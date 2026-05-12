@@ -18,27 +18,26 @@ use OxidEsales\EshopCommunity\Tests\Integration\IntegrationTestCase;
 use OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface;
 use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface;
 use OxidEsales\SecurityModule\Captcha\Shop\NewsletterController as ModuleNewsletterController;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 
+#[AllowMockObjectsWithoutExpectations]
 class NewsletterControllerTest extends IntegrationTestCase
 {
-    protected UtilsView $utilsViewMock;
+    protected UtilsView $utilsViewSpy;
     protected Request $requestMock;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->utilsViewMock = $this->getMockBuilder(UtilsView::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['addErrorToDisplay'])
-            ->getMock();
+        $this->utilsViewSpy = $this->createMock(UtilsView::class);
 
         $this->requestMock = $this->getMockBuilder(Request::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getRequestParameter'])
             ->getMock();
 
-        Registry::set(UtilsView::class, $this->utilsViewMock);
+        Registry::set(UtilsView::class, $this->utilsViewSpy);
         Registry::set(Request::class, $this->requestMock);
     }
 
@@ -53,7 +52,7 @@ class NewsletterControllerTest extends IntegrationTestCase
                 return ['oxuser__oxusername' => '']; //suppress warnings from shop
             });
 
-        $this->utilsViewMock
+        $this->utilsViewSpy
             ->expects($this->any())
             ->method('addErrorToDisplay')
             ->willReturnCallback(function ($message) {
@@ -66,7 +65,7 @@ class NewsletterControllerTest extends IntegrationTestCase
 
     public function testSendWithInvalidCaptcha()
     {
-        $this->utilsViewMock
+        $this->utilsViewSpy
             ->expects($this->once())
             ->method('addErrorToDisplay')
             ->with('ERROR_INVALID_CAPTCHA');
@@ -80,7 +79,7 @@ class NewsletterControllerTest extends IntegrationTestCase
 
     public function testSendWithEmptyCaptcha()
     {
-        $this->utilsViewMock
+        $this->utilsViewSpy
             ->expects($this->once())
             ->method('addErrorToDisplay')
             ->with('ERROR_EMPTY_CAPTCHA');
@@ -94,7 +93,7 @@ class NewsletterControllerTest extends IntegrationTestCase
 
     public function testSendWithInvalidHoneyPotCaptcha()
     {
-        $this->utilsViewMock
+        $this->utilsViewSpy
             ->expects($this->once())
             ->method('addErrorToDisplay')
             ->with('FORM_VALIDATION_FAILED');

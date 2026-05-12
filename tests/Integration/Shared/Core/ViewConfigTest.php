@@ -14,8 +14,10 @@ use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFAShopSettingsInterface;
 use OxidEsales\SecurityModule\Shared\Core\ViewConfig;
 use OxidEsales\SecurityModule\Tests\Integration\IntegrationTestCase;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 
+#[AllowMockObjectsWithoutExpectations]
 class ViewConfigTest extends IntegrationTestCase
 {
     #[DataProvider('isTwoFAEnabledForShopDataProvider')]

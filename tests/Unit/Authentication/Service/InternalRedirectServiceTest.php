@@ -21,8 +21,8 @@ class InternalRedirectServiceTest extends TestCase
         $shopUrl = 'https://shop.example.com/';
         $storedUrl = $shopUrl . 'some/page';
 
-        $sessionStub = $this->createStub(SessionInterface::class);
-        $sessionStub->method('get')
+        $sessionMock = $this->createMock(SessionInterface::class);
+        $sessionMock->method('get')
             ->with(InternalRedirectService::AUTH_REDIRECT_URL)
             ->willReturn($storedUrl);
 
@@ -30,7 +30,7 @@ class InternalRedirectServiceTest extends TestCase
         $configStub->method('getShopUrl')->willReturn($shopUrl);
         $configStub->method('getSslShopUrl')->willReturn($shopUrl);
 
-        $sut = new InternalRedirectService($sessionStub, $configStub);
+        $sut = new InternalRedirectService($sessionMock, $configStub);
 
         $this->assertSame($storedUrl, $sut->getRedirectUrl());
     }
@@ -41,8 +41,8 @@ class InternalRedirectServiceTest extends TestCase
         $sslShopUrl = 'https://shop.example.com/';
         $storedUrl = $sslShopUrl . 'some/page';
 
-        $sessionStub = $this->createStub(SessionInterface::class);
-        $sessionStub->method('get')
+        $sessionMock = $this->createMock(SessionInterface::class);
+        $sessionMock->method('get')
             ->with(InternalRedirectService::AUTH_REDIRECT_URL)
             ->willReturn($storedUrl);
 
@@ -50,7 +50,7 @@ class InternalRedirectServiceTest extends TestCase
         $configStub->method('getShopUrl')->willReturn($shopUrl);
         $configStub->method('getSslShopUrl')->willReturn($sslShopUrl);
 
-        $sut = new InternalRedirectService($sessionStub, $configStub);
+        $sut = new InternalRedirectService($sessionMock, $configStub);
 
         $this->assertSame($storedUrl, $sut->getRedirectUrl());
     }
@@ -61,8 +61,8 @@ class InternalRedirectServiceTest extends TestCase
         $shopHomeUrl = 'https://shop.example.com/index.php?';
         $externalUrl = 'https://evil.example.com/phishing';
 
-        $sessionStub = $this->createStub(SessionInterface::class);
-        $sessionStub->method('get')
+        $sessionMock = $this->createMock(SessionInterface::class);
+        $sessionMock->method('get')
             ->with(InternalRedirectService::AUTH_REDIRECT_URL)
             ->willReturn($externalUrl);
 
@@ -71,7 +71,7 @@ class InternalRedirectServiceTest extends TestCase
         $configStub->method('getSslShopUrl')->willReturn($shopUrl);
         $configStub->method('getShopHomeUrl')->willReturn($shopHomeUrl);
 
-        $sut = new InternalRedirectService($sessionStub, $configStub);
+        $sut = new InternalRedirectService($sessionMock, $configStub);
 
         $this->assertSame($shopHomeUrl, $sut->getRedirectUrl());
     }
@@ -80,15 +80,15 @@ class InternalRedirectServiceTest extends TestCase
     {
         $shopHomeUrl = 'https://shop.example.com/index.php?';
 
-        $sessionStub = $this->createStub(SessionInterface::class);
-        $sessionStub->method('get')
+        $sessionMock = $this->createMock(SessionInterface::class);
+        $sessionMock->method('get')
             ->with(InternalRedirectService::AUTH_REDIRECT_URL)
             ->willReturn(null);
 
         $configStub = $this->createStub(Config::class);
         $configStub->method('getShopHomeUrl')->willReturn($shopHomeUrl);
 
-        $sut = new InternalRedirectService($sessionStub, $configStub);
+        $sut = new InternalRedirectService($sessionMock, $configStub);
 
         $this->assertSame($shopHomeUrl, $sut->getRedirectUrl());
     }
@@ -97,15 +97,15 @@ class InternalRedirectServiceTest extends TestCase
     {
         $shopHomeUrl = 'https://shop.example.com/index.php?';
 
-        $sessionStub = $this->createStub(SessionInterface::class);
-        $sessionStub->method('get')
+        $sessionMock = $this->createMock(SessionInterface::class);
+        $sessionMock->method('get')
             ->with(InternalRedirectService::AUTH_REDIRECT_URL)
             ->willReturn('');
 
         $configStub = $this->createStub(Config::class);
         $configStub->method('getShopHomeUrl')->willReturn($shopHomeUrl);
 
-        $sut = new InternalRedirectService($sessionStub, $configStub);
+        $sut = new InternalRedirectService($sessionMock, $configStub);
 
         $this->assertSame($shopHomeUrl, $sut->getRedirectUrl());
     }

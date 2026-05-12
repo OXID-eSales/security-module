@@ -41,8 +41,8 @@ class StoreCurrentUrlSubscriberTest extends TestCase
         $configStub->method('isAdmin')->willReturn(false);
         $configStub->method('getTopActiveView')->willReturn($viewStub);
 
-        $requestStub = $this->createStub(Request::class);
-        $requestStub->method('getRequestParameter')->with('fnc')->willReturn(null);
+        $requestMock = $this->createMock(Request::class);
+        $requestMock->method('getRequestParameter')->with('fnc')->willReturn(null);
 
         $sessionMock = $this->createMock(SessionInterface::class);
         $sessionMock->expects($this->once())
@@ -52,7 +52,7 @@ class StoreCurrentUrlSubscriberTest extends TestCase
         $sut = $this->getSut(
             session: $sessionMock,
             config: $configStub,
-            request: $requestStub,
+            request: $requestMock,
         );
         $eventStub = $this->createStub(ViewRenderedEvent::class);
 
@@ -106,8 +106,8 @@ class StoreCurrentUrlSubscriberTest extends TestCase
         $configStub->method('isAdmin')->willReturn(false);
         $configStub->method('getTopActiveView')->willReturn($viewStub);
 
-        $requestStub = $this->createStub(Request::class);
-        $requestStub->method('getRequestParameter')->with('fnc')->willReturn(null);
+        $requestMock = $this->createMock(Request::class);
+        $requestMock->method('getRequestParameter')->with('fnc')->willReturn(null);
 
         $sessionMock = $this->createMock(SessionInterface::class);
         $sessionMock->expects($this->never())->method('set');
@@ -115,7 +115,7 @@ class StoreCurrentUrlSubscriberTest extends TestCase
         $sut = $this->getSut(
             session: $sessionMock,
             config: $configStub,
-            request: $requestStub,
+            request: $requestMock,
         );
         $eventStub = $this->createStub(ViewRenderedEvent::class);
 
@@ -131,8 +131,8 @@ class StoreCurrentUrlSubscriberTest extends TestCase
         $configStub->method('isAdmin')->willReturn(false);
         $configStub->method('getTopActiveView')->willReturn($viewStub);
 
-        $requestStub = $this->createStub(Request::class);
-        $requestStub->method('getRequestParameter')->with('fnc')->willReturn(null);
+        $requestMock = $this->createMock(Request::class);
+        $requestMock->method('getRequestParameter')->with('fnc')->willReturn(null);
 
         $sessionMock = $this->createMock(SessionInterface::class);
         $sessionMock->expects($this->never())->method('set');
@@ -140,7 +140,7 @@ class StoreCurrentUrlSubscriberTest extends TestCase
         $sut = $this->getSut(
             session: $sessionMock,
             config: $configStub,
-            request: $requestStub,
+            request: $requestMock,
         );
         $eventStub = $this->createStub(ViewRenderedEvent::class);
 
@@ -175,8 +175,8 @@ class StoreCurrentUrlSubscriberTest extends TestCase
         $configStub->method('isAdmin')->willReturn(false);
         $configStub->method('getTopActiveView')->willReturn($viewStub);
 
-        $requestStub = $this->createStub(Request::class);
-        $requestStub->method('getRequestParameter')->with('fnc')->willReturn(null);
+        $requestMock = $this->createMock(Request::class);
+        $requestMock->method('getRequestParameter')->with('fnc')->willReturn(null);
 
         $sessionMock = $this->createMock(SessionInterface::class);
         $sessionMock->expects($this->never())->method('set');
@@ -184,7 +184,7 @@ class StoreCurrentUrlSubscriberTest extends TestCase
         $sut = $this->getSut(
             session: $sessionMock,
             config: $configStub,
-            request: $requestStub,
+            request: $requestMock,
         );
         $eventStub = $this->createStub(ViewRenderedEvent::class);
 
@@ -200,8 +200,8 @@ class StoreCurrentUrlSubscriberTest extends TestCase
         $configStub->method('isAdmin')->willReturn(false);
         $configStub->method('getTopActiveView')->willReturn($viewStub);
 
-        $requestStub = $this->createStub(Request::class);
-        $requestStub->method('getRequestParameter')->with('fnc')->willReturn('logout');
+        $requestMock = $this->createMock(Request::class);
+        $requestMock->method('getRequestParameter')->with('fnc')->willReturn('logout');
 
         $sessionMock = $this->createMock(SessionInterface::class);
         $sessionMock->expects($this->never())->method('set');
@@ -209,7 +209,7 @@ class StoreCurrentUrlSubscriberTest extends TestCase
         $sut = $this->getSut(
             session: $sessionMock,
             config: $configStub,
-            request: $requestStub,
+            request: $requestMock,
         );
         $eventStub = $this->createStub(ViewRenderedEvent::class);
 
@@ -225,8 +225,8 @@ class StoreCurrentUrlSubscriberTest extends TestCase
         $configStub->method('isAdmin')->willReturn(false);
         $configStub->method('getTopActiveView')->willReturn($viewStub);
 
-        $requestStub = $this->createStub(Request::class);
-        $requestStub->method('getRequestParameter')->with('fnc')->willReturn('Logout');
+        $requestMock = $this->createMock(Request::class);
+        $requestMock->method('getRequestParameter')->with('fnc')->willReturn('Logout');
 
         $sessionMock = $this->createMock(SessionInterface::class);
         $sessionMock->expects($this->never())->method('set');
@@ -234,7 +234,7 @@ class StoreCurrentUrlSubscriberTest extends TestCase
         $sut = $this->getSut(
             session: $sessionMock,
             config: $configStub,
-            request: $requestStub,
+            request: $requestMock,
         );
         $eventStub = $this->createStub(ViewRenderedEvent::class);
 
@@ -253,8 +253,8 @@ class StoreCurrentUrlSubscriberTest extends TestCase
         $configStub->method('isAdmin')->willReturn(false);
         $configStub->method('getTopActiveView')->willReturn($viewStub);
 
-        $requestStub = $this->createStub(Request::class);
-        $requestStub->method('getRequestParameter')->with('fnc')->willReturn('tobasket');
+        $requestMock = $this->createMock(Request::class);
+        $requestMock->method('getRequestParameter')->with('fnc')->willReturn('tobasket');
 
         $sessionMock = $this->createMock(SessionInterface::class);
         $sessionMock->expects($this->once())
@@ -264,7 +264,7 @@ class StoreCurrentUrlSubscriberTest extends TestCase
         $sut = $this->getSut(
             session: $sessionMock,
             config: $configStub,
-            request: $requestStub,
+            request: $requestMock,
         );
         $eventStub = $this->createStub(ViewRenderedEvent::class);
 

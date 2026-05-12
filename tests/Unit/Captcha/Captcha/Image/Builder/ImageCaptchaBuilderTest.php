@@ -12,8 +12,10 @@ namespace OxidEsales\SecurityModule\Tests\Unit\Captcha\Captcha\Image\Builder;
 use OxidEsales\SecurityModule\Captcha\Captcha\Image\Builder\ImageCaptchaBuilder;
 use OxidEsales\SecurityModule\Captcha\Captcha\Image\Builder\ImageCaptchaBuilderInterface;
 use OxidEsales\SecurityModule\Captcha\Captcha\Image\Exception\GDMethodsMissingException;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 
+#[AllowMockObjectsWithoutExpectations]
 class ImageCaptchaBuilderTest extends TestCase
 {
     public function testDefaultConstructor()

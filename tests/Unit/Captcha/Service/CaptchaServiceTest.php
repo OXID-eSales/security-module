@@ -28,7 +28,7 @@ class CaptchaServiceTest extends TestCase
 
     public function testValidationWithoutValidators(): void
     {
-        $request = $this->createMock(Request::class);
+        $request = $this->createStub(Request::class);
 
         $passwordValidatorChain = new CaptchaService([]);
         $passwordValidatorChain->validate($request);
@@ -38,7 +38,7 @@ class CaptchaServiceTest extends TestCase
 
     public function testValidationWithInactiveValidatorDoesNotTriggerValidation(): void
     {
-        $request = $this->createMock(Request::class);
+        $request = $this->createStub(Request::class);
 
         $validatorMock = $this->createMock(ImageCaptchaServiceInterface::class);
         $validatorMock->method('isEnabled')->willReturn(false);
@@ -52,21 +52,21 @@ class CaptchaServiceTest extends TestCase
 
     public function testValidatorWillThrowFirstFailingValidatorException(): void
     {
-        $request = $this->createMock(Request::class);
+        $request = $this->createStub(Request::class);
 
-        $validator1Mock = $this->createMock(ImageCaptchaServiceInterface::class);
-        $validator1Mock->method('isEnabled')->willReturn(true);
+        $validator1Stub = $this->createStub(ImageCaptchaServiceInterface::class);
+        $validator1Stub->method('isEnabled')->willReturn(true);
 
-        $validator2Mock = $this->createMock(HoneyPotCaptchaServiceInterface::class);
-        $validator2Mock->method('isEnabled')->willReturn(true);
+        $validator2Stub = $this->createStub(HoneyPotCaptchaServiceInterface::class);
+        $validator2Stub->method('isEnabled')->willReturn(true);
         $expectedException = new CaptchaValidateException();
-        $validator2Mock->method('validate')->willThrowException($expectedException);
+        $validator2Stub->method('validate')->willThrowException($expectedException);
 
         $this->expectException(CaptchaValidateException::class);
 
         $passwordValidatorChain = new CaptchaService([
-            $validator1Mock,
-            $validator2Mock
+            $validator1Stub,
+            $validator2Stub
         ]);
 
         $this->expectExceptionObject($expectedException);
@@ -75,13 +75,13 @@ class CaptchaServiceTest extends TestCase
 
     public function testCaptchaGenerate(): void
     {
-        $captcha1Mock = $this->createMock(ImageCaptchaServiceInterface::class);
-        $captcha1Mock->method('isEnabled')->willReturn(true);
-        $captcha1Mock->method('getName')->willReturn($name = uniqid());
-        $captcha1Mock->method('generate')->willReturn($content = uniqid());
+        $captcha1Stub = $this->createStub(ImageCaptchaServiceInterface::class);
+        $captcha1Stub->method('isEnabled')->willReturn(true);
+        $captcha1Stub->method('getName')->willReturn($name = uniqid());
+        $captcha1Stub->method('generate')->willReturn($content = uniqid());
 
         $passwordValidatorChain = new CaptchaService([
-            $captcha1Mock
+            $captcha1Stub
         ]);
 
         $generators = $passwordValidatorChain->generate();
@@ -95,17 +95,17 @@ class CaptchaServiceTest extends TestCase
 
     public function testCaptchaGenerateWithInactiveCaptcha(): void
     {
-        $captcha1Mock = $this->createMock(ImageCaptchaServiceInterface::class);
-        $captcha1Mock->method('isEnabled')->willReturn(true);
-        $captcha1Mock->method('getName')->willReturn($name = uniqid());
-        $captcha1Mock->method('generate')->willReturn($content = uniqid());
+        $captcha1Stub = $this->createStub(ImageCaptchaServiceInterface::class);
+        $captcha1Stub->method('isEnabled')->willReturn(true);
+        $captcha1Stub->method('getName')->willReturn($name = uniqid());
+        $captcha1Stub->method('generate')->willReturn($content = uniqid());
 
-        $captcha2Mock = $this->createMock(HoneyPotCaptchaServiceInterface::class);
-        $captcha2Mock->method('isEnabled')->willReturn(false);
+        $captcha2Stub = $this->createStub(HoneyPotCaptchaServiceInterface::class);
+        $captcha2Stub->method('isEnabled')->willReturn(false);
 
         $passwordValidatorChain = new CaptchaService([
-            $captcha1Mock,
-            $captcha2Mock
+            $captcha1Stub,
+            $captcha2Stub
         ]);
 
         $generators = $passwordValidatorChain->generate();
