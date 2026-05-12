@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [3.0.0] - unreleased
+## [3.0.0] - 2026-05-12
 
 ### Added
 - Two-Factor Authentication (2FA) with email OTP verification
@@ -61,6 +61,7 @@ This is the stable release of v1.0.0. No changes have been made since v1.0.0-rc.
 - Button for generating strong password
 - Button for show/hide password in password fields
 
+[3.0.0]: https://github.com/OXID-eSales/security-module/compare/v2.1.0...v3.0.0
 [2.1.0]: https://github.com/OXID-eSales/security-module/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/OXID-eSales/security-module/compare/v2.0.0-rc.3...v2.0.0
 [2.0.0-rc.3]: https://github.com/OXID-eSales/security-module/compare/v2.0.0-rc.2...v2.0.0-rc.3
