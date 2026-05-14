@@ -36,6 +36,8 @@ class ImageCaptchaValidatorTest extends TestCase
 
     public function testValidateWhenCaptchaIsValid(): void
     {
+        $this->expectNotToPerformAssertions();
+
         $sameCaptchaText = uniqid();
         $validator = $this->getSut();
         $validator->validate($sameCaptchaText, $sameCaptchaText, time() + 60);

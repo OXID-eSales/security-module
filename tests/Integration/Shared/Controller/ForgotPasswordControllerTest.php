@@ -47,6 +47,8 @@ class ForgotPasswordControllerTest extends IntegrationTestCase
     #[Test]
     public function forgotPasswordWithValidCaptcha(): void
     {
+        $this->expectNotToPerformAssertions();
+
         $this->requestMock
             ->method('getRequestParameter')
             ->willReturnCallback(function ($param) {
