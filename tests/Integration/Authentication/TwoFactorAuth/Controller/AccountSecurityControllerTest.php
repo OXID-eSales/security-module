@@ -14,7 +14,7 @@ use OxidEsales\Eshop\Application\Controller\AccountController;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\Eshop\Core\Field;
 use OxidEsales\Eshop\Core\UtilsServer;
-use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface;
+use OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Controller\AccountSecurityController;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFAUserSettingsInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Transput\UserSettingsUpdateRequestInterface;
@@ -131,7 +131,7 @@ class AccountSecurityControllerTest extends IntegrationTestCase
         $updateRequestStub = $this->createStub(UserSettingsUpdateRequestInterface::class);
         $updateRequestStub->method('isTwoFAEnabled')->willReturn($twoFAEnabled);
 
-        $contextStub = $this->createStub(BasicContextInterface::class);
+        $contextStub = $this->createStub(ContextInterface::class);
         $contextStub->method('getCurrentShopId')->willReturn($shopId);
 
         $utilsServerSpy = $this->createMock(UtilsServer::class);
@@ -153,12 +153,12 @@ class AccountSecurityControllerTest extends IntegrationTestCase
         TwoFAUserSettingsInterface $userSettingsService = null,
         UserSettingsUpdateRequestInterface $updateRequest = null,
         UtilsServer $utilsServer = null,
-        BasicContextInterface $context = null,
+        ContextInterface $context = null,
     ): AccountSecurityController {
         $userSettingsService ??= $this->createStub(TwoFAUserSettingsInterface::class);
         $updateRequest ??= $this->createStub(UserSettingsUpdateRequestInterface::class);
         $utilsServer ??= $this->createStub(UtilsServer::class);
-        $context ??= $this->createStub(BasicContextInterface::class);
+        $context ??= $this->createStub(ContextInterface::class);
 
         return $this->getMockBuilder(AccountSecurityController::class)
             ->setConstructorArgs([
