@@ -11,7 +11,7 @@ namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Controller;
 
 use OxidEsales\Eshop\Application\Controller\AccountController;
 use OxidEsales\Eshop\Core\UtilsServer;
-use OxidEsales\EshopCommunity\Internal\Transition\Utility\BasicContextInterface;
+use OxidEsales\EshopCommunity\Internal\Transition\Utility\ContextInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFAUserSettingsInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Transput\UserSettingsUpdateRequestInterface;
 
@@ -21,7 +21,7 @@ class AccountSecurityController extends AccountController
         private readonly TwoFAUserSettingsInterface $userSettingsService,
         private readonly UserSettingsUpdateRequestInterface $settingUpdateRequest,
         private readonly UtilsServer $utilsServer,
-        private readonly BasicContextInterface $context,
+        private readonly ContextInterface $context,
     ) {
         $this->setTemplateName('@oe_security_module/templates/account_security');
         parent::__construct();
