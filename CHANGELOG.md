@@ -45,6 +45,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   enable or disable their own 2FA preference.
 - CMS-editable, branded HTML 2FA OTP email (per-language subject + body via oxcontents) with a plain-text fallback
 
+### Added
+- Strip session token (stoken) from GET form URLs (search, attribute filter, product list) via new Form Security admin setting
+
 ### Changed
 - Updated to work with OXID eShop 7.5.x
 - Minimum PHP version is now 8.3, tested with up to PHP 8.5

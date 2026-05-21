@@ -47,4 +47,18 @@ $aLang = [
     'HELP_SHOP_MODULE_oeSecurityTwoFactorAuthOtpCodeLifetime' => 'How long an emailed OTP code remains '
         . 'valid, in seconds. Applies to both the storefront/admin and API 2FA flows. Acts as the '
         . 'upper bound for the API challenge lifetime above. Default: 300 (5 minutes).',
+    'SHOP_MODULE_GROUP_form_security'                    => 'Form Security',
+    'SHOP_MODULE_oeSecurityGetFormStripStoken'           => 'Strip session token from GET form URLs',
+    'HELP_SHOP_MODULE_oeSecurityGetFormStripStoken'      => 'When enabled, session tokens (stoken) are removed from GET form submissions. ' .
+        'This module provides coverage for the Apex theme search form, attribute filter, and product list. ' .
+        'Custom themes or additional modules can integrate with this setting via ' .
+        'oViewConf.getSecurityModuleFormSettings().isGetFormStripStokenEnabled(). ' .
+        'POST forms are unaffected.',
+
+    'SHOP_MODULE_GROUP_two_factor_auth'            => 'Two Factor Authentication',
+    'SHOP_MODULE_oeSecurityTwoFactorAuthEnabled'   => 'Enable Two Factor Authentication',
+    'SHOP_MODULE_oeSecurityTwoFactorAuthType'      => 'Two Factor Authentication type',
+    'SHOP_MODULE_oeSecurityTwoFactorAuthType_otp'  => 'OTP',
+    'SHOP_MODULE_oeSecurityTwoFactorAuthType_totp' => 'TOTP',
+    'SHOP_MODULE_oeSecurityTwoFactorAuthType_both' => 'OTP and TOTP',
 ];
