@@ -12,7 +12,8 @@
         "proprietary"
     ],
     "require": {
-        "php": "^8.3"
+        "php": "^8.3",
+        "oxid-esales/apex-theme": "dev-b-7.5.x-forms-OXDEV-10199"
     },
     "conflict": {
         "oxid-esales/oxideshop-ce": "<7.5"
