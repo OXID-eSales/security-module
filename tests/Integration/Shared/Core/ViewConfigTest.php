@@ -12,6 +12,7 @@ namespace OxidEsales\SecurityModule\Tests\Integration\Shared\Core;
 use Generator;
 use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFAShopSettingsInterface;
+use OxidEsales\SecurityModule\FormSecurity\Service\SessionlessHiddenParamsBuilderInterface;
 // phpcs:ignore Generic.Files.LineLength
 use OxidEsales\SecurityModule\FormSecurity\Service\ModuleSettingsServiceInterface as FormSecuritySettingsServiceInterface;
 use OxidEsales\SecurityModule\Shared\Core\ViewConfig;
@@ -43,8 +44,8 @@ class ViewConfigTest extends IntegrationTestCase
     }
 
     #[Test]
-    #[DataProvider('getSecurityModuleFormSettingsDataProvider')]
-    public function getSecurityModuleFormSettingsReturnsFormSecurityService(bool $enabled): void
+    #[DataProvider('isGetFormStripStokenEnabledDataProvider')]
+    public function isGetFormStripStokenEnabledDelegatesToFormSecuritySettings(bool $enabled): void
     {
         $formSettingsStub = $this->createStub(FormSecuritySettingsServiceInterface::class);
         $formSettingsStub->method('isGetFormStripStokenEnabled')->willReturn($enabled);
@@ -53,48 +54,40 @@ class ViewConfigTest extends IntegrationTestCase
             FormSecuritySettingsServiceInterface::class => $formSettingsStub,
         ]);
 
-        $this->assertSame($enabled, $sut->getSecurityModuleFormSettings()->isGetFormStripStokenEnabled());
+        $this->assertSame($enabled, $sut->isGetFormStripStokenEnabled());
     }
 
-    public static function getSecurityModuleFormSettingsDataProvider(): \Generator
+    public static function isGetFormStripStokenEnabledDataProvider(): Generator
     {
         yield 'form security enabled' => ['enabled' => true];
         yield 'form security disabled' => ['enabled' => false];
     }
 
     #[Test]
-    public function getHiddenParamsOnlyExcludesStokenAndIncludesLangAndAdditionalParams(): void
+    public function getHiddenParamsOnlyDelegatesToSessionlessHiddenParamsBuilderWithAdditionalRequestParameters(): void
     {
-        $langHidden = '<input type="hidden" name="lang" value="0">';
-        $additionalParams = '<input type="hidden" name="extra" value="1">';
+        $additionalParams = '<input type="hidden" name="cnid" value="abc">';
+        $expected = '<input type="hidden" name="lang" value="0">' . $additionalParams;
 
-        $sut = $this->getSut();
-        $sut->method('getFormLang')->willReturn($langHidden);
+        $builderMock = $this->createMock(SessionlessHiddenParamsBuilderInterface::class);
+        $builderMock->expects($this->once())
+            ->method('build')
+            ->with($additionalParams)
+            ->willReturn($expected);
+
+        $sut = $this->getSut([
+            SessionlessHiddenParamsBuilderInterface::class => $builderMock,
+        ]);
         $sut->method('getAdditionalRequestParameters')->willReturn($additionalParams);
 
-        $result = $sut->getHiddenParamsOnly();
-
-        $this->assertStringContainsString($langHidden, $result);
-        $this->assertStringContainsString($additionalParams, $result);
-        $this->assertStringNotContainsString('stoken', $result);
-        $this->assertStringNotContainsString('sid', $result);
-    }
-
-    #[Test]
-    public function getHiddenParamsOnlyReturnsEmptyStringWhenNoLangAndNoAdditionalParams(): void
-    {
-        $sut = $this->getSut();
-        $sut->method('getFormLang')->willReturn('');
-        $sut->method('getAdditionalRequestParameters')->willReturn('');
-
-        $this->assertSame('', $sut->getHiddenParamsOnly());
+        $this->assertSame($expected, $sut->getHiddenParamsOnly());
     }
 
     private function getSut(array $serviceOverrides = []): ViewConfig
     {
         /** @var ViewConfig $sut */
         $sut = $this->getMockBuilder(ViewConfig::class)
-            ->onlyMethods(['getService', 'getFormLang', 'getAdditionalRequestParameters'])
+            ->onlyMethods(['getService', 'getAdditionalRequestParameters'])
             ->getMock();
         $sut->method('getService')->willReturnCallback(
             fn(string $id) => $serviceOverrides[$id] ?? ContainerFacade::get($id)

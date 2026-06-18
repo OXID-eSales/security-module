@@ -13,6 +13,8 @@ use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFAShopSet
 use OxidEsales\SecurityModule\Captcha\Captcha\Image\Service\ImageCaptchaService;
 use OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface;
 // phpcs:ignore Generic.Files.LineLength
+use OxidEsales\SecurityModule\FormSecurity\Service\SessionlessHiddenParamsBuilderInterface;
+// phpcs:ignore Generic.Files.LineLength
 use OxidEsales\SecurityModule\FormSecurity\Service\ModuleSettingsServiceInterface as FormSecuritySettingsServiceInterface;
 use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsServiceInterface as PasswordSettingsServiceInterface;
 use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface as CaptchaSettingsServiceInterface;
@@ -60,26 +62,14 @@ class ViewConfig extends ViewConfig_parent
         return $this->getService(TwoFAShopSettingsInterface::class)->isTwoFactorAuthEnabled();
     }
 
-    public function getSecurityModuleFormSettings(): FormSecuritySettingsServiceInterface
+    public function isGetFormStripStokenEnabled(): bool
     {
-        return $this->getService(FormSecuritySettingsServiceInterface::class);
+        return $this->getService(FormSecuritySettingsServiceInterface::class)->isGetFormStripStokenEnabled();
     }
 
     public function getHiddenParamsOnly(): string
     {
-        $value = '';
-
-        if (($lang = $this->getFormLang())) {
-            $value .= "\n{$lang}";
-        }
-
-        $value .= $this->getAdditionalRequestParameters();
-
-        return $value;
-    }
-
-    protected function getFormLang(): string
-    {
-        return Registry::getLang()->getFormLang();
+        return $this->getService(SessionlessHiddenParamsBuilderInterface::class)
+            ->build($this->getAdditionalRequestParameters());
     }
 }

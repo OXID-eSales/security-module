@@ -6,3 +6,7 @@ services:
   OxidEsales\SecurityModule\FormSecurity\Service\ModuleSettingsServiceInterface:
     class: OxidEsales\SecurityModule\FormSecurity\Service\ModuleSettingsService
     public: true
+
+  OxidEsales\SecurityModule\FormSecurity\Service\SessionlessHiddenParamsBuilderInterface:
+    class: OxidEsales\SecurityModule\FormSecurity\Service\SessionlessHiddenParamsBuilder
+    public: true
