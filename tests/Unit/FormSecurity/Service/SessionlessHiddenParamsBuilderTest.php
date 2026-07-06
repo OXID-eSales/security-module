@@ -50,12 +50,12 @@ class SessionlessHiddenParamsBuilderTest extends TestCase
     }
 
     #[Test]
-    public function buildOutputContainsNeitherStokenNorSidWhenInputsHaveNone(): void
+    public function buildOmitsSidAndStokenWhenSidIsNotNeeded(): void
     {
         $langHidden = '<input type="hidden" name="lang" value="0">';
         $additionalParams = '<input type="hidden" name="cnid" value="abc">';
 
-        $sut = $this->getSut(formLang: $langHidden);
+        $sut = $this->getSut(formLang: $langHidden, sidHiddenParameter: '');
 
         $result = $sut->build($additionalParams);
 
@@ -63,12 +63,30 @@ class SessionlessHiddenParamsBuilderTest extends TestCase
         $this->assertStringNotContainsString('name="sid"', $result);
     }
 
-    private function getSut(string $formLang): SessionlessHiddenParamsBuilder
+    #[Test]
+    public function buildIncludesSidButNeverStokenWhenSidIsNeeded(): void
+    {
+        $sidHidden = '<input type="hidden" name="sid" value="abc123" />';
+        $langHidden = '<input type="hidden" name="lang" value="0">';
+        $additionalParams = '<input type="hidden" name="cnid" value="abc">';
+
+        $sut = $this->getSut(formLang: $langHidden, sidHiddenParameter: $sidHidden);
+
+        $result = $sut->build($additionalParams);
+
+        $this->assertStringContainsString($sidHidden, $result);
+        $this->assertStringContainsString($langHidden, $result);
+        $this->assertStringContainsString($additionalParams, $result);
+        $this->assertStringNotContainsString('stoken', $result);
+    }
+
+    private function getSut(string $formLang, string $sidHiddenParameter = ''): SessionlessHiddenParamsBuilder
     {
         $sut = $this->getMockBuilder(SessionlessHiddenParamsBuilder::class)
-            ->onlyMethods(['getFormLang'])
+            ->onlyMethods(['getFormLang', 'getSidHiddenParameter'])
             ->getMock();
         $sut->method('getFormLang')->willReturn($formLang);
+        $sut->method('getSidHiddenParameter')->willReturn($sidHiddenParameter);
 
         return $sut;
     }

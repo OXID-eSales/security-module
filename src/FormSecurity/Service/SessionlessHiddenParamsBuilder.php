@@ -15,7 +15,7 @@ class SessionlessHiddenParamsBuilder implements SessionlessHiddenParamsBuilderIn
 {
     public function build(string $additionalParams): string
     {
-        $value = '';
+        $value = $this->getSidHiddenParameter();
 
         $lang = $this->getFormLang();
         if ($lang !== '') {
@@ -25,6 +25,23 @@ class SessionlessHiddenParamsBuilder implements SessionlessHiddenParamsBuilderIn
         $value .= $additionalParams;
 
         return $value;
+    }
+
+    /**
+     * Emits the session id hidden input when the shop needs it (e.g. cookieless
+     * sessions), mirroring the core Session::hiddenSid() output but WITHOUT the
+     * stoken input. Dropping the stoken keeps it out of GET URLs; keeping the sid
+     * preserves the session when cookies are disabled.
+     */
+    protected function getSidHiddenParameter(): string
+    {
+        $session = Registry::getSession();
+
+        if (!$session->isSidNeeded()) {
+            return '';
+        }
+
+        return '<input type="hidden" name="' . $session->getName() . '" value="' . $session->getId() . '" />';
     }
 
     protected function getFormLang(): string

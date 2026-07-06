@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [4.1.0] - unreleased
 
+### Added
+- Strip session token (stoken) from GET form URLs (search, attribute filter, product list) via new Form Security admin setting.
+  The session id (sid) is still emitted when the shop needs it (e.g. cookieless sessions), so the session/basket is not
+  lost on submit.
+
 ### Changed
 - Update module to work with OXID eShop 7.6
 
@@ -44,9 +49,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - OXAPI `setTwoFactorAuth(enabled)` mutation: lets an authenticated user
   enable or disable their own 2FA preference.
 - CMS-editable, branded HTML 2FA OTP email (per-language subject + body via oxcontents) with a plain-text fallback
-
-### Added
-- Strip session token (stoken) from GET form URLs (search, attribute filter, product list) via new Form Security admin setting
 
 ### Changed
 - Updated to work with OXID eShop 7.5.x
