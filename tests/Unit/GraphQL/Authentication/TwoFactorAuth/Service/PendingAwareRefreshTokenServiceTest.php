@@ -24,10 +24,10 @@ class PendingAwareRefreshTokenServiceTest extends TestCase
     {
         $pendingUser = new TwoFAPendingUser($this->createStub(EshopUserModel::class));
 
-        $innerMock = $this->createMock(RefreshTokenServiceInterface::class);
-        $innerMock->expects($this->never())->method('createRefreshTokenForUser');
+        $innerSpy = $this->createMock(RefreshTokenServiceInterface::class);
+        $innerSpy->expects($this->never())->method('createRefreshTokenForUser');
 
-        $sut = $this->getSut(inner: $innerMock);
+        $sut = $this->getSut(inner: $innerSpy);
 
         $this->assertSame('', $sut->createRefreshTokenForUser($pendingUser));
     }

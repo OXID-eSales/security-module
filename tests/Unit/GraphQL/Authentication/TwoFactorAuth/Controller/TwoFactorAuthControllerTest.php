@@ -37,12 +37,12 @@ class TwoFactorAuthControllerTest extends TestCase
         $tokenStub = $this->createStub(Token::class);
         $tokenStub->method('createTokenForUser')->willReturn($this->accessTokenStub($accessToken));
 
-        $twoFAServiceMock = $this->createMock(TwoFAServiceInterface::class);
-        $twoFAServiceMock->expects($this->once())->method('verify')->with($userId, $otp);
-        $twoFAServiceMock->expects($this->once())->method('consumeChallenge')->with($userId);
+        $twoFAServiceSpy = $this->createMock(TwoFAServiceInterface::class);
+        $twoFAServiceSpy->expects($this->once())->method('verify')->with($userId, $otp);
+        $twoFAServiceSpy->expects($this->once())->method('consumeChallenge')->with($userId);
 
         $sut = $this->getSut(
-            twoFAService: $twoFAServiceMock,
+            twoFAService: $twoFAServiceSpy,
             challengeValidator: $this->validatorReturning($userId),
             tokenService: $tokenStub,
             legacy: $this->legacyStubFor($userId),
@@ -56,12 +56,12 @@ class TwoFactorAuthControllerTest extends TestCase
     {
         $userId = uniqid();
 
-        $twoFAServiceMock = $this->createMock(TwoFAServiceInterface::class);
-        $twoFAServiceMock->method('verify')->willThrowException(new InvalidCodeException());
-        $twoFAServiceMock->expects($this->never())->method('consumeChallenge');
+        $twoFAServiceSpy = $this->createMock(TwoFAServiceInterface::class);
+        $twoFAServiceSpy->method('verify')->willThrowException(new InvalidCodeException());
+        $twoFAServiceSpy->expects($this->never())->method('consumeChallenge');
 
         $sut = $this->getSut(
-            twoFAService: $twoFAServiceMock,
+            twoFAService: $twoFAServiceSpy,
             challengeValidator: $this->validatorReturning($userId),
             legacy: $this->legacyStubFor($userId),
         );
@@ -74,12 +74,12 @@ class TwoFactorAuthControllerTest extends TestCase
     #[Test]
     public function verifyTwoFactorTokenPropagatesChallengeValidationFailureAndSkipsVerify(): void
     {
-        $twoFAServiceMock = $this->createMock(TwoFAServiceInterface::class);
-        $twoFAServiceMock->expects($this->never())->method('verify');
-        $twoFAServiceMock->expects($this->never())->method('consumeChallenge');
+        $twoFAServiceSpy = $this->createMock(TwoFAServiceInterface::class);
+        $twoFAServiceSpy->expects($this->never())->method('verify');
+        $twoFAServiceSpy->expects($this->never())->method('consumeChallenge');
 
         $sut = $this->getSut(
-            twoFAService: $twoFAServiceMock,
+            twoFAService: $twoFAServiceSpy,
             challengeValidator: $this->validatorThrowing(),
         );
 
@@ -104,12 +104,12 @@ class TwoFactorAuthControllerTest extends TestCase
             ->method('createRefreshTokenForUser')
             ->willReturn($refreshToken);
 
-        $twoFAServiceMock = $this->createMock(TwoFAServiceInterface::class);
-        $twoFAServiceMock->expects($this->once())->method('verify')->with($userId, $otp);
-        $twoFAServiceMock->expects($this->once())->method('consumeChallenge')->with($userId);
+        $twoFAServiceSpy = $this->createMock(TwoFAServiceInterface::class);
+        $twoFAServiceSpy->expects($this->once())->method('verify')->with($userId, $otp);
+        $twoFAServiceSpy->expects($this->once())->method('consumeChallenge')->with($userId);
 
         $sut = $this->getSut(
-            twoFAService: $twoFAServiceMock,
+            twoFAService: $twoFAServiceSpy,
             challengeValidator: $this->validatorReturning($userId),
             tokenService: $tokenStub,
             legacy: $this->legacyStubFor($userId),
@@ -126,16 +126,16 @@ class TwoFactorAuthControllerTest extends TestCase
     #[Test]
     public function verifyTwoFactorLoginPropagatesChallengeValidationFailureAndIssuesNoRefreshToken(): void
     {
-        $refreshServiceMock = $this->createMock(RefreshTokenServiceInterface::class);
-        $refreshServiceMock->expects($this->never())->method('createRefreshTokenForUser');
+        $refreshServiceSpy = $this->createMock(RefreshTokenServiceInterface::class);
+        $refreshServiceSpy->expects($this->never())->method('createRefreshTokenForUser');
 
-        $twoFAServiceMock = $this->createMock(TwoFAServiceInterface::class);
-        $twoFAServiceMock->expects($this->never())->method('verify');
+        $twoFAServiceSpy = $this->createMock(TwoFAServiceInterface::class);
+        $twoFAServiceSpy->expects($this->never())->method('verify');
 
         $sut = $this->getSut(
-            twoFAService: $twoFAServiceMock,
+            twoFAService: $twoFAServiceSpy,
             challengeValidator: $this->validatorThrowing(),
-            refreshTokenService: $refreshServiceMock,
+            refreshTokenService: $refreshServiceSpy,
         );
 
         $this->expectException(InvalidToken::class);

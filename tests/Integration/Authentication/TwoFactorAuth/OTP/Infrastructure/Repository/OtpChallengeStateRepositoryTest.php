@@ -66,19 +66,19 @@ class OtpChallengeStateRepositoryTest extends IntegrationTestCase
 
         $sut->createChallengeState(
             userId: $userId = uniqid(),
-            codeHash: 'first_hash',
+            codeHash: uniqid(),
             expiresAt: new DateTimeImmutable('+5 minutes'),
         );
 
         $sut->createChallengeState(
             userId: $userId,
-            codeHash: 'second_hash',
+            codeHash: $secondHash = uniqid(),
             expiresAt: $secondExpiresAt = new DateTimeImmutable('+10 minutes'),
         );
 
         $result = $sut->findByUserId($userId);
 
-        $this->assertSame('second_hash', $result->getCodeHash());
+        $this->assertSame($secondHash, $result->getCodeHash());
         $this->assertSame(
             $secondExpiresAt->format('Y-m-d H:i:s'),
             $result->getExpiresAt()->format('Y-m-d H:i:s')
