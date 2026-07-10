@@ -58,7 +58,6 @@ class TwoFactorAuthControllerTest extends TestCase
 
         $twoFAServiceMock = $this->createMock(TwoFAServiceInterface::class);
         $twoFAServiceMock->method('verify')->willThrowException(new InvalidCodeException());
-        // Challenge must NOT be consumed when verification fails.
         $twoFAServiceMock->expects($this->never())->method('consumeChallenge');
 
         $sut = $this->getSut(

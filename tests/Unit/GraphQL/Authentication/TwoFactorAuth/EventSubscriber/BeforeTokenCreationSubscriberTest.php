@@ -25,6 +25,8 @@ class BeforeTokenCreationSubscriberTest extends TestCase
     public function stampsPendingAndEffectiveExpiryClaimsWhenUserIsTwoFAPending(): void
     {
         $lifetime = random_int(60, 900);
+        $settingsStub = $this->createStub(TwoFAShopSettingsInterface::class);
+        $settingsStub->method('getEffectiveChallengeLifetime')->willReturn($lifetime);
         $pendingUser = new TwoFAPendingUser($this->createStub(EshopUserModel::class));
 
         $stampedClaims = [];
@@ -40,11 +42,10 @@ class BeforeTokenCreationSubscriberTest extends TestCase
             );
 
         $before = time();
-        $this->getSut(effectiveChallengeLifetime: $lifetime)->onBeforeTokenCreation($eventMock);
+        $this->getSut(settings: $settingsStub)->onBeforeTokenCreation($eventMock);
         $after = time();
 
         $this->assertTrue($stampedClaims[TwoFactorClaim::PENDING]);
-        // EXPIRES_AT is now + the effective lifetime (allowing for a clock tick during the call).
         $this->assertGreaterThanOrEqual($before + $lifetime, $stampedClaims[TwoFactorClaim::EXPIRES_AT]);
         $this->assertLessThanOrEqual($after + $lifetime, $stampedClaims[TwoFactorClaim::EXPIRES_AT]);
     }
@@ -70,11 +71,10 @@ class BeforeTokenCreationSubscriberTest extends TestCase
         );
     }
 
-    private function getSut(int $effectiveChallengeLifetime = 300): BeforeTokenCreationSubscriber
+    private function getSut(?TwoFAShopSettingsInterface $settings = null): BeforeTokenCreationSubscriber
     {
-        $settingsStub = $this->createStub(TwoFAShopSettingsInterface::class);
-        $settingsStub->method('getEffectiveChallengeLifetime')->willReturn($effectiveChallengeLifetime);
-
-        return new BeforeTokenCreationSubscriber(settings: $settingsStub);
+        return new BeforeTokenCreationSubscriber(
+            settings: $settings ?? $this->createStub(TwoFAShopSettingsInterface::class),
+        );
     }
 }
