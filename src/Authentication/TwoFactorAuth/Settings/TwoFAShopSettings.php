@@ -51,11 +51,6 @@ class TwoFAShopSettings implements TwoFAShopSettingsInterface
         return $this->moduleSettingService->getInteger(self::OTP_CODE_LIFETIME, Module::MODULE_ID);
     }
 
-    /**
-     * Effective lifetime of an oxapi 2FA challenge Bearer: the smaller of the configured API
-     * challenge lifetime and the OTP code lifetime. The Bearer is never useful longer than the OTP
-     * it gates, so clamping here keeps operators from configuring a Bearer that outlives its OTP.
-     */
     public function getEffectiveChallengeLifetime(): int
     {
         return min($this->getApiChallengeLifetime(), $this->getOtpCodeLifetime());

@@ -13,14 +13,6 @@ use OxidEsales\Eshop\Application\Model\User as EshopUserModel;
 use OxidEsales\GraphQL\Base\DataType\UserInterface;
 use TheCodingMachine\GraphQLite\Types\ID;
 
-/**
- * Sentinel user returned by SecureApiLegacy when an API login triggers a 2FA challenge.
- *
- * Wraps the already-loaded eShop user model. isAnonymous() is always true, so the resulting
- * challenge token is blocked from #[Logged] mutations; BeforeTokenCreationSubscriber detects this
- * exact type to stamp the mfa_pending claim. Only ever instantiated by SecureApiLegacy (active
- * only when graphql-base is present), so its dependency on the graphql-base UserInterface is safe.
- */
 final class TwoFAPendingUser implements UserInterface
 {
     public function __construct(private readonly EshopUserModel $userModel)

@@ -5,9 +5,6 @@ services:
   _defaults:
     public: false
 
-  # Cross-domain: registers this module's oxapi controllers/types with graphql-base's schema.
-  # Plain duck-typed namespace mapper (no graphql-base interface). Tag consumed only by
-  # graphql-base's compiler pass → inert + safe when graphql-base is absent.
   OxidEsales\SecurityModule\GraphQL\Shared\NamespaceMapper:
     autowire: false
     tags:

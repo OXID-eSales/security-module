@@ -19,23 +19,10 @@ use OxidEsales\GraphQL\Base\Infrastructure\Legacy;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\TwoFactorRequiredException;
 use OxidEsales\SecurityModule\GraphQL\Authentication\TwoFactorAuth\DataType\TwoFAPendingUser;
 
-/**
- * Decorates graphql-base's Legacy so the oxapi login flow can enforce 2FA.
- *
- * Plain Legacy::login() wraps every exception (including TwoFactorRequiredException) into a
- * generic InvalidLogin, which makes 2FA authentication impossible through the API. This decorator
- * reimplements login() to catch TwoFactorRequiredException specifically and return a
- * TwoFAPendingUser (→ short-lived, anonymous challenge token), while keeping the normal
- * bad-credentials behaviour. All other Legacy methods are delegated to the inner instance.
- *
- * Registered with `decoration_on_invalid: ignore` + `autowire: false`, so when the optional
- * graphql-base module is absent this decorator is silently dropped and never autoloaded.
- */
 final class SecureApiLegacy extends Legacy
 {
     public function __construct(private readonly Legacy $inner)
     {
-        // Delegating decorator: the inner Legacy is fully constructed; we never use parent state.
     }
 
     public function login(?string $username = null, ?string $password = null): UserInterface

@@ -15,17 +15,6 @@ use OxidEsales\GraphQL\Base\Exception\InvalidToken;
 use OxidEsales\GraphQL\Base\Service\Token;
 use OxidEsales\SecurityModule\GraphQL\Authentication\TwoFactorAuth\TwoFactorClaim;
 
-/**
- * Validates the oxapi 2FA challenge token that the verify controller receives.
- *
- * The JWT `exp` (graphql-base default 8h) is far too long for a challenge token, so we stamp and
- * enforce our own short, resend-independent window (mfa_exp) on top of the mfa_pending marker.
- *
- * graphql-base is an OPTIONAL (require-dev) module, so its Token service is injected optionally
- * (`@?` in services.yaml). The accessor fails loud rather than suppressing the null case; it
- * cannot actually occur, because without graphql-base the schema is never built and the verify
- * mutations that use this service are never reached.
- */
 final class ChallengeTokenValidatorService implements ChallengeTokenValidatorServiceInterface
 {
     private const BASE_REQUIRED = 'graphql-base is required for the oxapi two-factor challenge validation';
