@@ -55,12 +55,13 @@ final class VerifyTwoFactorTokenCest extends BaseCest
         $this->prepareTwoFAChallengeUser($I);
         $this->setApiChallengeLifetime(60); // override the default 5 minutes
 
-        $now = time();
+        $before = time();
         $challenge = $this->requestChallengeToken($I);
+        $after = time();
 
         $mfaExp = (int)$this->claimsOf($I, $challenge)->get('mfa_exp');
-        $I->assertGreaterThan($now, $mfaExp);
-        $I->assertLessThanOrEqual($now + 60, $mfaExp, 'mfa_exp must honour the configured 60s lifetime');
+        $I->assertGreaterThanOrEqual($before + 60, $mfaExp, 'mfa_exp must honour the configured 60s lifetime');
+        $I->assertLessThanOrEqual($after + 60, $mfaExp, 'mfa_exp must honour the configured 60s lifetime');
     }
 
     public function challengeTokenIsRejectedOnALoggedQuery(AcceptanceTester $I): void
