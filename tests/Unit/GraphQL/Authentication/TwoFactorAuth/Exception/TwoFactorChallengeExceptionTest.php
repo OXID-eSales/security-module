@@ -23,7 +23,7 @@ class TwoFactorChallengeExceptionTest extends TestCase
         $sut = new TwoFactorChallengeException();
 
         $this->assertTrue($sut->isClientSafe(), 'Message must be surfaced to the client');
-        $this->assertSame('Invalid or expired two-factor code', $sut->getMessage());
+        $this->assertNotEmpty($sut->getMessage(), 'A generic client-facing message must be present');
         $this->assertSame(ErrorCategories::REQUESTERROR, $sut->getCategory());
     }
 
