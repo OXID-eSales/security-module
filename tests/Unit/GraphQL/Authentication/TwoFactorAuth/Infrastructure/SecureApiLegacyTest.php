@@ -20,6 +20,8 @@ use OxidEsales\SecurityModule\GraphQL\Authentication\TwoFactorAuth\DataType\TwoF
 use OxidEsales\SecurityModule\GraphQL\Authentication\TwoFactorAuth\Infrastructure\SecureApiLegacy;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use ReflectionMethod;
 
 class SecureApiLegacyTest extends TestCase
 {
@@ -183,6 +185,26 @@ class SecureApiLegacyTest extends TestCase
         $innerMock->expects($this->once())->method('createUniqueIdentifier')->willReturn($identifier);
 
         $this->assertSame($identifier, $this->getSut(inner: $innerMock)->createUniqueIdentifier());
+    }
+
+    #[Test]
+    public function everyPublicLegacyMethodIsOverriddenForDelegation(): void
+    {
+        $parent = new ReflectionClass(Legacy::class);
+        $decorator = new ReflectionClass(SecureApiLegacy::class);
+
+        foreach ($parent->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
+            if ($method->isStatic() || $method->isConstructor()) {
+                continue;
+            }
+
+            $name = $method->getName();
+            $this->assertSame(
+                SecureApiLegacy::class,
+                $decorator->getMethod($name)->getDeclaringClass()->getName(),
+                sprintf('SecureApiLegacy must override Legacy::%s() to delegate to the inner instance', $name)
+            );
+        }
     }
 
     private function getSut(?Legacy $inner = null): SecureApiLegacy
