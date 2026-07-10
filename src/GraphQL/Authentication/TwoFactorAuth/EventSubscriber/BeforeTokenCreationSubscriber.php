@@ -13,6 +13,7 @@ use DateTimeImmutable;
 use OxidEsales\GraphQL\Base\Event\BeforeTokenCreation;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFAShopSettingsInterface;
 use OxidEsales\SecurityModule\GraphQL\Authentication\TwoFactorAuth\DataType\TwoFAPendingUser;
+use OxidEsales\SecurityModule\GraphQL\Authentication\TwoFactorAuth\TwoFactorClaim;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -53,7 +54,7 @@ final class BeforeTokenCreationSubscriber implements EventSubscriberInterface
         $challengeExpiresAt = (new DateTimeImmutable())->getTimestamp()
             + $this->settings->getEffectiveChallengeLifetime();
 
-        $event->withClaim('mfa_pending', true);
-        $event->withClaim('mfa_exp', $challengeExpiresAt);
+        $event->withClaim(TwoFactorClaim::PENDING, true);
+        $event->withClaim(TwoFactorClaim::EXPIRES_AT, $challengeExpiresAt);
     }
 }

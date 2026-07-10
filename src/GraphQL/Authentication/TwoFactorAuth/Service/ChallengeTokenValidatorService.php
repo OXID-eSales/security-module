@@ -13,6 +13,7 @@ use DateTimeImmutable;
 use LogicException;
 use OxidEsales\GraphQL\Base\Exception\InvalidToken;
 use OxidEsales\GraphQL\Base\Service\Token;
+use OxidEsales\SecurityModule\GraphQL\Authentication\TwoFactorAuth\TwoFactorClaim;
 
 /**
  * Validates the oxapi 2FA challenge token that the verify controller receives.
@@ -27,8 +28,6 @@ use OxidEsales\GraphQL\Base\Service\Token;
  */
 final class ChallengeTokenValidatorService implements ChallengeTokenValidatorServiceInterface
 {
-    private const CLAIM_MFA_PENDING = 'mfa_pending';
-    private const CLAIM_MFA_EXP = 'mfa_exp';
     private const BASE_REQUIRED = 'graphql-base is required for the oxapi two-factor challenge validation';
 
     public function __construct(private readonly ?Token $tokenService = null)
@@ -39,11 +38,11 @@ final class ChallengeTokenValidatorService implements ChallengeTokenValidatorSer
     {
         $tokenService = $this->tokenService();
 
-        if ($tokenService->getTokenClaim(self::CLAIM_MFA_PENDING, false) !== true) {
+        if ($tokenService->getTokenClaim(TwoFactorClaim::PENDING, false) !== true) {
             throw new InvalidToken('Not a two-factor challenge token');
         }
 
-        $challengeExpiresAt = (int)$tokenService->getTokenClaim(self::CLAIM_MFA_EXP, 0);
+        $challengeExpiresAt = (int)$tokenService->getTokenClaim(TwoFactorClaim::EXPIRES_AT, 0);
         if ($challengeExpiresAt < (new DateTimeImmutable())->getTimestamp()) {
             throw new InvalidToken('Two-factor challenge has expired');
         }

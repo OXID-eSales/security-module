@@ -15,6 +15,7 @@ use OxidEsales\GraphQL\Base\Event\BeforeTokenCreation;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFAShopSettingsInterface;
 use OxidEsales\SecurityModule\GraphQL\Authentication\TwoFactorAuth\DataType\TwoFAPendingUser;
 use OxidEsales\SecurityModule\GraphQL\Authentication\TwoFactorAuth\EventSubscriber\BeforeTokenCreationSubscriber;
+use OxidEsales\SecurityModule\GraphQL\Authentication\TwoFactorAuth\TwoFactorClaim;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
@@ -42,10 +43,10 @@ class BeforeTokenCreationSubscriberTest extends TestCase
         $this->getSut(effectiveChallengeLifetime: $lifetime)->onBeforeTokenCreation($eventMock);
         $after = time();
 
-        $this->assertTrue($stampedClaims['mfa_pending']);
-        // mfa_exp is now + the effective lifetime (allowing for a clock tick during the call).
-        $this->assertGreaterThanOrEqual($before + $lifetime, $stampedClaims['mfa_exp']);
-        $this->assertLessThanOrEqual($after + $lifetime, $stampedClaims['mfa_exp']);
+        $this->assertTrue($stampedClaims[TwoFactorClaim::PENDING]);
+        // EXPIRES_AT is now + the effective lifetime (allowing for a clock tick during the call).
+        $this->assertGreaterThanOrEqual($before + $lifetime, $stampedClaims[TwoFactorClaim::EXPIRES_AT]);
+        $this->assertLessThanOrEqual($after + $lifetime, $stampedClaims[TwoFactorClaim::EXPIRES_AT]);
     }
 
     #[Test]

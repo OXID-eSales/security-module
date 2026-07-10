@@ -12,6 +12,7 @@ namespace OxidEsales\SecurityModule\Tests\Unit\GraphQL\Authentication\TwoFactorA
 use OxidEsales\GraphQL\Base\Exception\InvalidToken;
 use OxidEsales\GraphQL\Base\Service\Token;
 use OxidEsales\SecurityModule\GraphQL\Authentication\TwoFactorAuth\Service\ChallengeTokenValidatorService;
+use OxidEsales\SecurityModule\GraphQL\Authentication\TwoFactorAuth\TwoFactorClaim;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
@@ -23,8 +24,8 @@ class ChallengeTokenValidatorServiceTest extends TestCase
         $userId = uniqid();
 
         $sut = $this->getSut($this->tokenStub([
-            'mfa_pending' => true,
-            'mfa_exp' => time() + 300,
+            TwoFactorClaim::PENDING => true,
+            TwoFactorClaim::EXPIRES_AT => time() + 300,
             Token::CLAIM_USERID => $userId,
         ]));
 
@@ -34,7 +35,7 @@ class ChallengeTokenValidatorServiceTest extends TestCase
     #[Test]
     public function validateAndGetUserIdThrowsWhenChallengeIsNotPending(): void
     {
-        $sut = $this->getSut($this->tokenStub(['mfa_pending' => false]));
+        $sut = $this->getSut($this->tokenStub([TwoFactorClaim::PENDING => false]));
 
         $this->expectException(InvalidToken::class);
 
@@ -45,8 +46,8 @@ class ChallengeTokenValidatorServiceTest extends TestCase
     public function validateAndGetUserIdThrowsWhenChallengeExpired(): void
     {
         $sut = $this->getSut($this->tokenStub([
-            'mfa_pending' => true,
-            'mfa_exp' => time() - 1,
+            TwoFactorClaim::PENDING => true,
+            TwoFactorClaim::EXPIRES_AT => time() - 1,
         ]));
 
         $this->expectException(InvalidToken::class);
