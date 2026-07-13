@@ -1,9 +1,5 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-</head>
-<body>
-    {% include_content contentIdent|default('oesm2faotpemail') with {otp: otp} %}
-</body>
-</html>
+{% include "email/html/header.html.twig" with {title: "OTP_EMAIL_SUBJECT"|translate} %}
+
+{% include_content contentIdent|default('oesm2faotpemail') with {otp: otp} %}
+
+{% include "email/html/footer.html.twig" %}
