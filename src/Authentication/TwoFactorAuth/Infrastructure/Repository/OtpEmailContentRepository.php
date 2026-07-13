@@ -22,7 +22,11 @@ class OtpEmailContentRepository implements OtpEmailContentRepositoryInterface
     {
         $content = $this->contentFactory->create();
 
-        if (!$content->loadByIdent($ident, true)) {
+        if (!$content->loadByIdent($ident)) {
+            return null;
+        }
+
+        if (!(int) $content->getFieldData('oxactive')) {
             return null;
         }
 
