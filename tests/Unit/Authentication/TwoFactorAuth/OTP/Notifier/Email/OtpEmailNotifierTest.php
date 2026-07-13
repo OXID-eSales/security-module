@@ -102,12 +102,31 @@ class OtpEmailNotifierTest extends TestCase
         $this->assertPlainFallbackIsSent($contentRepositoryStub, $rendererStub);
     }
 
+    #[Test]
+    public function notifyFallsBackToPlainMailWhenRenderedPlainMissesTheCode(): void
+    {
+        $code = (string) random_int(100000, 999999);
+
+        $contentRepositoryStub = $this->createStub(OtpEmailContentRepositoryInterface::class);
+        $contentRepositoryStub->method('getEmailSubject')->willReturn(uniqid());
+
+        $rendererStub = $this->createStub(OtpMailRendererInterface::class);
+        $rendererStub->method('render')->willReturnCallback(
+            fn(string $template): string => str_contains($template, '/html/')
+                ? uniqid() . " $code " . uniqid()
+                : uniqid()
+        );
+
+        $this->assertPlainFallbackIsSent($contentRepositoryStub, $rendererStub, $code);
+    }
+
     private function assertPlainFallbackIsSent(
         OtpEmailContentRepositoryInterface $contentRepository,
         OtpMailRendererInterface $renderer,
+        ?string $code = null,
     ): void {
         $email = uniqid() . '@example.com';
-        $code = (string) random_int(100000, 999999);
+        $code ??= (string) random_int(100000, 999999);
         $subject = uniqid();
         $bodyTemplate = uniqid() . ' %s';
 

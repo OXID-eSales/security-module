@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Tests\Integration\Authentication\TwoFactorAuth\OTP\Notifier\Email;
 
 use OxidEsales\Eshop\Application\Model\Content;
+use OxidEsales\Eshop\Core\DatabaseProvider;
 use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
 use OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateRendererBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Transition\Adapter\ShopAdapterInterface;
@@ -26,6 +27,19 @@ use PHPUnit\Framework\Attributes\Test;
 class OtpEmailNotifierTest extends IntegrationTestCase
 {
     private const MAILPIT_API = 'http://mailpit:8025/api/v1';
+
+    public function tearDown(): void
+    {
+        parent::tearDown();
+
+        // The CMS content is seeded at the fixed production ident (OtpMailContent::IDENT). Purge it
+        // explicitly after the transaction rollback so a broken outer transaction cannot leak the row
+        // and collide with the next run.
+        DatabaseProvider::getDb()->execute(
+            'DELETE FROM oxcontents WHERE OXLOADID = ?',
+            [OtpMailContent::IDENT]
+        );
+    }
 
     #[Test]
     public function notifySendsHtmlMailWithTheCodeThroughShopMailer(): void
@@ -61,6 +75,9 @@ class OtpEmailNotifierTest extends IntegrationTestCase
 
     private function seedActiveContent(string $ident, string $body): void
     {
+        // Idempotent seed: remove any row left behind by a previous run before inserting.
+        DatabaseProvider::getDb()->execute('DELETE FROM oxcontents WHERE OXLOADID = ?', [$ident]);
+
         $content = oxNew(Content::class);
         $content->assign([
             'oxloadid' => $ident,

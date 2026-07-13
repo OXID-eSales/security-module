@@ -38,6 +38,18 @@ class OtpMailContentMigrationTest extends IntegrationTestCase
         $this->applyMigration();
     }
 
+    public function tearDown(): void
+    {
+        parent::tearDown();
+
+        // The migration seeds the fixed production ident. Purge it after the transaction rollback so a
+        // broken outer transaction cannot leak the row and collide with the next run.
+        DatabaseProvider::getDb()->execute(
+            'DELETE FROM oxcontents WHERE OXLOADID = ?',
+            [OtpMailContent::IDENT]
+        );
+    }
+
     #[Test]
     public function migrationSeedsAnActiveOtpMailContentRow(): void
     {

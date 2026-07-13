@@ -1,5 +1,6 @@
 {% include "email/html/header.html.twig" with {title: "OTP_EMAIL_SUBJECT"|translate} %}
 
+{# 'oesm2faotpemail' mirrors OtpMailContent::IDENT; the notifier always passes contentIdent explicitly. #}
 {% include_content contentIdent|default('oesm2faotpemail') with {otp: otp} %}
 
 {% include "email/html/footer.html.twig" %}

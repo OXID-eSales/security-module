@@ -57,7 +57,7 @@ class OtpEmailNotifier implements OtpNotifierInterface
             return false;
         }
 
-        if (!str_contains($html, $code)) {
+        if (!str_contains($html, $code) || !str_contains($plain, $code)) {
             return false;
         }
 
