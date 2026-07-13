@@ -1,0 +1,33 @@
+<?php
+
+/**
+ * Copyright © OXID eSales AG. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
+declare(strict_types=1);
+
+namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository;
+
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\ContentModelFactoryInterface;
+
+class OtpEmailContentRepository implements OtpEmailContentRepositoryInterface
+{
+    public function __construct(
+        private ContentModelFactoryInterface $contentFactory,
+    ) {
+    }
+
+    public function getEmailSubject(string $ident): ?string
+    {
+        $content = $this->contentFactory->create();
+
+        if (!$content->loadByIdent($ident, true)) {
+            return null;
+        }
+
+        $title = trim((string) $content->getFieldData('oxtitle'));
+
+        return $title !== '' ? $title : null;
+    }
+}
