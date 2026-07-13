@@ -26,6 +26,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - OXAPI `setTwoFactorAuth(enabled)` mutation: lets an authenticated user
   enable or disable their own 2FA preference.
 
+### Added
+- CMS-editable, branded HTML 2FA OTP email (per-language subject + body via oxcontents) with a plain-text fallback that guarantees code delivery.
+
 ### Changed
 - Updated to work with OXID eShop 7.5.x
 - Minimum PHP version is now 8.3, tested with up to PHP 8.5
