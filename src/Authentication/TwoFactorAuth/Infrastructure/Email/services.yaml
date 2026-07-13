@@ -1,0 +1,9 @@
+services:
+  _defaults:
+    autowire: true
+    public: false
+
+  OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Email\OtpMailRendererInterface:
+    class: OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Email\OtpMailRenderer
+    arguments:
+      $rendererBridge: '@OxidEsales\EshopCommunity\Internal\Framework\Templating\TemplateRendererBridgeInterface'

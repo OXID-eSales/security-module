@@ -1,4 +1,5 @@
 imports:
+  - { resource: Email/services.yaml }
   - { resource: Factory/services.yaml }
   - { resource: Repository/services.yaml }
   - { resource: Service/services.yaml }
