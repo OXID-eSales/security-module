@@ -37,6 +37,5 @@ final class Version20260713120000 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        $this->addSql("DELETE FROM `oxcontents` WHERE `OXLOADID` = 'oesm2faotpemail'");
     }
 }

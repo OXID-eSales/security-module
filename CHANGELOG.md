@@ -27,7 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   enable or disable their own 2FA preference.
 
 ### Added
-- CMS-editable, branded HTML 2FA OTP email (per-language subject + body via oxcontents) with a plain-text fallback that guarantees code delivery.
+- CMS-editable, branded HTML 2FA OTP email (per-language subject + body via oxcontents) with a plain-text fallback
 
 ### Changed
 - Updated to work with OXID eShop 7.5.x

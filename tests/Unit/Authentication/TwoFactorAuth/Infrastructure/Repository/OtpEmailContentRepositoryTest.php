@@ -21,7 +21,7 @@ class OtpEmailContentRepositoryTest extends TestCase
     public function getEmailSubjectReturnsTitleForActiveContent(): void
     {
         $title = uniqid();
-        $contentStub = $this->contentStub(loaded: true, active: 1, title: $title);
+        $contentStub = $this->contentStub(loaded: true, active: true, title: $title);
 
         $sut = $this->getSut($this->factoryReturning($contentStub));
 
@@ -31,7 +31,7 @@ class OtpEmailContentRepositoryTest extends TestCase
     #[Test]
     public function getEmailSubjectReturnsNullWhenContentDoesNotLoad(): void
     {
-        $contentStub = $this->contentStub(loaded: false, active: 0, title: uniqid());
+        $contentStub = $this->contentStub(loaded: false, active: false, title: uniqid());
 
         $sut = $this->getSut($this->factoryReturning($contentStub));
 
@@ -41,7 +41,7 @@ class OtpEmailContentRepositoryTest extends TestCase
     #[Test]
     public function getEmailSubjectReturnsNullWhenContentIsInactive(): void
     {
-        $contentStub = $this->contentStub(loaded: true, active: 0, title: uniqid());
+        $contentStub = $this->contentStub(loaded: true, active: false, title: uniqid());
 
         $sut = $this->getSut($this->factoryReturning($contentStub));
 
@@ -51,21 +51,19 @@ class OtpEmailContentRepositoryTest extends TestCase
     #[Test]
     public function getEmailSubjectReturnsNullWhenTitleIsEmpty(): void
     {
-        $contentStub = $this->contentStub(loaded: true, active: 1, title: '   ');
+        $contentStub = $this->contentStub(loaded: true, active: true, title: '   ');
 
         $sut = $this->getSut($this->factoryReturning($contentStub));
 
         $this->assertNull($sut->getEmailSubject(uniqid()));
     }
 
-    private function contentStub(bool $loaded, int $active, string $title): Content
+    private function contentStub(bool $loaded, bool $active, string $title): Content
     {
         $contentStub = $this->createStub(Content::class);
         $contentStub->method('loadByIdent')->willReturn($loaded);
-        $contentStub->method('getFieldData')->willReturnMap([
-            ['oxactive', $active],
-            ['oxtitle', $title],
-        ]);
+        $contentStub->method('isActive')->willReturn($active);
+        $contentStub->method('getTitle')->willReturn($title);
 
         return $contentStub;
     }

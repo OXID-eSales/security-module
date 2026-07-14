@@ -63,8 +63,7 @@ class OtpEmailNotifier implements OtpNotifierInterface
 
         $mail = $this->emailFactory->create();
         $shop = $mail->getShop();
-        // Mirror Core\Email::setMailParams() (protected): a manual multipart send must set
-        // the sender and SMTP transport from the shop, just like sendEmail() does internally.
+
         $mail->setFrom((string) $shop->getFieldData('oxorderemail'), (string) $shop->getFieldData('oxname'));
         $mail->setSmtp($shop);
         $mail->setSubject($subject);

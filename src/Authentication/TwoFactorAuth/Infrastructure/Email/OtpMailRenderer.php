@@ -20,6 +20,8 @@ class OtpMailRenderer implements OtpMailRendererInterface
 
     public function render(string $template, array $data): string
     {
-        return $this->rendererBridge->getTemplateRenderer()->renderTemplate($template, $data);
+        return $this->rendererBridge
+            ->getTemplateRenderer()
+            ->renderTemplate($template, $data);
     }
 }

@@ -26,11 +26,11 @@ class OtpEmailContentRepository implements OtpEmailContentRepositoryInterface
             return null;
         }
 
-        if (!(int) $content->getFieldData('oxactive')) {
+        if (!$content->isActive()) {
             return null;
         }
 
-        $title = trim((string) $content->getFieldData('oxtitle'));
+        $title = trim($content->getTitle());
 
         return $title !== '' ? $title : null;
     }
