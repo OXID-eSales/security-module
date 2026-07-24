@@ -17,8 +17,11 @@ use OxidEsales\GraphQL\Base\Infrastructure\Legacy;
 use OxidEsales\GraphQL\Base\Service\RefreshTokenServiceInterface;
 use OxidEsales\GraphQL\Base\Service\Token;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\CodeValidationException;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\ResendCooldownException;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAResendableInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAServiceInterface;
 use OxidEsales\SecurityModule\GraphQL\Authentication\TwoFactorAuth\Exception\TwoFactorChallengeException;
+use OxidEsales\SecurityModule\GraphQL\Authentication\TwoFactorAuth\Exception\TwoFactorResendCooldownException;
 use OxidEsales\SecurityModule\GraphQL\Authentication\TwoFactorAuth\Service\ChallengeTokenValidatorServiceInterface;
 use TheCodingMachine\GraphQLite\Annotations\Mutation;
 
@@ -29,6 +32,7 @@ final class TwoFactorAuthController
     public function __construct(
         private readonly TwoFAServiceInterface $twoFAService,
         private readonly ChallengeTokenValidatorServiceInterface $challengeValidator,
+        private readonly TwoFAResendableInterface $resendService,
         private readonly ?Token $tokenService = null,
         private readonly ?Legacy $legacy = null,
         private readonly ?RefreshTokenServiceInterface $refreshTokenService = null,
@@ -60,6 +64,23 @@ final class TwoFactorAuthController
         $this->twoFAService->consumeChallenge((string)$user->id());
 
         return $login;
+    }
+
+    #[Mutation]
+    public function resendTwoFactorOtp(): bool
+    {
+        // todo-medium: resend refreshes the OTP code + its lifetime but not the challenge JWT's
+        // mfa_exp. A late resend can create an OTP that outlives the challenge Bearer, forcing a
+        // re-login. Safe (no bypass), but decide whether resend should also extend the challenge
+        $userId = $this->challengeValidator->validateAndGetUserId();
+
+        try {
+            $this->resendService->resend($userId);
+        } catch (ResendCooldownException $exception) {
+            throw new TwoFactorResendCooldownException(previous: $exception);
+        }
+
+        return true;
     }
 
     private function resolveVerifiedUser(string $otp): User

@@ -33,6 +33,14 @@ services:
     arguments:
       $twoFAService: '@OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAServiceInterface'
       $challengeValidator: '@OxidEsales\SecurityModule\GraphQL\Authentication\TwoFactorAuth\Service\ChallengeTokenValidatorServiceInterface'
+      $resendService: '@OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAResendableInterface'
       $tokenService: '@?OxidEsales\GraphQL\Base\Service\Token'
       $legacy: '@?OxidEsales\GraphQL\Base\Infrastructure\Legacy'
       $refreshTokenService: '@?OxidEsales\GraphQL\Base\Service\RefreshTokenServiceInterface'
+
+  OxidEsales\SecurityModule\GraphQL\Authentication\TwoFactorAuth\Controller\TwoFactorAuthSettingsController:
+    public: true
+    autowire: false
+    arguments:
+      $userSettings: '@OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFAUserSettingsInterface'
+      $tokenService: '@?OxidEsales\GraphQL\Base\Service\Token'

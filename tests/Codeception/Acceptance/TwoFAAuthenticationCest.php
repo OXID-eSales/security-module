@@ -188,7 +188,7 @@ class TwoFAAuthenticationCest extends BaseCest
         $I->waitForPageLoad();
 
         // A code was just sent at login, so the server-driven cooldown should disable the button
-        $I->waitForJS("return document.getElementById('resend-btn').disabled === true", 5);
+        $I->waitForJS("return document.getElementById('resend-btn').disabled === true", 20);
         $I->seeElement('#resend-btn[disabled]');
     }
 

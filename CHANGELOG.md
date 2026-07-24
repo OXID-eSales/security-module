@@ -20,6 +20,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Admin help texts for the four `two_factor_auth` module settings
   (`Enabled`, `Type`, `ApiChallengeLifetime`, `OtpCodeLifetime`) in
   English and German.
+- OXAPI `resendTwoFactorOtp` mutation: re-issues the OTP for a valid
+  `mfa_pending` challenge token, respecting the OtpSendPolicyService resend
+  cooldown.
+- OXAPI `setTwoFactorAuth(enabled)` mutation: lets an authenticated user
+  enable or disable their own 2FA preference.
 
 ### Changed
 - Updated to work with OXID eShop 7.5.x

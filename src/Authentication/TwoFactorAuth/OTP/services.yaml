@@ -9,3 +9,6 @@ services:
     public: false
 
   OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\OtpFacade: ~
+
+  OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAResendableInterface:
+    alias: OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\OtpFacade

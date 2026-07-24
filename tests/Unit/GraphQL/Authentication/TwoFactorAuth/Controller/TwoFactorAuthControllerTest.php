@@ -17,9 +17,12 @@ use OxidEsales\GraphQL\Base\Infrastructure\Legacy;
 use OxidEsales\GraphQL\Base\Service\RefreshTokenServiceInterface;
 use OxidEsales\GraphQL\Base\Service\Token;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\InvalidCodeException;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\ResendCooldownException;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAResendableInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAServiceInterface;
 use OxidEsales\SecurityModule\GraphQL\Authentication\TwoFactorAuth\Controller\TwoFactorAuthController;
 use OxidEsales\SecurityModule\GraphQL\Authentication\TwoFactorAuth\Exception\TwoFactorChallengeException;
+use OxidEsales\SecurityModule\GraphQL\Authentication\TwoFactorAuth\Exception\TwoFactorResendCooldownException;
 // phpcs:ignore Generic.Files.LineLength
 use OxidEsales\SecurityModule\GraphQL\Authentication\TwoFactorAuth\Service\ChallengeTokenValidatorServiceInterface;
 use PHPUnit\Framework\Attributes\Test;
@@ -143,6 +146,54 @@ class TwoFactorAuthControllerTest extends TestCase
         $sut->verifyTwoFactorLogin(uniqid());
     }
 
+    #[Test]
+    public function resendTwoFactorOtpTriggersResendForValidatedChallenge(): void
+    {
+        $userId = uniqid();
+
+        $resendServiceSpy = $this->createMock(TwoFAResendableInterface::class);
+        $resendServiceSpy->expects($this->once())->method('resend')->with($userId);
+
+        $sut = $this->getSut(
+            challengeValidator: $this->validatorReturning($userId),
+            resendService: $resendServiceSpy,
+        );
+
+        $this->assertTrue($sut->resendTwoFactorOtp());
+    }
+
+    #[Test]
+    public function resendTwoFactorOtpTranslatesCooldownToClientAwareError(): void
+    {
+        $resendServiceSpy = $this->createMock(TwoFAResendableInterface::class);
+        $resendServiceSpy->method('resend')->willThrowException(new ResendCooldownException());
+
+        $sut = $this->getSut(
+            challengeValidator: $this->validatorReturning(uniqid()),
+            resendService: $resendServiceSpy,
+        );
+
+        $this->expectException(TwoFactorResendCooldownException::class);
+
+        $sut->resendTwoFactorOtp();
+    }
+
+    #[Test]
+    public function resendTwoFactorOtpPropagatesChallengeValidationFailureAndSkipsResend(): void
+    {
+        $resendServiceSpy = $this->createMock(TwoFAResendableInterface::class);
+        $resendServiceSpy->expects($this->never())->method('resend');
+
+        $sut = $this->getSut(
+            challengeValidator: $this->validatorThrowing(),
+            resendService: $resendServiceSpy,
+        );
+
+        $this->expectException(InvalidToken::class);
+
+        $sut->resendTwoFactorOtp();
+    }
+
     private function accessTokenStub(string $accessToken): UnencryptedToken
     {
         $stub = $this->createStub(UnencryptedToken::class);
@@ -181,6 +232,7 @@ class TwoFactorAuthControllerTest extends TestCase
     private function getSut(
         ?TwoFAServiceInterface $twoFAService = null,
         ?ChallengeTokenValidatorServiceInterface $challengeValidator = null,
+        ?TwoFAResendableInterface $resendService = null,
         ?Token $tokenService = null,
         ?Legacy $legacy = null,
         ?RefreshTokenServiceInterface $refreshTokenService = null,
@@ -189,6 +241,7 @@ class TwoFactorAuthControllerTest extends TestCase
             twoFAService: $twoFAService ?? $this->createStub(TwoFAServiceInterface::class),
             challengeValidator: $challengeValidator
                 ?? $this->createStub(ChallengeTokenValidatorServiceInterface::class),
+            resendService: $resendService ?? $this->createStub(TwoFAResendableInterface::class),
             tokenService: $tokenService ?? $this->createStub(Token::class),
             legacy: $legacy ?? $this->createStub(Legacy::class),
             refreshTokenService: $refreshTokenService ?? $this->createStub(RefreshTokenServiceInterface::class),
