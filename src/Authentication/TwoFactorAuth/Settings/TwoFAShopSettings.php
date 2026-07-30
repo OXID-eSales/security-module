@@ -19,6 +19,10 @@ class TwoFAShopSettings implements TwoFAShopSettingsInterface
 
     public const TWO_FACTOR_TYPE = 'oeSecurityTwoFactorAuthType';
 
+    public const API_CHALLENGE_LIFETIME = 'oeSecurityTwoFactorAuthApiChallengeLifetime';
+
+    public const OTP_CODE_LIFETIME = 'oeSecurityTwoFactorAuthOtpCodeLifetime';
+
     public function __construct(
         private Config $config,
         private ModuleSettingServiceInterface $moduleSettingService,
@@ -35,6 +39,21 @@ class TwoFAShopSettings implements TwoFAShopSettingsInterface
         return $this->moduleSettingService->getString(self::TWO_FACTOR_TYPE, Module::MODULE_ID)
             ->trim()
             ->toString();
+    }
+
+    public function getApiChallengeLifetime(): int
+    {
+        return $this->moduleSettingService->getInteger(self::API_CHALLENGE_LIFETIME, Module::MODULE_ID);
+    }
+
+    public function getOtpCodeLifetime(): int
+    {
+        return $this->moduleSettingService->getInteger(self::OTP_CODE_LIFETIME, Module::MODULE_ID);
+    }
+
+    public function getEffectiveChallengeLifetime(): int
+    {
+        return min($this->getApiChallengeLifetime(), $this->getOtpCodeLifetime());
     }
 
     public function getVerificationUrl(): string

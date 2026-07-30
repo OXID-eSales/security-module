@@ -17,6 +17,8 @@ interface TwoFAServiceInterface
 
     public function invalidateChallenge(string $userId): void;
 
+    public function consumeChallenge(string $userId): void;
+
     /**
      * @throws CodeValidationException
      */

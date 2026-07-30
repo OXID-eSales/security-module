@@ -11,27 +11,29 @@ namespace OxidEsales\SecurityModule\Tests\Integration\Authentication\TwoFactorAu
 
 use OxidEsales\Eshop\Core\Email;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\EmailFactory;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class EmailFactoryTest extends TestCase
 {
-    public function testCreateUserFactory(): void
+    #[Test]
+    public function createReturnsAnEmailModel(): void
     {
         $emailFactory = new EmailFactory();
-        $emailModel = $emailFactory->create();
 
-        $this->assertInstanceOf(Email::class, $emailModel);
+        $this->assertInstanceOf(Email::class, $emailFactory->create());
     }
 
-    public function testCreateMultipleUserFactory(): void
+    #[Test]
+    public function eachCreateReturnsADistinctEmailModel(): void
     {
         $emailFactory = new EmailFactory();
 
         $emailModel = $emailFactory->create();
-        $this->assertInstanceOf(Email::class, $emailModel);
+        $newEmailModel = $emailFactory->create();
 
-        $newEmailFactory = $emailFactory->create();
-        $this->assertInstanceOf(Email::class, $newEmailFactory);
-        $this->assertNotSame($emailModel, $newEmailFactory);
+        $this->assertInstanceOf(Email::class, $emailModel);
+        $this->assertInstanceOf(Email::class, $newEmailModel);
+        $this->assertNotSame($emailModel, $newEmailModel);
     }
 }

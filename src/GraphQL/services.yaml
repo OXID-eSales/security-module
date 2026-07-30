@@ -1,0 +1,11 @@
+imports:
+  - { resource: Authentication/TwoFactorAuth/services.yaml }
+
+services:
+  _defaults:
+    public: false
+
+  OxidEsales\SecurityModule\GraphQL\Shared\NamespaceMapper:
+    autowire: false
+    tags:
+      - { name: graphql_namespace_mapper }

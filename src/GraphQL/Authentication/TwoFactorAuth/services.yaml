@@ -1,0 +1,46 @@
+services:
+  _defaults:
+    public: false
+
+  OxidEsales\SecurityModule\GraphQL\Authentication\TwoFactorAuth\Infrastructure\SecureApiLegacy:
+    decorates: OxidEsales\GraphQL\Base\Infrastructure\Legacy
+    decoration_on_invalid: ignore
+    autowire: false
+    arguments: ['@.inner']
+
+  OxidEsales\SecurityModule\GraphQL\Authentication\TwoFactorAuth\Service\PendingAwareRefreshTokenService:
+    decorates: OxidEsales\GraphQL\Base\Service\RefreshTokenServiceInterface
+    decoration_on_invalid: ignore
+    autowire: false
+    arguments: ['@.inner']
+
+  OxidEsales\SecurityModule\GraphQL\Authentication\TwoFactorAuth\EventSubscriber\BeforeTokenCreationSubscriber:
+    autowire: false
+    arguments:
+      $settings: '@OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFAShopSettingsInterface'
+    tags:
+      - { name: kernel.event_subscriber }
+
+  OxidEsales\SecurityModule\GraphQL\Authentication\TwoFactorAuth\Service\ChallengeTokenValidatorServiceInterface:
+    class: OxidEsales\SecurityModule\GraphQL\Authentication\TwoFactorAuth\Service\ChallengeTokenValidatorService
+    autowire: false
+    arguments:
+      $tokenService: '@?OxidEsales\GraphQL\Base\Service\Token'
+
+  OxidEsales\SecurityModule\GraphQL\Authentication\TwoFactorAuth\Controller\TwoFactorAuthController:
+    public: true
+    autowire: false
+    arguments:
+      $twoFAService: '@OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAServiceInterface'
+      $challengeValidator: '@OxidEsales\SecurityModule\GraphQL\Authentication\TwoFactorAuth\Service\ChallengeTokenValidatorServiceInterface'
+      $resendService: '@OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAResendableInterface'
+      $tokenService: '@?OxidEsales\GraphQL\Base\Service\Token'
+      $legacy: '@?OxidEsales\GraphQL\Base\Infrastructure\Legacy'
+      $refreshTokenService: '@?OxidEsales\GraphQL\Base\Service\RefreshTokenServiceInterface'
+
+  OxidEsales\SecurityModule\GraphQL\Authentication\TwoFactorAuth\Controller\TwoFactorAuthSettingsController:
+    public: true
+    autowire: false
+    arguments:
+      $userSettings: '@OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFAUserSettingsInterface'
+      $tokenService: '@?OxidEsales\GraphQL\Base\Service\Token'
