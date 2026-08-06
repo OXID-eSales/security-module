@@ -21,6 +21,8 @@ use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factor
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository\OtpEmailContentRepositoryInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository\UserRepositoryInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Notifier\Email\OtpEmailNotifier;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFAShopSettingsInterface;
+use Psr\Log\NullLogger;
 use OxidEsales\SecurityModule\Tests\Integration\IntegrationTestCase;
 use PHPUnit\Framework\Attributes\Test;
 
@@ -32,9 +34,6 @@ class OtpEmailNotifierTest extends IntegrationTestCase
     {
         parent::tearDown();
 
-        // The CMS content is seeded at the fixed production ident (OtpMailContent::IDENT). Purge it
-        // explicitly after the transaction rollback so a broken outer transaction cannot leak the row
-        // and collide with the next run.
         DatabaseProvider::getDb()->execute(
             'DELETE FROM oxcontents WHERE OXLOADID = ?',
             [OtpMailContent::IDENT]
@@ -70,7 +69,17 @@ class OtpEmailNotifierTest extends IntegrationTestCase
             renderer: new OtpMailRenderer(
                 ContainerFactory::getInstance()->getContainer()->get(TemplateRendererBridgeInterface::class),
             ),
+            settings: $this->settingsStub(),
+            logger: new NullLogger(),
         );
+    }
+
+    private function settingsStub(): TwoFAShopSettingsInterface
+    {
+        $stub = $this->createStub(TwoFAShopSettingsInterface::class);
+        $stub->method('getOtpCodeLifetime')->willReturn(300);
+
+        return $stub;
     }
 
     private function seedActiveContent(string $ident, string $body): void

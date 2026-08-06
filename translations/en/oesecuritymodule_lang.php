@@ -46,7 +46,7 @@ $aLang = [
     'OTP_EMAIL_BODY'    => "Hello,\n\n"
         . "Someone (hopefully you) is trying to log in to your OXID eShop account.\n\n"
         . "Your verification code is: %s\n\n"
-        . "This code expires in 5 minutes and can only be used once.\n\n"
+        . "This code expires in %d minutes and can only be used once.\n\n"
         . "If you didn't try to log in, you can safely ignore this email — but we'd recommend"
         . " changing your password just to be safe.\n\n"
         . "Your OXID eShop team.",

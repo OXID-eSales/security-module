@@ -1,9 +1,9 @@
-{% include "email/html/header.html.twig" with {title: "OTP_EMAIL_SUBJECT"|translate} %}
+{% include "email/html/header.html.twig" with {title: subject|default("OTP_EMAIL_SUBJECT"|translate)} %}
 
 {# 'oesm2faotpemail' mirrors OtpMailContent::IDENT; the notifier always passes contentIdent explicitly. #}
 {# The content body is stored as plain text with newlines; nl2br turns them into <br> for the HTML mail. #}
 {% apply nl2br %}
-{%- include_content contentIdent|default('oesm2faotpemail') with {otp: otp} -%}
+{%- include_content contentIdent|default('oesm2faotpemail') with {otp: otp, minutes: minutes} -%}
 {% endapply %}
 
 {% include "email/html/footer.html.twig" %}

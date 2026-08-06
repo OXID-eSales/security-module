@@ -19,6 +19,8 @@ use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factor
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository\OtpEmailContentRepositoryInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository\UserRepositoryInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Notifier\Email\OtpEmailNotifier;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFAShopSettingsInterface;
+use Psr\Log\LoggerInterface;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
@@ -64,6 +66,133 @@ class OtpEmailNotifierTest extends TestCase
             userRepository: $this->userRepositoryReturning($email),
             contentRepository: $contentRepositoryMock,
             renderer: $rendererMock,
+        );
+
+        $sut->notify(userId: uniqid(), code: $code);
+    }
+
+    #[Test]
+    public function notifyPassesConfiguredLifetimeAsMinutesToTemplate(): void
+    {
+        $code = (string) random_int(100000, 999999);
+        $html = uniqid() . " $code " . uniqid();
+        $plain = uniqid() . " $code";
+
+        $contentRepositoryStub = $this->createStub(OtpEmailContentRepositoryInterface::class);
+        $contentRepositoryStub->method('getEmailSubject')->willReturn(uniqid());
+
+        $rendererMock = $this->createMock(OtpMailRendererInterface::class);
+        $rendererMock->expects($this->exactly(2))
+            ->method('render')
+            ->willReturnCallback(function (string $template, array $data) use ($html, $plain): string {
+                // 300 s configured lifetime -> "5" minutes in the mail copy
+                $this->assertSame(5, $data['minutes']);
+
+                return str_contains($template, '/html/') ? $html : $plain;
+            });
+
+        $emailModelMock = $this->createMock(Email::class);
+        $emailModelMock->method('getShop')->willReturn($this->createStub(Shop::class));
+        $emailModelMock->expects($this->once())->method('send');
+
+        $sut = $this->getSut(
+            emailFactory: $this->emailFactoryReturning($emailModelMock),
+            userRepository: $this->userRepositoryReturning(uniqid() . '@example.com'),
+            contentRepository: $contentRepositoryStub,
+            renderer: $rendererMock,
+            settings: $this->settingsWithLifetime(300),
+        );
+
+        $sut->notify(userId: uniqid(), code: $code);
+    }
+
+    #[Test]
+    public function notifyFallbackShowsConfiguredLifetimeMinutes(): void
+    {
+        $email = uniqid() . '@example.com';
+        $code = (string) random_int(100000, 999999);
+        $subject = uniqid();
+        $bodyTemplate = uniqid() . ' code %s valid %d min';
+
+        $translations = ['OTP_EMAIL_SUBJECT' => $subject, 'OTP_EMAIL_BODY' => $bodyTemplate];
+        $shopAdapterStub = $this->createStub(ShopAdapterInterface::class);
+        $shopAdapterStub->method('translateString')->willReturnCallback(
+            fn(string $key): string => $translations[$key] ?? $key
+        );
+
+        $contentRepositoryStub = $this->createStub(OtpEmailContentRepositoryInterface::class);
+        $contentRepositoryStub->method('getEmailSubject')->willReturn(null); // force fallback
+
+        $emailModelMock = $this->createMock(Email::class);
+        $emailModelMock->expects($this->once())
+            ->method('sendEmail')
+            // 120 s -> 2 minutes
+            ->with($email, $subject, sprintf($bodyTemplate, $code, 2));
+
+        $sut = $this->getSut(
+            emailFactory: $this->emailFactoryReturning($emailModelMock),
+            userRepository: $this->userRepositoryReturning($email),
+            shopAdapter: $shopAdapterStub,
+            contentRepository: $contentRepositoryStub,
+            settings: $this->settingsWithLifetime(120),
+        );
+
+        $sut->notify(userId: uniqid(), code: $code);
+    }
+
+    #[Test]
+    public function notifyLogsWarningAndFallsBackWhenRendererThrows(): void
+    {
+        $code = (string) random_int(100000, 999999);
+
+        $contentRepositoryStub = $this->createStub(OtpEmailContentRepositoryInterface::class);
+        $contentRepositoryStub->method('getEmailSubject')->willReturn(uniqid());
+
+        $rendererStub = $this->createStub(OtpMailRendererInterface::class);
+        $rendererStub->method('render')->willThrowException(new \RuntimeException(uniqid()));
+
+        $loggerMock = $this->createMock(LoggerInterface::class);
+        $loggerMock->expects($this->once())->method('warning')
+            ->willReturnCallback(fn(string $message, array $context = []) => $this->assertCodeNotLogged($code, $message, $context));
+
+        $emailModelMock = $this->createMock(Email::class);
+        $emailModelMock->expects($this->once())->method('sendEmail'); // fallback still delivers
+
+        $sut = $this->getSut(
+            emailFactory: $this->emailFactoryReturning($emailModelMock),
+            userRepository: $this->userRepositoryReturning(uniqid() . '@example.com'),
+            contentRepository: $contentRepositoryStub,
+            renderer: $rendererStub,
+            logger: $loggerMock,
+        );
+
+        $sut->notify(userId: uniqid(), code: $code);
+    }
+
+    #[Test]
+    public function notifyLogsWarningAndFallsBackWhenRenderedBodyMissesCode(): void
+    {
+        $code = (string) random_int(100000, 999999);
+
+        $contentRepositoryStub = $this->createStub(OtpEmailContentRepositoryInterface::class);
+        $contentRepositoryStub->method('getEmailSubject')->willReturn(uniqid());
+
+        $rendererStub = $this->createStub(OtpMailRendererInterface::class);
+        $rendererStub->method('render')->willReturn(uniqid()); // rendered body without the code
+
+        $loggerMock = $this->createMock(LoggerInterface::class);
+        $loggerMock->expects($this->once())->method('warning')
+            ->willReturnCallback(fn(string $message, array $context = []) => $this->assertCodeNotLogged($code, $message, $context));
+
+        $emailModelMock = $this->createMock(Email::class);
+        $emailModelMock->expects($this->once())->method('sendEmail');
+
+        $sut = $this->getSut(
+            emailFactory: $this->emailFactoryReturning($emailModelMock),
+            userRepository: $this->userRepositoryReturning(uniqid() . '@example.com'),
+            contentRepository: $contentRepositoryStub,
+            renderer: $rendererStub,
+            logger: $loggerMock,
         );
 
         $sut->notify(userId: uniqid(), code: $code);
@@ -175,12 +304,28 @@ class OtpEmailNotifierTest extends TestCase
         return $userRepositoryStub;
     }
 
+    private function assertCodeNotLogged(string $code, string $message, array $context): void
+    {
+        $this->assertStringNotContainsString($code, $message);
+        $this->assertStringNotContainsString($code, (string) json_encode($context));
+    }
+
+    private function settingsWithLifetime(int $seconds): TwoFAShopSettingsInterface
+    {
+        $stub = $this->createStub(TwoFAShopSettingsInterface::class);
+        $stub->method('getOtpCodeLifetime')->willReturn($seconds);
+
+        return $stub;
+    }
+
     private function getSut(
         ?EmailFactoryInterface $emailFactory = null,
         ?UserRepositoryInterface $userRepository = null,
         ?ShopAdapterInterface $shopAdapter = null,
         ?OtpEmailContentRepositoryInterface $contentRepository = null,
         ?OtpMailRendererInterface $renderer = null,
+        ?TwoFAShopSettingsInterface $settings = null,
+        ?LoggerInterface $logger = null,
     ): OtpEmailNotifier {
         return new OtpEmailNotifier(
             emailFactory: $emailFactory ?? $this->createStub(EmailFactoryInterface::class),
@@ -188,6 +333,8 @@ class OtpEmailNotifierTest extends TestCase
             shopAdapter: $shopAdapter ?? $this->createStub(ShopAdapterInterface::class),
             contentRepository: $contentRepository ?? $this->createStub(OtpEmailContentRepositoryInterface::class),
             renderer: $renderer ?? $this->createStub(OtpMailRendererInterface::class),
+            settings: $settings ?? $this->createStub(TwoFAShopSettingsInterface::class),
+            logger: $logger ?? $this->createStub(LoggerInterface::class),
         );
     }
 }

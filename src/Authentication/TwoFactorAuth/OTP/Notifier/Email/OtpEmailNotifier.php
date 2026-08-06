@@ -16,6 +16,8 @@ use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factor
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository\OtpEmailContentRepositoryInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository\UserRepositoryInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\OTP\Notifier\OtpNotifierInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFAShopSettingsInterface;
+use Psr\Log\LoggerInterface;
 
 class OtpEmailNotifier implements OtpNotifierInterface
 {
@@ -28,21 +30,24 @@ class OtpEmailNotifier implements OtpNotifierInterface
         private ShopAdapterInterface $shopAdapter,
         private OtpEmailContentRepositoryInterface $contentRepository,
         private OtpMailRendererInterface $renderer,
+        private TwoFAShopSettingsInterface $settings,
+        private LoggerInterface $logger,
     ) {
     }
 
     public function notify(string $userId, #[\SensitiveParameter] string $code): void
     {
         $email = $this->userRepository->getUserById($userId)->getEmail();
+        $minutes = $this->otpLifetimeInMinutes();
 
-        if ($this->sendFromCmsContent($email, $code)) {
+        if ($this->sendFromCmsContent($email, $code, $minutes)) {
             return;
         }
 
-        $this->sendFallback($email, $code);
+        $this->sendFallback($email, $code, $minutes);
     }
 
-    private function sendFromCmsContent(string $email, #[\SensitiveParameter] string $code): bool
+    private function sendFromCmsContent(string $email, #[\SensitiveParameter] string $code, int $minutes): bool
     {
         $subject = $this->contentRepository->getEmailSubject(OtpMailContent::IDENT);
         if ($subject === null) {
@@ -50,14 +55,25 @@ class OtpEmailNotifier implements OtpNotifierInterface
         }
 
         try {
-            $data = ['otp' => $code, 'contentIdent' => OtpMailContent::IDENT];
+            $data = ['otp' => $code, 'minutes' => $minutes, 'subject' => $subject, 'contentIdent' => OtpMailContent::IDENT];
             $html = $this->renderer->render(self::HTML_TEMPLATE, $data);
             $plain = $this->renderer->render(self::PLAIN_TEMPLATE, $data);
-        } catch (\Throwable) {
+        } catch (\Throwable $e) {
+            $this->logger->warning(
+                'Rendering the 2FA OTP CMS mail template failed; falling back to the built-in mail.',
+                ['contentIdent' => OtpMailContent::IDENT, 'exception' => $e::class, 'message' => $e->getMessage()],
+            );
+
             return false;
         }
 
         if (!str_contains($html, $code) || !str_contains($plain, $code)) {
+            $this->logger->warning(
+                'The 2FA OTP CMS mail content does not contain the code placeholder;'
+                . ' falling back to the built-in mail.',
+                ['contentIdent' => OtpMailContent::IDENT],
+            );
+
             return false;
         }
 
@@ -75,11 +91,16 @@ class OtpEmailNotifier implements OtpNotifierInterface
         return true;
     }
 
-    private function sendFallback(string $email, #[\SensitiveParameter] string $code): void
+    private function sendFallback(string $email, #[\SensitiveParameter] string $code, int $minutes): void
     {
         $subject = $this->shopAdapter->translateString('OTP_EMAIL_SUBJECT');
         $bodyTemplate = $this->shopAdapter->translateString('OTP_EMAIL_BODY');
 
-        $this->emailFactory->create()->sendEmail($email, $subject, sprintf($bodyTemplate, $code));
+        $this->emailFactory->create()->sendEmail($email, $subject, sprintf($bodyTemplate, $code, $minutes));
+    }
+
+    private function otpLifetimeInMinutes(): int
+    {
+        return max(1, (int) round($this->settings->getOtpCodeLifetime() / 60));
     }
 }

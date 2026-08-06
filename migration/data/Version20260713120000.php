@@ -25,8 +25,8 @@ final class Version20260713120000 extends AbstractMigration
     {
         // The body is stored as plain text with newlines: the plain email template renders it as-is,
         // the HTML template wraps it in {% apply nl2br %} so the same newlines become <br>. {{ otp }}
-        // is substituted at render time. The "5 minutes" wording tracks the hardwired OTP lifetime
-        // in OtpChallengeStateService (todo there: move to a setting and keep this copy in sync).
+        // and {{ minutes }} are substituted at render time — {{ minutes }} is the configured OTP code
+        // lifetime (oeSecurityTwoFactorAuthOtpCodeLifetime, in minutes), passed in by OtpEmailNotifier.
         $titleDe = 'Ihr OXID eShop Verifizierungscode';
         $bodyDe = <<<'TEXT'
             Hallo,
@@ -35,7 +35,7 @@ final class Version20260713120000 extends AbstractMigration
 
             Ihr Verifizierungscode lautet: {{ otp }}
 
-            Dieser Code läuft in 5 Minuten ab und kann nur einmal verwendet werden.
+            Dieser Code läuft in {{ minutes }} Minuten ab und kann nur einmal verwendet werden.
 
             Falls Sie sich nicht anmelden wollten, können Sie diese E-Mail ignorieren – zur Sicherheit empfehlen wir jedoch, Ihr Passwort zu ändern.
 
@@ -50,7 +50,7 @@ final class Version20260713120000 extends AbstractMigration
 
             Your verification code is: {{ otp }}
 
-            This code expires in 5 minutes and can only be used once.
+            This code expires in {{ minutes }} minutes and can only be used once.
 
             If you didn't try to log in, you can safely ignore this email — but we'd recommend changing your password just to be safe.
 

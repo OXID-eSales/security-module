@@ -92,6 +92,19 @@ When enabled, users are required to enter a verification code sent to their emai
 - Enable/Disable Two-Factor Authentication
 - Verification type (currently supports OTP)
 
+#### OTP email template (CMS content)
+
+The OTP email is rendered from a CMS content block (`OXLOADID: oesm2faotpemail`, folder
+`CMSFOLDER_EMAILS`) so operators can edit the subject and body in the admin. The `{{ otp }}` and
+`{{ minutes }}` placeholders are substituted at send time — `{{ minutes }}` is the configured OTP
+code lifetime (`oeSecurityTwoFactorAuthOtpCodeLifetime`). If the CMS content is missing or inactive,
+the module falls back to the built-in translated plain-text mail.
+
+> **Note:** the content is seeded by migration for **shop 1** in **German and English** only.
+> Depending on your shop setup (CE / PE / EE) and the active languages, it may be necessary to add
+> the mail template into CMS content manually — e.g. for additional languages or for EE subshops
+> other than shop 1.
+
 ### Running the tests and quality tools
 
 Check the "scripts" section in the `composer.json` file for the available commands. Those commands can be executed

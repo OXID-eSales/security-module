@@ -165,12 +165,12 @@ class TwoFactorAuthControllerTest extends TestCase
     #[Test]
     public function resendTwoFactorOtpTranslatesCooldownToClientAwareError(): void
     {
-        $resendServiceSpy = $this->createMock(TwoFAResendableInterface::class);
-        $resendServiceSpy->method('resend')->willThrowException(new ResendCooldownException());
+        $resendServiceStub = $this->createStub(TwoFAResendableInterface::class);
+        $resendServiceStub->method('resend')->willThrowException(new ResendCooldownException());
 
         $sut = $this->getSut(
             challengeValidator: $this->validatorReturning(uniqid()),
-            resendService: $resendServiceSpy,
+            resendService: $resendServiceStub,
         );
 
         $this->expectException(TwoFactorResendCooldownException::class);
