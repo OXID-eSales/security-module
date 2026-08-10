@@ -153,7 +153,9 @@ class OtpEmailNotifierTest extends TestCase
 
         $loggerMock = $this->createMock(LoggerInterface::class);
         $loggerMock->expects($this->once())->method('warning')
-            ->willReturnCallback(fn(string $message, array $context = []) => $this->assertCodeNotLogged($code, $message, $context));
+            ->willReturnCallback(
+                fn(string $message, array $context = []) => $this->assertCodeNotLogged($code, $message, $context)
+            );
 
         $emailModelMock = $this->createMock(Email::class);
         $emailModelMock->expects($this->once())->method('sendEmail'); // fallback still delivers
@@ -182,7 +184,9 @@ class OtpEmailNotifierTest extends TestCase
 
         $loggerMock = $this->createMock(LoggerInterface::class);
         $loggerMock->expects($this->once())->method('warning')
-            ->willReturnCallback(fn(string $message, array $context = []) => $this->assertCodeNotLogged($code, $message, $context));
+            ->willReturnCallback(
+                fn(string $message, array $context = []) => $this->assertCodeNotLogged($code, $message, $context)
+            );
 
         $emailModelMock = $this->createMock(Email::class);
         $emailModelMock->expects($this->once())->method('sendEmail');

@@ -55,7 +55,12 @@ class OtpEmailNotifier implements OtpNotifierInterface
         }
 
         try {
-            $data = ['otp' => $code, 'minutes' => $minutes, 'subject' => $subject, 'contentIdent' => OtpMailContent::IDENT];
+            $data = [
+                'otp' => $code,
+                'minutes' => $minutes,
+                'subject' => $subject,
+                'contentIdent' => OtpMailContent::IDENT,
+            ];
             $html = $this->renderer->render(self::HTML_TEMPLATE, $data);
             $plain = $this->renderer->render(self::PLAIN_TEMPLATE, $data);
         } catch (\Throwable $e) {
