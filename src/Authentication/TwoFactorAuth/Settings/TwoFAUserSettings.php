@@ -10,11 +10,13 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings;
 
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Repository\UserRepositoryInterface;
+use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TokenInvalidationServiceInterface;
 
 class TwoFAUserSettings implements TwoFAUserSettingsInterface
 {
     public function __construct(
         private UserRepositoryInterface $userRepository,
+        private TokenInvalidationServiceInterface $tokenInvalidationService,
     ) {
     }
 
@@ -25,6 +27,12 @@ class TwoFAUserSettings implements TwoFAUserSettingsInterface
 
     public function setEnabledForUser(string $userId, bool $enabled): void
     {
+        $wasEnabled = $this->isEnabledForUser($userId);
+
         $this->userRepository->setTwoFAEnabled($userId, $enabled);
+
+        if ($enabled && !$wasEnabled) {
+            $this->tokenInvalidationService->invalidateForUser($userId);
+        }
     }
 }

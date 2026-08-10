@@ -37,6 +37,25 @@ final class SetTwoFactorAuthCest extends BaseCest
         $I->seeInDatabase('oxuser', ['OXID' => $user['userId'], 'OE2FAENABLED' => 0]);
     }
 
+    public function enablingTwoFactorAuthInvalidatesTheCurrentToken(AcceptanceTester $I): void
+    {
+        $this->prepareRegularUser($I);
+        $user = $this->user();
+        $I->amBearerAuthenticated($this->fullToken($I));
+
+        $before = $this->sendGraphQL($I, self::TOGGLE, ['e' => false]);
+        $I->assertArrayNotHasKey('errors', $before, 'The full token must work before 2FA is enabled');
+
+        $enable = $this->sendGraphQL($I, self::TOGGLE, ['e' => true]);
+        $I->assertTrue($enable['data']['setTwoFactorAuth'] ?? false);
+        $I->seeInDatabase('oxuser', ['OXID' => $user['userId'], 'OE2FAENABLED' => 1]);
+
+        $after = $this->sendGraphQL($I, self::TOGGLE, ['e' => false]);
+        $I->assertArrayHasKey('errors', $after, 'The token must be invalid after 2FA was enabled');
+        $I->assertNull($after['data']['setTwoFactorAuth'] ?? null);
+        $I->seeInDatabase('oxuser', ['OXID' => $user['userId'], 'OE2FAENABLED' => 1]);
+    }
+
     public function rejectsAnAnonymousChallengeToken(AcceptanceTester $I): void
     {
         $this->prepareTwoFAChallengeUser($I);

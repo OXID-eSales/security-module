@@ -27,6 +27,13 @@ services:
     arguments:
       $tokenService: '@?OxidEsales\GraphQL\Base\Service\Token'
 
+  OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TokenInvalidationServiceInterface:
+    class: OxidEsales\SecurityModule\GraphQL\Authentication\TwoFactorAuth\Service\TokenInvalidationService
+    autowire: false
+    arguments:
+      $tokenInfrastructure: '@?OxidEsales\GraphQL\Base\Infrastructure\Token'
+      $refreshTokenRepository: '@?OxidEsales\GraphQL\Base\Infrastructure\RefreshTokenRepositoryInterface'
+
   OxidEsales\SecurityModule\GraphQL\Authentication\TwoFactorAuth\Controller\TwoFactorAuthController:
     public: true
     autowire: false
