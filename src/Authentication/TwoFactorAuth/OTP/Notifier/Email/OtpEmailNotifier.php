@@ -91,7 +91,15 @@ class OtpEmailNotifier implements OtpNotifierInterface
         $mail->setBody($html);
         $mail->setAltBody($plain);
         $mail->setRecipient($email, '');
-        $mail->send();
+
+        if (!$mail->send()) {
+            $this->logger->warning(
+                'Sending the 2FA OTP CMS mail failed; falling back to the built-in mail.',
+                ['contentIdent' => OtpMailContent::IDENT],
+            );
+
+            return false;
+        }
 
         return true;
     }

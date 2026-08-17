@@ -28,18 +28,6 @@ use PHPUnit\Framework\Attributes\Test;
 
 class OtpEmailNotifierTest extends IntegrationTestCase
 {
-    private const MAILPIT_API = 'http://mailpit:8025/api/v1';
-
-    public function tearDown(): void
-    {
-        parent::tearDown();
-
-        DatabaseProvider::getDb()->execute(
-            'DELETE FROM oxcontents WHERE OXLOADID = ?',
-            [OtpMailContent::IDENT]
-        );
-    }
-
     #[Test]
     public function notifySendsHtmlMailWithTheCodeThroughShopMailer(): void
     {
@@ -123,8 +111,16 @@ class OtpEmailNotifierTest extends IntegrationTestCase
      */
     private function mailpitGet(string $path): array
     {
-        $response = file_get_contents(self::MAILPIT_API . $path);
+        $response = file_get_contents($this->mailpitApiBase() . $path);
 
         return $response ? (array) json_decode($response, true) : [];
+    }
+
+    private function mailpitApiBase(): string
+    {
+        $host = getenv('MAIL_HOST') ?: 'mailpit';
+        $port = getenv('MAIL_WEB_PORT') ?: '8025';
+
+        return sprintf('http://%s:%s/api/v1', $host, $port);
     }
 }

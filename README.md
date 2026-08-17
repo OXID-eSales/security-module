@@ -53,6 +53,15 @@ git clone --recurse-submodules https://github.com/OXID-eSales/security-module.gi
 You should be able to access the shop with http://localhost.local and the admin panel with http://localhost.local/admin
 (credentials: noreply@oxid-esales.com / admin)
 
+## Building the documentation locally
+
+If the "Development installation on OXID eShop SDK" section was followed, the documentation repository will be already
+cloned and prepared to use for you, so the documentation can be built locally:
+
+```
+make generate-docs
+```
+
 ## Features
 
 ### Password Strength Policy

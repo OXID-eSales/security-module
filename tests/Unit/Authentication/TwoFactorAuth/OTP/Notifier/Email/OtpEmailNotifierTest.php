@@ -58,7 +58,7 @@ class OtpEmailNotifierTest extends TestCase
         $emailModelMock->expects($this->once())->method('setBody')->with($html);
         $emailModelMock->expects($this->once())->method('setAltBody')->with($plain);
         $emailModelMock->expects($this->once())->method('setRecipient')->with($email, '');
-        $emailModelMock->expects($this->once())->method('send');
+        $emailModelMock->expects($this->once())->method('send')->willReturn(true);
         $emailModelMock->expects($this->never())->method('sendEmail');
 
         $sut = $this->getSut(
@@ -93,7 +93,7 @@ class OtpEmailNotifierTest extends TestCase
 
         $emailModelMock = $this->createMock(Email::class);
         $emailModelMock->method('getShop')->willReturn($this->createStub(Shop::class));
-        $emailModelMock->expects($this->once())->method('send');
+        $emailModelMock->expects($this->once())->method('send')->willReturn(true);
 
         $sut = $this->getSut(
             emailFactory: $this->emailFactoryReturning($emailModelMock),
@@ -190,6 +190,43 @@ class OtpEmailNotifierTest extends TestCase
 
         $emailModelMock = $this->createMock(Email::class);
         $emailModelMock->expects($this->once())->method('sendEmail');
+
+        $sut = $this->getSut(
+            emailFactory: $this->emailFactoryReturning($emailModelMock),
+            userRepository: $this->userRepositoryReturning(uniqid() . '@example.com'),
+            contentRepository: $contentRepositoryStub,
+            renderer: $rendererStub,
+            logger: $loggerMock,
+        );
+
+        $sut->notify(userId: uniqid(), code: $code);
+    }
+
+    #[Test]
+    public function notifyLogsWarningAndFallsBackWhenCmsMailSendFails(): void
+    {
+        $code = (string) random_int(100000, 999999);
+        $html = uniqid() . " $code " . uniqid();
+        $plain = uniqid() . " $code";
+
+        $contentRepositoryStub = $this->createStub(OtpEmailContentRepositoryInterface::class);
+        $contentRepositoryStub->method('getEmailSubject')->willReturn(uniqid());
+
+        $rendererStub = $this->createStub(OtpMailRendererInterface::class);
+        $rendererStub->method('render')->willReturnCallback(
+            fn(string $template): string => str_contains($template, '/html/') ? $html : $plain
+        );
+
+        $loggerMock = $this->createMock(LoggerInterface::class);
+        $loggerMock->expects($this->once())->method('warning')
+            ->willReturnCallback(
+                fn(string $message, array $context = []) => $this->assertCodeNotLogged($code, $message, $context)
+            );
+
+        $emailModelMock = $this->createMock(Email::class);
+        $emailModelMock->method('getShop')->willReturn($this->createStub(Shop::class));
+        $emailModelMock->expects($this->once())->method('send')->willReturn(false);
+        $emailModelMock->expects($this->once())->method('sendEmail'); // fallback delivers after the CMS mail send fails
 
         $sut = $this->getSut(
             emailFactory: $this->emailFactoryReturning($emailModelMock),

@@ -21,6 +21,10 @@ make file=services/adminer.yml addservice
 make file=services/selenium-chrome-126.yml addservice
 make file=services/node.yml addservice
 
+# Clone documentation and add Sphinx container
+git clone https://github.com/OXID-eSales/security-module-documentation source/documentation
+make docpath=./source/documentation addsphinxservice
+
 # Configure containers
 perl -pi\
   -e 's#error_reporting = .*#error_reporting = E_ALL ^ E_WARNING ^ E_DEPRECATED#g;'\

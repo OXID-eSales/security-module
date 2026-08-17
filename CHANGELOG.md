@@ -25,8 +25,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   cooldown.
 - OXAPI `setTwoFactorAuth(enabled)` mutation: lets an authenticated user
   enable or disable their own 2FA preference.
-
-### Added
 - CMS-editable, branded HTML 2FA OTP email (per-language subject + body via oxcontents) with a plain-text fallback
 
 ### Changed
