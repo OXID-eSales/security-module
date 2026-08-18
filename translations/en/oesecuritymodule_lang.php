@@ -42,8 +42,14 @@ $aLang = [
 
     'SIGN_IN_PROVIDER' => 'Sign in with %s',
 
-    'OTP_EMAIL_SUBJECT' => 'Your verification code',
-    'OTP_EMAIL_BODY'    => 'Your verification code is: %s',
+    'OTP_EMAIL_SUBJECT' => 'Your OXID eShop verification code',
+    'OTP_EMAIL_BODY'    => "Hello,\n\n"
+        . "Someone (hopefully you) is trying to log in to your OXID eShop account.\n\n"
+        . "Your verification code is: %s\n\n"
+        . "This code expires in %d minutes and can only be used once.\n\n"
+        . "If you didn't try to log in, you can safely ignore this email — but we'd recommend"
+        . " changing your password just to be safe.\n\n"
+        . "Your OXID eShop team.",
 
     'TWO_FACTOR_AUTHENTICATION_TITLE'       => 'Two Factor Authentication',
     'TWO_FACTOR_AUTHENTICATION_DESCRIPTION' => 'Code has been sent to your email. Please enter it below to proceed.',
