@@ -36,8 +36,8 @@ runscript: &runscript
   matrix:
     script: |
       [
-        "no_report:tests-unit",
-        "no_report:tests-integration",
+        "report:tests-unit",
+        "report:tests-integration",
         "no_report:tests-codeception"
       ]
   report:
@@ -52,7 +52,7 @@ runslim:
     script: |
       [
         "no_report:phpcs",
-        "no_report:phpstan-report",
+        "report:phpstan-report",
         "no_report:phpmd"
       ]
 
