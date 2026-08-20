@@ -22,7 +22,7 @@ This module assumes you have OXID eShop Compilation version 7.5.0 installed.
 
 # Development installation
 
-To be able running the tests and other preconfigured quality tools, please install the module as a [root package](https://getcomposer.org/doc/04-schema.md#root-package).
+To be able to run the tests and other preconfigured quality tools, please install the module as a [root package](https://getcomposer.org/doc/04-schema.md#root-package).
 
 The next section shows how to install the module as a root package by using the OXID eShop SDK.
 
