@@ -17,6 +17,7 @@ use OxidEsales\SecurityModule\Tests\Codeception\Support\AcceptanceTester;
 final class SetTwoFactorAuthCest extends BaseCest
 {
     private const TOGGLE = 'mutation ($e: Boolean!) { setTwoFactorAuth(enabled: $e) }';
+    private const VERIFY_TOKEN = 'mutation ($otp: String!) { verifyTwoFactorToken(otp: $otp) }';
 
     public function togglesTwoFactorPreferenceForALoggedInUser(AcceptanceTester $I): void
     {
@@ -30,7 +31,9 @@ final class SetTwoFactorAuthCest extends BaseCest
         $I->assertTrue($enabled['data']['setTwoFactorAuth'] ?? false);
         $I->seeInDatabase('oxuser', ['OXID' => $user['userId'], 'OE2FAENABLED' => 1]);
 
-        // Disable - same still-valid token; the preference change does not affect the current session.
+        // Disable - enabling invalidated the old token and enrolled the user in 2FA, so a fresh
+        // login now returns a challenge token; verify its OTP to get a usable full token.
+        $I->amBearerAuthenticated($this->verifiedFullToken($I));
         $disabled = $this->sendGraphQL($I, self::TOGGLE, ['e' => false]);
         $I->assertArrayNotHasKey('errors', $disabled);
         $I->assertFalse($disabled['data']['setTwoFactorAuth'] ?? true);
@@ -96,5 +99,16 @@ final class SetTwoFactorAuthCest extends BaseCest
     private function challengeToken(AcceptanceTester $I): string
     {
         return $this->fullToken($I);
+    }
+
+    private function verifiedFullToken(AcceptanceTester $I): string
+    {
+        $challenge = $this->challengeToken($I);
+        $otp = $this->grabOtpFromEmail($I);
+
+        $I->amBearerAuthenticated($challenge);
+        $data = $this->sendGraphQL($I, self::VERIFY_TOKEN, ['otp' => $otp]);
+
+        return $data['data']['verifyTwoFactorToken'];
     }
 }
