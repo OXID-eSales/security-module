@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.1] - 2026-08-20
+
+### Fixed
+- The `oxid-esales/graphql-base` requirement is now a stable version constraint (`^13.1`) instead of
+  a development branch. Version 4.0.0 cannot be installed in a shop project that uses the default
+  (stable) minimum stability — use 4.0.1 or later.
+
 ## [4.0.0] - 2026-08-20
 
 ### Added
@@ -94,6 +101,7 @@ This is the stable release of v1.0.0. No changes have been made since v1.0.0-rc.
 - Button for generating strong password
 - Button for show/hide password in password fields
 
+[4.0.1]: https://github.com/OXID-eSales/security-module/compare/v4.0.0...v4.0.1
 [4.0.0]: https://github.com/OXID-eSales/security-module/compare/v3.0.0...v4.0.0
 [3.0.0]: https://github.com/OXID-eSales/security-module/compare/v2.1.0...v3.0.0
 [2.1.0]: https://github.com/OXID-eSales/security-module/compare/v2.0.0...v2.1.0
