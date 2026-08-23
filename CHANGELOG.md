@@ -10,6 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Strip session token (stoken) from GET form URLs (search, attribute filter) via new Form Security admin setting.
   The session id (sid) is still emitted when the shop needs it (e.g. cookieless sessions), so the session/basket is not
   lost on submit.
+- Password reuse prevention: a configurable "last N passwords" guard rejects reusing the
+  current or a recently used password on the My-Account change, forgot-password reset and
+  admin user-edit flows. Off by default (`oeSecurityPasswordReuseEnable`); remembered-count
+  is configurable per account type (`oeSecurityPasswordReuseCustomerSize`, default 5;
+  `oeSecurityPasswordReuseAdminSize`, default 10).
+- Password-change notification email (`oeSecurityPasswordChangeNotificationEnable`, off by
+  default): the account holder is notified when their password changes.
 
 ### Changed
 - Update module to work with OXID eShop 7.6

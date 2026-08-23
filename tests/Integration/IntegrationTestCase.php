@@ -16,6 +16,8 @@ class IntegrationTestCase extends EshopIntegrationTestCase
 {
     public function setUp(): void
     {
+        parent::setUp();
+
         $facts = new Facts();
 
         $container = ContainerFactory::getInstance()->getContainer();
@@ -29,7 +31,5 @@ class IntegrationTestCase extends EshopIntegrationTestCase
                 . strtolower($facts->getEdition()) . '.sql'
             )
         );
-
-        parent::setUp();
     }
 }

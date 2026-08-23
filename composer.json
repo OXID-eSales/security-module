@@ -13,7 +13,14 @@
     ],
     "require": {
         "php": "^8.3",
-        "oxid-esales/graphql-base": "dev-b-7.6.x"
+        "oxid-esales/graphql-base": "dev-b-7.6.x",
+        "oxid-esales/oxideshop-ce": "dev-b-7.6.x",
+        "oxid-esales/twig-component": "dev-b-7.6.x",
+        "oxid-esales/twig-admin-theme": "dev-b-7.6.x",
+        "oxid-esales/developer-tools": "dev-b-7.6.x",
+        "oxid-esales/oxideshop-doctrine-migration-wrapper": "dev-b-7.6.x",
+        "oxid-esales/oxideshop-demodata-ce": "dev-b-7.6.x",
+        "oxid-esales/apex-theme": "dev-b-7.6.x"
     },
     "conflict": {
         "oxid-esales/oxideshop-ce": "<7.6"
@@ -23,7 +30,6 @@
         "phpstan/phpstan": "^1.11",
         "squizlabs/php_codesniffer": "3.*",
         "phpmd/phpmd": "^2.15",
-        "oxid-esales/oxideshop-ce": "dev-b-7.6.x",
         "codeception/codeception": "*",
         "codeception/module-asserts": "*",
         "codeception/module-db": "*",
@@ -44,10 +50,11 @@
         }
     },
     "autoload-dev": {
-            "psr-4": {
-                "OxidEsales\\EshopCommunity\\Tests\\": "./vendor/oxid-esales/oxideshop-ce/tests"
-            }
-        },
+        "psr-4": {
+            "OxidEsales\\EshopCommunity\\Tests\\": "./vendor/oxid-esales/oxideshop-ce/tests",
+            "OxidEsales\\GraphQL\\Base\\Tests\\": "./vendor/oxid-esales/graphql-base/tests"
+        }
+    },
     "scripts": {
         "phpcs": "phpcs --standard=tests/phpcs.xml",
         "phpcs-report": "phpcs --standard=tests/phpcs.xml --report=json --report-file=tests/Reports/phpcs.report.json",
@@ -55,6 +62,7 @@
 
         "phpstan": "phpstan -ctests/PhpStan/phpstan.neon analyse src/",
         "phpstan-report": "phpstan -ctests/PhpStan/phpstan.neon analyse src/ --error-format=json > phpstan.report.json",
+        "phpstan-oxapistorefront": "phpstan -ctests/PhpStan/phpstan-storefront.neon analyse src/GraphQL/Storefront",
 
         "phpmd": "phpmd src ansi tests/PhpMd/standard.xml --ignore-errors-on-exit --ignore-violations-on-exit",
         "phpmd-report": "phpmd src json tests/PhpMd/standard.xml --ignore-errors-on-exit --ignore-violations-on-exit --reportfile tests/Reports/phpmd.report.json",
@@ -91,5 +99,18 @@
             "oxid-esales/oxideshop-composer-plugin": true,
             "oxid-esales/oxideshop-unified-namespace-generator": true
         }
-    }
+    },
+    "repositories": [{
+        "name": "oxid-esales/oxideshop-demodata-ce",
+        "type": "git",
+        "url": "https://github.com/OXID-eSales/oxideshop_demodata_ce"
+    },{
+        "name": "oxid-esales/twig-component",
+        "type": "git",
+        "url": "https://github.com/OXID-eSales/twig-component"
+    },{
+        "name": "oxid-esales/oxideshop-ce",
+        "type": "git",
+        "url": "https://github.com/OXID-eSales/oxideshop_ce.git"
+    }]
 }

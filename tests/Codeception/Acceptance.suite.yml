@@ -15,7 +15,7 @@ modules:
         host: '%SELENIUM_SERVER_HOST%'
         browser: '%BROWSER_NAME%'
         port: '%SELENIUM_SERVER_PORT%'
-        window_size: 1920x1080
+        window_size: 2000x2000
         clear_cookies: true
     - Db:
         dsn: 'mysql:host=%DB_HOST%;dbname=%DB_NAME%;charset=utf8'
@@ -35,6 +35,11 @@ modules:
         depends:
           - WebDriver
           - Db
+    - \OxidEsales\Codeception\Module\OxideshopAdmin:
+        screen_shot_url: '%SCREEN_SHOT_URL%'
+        depends:
+          - WebDriver
+          - \OxidEsales\Codeception\Module\Oxideshop
     - \OxidEsales\Codeception\Module\Database:
         depends: Db
     - \OxidEsales\Codeception\Module\SelectTheme:
@@ -48,6 +53,14 @@ modules:
           - 'Application/views/%THEME_ID%'
           - 'Application/views/admin_twig'
           - '%SOURCE_RELATIVE_PACKAGE_PATH%/translations'
+        paths_admin:
+          - 'Application/views/admin_twig'
     - \OxidEsales\Codeception\Module\OxideshopModules
+    - Mailpit:
+        url: '%MAIL_HOST%'
+        port: '%MAIL_WEB_PORT%'
+    - \OxidEsales\Codeception\Module\Email:
+        depends:
+          - Mailpit
 step_decorators:
     - \Codeception\Step\Retry
