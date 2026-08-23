@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [4.1.0] - unreleased
 
+### Added
+- Password reuse prevention: a configurable "last N passwords" guard rejects reusing the
+  current or a recently used password on the My-Account change, forgot-password reset and
+  admin user-edit flows. Off by default (`oeSecurityPasswordReuseEnable`); remembered-count
+  is configurable per account type (`oeSecurityPasswordReuseCustomerSize`, default 5;
+  `oeSecurityPasswordReuseAdminSize`, default 10).
+- Password-change notification email (`oeSecurityPasswordChangeNotificationEnable`, off by
+  default): the account holder is notified when their password changes.
+
 ### Changed
 - Update module to work with OXID eShop 7.6
 
