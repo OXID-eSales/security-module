@@ -22,7 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   controls the API challenge token's exchange window.
 - Configurable OTP code lifetime via `oeSecurityTwoFactorAuthOtpCodeLifetime`
   (default 300 seconds). Replaces the previous hardcoded 5-minute value
-  in `OtpChallengeStateService`. Applies to both the storefront/admin
+  in `OtpChallengeStateService`. Applies to both the storefront
   and API 2FA flows.
 - Admin help texts for the four `two_factor_auth` module settings
   (`Enabled`, `Type`, `ApiChallengeLifetime`, `OtpCodeLifetime`) in
