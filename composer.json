@@ -13,17 +13,17 @@
     ],
     "require": {
         "php": "^8.3",
-        "oxid-esales/graphql-base": "dev-b-7.5.x"
+        "oxid-esales/graphql-base": "dev-b-7.6.x"
     },
     "conflict": {
-        "oxid-esales/oxideshop-ce": "<7.5"
+        "oxid-esales/oxideshop-ce": "<7.6"
     },
     "require-dev": {
         "phpunit/phpunit": "^12.5",
         "phpstan/phpstan": "^1.11",
         "squizlabs/php_codesniffer": "3.*",
         "phpmd/phpmd": "^2.15",
-        "oxid-esales/oxideshop-ce": "dev-b-7.5.x",
+        "oxid-esales/oxideshop-ce": "dev-b-7.6.x",
         "codeception/codeception": "*",
         "codeception/module-asserts": "*",
         "codeception/module-db": "*",
@@ -31,8 +31,8 @@
         "codeception/module-webdriver": "*",
         "codeception/module-phpbrowser": "*",
         "codeception/module-rest": "*",
-        "oxid-esales/codeception-modules": "dev-b-7.5.x",
-        "oxid-esales/codeception-page-objects": "dev-b-7.5.x",
+        "oxid-esales/codeception-modules": "dev-b-7.6.x",
+        "oxid-esales/codeception-page-objects": "dev-b-7.6.x",
         "mikey179/vfsstream": "^1.6"
     },
     "minimum-stability": "dev",
