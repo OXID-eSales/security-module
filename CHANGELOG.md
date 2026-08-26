@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Update module to work with OXID eShop 7.6
 
+## [4.0.2] - 2026-08-26
+
+### Changed
+- Clarified the 4.0.0 changelog: two-factor authentication is available for the
+  storefront and the OXAPI. It does not protect the admin panel login.
+
 ## [4.0.1] - 2026-08-20
 
 ### Fixed
