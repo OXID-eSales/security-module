@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\PasswordReuse\Subscriber;
 
-use DateTimeInterface;
+use DateTimeImmutable;
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\EshopCommunity\Internal\Domain\Authentication\Bridge\PasswordServiceBridgeInterface;
 use OxidEsales\EshopCommunity\Internal\Transition\ShopEvents\AfterModelUpdateEvent;
@@ -117,7 +117,7 @@ class PasswordChangeSubscriber implements EventSubscriberInterface
             && !$this->confirmedChangeRegistry->isConfirmed($userId);
     }
 
-    private function record(string $userId, string $oldHash, DateTimeInterface $changedAt): void
+    private function record(string $userId, string $oldHash, DateTimeImmutable $changedAt): void
     {
         if (!$this->settings->isReusePreventionEnabled()) {
             return;
@@ -127,7 +127,7 @@ class PasswordChangeSubscriber implements EventSubscriberInterface
         $this->historyService->record($userId, $oldHash, $rights, $changedAt);
     }
 
-    private function sendNotification(string $userId, DateTimeInterface $changedAt): void
+    private function sendNotification(string $userId, DateTimeImmutable $changedAt): void
     {
         if (!$this->settings->isChangeNotificationEnabled()) {
             return;

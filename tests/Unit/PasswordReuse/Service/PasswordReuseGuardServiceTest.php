@@ -26,30 +26,32 @@ class PasswordReuseGuardServiceTest extends TestCase
     #[Test]
     public function disabledReusePreventionIsANoOpWithoutCheckingOrConfirming(): void
     {
-        $settings = $this->createStub(ModuleSettingsServiceInterface::class);
-        $settings->method('isReusePreventionEnabled')->willReturn(false);
+        $settingsStub = $this->createStub(ModuleSettingsServiceInterface::class);
+        $settingsStub->method('isReusePreventionEnabled')->willReturn(false);
 
-        $collection = $this->createMock(PasswordCollectionServiceInterface::class);
-        $collection->expects($this->never())->method('isCandidateInCollection');
+        $collectionSpy = $this->createMock(PasswordCollectionServiceInterface::class);
+        $collectionSpy->expects($this->never())->method('isCandidateInCollection');
 
-        $registry = $this->createMock(ConfirmedChangeRegistryInterface::class);
-        $registry->expects($this->never())->method('confirm');
+        $registrySpy = $this->createMock(ConfirmedChangeRegistryInterface::class);
+        $registrySpy->expects($this->never())->method('confirm');
 
-        $this->getSut(settings: $settings, collection: $collection, registry: $registry)
-            ->guardChange(uniqid('user_', true), uniqid('plain_', true), uniqid('hash_', true));
+        $sut = $this->getSut(settings: $settingsStub, collection: $collectionSpy, registry: $registrySpy);
+
+        $sut->guardChange(uniqid('user_', true), uniqid('plain_', true), uniqid('hash_', true));
     }
 
     #[Test]
     public function emptyCurrentHashIsInitialEstablishmentExemptFromCheckAndConfirm(): void
     {
-        $collection = $this->createMock(PasswordCollectionServiceInterface::class);
-        $collection->expects($this->never())->method('isCandidateInCollection');
+        $collectionSpy = $this->createMock(PasswordCollectionServiceInterface::class);
+        $collectionSpy->expects($this->never())->method('isCandidateInCollection');
 
-        $registry = $this->createMock(ConfirmedChangeRegistryInterface::class);
-        $registry->expects($this->never())->method('confirm');
+        $registrySpy = $this->createMock(ConfirmedChangeRegistryInterface::class);
+        $registrySpy->expects($this->never())->method('confirm');
 
-        $this->getSut(collection: $collection, registry: $registry)
-            ->guardChange(uniqid('user_', true), uniqid('plain_', true), '');
+        $sut = $this->getSut(collection: $collectionSpy, registry: $registrySpy);
+
+        $sut->guardChange(uniqid('user_', true), uniqid('plain_', true), '');
     }
 
     #[Test]
@@ -59,19 +61,20 @@ class PasswordReuseGuardServiceTest extends TestCase
         $candidate = uniqid('plain_', true);
         $currentHash = uniqid('hash_', true);
 
-        $collection = $this->createMock(PasswordCollectionServiceInterface::class);
-        $collection->expects($this->once())
+        $collectionMock = $this->createMock(PasswordCollectionServiceInterface::class);
+        $collectionMock->expects($this->once())
             ->method('isCandidateInCollection')
             ->with($userId, $candidate, $currentHash)
             ->willReturn(true);
 
-        $registry = $this->createMock(ConfirmedChangeRegistryInterface::class);
-        $registry->expects($this->never())->method('confirm');
+        $registrySpy = $this->createMock(ConfirmedChangeRegistryInterface::class);
+        $registrySpy->expects($this->never())->method('confirm');
+
+        $sut = $this->getSut(collection: $collectionMock, registry: $registrySpy);
 
         $this->expectException(PasswordReuseException::class);
 
-        $this->getSut(collection: $collection, registry: $registry)
-            ->guardChange($userId, $candidate, $currentHash);
+        $sut->guardChange($userId, $candidate, $currentHash);
     }
 
     #[Test]
@@ -81,33 +84,35 @@ class PasswordReuseGuardServiceTest extends TestCase
         $candidate = uniqid('plain_', true);
         $currentHash = uniqid('hash_', true);
 
-        $collection = $this->createStub(PasswordCollectionServiceInterface::class);
-        $collection->method('isCandidateInCollection')->willReturn(false);
+        $collectionStub = $this->createStub(PasswordCollectionServiceInterface::class);
+        $collectionStub->method('isCandidateInCollection')->willReturn(false);
 
-        $registry = $this->createMock(ConfirmedChangeRegistryInterface::class);
-        $registry->expects($this->once())->method('confirm')->with($userId);
+        $registrySpy = $this->createMock(ConfirmedChangeRegistryInterface::class);
+        $registrySpy->expects($this->once())->method('confirm')->with($userId);
 
-        $this->getSut(collection: $collection, registry: $registry)
-            ->guardChange($userId, $candidate, $currentHash);
+        $sut = $this->getSut(collection: $collectionStub, registry: $registrySpy);
+
+        $sut->guardChange($userId, $candidate, $currentHash);
     }
 
     #[Test]
     public function failClosedCheckExceptionPropagatesLoggedAndDoesNotConfirm(): void
     {
-        $collection = $this->createStub(PasswordCollectionServiceInterface::class);
-        $collection->method('isCandidateInCollection')
+        $collectionStub = $this->createStub(PasswordCollectionServiceInterface::class);
+        $collectionStub->method('isCandidateInCollection')
             ->willThrowException(new PasswordReuseCheckException());
 
-        $registry = $this->createMock(ConfirmedChangeRegistryInterface::class);
-        $registry->expects($this->never())->method('confirm');
+        $registrySpy = $this->createMock(ConfirmedChangeRegistryInterface::class);
+        $registrySpy->expects($this->never())->method('confirm');
 
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->once())->method('error');
+        $loggerSpy = $this->createMock(LoggerInterface::class);
+        $loggerSpy->expects($this->once())->method('error');
+
+        $sut = $this->getSut(collection: $collectionStub, registry: $registrySpy, logger: $loggerSpy);
 
         $this->expectException(PasswordReuseCheckException::class);
 
-        $this->getSut(collection: $collection, registry: $registry, logger: $logger)
-            ->guardChange(uniqid('user_', true), uniqid('plain_', true), uniqid('hash_', true));
+        $sut->guardChange(uniqid('user_', true), uniqid('plain_', true), uniqid('hash_', true));
     }
 
     #[Test]

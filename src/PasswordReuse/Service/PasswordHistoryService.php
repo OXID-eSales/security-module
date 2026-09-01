@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\PasswordReuse\Service;
 
-use DateTimeInterface;
+use DateTimeImmutable;
 use OxidEsales\SecurityModule\PasswordReuse\Infrastructure\Repository\PasswordHistoryRepositoryInterface;
 use Psr\Log\LoggerInterface;
 use Throwable;
@@ -27,7 +27,7 @@ class PasswordHistoryService implements PasswordHistoryServiceInterface
         string $userId,
         #[\SensitiveParameter] string $supersededHash,
         ?string $rights,
-        DateTimeInterface $supersededAt
+        DateTimeImmutable $supersededAt
     ): void {
         if (!$this->settings->isReusePreventionEnabled()) {
             return;

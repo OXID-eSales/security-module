@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Tests\Integration\PasswordReuse\Infrastructure\Repository;
 
 use OxidEsales\Eshop\Application\Model\User;
-use OxidEsales\Eshop\Core\Language;
 use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
 use OxidEsales\EshopCommunity\Tests\Integration\IntegrationTestCase;
 use OxidEsales\SecurityModule\PasswordReuse\Exception\AccountNotFoundException;
@@ -21,51 +20,16 @@ use PHPUnit\Framework\Attributes\Test;
 final class AccountRepositoryTest extends IntegrationTestCase
 {
     #[Test]
-    public function getByIdReturnsRecipientAndShopFieldsFromOxuser(): void
+    public function getByIdReturnsRecipientFieldsFromOxuser(): void
     {
         $email = uniqid('mail_', true) . '@example.test';
-        $shopId = mt_rand(1, 9);
-        $userId = $this->createUser(
-            email: $email,
-            rights: 'user',
-            shopId: $shopId,
-        );
+        $userId = $this->createUser(email: $email, rights: 'user');
 
         $affectedAccount = $this->getSut()->getById($userId);
 
         $this->assertSame($userId, $affectedAccount->getUserId());
         $this->assertSame($email, $affectedAccount->getEmail());
         $this->assertSame('user', $affectedAccount->getRights());
-        $this->assertSame($shopId, $affectedAccount->getShopId());
-    }
-
-    #[Test]
-    public function getByIdResolvesNotificationLanguageFromAccountShopNotRequestLanguage(): void
-    {
-        $shopId = 1;
-        $shopDefaultLanguage = 1;
-        $this->setShopDefaultLanguage($shopId, $shopDefaultLanguage);
-
-        $actorRequestLanguage = 0;
-        $this->get(Language::class)->setBaseLanguage($actorRequestLanguage);
-
-        $email = uniqid('mail_', true) . '@example.test';
-        $userId = $this->createUser(email: $email, rights: 'user', shopId: $shopId);
-
-        $affectedAccount = $this->getSut()->getById($userId);
-
-        $this->assertSame(
-            $shopDefaultLanguage,
-            $affectedAccount->getLanguageId(),
-            'Notification language must be the affected account shop default (BR015).'
-        );
-        $this->assertNotSame(
-            $actorRequestLanguage,
-            $affectedAccount->getLanguageId(),
-            'Notification language must not follow the actor request locale (BR015).'
-        );
-        $this->assertSame($email, $affectedAccount->getEmail());
-        $this->assertSame($shopId, $affectedAccount->getShopId());
     }
 
     #[Test]
@@ -91,7 +55,6 @@ final class AccountRepositoryTest extends IntegrationTestCase
     private function createUser(
         string $email = '',
         string $rights = 'user',
-        int $shopId = 1,
     ): string {
         $userId = substr(uniqid('acc', true), 0, 32);
 
@@ -107,33 +70,11 @@ final class AccountRepositoryTest extends IntegrationTestCase
             ->create()
             ->getConnection()
             ->executeStatement(
-                'UPDATE oxuser SET OXRIGHTS = :rights, OXSHOPID = :shopId WHERE OXID = :userId',
-                ['rights' => $rights, 'shopId' => $shopId, 'userId' => $userId]
+                'UPDATE oxuser SET OXRIGHTS = :rights WHERE OXID = :userId',
+                ['rights' => $rights, 'userId' => $userId]
             );
 
         return $userId;
-    }
-
-    private function setShopDefaultLanguage(int $shopId, int $languageId): void
-    {
-        $connection = $this->get(QueryBuilderFactoryInterface::class)
-            ->create()
-            ->getConnection();
-
-        $connection->executeStatement(
-            "DELETE FROM oxconfig
-             WHERE oxvarname = 'sDefaultLang' AND oxshopid = :shopId AND oxmodule = ''",
-            ['shopId' => $shopId]
-        );
-        $connection->executeStatement(
-            "INSERT INTO oxconfig (OXID, OXSHOPID, OXMODULE, OXVARNAME, OXVARTYPE, OXVARVALUE)
-             VALUES (:id, :shopId, '', 'sDefaultLang', 'str', :value)",
-            [
-                'id'     => substr(uniqid('cfg', true), 0, 32),
-                'shopId' => $shopId,
-                'value'  => (string)$languageId,
-            ]
-        );
     }
 
     private function getSut(): AccountRepositoryInterface

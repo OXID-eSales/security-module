@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\PasswordReuse\Service;
 
-use DateTimeInterface;
+use DateTimeImmutable;
 
 interface PasswordHistoryServiceInterface
 {
@@ -17,7 +17,7 @@ interface PasswordHistoryServiceInterface
         string $userId,
         #[\SensitiveParameter] string $supersededHash,
         ?string $rights,
-        DateTimeInterface $supersededAt
+        DateTimeImmutable $supersededAt
     ): void;
 
     public function purgeForUser(string $userId): void;

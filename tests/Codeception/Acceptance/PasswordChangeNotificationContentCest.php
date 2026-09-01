@@ -12,9 +12,7 @@ namespace OxidEsales\SecurityModule\Tests\Codeception\Acceptance;
 use Codeception\Attribute\Group;
 use DateTimeImmutable;
 use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
 use OxidEsales\SecurityModule\PasswordReuse\Infrastructure\Email\PasswordChangeMailContent;
-use OxidEsales\SecurityModule\PasswordReuse\Service\AccountTypeResolverInterface;
 use OxidEsales\SecurityModule\Tests\Codeception\Support\AcceptanceTester;
 
 #[Group('flow:storefront-change')]
@@ -26,6 +24,7 @@ final class PasswordChangeNotificationContentCest extends BaseCest
     private const NEW_PASSWORD = 'C0ntent-fr3sh-pass!';
     private const CUSTOM_SUBJECT = 'OXDEV-10136 custom change subject';
     private const CUSTOM_BODY_MARKER = 'OXDEV-10136 custom change body marker';
+    private const STOREFRONT_LANGUAGE_ID = 1;
 
     private string $originalPasswordHash = '';
     private string $originalPasswordSalt = '';
@@ -96,7 +95,7 @@ final class PasswordChangeNotificationContentCest extends BaseCest
         );
 
         $this->submitPasswordChange($I, $userData, $userData['userPassword'], self::NEW_PASSWORD);
-        $languageId = $this->accountLanguageId($userData['userId']);
+        $languageId = self::STOREFRONT_LANGUAGE_ID;
 
         $I->openRecentEmail();
         $I->seeInEmailTo($userData['userLoginName']);
@@ -118,7 +117,7 @@ final class PasswordChangeNotificationContentCest extends BaseCest
         );
 
         $this->submitPasswordChange($I, $userData, $userData['userPassword'], self::NEW_PASSWORD);
-        $languageId = $this->accountLanguageId($userData['userId']);
+        $languageId = self::STOREFRONT_LANGUAGE_ID;
 
         $I->openRecentEmail();
         $I->seeInEmailTo($userData['userLoginName']);
@@ -139,13 +138,6 @@ final class PasswordChangeNotificationContentCest extends BaseCest
         }
 
         return $row;
-    }
-
-    private function accountLanguageId(string $userId): int
-    {
-        return ContainerFacade::get(AccountTypeResolverInterface::class)
-            ->resolveAccount($userId)
-            ->getLanguageId();
     }
 
     private function timestampPattern(int $languageId): string

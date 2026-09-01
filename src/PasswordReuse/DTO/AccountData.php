@@ -12,11 +12,9 @@ namespace OxidEsales\SecurityModule\PasswordReuse\DTO;
 class AccountData implements AccountDataInterface
 {
     public function __construct(
-        private string $userId,
-        private string $email,
-        private string $rights,
-        private int $languageId,
-        private int $shopId,
+        private readonly string $userId,
+        private readonly string $email,
+        private readonly string $rights,
     ) {
     }
 
@@ -33,15 +31,5 @@ class AccountData implements AccountDataInterface
     public function getRights(): string
     {
         return $this->rights;
-    }
-
-    public function getLanguageId(): int
-    {
-        return $this->languageId;
-    }
-
-    public function getShopId(): int
-    {
-        return $this->shopId;
     }
 }

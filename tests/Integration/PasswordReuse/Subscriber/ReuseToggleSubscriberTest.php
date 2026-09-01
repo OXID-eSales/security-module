@@ -77,12 +77,12 @@ final class ReuseToggleSubscriberTest extends IntegrationTestCase
     {
         $seededUser = $this->seedEntry();
 
-        $throwingRepository = $this->createStub(PasswordHistoryRepositoryInterface::class);
-        $throwingRepository->method('purgeAll')->willThrowException(new RuntimeException('table outage'));
+        $throwingRepositoryStub = $this->createStub(PasswordHistoryRepositoryInterface::class);
+        $throwingRepositoryStub->method('purgeAll')->willThrowException(new RuntimeException('table outage'));
 
         $subscriber = new ReuseToggleSubscriber(
             $this->disabledSettings(),
-            $throwingRepository,
+            $throwingRepositoryStub,
             $this->get(LoggerInterface::class),
         );
 
@@ -117,18 +117,18 @@ final class ReuseToggleSubscriberTest extends IntegrationTestCase
 
     private function disabledSettings(): ModuleSettingsServiceInterface
     {
-        $settings = $this->createStub(ModuleSettingsServiceInterface::class);
-        $settings->method('isReusePreventionEnabled')->willReturn(false);
+        $settingsStub = $this->createStub(ModuleSettingsServiceInterface::class);
+        $settingsStub->method('isReusePreventionEnabled')->willReturn(false);
 
-        return $settings;
+        return $settingsStub;
     }
 
     private function enabledSettings(): ModuleSettingsServiceInterface
     {
-        $settings = $this->createStub(ModuleSettingsServiceInterface::class);
-        $settings->method('isReusePreventionEnabled')->willReturn(true);
+        $settingsStub = $this->createStub(ModuleSettingsServiceInterface::class);
+        $settingsStub->method('isReusePreventionEnabled')->willReturn(true);
 
-        return $settings;
+        return $settingsStub;
     }
 
     private function seedEntry(): string

@@ -9,14 +9,14 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\PasswordReuse\Infrastructure\Repository;
 
-use DateTimeInterface;
+use DateTimeImmutable;
+use Doctrine\DBAL\Types\Types;
 use OxidEsales\EshopCommunity\Internal\Framework\Database\QueryBuilderFactoryInterface;
 use OxidEsales\EshopCommunity\Internal\Transition\Adapter\ShopAdapterInterface;
 
 class PasswordHistoryRepository implements PasswordHistoryRepositoryInterface
 {
     private const TABLE = 'oesm_password_history';
-    private const DB_DATETIME_FORMAT = 'Y-m-d H:i:s';
 
     public function __construct(
         private readonly QueryBuilderFactoryInterface $queryBuilderFactory,
@@ -24,7 +24,7 @@ class PasswordHistoryRepository implements PasswordHistoryRepositoryInterface
     ) {
     }
 
-    public function append(string $userId, string $hash, DateTimeInterface $supersededAt): void
+    public function append(string $userId, string $hash, DateTimeImmutable $supersededAt): void
     {
         $builder = $this->queryBuilderFactory->create();
         $builder->insert(self::TABLE)
@@ -34,12 +34,10 @@ class PasswordHistoryRepository implements PasswordHistoryRepositoryInterface
                 'PASSWORD_HASH' => ':hash',
                 'SUPERSEDED_AT' => ':supersededAt',
             ])
-            ->setParameters([
-                'oxid'         => $this->shopAdapter->generateUniqueId(),
-                'userId'       => $userId,
-                'hash'         => $hash,
-                'supersededAt' => $supersededAt->format(self::DB_DATETIME_FORMAT),
-            ])
+            ->setParameter('oxid', $this->shopAdapter->generateUniqueId())
+            ->setParameter('userId', $userId)
+            ->setParameter('hash', $hash)
+            ->setParameter('supersededAt', $supersededAt, Types::DATETIME_IMMUTABLE)
             ->execute();
     }
 

@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Tests\Unit\PasswordReuse\Service;
 
 use DateTimeImmutable;
-use DateTimeInterface;
 use OxidEsales\SecurityModule\PasswordReuse\Infrastructure\Repository\PasswordHistoryRepositoryInterface;
 use OxidEsales\SecurityModule\PasswordReuse\Service\ModuleSettingsServiceInterface;
 use OxidEsales\SecurityModule\PasswordReuse\Service\PasswordHistoryService;
@@ -31,23 +30,24 @@ class PasswordHistoryServiceTest extends TestCase
         $sizeN = mt_rand(3, 24);
         $supersededAt = new DateTimeImmutable();
 
-        $settings = $this->createMock(ModuleSettingsServiceInterface::class);
-        $settings->method('isReusePreventionEnabled')->willReturn(true);
-        $settings->expects($this->once())
+        $settingsMock = $this->createMock(ModuleSettingsServiceInterface::class);
+        $settingsMock->method('isReusePreventionEnabled')->willReturn(true);
+        $settingsMock->expects($this->once())
             ->method('resolveCollectionSizeForRights')
             ->with($rights)
             ->willReturn($sizeN);
 
-        $repository = $this->createMock(PasswordHistoryRepositoryInterface::class);
-        $repository->expects($this->once())
+        $repositorySpy = $this->createMock(PasswordHistoryRepositoryInterface::class);
+        $repositorySpy->expects($this->once())
             ->method('append')
             ->with($userId, $hash, $supersededAt);
-        $repository->expects($this->once())
+        $repositorySpy->expects($this->once())
             ->method('deleteSurplusBeyond')
             ->with($userId, $sizeN - 1);
 
-        $this->getSut(settings: $settings, repository: $repository)
-            ->record($userId, $hash, $rights, $supersededAt);
+        $sut = $this->getSut(settings: $settingsMock, repository: $repositorySpy);
+
+        $sut->record($userId, $hash, $rights, $supersededAt);
     }
 
     #[Test]
@@ -55,50 +55,53 @@ class PasswordHistoryServiceTest extends TestCase
     {
         $userId = uniqid('user_', true);
 
-        $settings = $this->createStub(ModuleSettingsServiceInterface::class);
-        $settings->method('isReusePreventionEnabled')->willReturn(true);
-        $settings->method('resolveCollectionSizeForRights')->willReturn(1);
+        $settingsStub = $this->createStub(ModuleSettingsServiceInterface::class);
+        $settingsStub->method('isReusePreventionEnabled')->willReturn(true);
+        $settingsStub->method('resolveCollectionSizeForRights')->willReturn(1);
 
-        $repository = $this->createMock(PasswordHistoryRepositoryInterface::class);
-        $repository->expects($this->once())->method('append');
-        $repository->expects($this->once())
+        $repositorySpy = $this->createMock(PasswordHistoryRepositoryInterface::class);
+        $repositorySpy->expects($this->once())->method('append');
+        $repositorySpy->expects($this->once())
             ->method('deleteSurplusBeyond')
             ->with($userId, 0);
 
-        $this->getSut(settings: $settings, repository: $repository)
-            ->record($userId, uniqid('hash_', true), 'user', new DateTimeImmutable());
+        $sut = $this->getSut(settings: $settingsStub, repository: $repositorySpy);
+
+        $sut->record($userId, uniqid('hash_', true), 'user', new DateTimeImmutable());
     }
 
     #[Test]
     public function recordIsANoOpWhenReusePreventionIsDisabled(): void
     {
-        $settings = $this->createStub(ModuleSettingsServiceInterface::class);
-        $settings->method('isReusePreventionEnabled')->willReturn(false);
+        $settingsStub = $this->createStub(ModuleSettingsServiceInterface::class);
+        $settingsStub->method('isReusePreventionEnabled')->willReturn(false);
 
-        $repository = $this->createMock(PasswordHistoryRepositoryInterface::class);
-        $repository->expects($this->never())->method('append');
-        $repository->expects($this->never())->method('deleteSurplusBeyond');
+        $repositorySpy = $this->createMock(PasswordHistoryRepositoryInterface::class);
+        $repositorySpy->expects($this->never())->method('append');
+        $repositorySpy->expects($this->never())->method('deleteSurplusBeyond');
 
-        $this->getSut(settings: $settings, repository: $repository)
-            ->record(uniqid('user_', true), uniqid('hash_', true), 'user', new DateTimeImmutable());
+        $sut = $this->getSut(settings: $settingsStub, repository: $repositorySpy);
+
+        $sut->record(uniqid('user_', true), uniqid('hash_', true), 'user', new DateTimeImmutable());
     }
 
     #[Test]
     public function recordLogsAndSwallowsRepositoryFailure(): void
     {
-        $settings = $this->createStub(ModuleSettingsServiceInterface::class);
-        $settings->method('isReusePreventionEnabled')->willReturn(true);
-        $settings->method('resolveCollectionSizeForRights')->willReturn(mt_rand(3, 24));
+        $settingsStub = $this->createStub(ModuleSettingsServiceInterface::class);
+        $settingsStub->method('isReusePreventionEnabled')->willReturn(true);
+        $settingsStub->method('resolveCollectionSizeForRights')->willReturn(mt_rand(3, 24));
 
-        $repository = $this->createMock(PasswordHistoryRepositoryInterface::class);
-        $repository->method('append')->willThrowException(new RuntimeException('db down'));
-        $repository->expects($this->never())->method('deleteSurplusBeyond');
+        $repositoryMock = $this->createMock(PasswordHistoryRepositoryInterface::class);
+        $repositoryMock->method('append')->willThrowException(new RuntimeException('db down'));
+        $repositoryMock->expects($this->never())->method('deleteSurplusBeyond');
 
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->once())->method('error');
+        $loggerSpy = $this->createMock(LoggerInterface::class);
+        $loggerSpy->expects($this->once())->method('error');
 
-        $this->getSut(settings: $settings, repository: $repository, logger: $logger)
-            ->record(uniqid('user_', true), uniqid('hash_', true), 'user', new DateTimeImmutable());
+        $sut = $this->getSut(settings: $settingsStub, repository: $repositoryMock, logger: $loggerSpy);
+
+        $sut->record(uniqid('user_', true), uniqid('hash_', true), 'user', new DateTimeImmutable());
     }
 
     #[Test]
@@ -106,12 +109,14 @@ class PasswordHistoryServiceTest extends TestCase
     {
         $userId = uniqid('user_', true);
 
-        $repository = $this->createMock(PasswordHistoryRepositoryInterface::class);
-        $repository->expects($this->once())
+        $repositorySpy = $this->createMock(PasswordHistoryRepositoryInterface::class);
+        $repositorySpy->expects($this->once())
             ->method('purgeForUser')
             ->with($userId);
 
-        $this->getSut(repository: $repository)->purgeForUser($userId);
+        $sut = $this->getSut(repository: $repositorySpy);
+
+        $sut->purgeForUser($userId);
     }
 
     #[Test]

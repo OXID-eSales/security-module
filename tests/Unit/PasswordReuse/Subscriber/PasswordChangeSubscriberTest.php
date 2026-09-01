@@ -25,7 +25,7 @@ use OxidEsales\SecurityModule\PasswordReuse\Service\ModuleSettingsServiceInterfa
 use OxidEsales\SecurityModule\PasswordReuse\Service\PasswordHistoryServiceInterface;
 use OxidEsales\SecurityModule\PasswordReuse\Subscriber\PasswordChangeSubscriber;
 use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
@@ -39,28 +39,28 @@ class PasswordChangeSubscriberTest extends TestCase
     #[Test]
     public function afterUpdateWithoutPriorArmingDoesNothing(): void
     {
-        $history = $this->createMock(PasswordHistoryServiceInterface::class);
-        $history->expects($this->never())->method('record');
-        $notifier = $this->createMock(PasswordChangeEmailNotifierInterface::class);
-        $notifier->expects($this->never())->method('notify');
+        $historySpy = $this->createMock(PasswordHistoryServiceInterface::class);
+        $historySpy->expects($this->never())->method('record');
+        $notifierSpy = $this->createMock(PasswordChangeEmailNotifierInterface::class);
+        $notifierSpy->expects($this->never())->method('notify');
 
-        $sut = $this->getSut(history: $history, notifier: $notifier);
+        $sut = $this->getSut(history: $historySpy, notifier: $notifierSpy);
         $sut->handleAfterUpdate($this->afterEvent(self::NEW_HASH));
     }
 
     #[Test]
     public function unchangedPasswordValueDoesNothing(): void
     {
-        $history = $this->createMock(PasswordHistoryServiceInterface::class);
-        $history->expects($this->never())->method('record');
-        $notifier = $this->createMock(PasswordChangeEmailNotifierInterface::class);
-        $notifier->expects($this->never())->method('notify');
+        $historySpy = $this->createMock(PasswordHistoryServiceInterface::class);
+        $historySpy->expects($this->never())->method('record');
+        $notifierSpy = $this->createMock(PasswordChangeEmailNotifierInterface::class);
+        $notifierSpy->expects($this->never())->method('notify');
 
         $sut = $this->getSut(
             settings: $this->settings(reuse: true, notify: true),
             reader: $this->reader(self::OLD_HASH),
-            history: $history,
-            notifier: $notifier,
+            history: $historySpy,
+            notifier: $notifierSpy,
         );
 
         $this->fire($sut, oldStored: self::OLD_HASH, persisted: self::OLD_HASH);
@@ -69,16 +69,16 @@ class PasswordChangeSubscriberTest extends TestCase
     #[Test]
     public function emptyOldHashIsInitialEstablishmentAndDoesNothing(): void
     {
-        $history = $this->createMock(PasswordHistoryServiceInterface::class);
-        $history->expects($this->never())->method('record');
-        $notifier = $this->createMock(PasswordChangeEmailNotifierInterface::class);
-        $notifier->expects($this->never())->method('notify');
+        $historySpy = $this->createMock(PasswordHistoryServiceInterface::class);
+        $historySpy->expects($this->never())->method('record');
+        $notifierSpy = $this->createMock(PasswordChangeEmailNotifierInterface::class);
+        $notifierSpy->expects($this->never())->method('notify');
 
         $sut = $this->getSut(
             settings: $this->settings(reuse: true, notify: true),
             reader: $this->reader(''),
-            history: $history,
-            notifier: $notifier,
+            history: $historySpy,
+            notifier: $notifierSpy,
         );
 
         $this->fire($sut, oldStored: '', persisted: self::NEW_HASH);
@@ -87,8 +87,8 @@ class PasswordChangeSubscriberTest extends TestCase
     #[Test]
     public function genuineChangeWithReuseOnRecordsSupersededHash(): void
     {
-        $history = $this->createMock(PasswordHistoryServiceInterface::class);
-        $history->expects($this->once())
+        $historySpy = $this->createMock(PasswordHistoryServiceInterface::class);
+        $historySpy->expects($this->once())
             ->method('record')
             ->with(
                 self::USER_ID,
@@ -97,14 +97,14 @@ class PasswordChangeSubscriberTest extends TestCase
                 $this->isInstanceOf(DateTimeInterface::class),
             );
 
-        $notifier = $this->createMock(PasswordChangeEmailNotifierInterface::class);
-        $notifier->expects($this->never())->method('notify');
+        $notifierSpy = $this->createMock(PasswordChangeEmailNotifierInterface::class);
+        $notifierSpy->expects($this->never())->method('notify');
 
         $sut = $this->getSut(
             settings: $this->settings(reuse: true, notify: false),
             reader: $this->reader(self::OLD_HASH),
-            history: $history,
-            notifier: $notifier,
+            history: $historySpy,
+            notifier: $notifierSpy,
             resolver: $this->resolver('malladmin'),
         );
 
@@ -114,19 +114,19 @@ class PasswordChangeSubscriberTest extends TestCase
     #[Test]
     public function genuineChangeWithNotifyOnNotifies(): void
     {
-        $history = $this->createMock(PasswordHistoryServiceInterface::class);
-        $history->expects($this->never())->method('record');
+        $historySpy = $this->createMock(PasswordHistoryServiceInterface::class);
+        $historySpy->expects($this->never())->method('record');
 
-        $notifier = $this->createMock(PasswordChangeEmailNotifierInterface::class);
-        $notifier->expects($this->once())
+        $notifierSpy = $this->createMock(PasswordChangeEmailNotifierInterface::class);
+        $notifierSpy->expects($this->once())
             ->method('notify')
             ->with(self::USER_ID, $this->isInstanceOf(DateTimeInterface::class));
 
         $sut = $this->getSut(
             settings: $this->settings(reuse: false, notify: true),
             reader: $this->reader(self::OLD_HASH),
-            history: $history,
-            notifier: $notifier,
+            history: $historySpy,
+            notifier: $notifierSpy,
         );
 
         $this->fire($sut, oldStored: self::OLD_HASH, persisted: self::NEW_HASH);
@@ -135,16 +135,16 @@ class PasswordChangeSubscriberTest extends TestCase
     #[Test]
     public function recordAndNotifyAreIndependentlyGated(): void
     {
-        $history = $this->createMock(PasswordHistoryServiceInterface::class);
-        $history->expects($this->once())->method('record');
-        $notifier = $this->createMock(PasswordChangeEmailNotifierInterface::class);
-        $notifier->expects($this->once())->method('notify');
+        $historySpy = $this->createMock(PasswordHistoryServiceInterface::class);
+        $historySpy->expects($this->once())->method('record');
+        $notifierSpy = $this->createMock(PasswordChangeEmailNotifierInterface::class);
+        $notifierSpy->expects($this->once())->method('notify');
 
         $sut = $this->getSut(
             settings: $this->settings(reuse: true, notify: true),
             reader: $this->reader(self::OLD_HASH),
-            history: $history,
-            notifier: $notifier,
+            history: $historySpy,
+            notifier: $notifierSpy,
         );
 
         $this->fire($sut, oldStored: self::OLD_HASH, persisted: self::NEW_HASH);
@@ -153,21 +153,21 @@ class PasswordChangeSubscriberTest extends TestCase
     #[Test]
     public function legacyRehashOldHashIsSuppressedWhenNotConfirmed(): void
     {
-        $history = $this->createMock(PasswordHistoryServiceInterface::class);
-        $history->expects($this->never())->method('record');
-        $notifier = $this->createMock(PasswordChangeEmailNotifierInterface::class);
-        $notifier->expects($this->never())->method('notify');
+        $historySpy = $this->createMock(PasswordHistoryServiceInterface::class);
+        $historySpy->expects($this->never())->method('record');
+        $notifierSpy = $this->createMock(PasswordChangeEmailNotifierInterface::class);
+        $notifierSpy->expects($this->never())->method('notify');
 
-        $registry = $this->createMock(ConfirmedChangeRegistryInterface::class);
-        $registry->method('isConfirmed')->willReturn(false);
-        $registry->expects($this->once())->method('clear')->with(self::USER_ID);
+        $registryMock = $this->createMock(ConfirmedChangeRegistryInterface::class);
+        $registryMock->method('isConfirmed')->willReturn(false);
+        $registryMock->expects($this->once())->method('clear')->with(self::USER_ID);
 
         $sut = $this->getSut(
             settings: $this->settings(reuse: true, notify: true),
             reader: $this->reader(self::OLD_HASH),
-            history: $history,
-            notifier: $notifier,
-            registry: $registry,
+            history: $historySpy,
+            notifier: $notifierSpy,
+            registry: $registryMock,
             bridge: $this->bridge(needsRehash: true),
         );
 
@@ -177,21 +177,21 @@ class PasswordChangeSubscriberTest extends TestCase
     #[Test]
     public function legacyRehashOldHashProceedsWhenConfirmedThenClears(): void
     {
-        $history = $this->createMock(PasswordHistoryServiceInterface::class);
-        $history->expects($this->once())->method('record');
-        $notifier = $this->createMock(PasswordChangeEmailNotifierInterface::class);
-        $notifier->expects($this->once())->method('notify');
+        $historySpy = $this->createMock(PasswordHistoryServiceInterface::class);
+        $historySpy->expects($this->once())->method('record');
+        $notifierSpy = $this->createMock(PasswordChangeEmailNotifierInterface::class);
+        $notifierSpy->expects($this->once())->method('notify');
 
-        $registry = $this->createMock(ConfirmedChangeRegistryInterface::class);
-        $registry->method('isConfirmed')->with(self::USER_ID)->willReturn(true);
-        $registry->expects($this->once())->method('clear')->with(self::USER_ID);
+        $registryMock = $this->createMock(ConfirmedChangeRegistryInterface::class);
+        $registryMock->method('isConfirmed')->with(self::USER_ID)->willReturn(true);
+        $registryMock->expects($this->once())->method('clear')->with(self::USER_ID);
 
         $sut = $this->getSut(
             settings: $this->settings(reuse: true, notify: true),
             reader: $this->reader(self::OLD_HASH),
-            history: $history,
-            notifier: $notifier,
-            registry: $registry,
+            history: $historySpy,
+            notifier: $notifierSpy,
+            registry: $registryMock,
             bridge: $this->bridge(needsRehash: true),
         );
 
@@ -201,17 +201,17 @@ class PasswordChangeSubscriberTest extends TestCase
     #[Test]
     public function recordFailureIsLoggedAndSwallowed(): void
     {
-        $history = $this->createStub(PasswordHistoryServiceInterface::class);
-        $history->method('record')->willThrowException(new RuntimeException('db down'));
+        $historyStub = $this->createStub(PasswordHistoryServiceInterface::class);
+        $historyStub->method('record')->willThrowException(new RuntimeException('db down'));
 
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->once())->method('error');
+        $loggerSpy = $this->createMock(LoggerInterface::class);
+        $loggerSpy->expects($this->once())->method('error');
 
         $sut = $this->getSut(
             settings: $this->settings(reuse: true, notify: true),
             reader: $this->reader(self::OLD_HASH),
-            history: $history,
-            logger: $logger,
+            history: $historyStub,
+            logger: $loggerSpy,
         );
 
         $this->fire($sut, oldStored: self::OLD_HASH, persisted: self::NEW_HASH);
@@ -220,17 +220,17 @@ class PasswordChangeSubscriberTest extends TestCase
     #[Test]
     public function notifyFailureIsLoggedAndSwallowed(): void
     {
-        $notifier = $this->createStub(PasswordChangeEmailNotifierInterface::class);
-        $notifier->method('notify')->willThrowException(new RuntimeException('mail down'));
+        $notifierStub = $this->createStub(PasswordChangeEmailNotifierInterface::class);
+        $notifierStub->method('notify')->willThrowException(new RuntimeException('mail down'));
 
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->once())->method('error');
+        $loggerSpy = $this->createMock(LoggerInterface::class);
+        $loggerSpy->expects($this->once())->method('error');
 
         $sut = $this->getSut(
             settings: $this->settings(reuse: false, notify: true),
             reader: $this->reader(self::OLD_HASH),
-            notifier: $notifier,
-            logger: $logger,
+            notifier: $notifierStub,
+            logger: $loggerSpy,
         );
 
         $this->fire($sut, oldStored: self::OLD_HASH, persisted: self::NEW_HASH);
@@ -239,16 +239,16 @@ class PasswordChangeSubscriberTest extends TestCase
     #[Test]
     public function beforeUpdateDoesNotArmWhenBothTogglesOff(): void
     {
-        $reader = $this->createMock(StoredPasswordReaderInterface::class);
-        $reader->expects($this->never())->method('getStoredPasswordHash');
+        $readerSpy = $this->createMock(StoredPasswordReaderInterface::class);
+        $readerSpy->expects($this->never())->method('getStoredPasswordHash');
 
-        $history = $this->createMock(PasswordHistoryServiceInterface::class);
-        $history->expects($this->never())->method('record');
+        $historySpy = $this->createMock(PasswordHistoryServiceInterface::class);
+        $historySpy->expects($this->never())->method('record');
 
         $sut = $this->getSut(
             settings: $this->settings(reuse: false, notify: false),
-            reader: $reader,
-            history: $history,
+            reader: $readerSpy,
+            history: $historySpy,
         );
 
         $this->fire($sut, oldStored: self::OLD_HASH, persisted: self::NEW_HASH);
@@ -257,22 +257,22 @@ class PasswordChangeSubscriberTest extends TestCase
     #[Test]
     public function beforeUpdateSwallowsThrowingToggleReadAndDoesNotArm(): void
     {
-        $settings = $this->createStub(ModuleSettingsServiceInterface::class);
-        $settings->method('isReusePreventionEnabled')->willThrowException(new RuntimeException('settings down'));
+        $settingsStub = $this->createStub(ModuleSettingsServiceInterface::class);
+        $settingsStub->method('isReusePreventionEnabled')->willThrowException(new RuntimeException('settings down'));
 
-        $history = $this->createMock(PasswordHistoryServiceInterface::class);
-        $history->expects($this->never())->method('record');
-        $notifier = $this->createMock(PasswordChangeEmailNotifierInterface::class);
-        $notifier->expects($this->never())->method('notify');
+        $historySpy = $this->createMock(PasswordHistoryServiceInterface::class);
+        $historySpy->expects($this->never())->method('record');
+        $notifierSpy = $this->createMock(PasswordChangeEmailNotifierInterface::class);
+        $notifierSpy->expects($this->never())->method('notify');
 
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->once())->method('error');
+        $loggerSpy = $this->createMock(LoggerInterface::class);
+        $loggerSpy->expects($this->once())->method('error');
 
         $sut = $this->getSut(
-            settings: $settings,
-            history: $history,
-            notifier: $notifier,
-            logger: $logger,
+            settings: $settingsStub,
+            history: $historySpy,
+            notifier: $notifierSpy,
+            logger: $loggerSpy,
         );
 
         $sut->handleBeforeUpdate($this->beforeEvent());
@@ -282,23 +282,23 @@ class PasswordChangeSubscriberTest extends TestCase
     #[Test]
     public function beforeUpdateSwallowsThrowingStoredHashReadAndDoesNotArm(): void
     {
-        $reader = $this->createStub(StoredPasswordReaderInterface::class);
-        $reader->method('getStoredPasswordHash')->willThrowException(new RuntimeException('reader down'));
+        $readerStub = $this->createStub(StoredPasswordReaderInterface::class);
+        $readerStub->method('getStoredPasswordHash')->willThrowException(new RuntimeException('reader down'));
 
-        $history = $this->createMock(PasswordHistoryServiceInterface::class);
-        $history->expects($this->never())->method('record');
-        $notifier = $this->createMock(PasswordChangeEmailNotifierInterface::class);
-        $notifier->expects($this->never())->method('notify');
+        $historySpy = $this->createMock(PasswordHistoryServiceInterface::class);
+        $historySpy->expects($this->never())->method('record');
+        $notifierSpy = $this->createMock(PasswordChangeEmailNotifierInterface::class);
+        $notifierSpy->expects($this->never())->method('notify');
 
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->once())->method('error');
+        $loggerSpy = $this->createMock(LoggerInterface::class);
+        $loggerSpy->expects($this->once())->method('error');
 
         $sut = $this->getSut(
             settings: $this->settings(reuse: true, notify: true),
-            history: $history,
-            notifier: $notifier,
-            reader: $reader,
-            logger: $logger,
+            history: $historySpy,
+            notifier: $notifierSpy,
+            reader: $readerStub,
+            logger: $loggerSpy,
         );
 
         $sut->handleBeforeUpdate($this->beforeEvent());
@@ -321,49 +321,49 @@ class PasswordChangeSubscriberTest extends TestCase
         return new AfterModelUpdateEvent($this->userModel($persistedHash));
     }
 
-    private function userModel(string $passwordHash): User&MockObject
+    private function userModel(string $passwordHash): User&Stub
     {
-        $user = $this->createMock(User::class);
-        $user->method('getId')->willReturn(self::USER_ID);
-        $user->method('getFieldData')->with('oxpassword')->willReturn($passwordHash);
+        $userStub = $this->createStub(User::class);
+        $userStub->method('getId')->willReturn(self::USER_ID);
+        $userStub->method('getFieldData')->willReturn($passwordHash);
 
-        return $user;
+        return $userStub;
     }
 
     private function settings(bool $reuse, bool $notify): ModuleSettingsServiceInterface
     {
-        $settings = $this->createStub(ModuleSettingsServiceInterface::class);
-        $settings->method('isReusePreventionEnabled')->willReturn($reuse);
-        $settings->method('isChangeNotificationEnabled')->willReturn($notify);
+        $settingsStub = $this->createStub(ModuleSettingsServiceInterface::class);
+        $settingsStub->method('isReusePreventionEnabled')->willReturn($reuse);
+        $settingsStub->method('isChangeNotificationEnabled')->willReturn($notify);
 
-        return $settings;
+        return $settingsStub;
     }
 
     private function reader(?string $hash): StoredPasswordReaderInterface
     {
-        $reader = $this->createStub(StoredPasswordReaderInterface::class);
-        $reader->method('getStoredPasswordHash')->willReturn($hash);
+        $readerStub = $this->createStub(StoredPasswordReaderInterface::class);
+        $readerStub->method('getStoredPasswordHash')->willReturn($hash);
 
-        return $reader;
+        return $readerStub;
     }
 
     private function resolver(string $rights): AccountTypeResolverInterface
     {
-        $account = $this->createStub(AccountDataInterface::class);
-        $account->method('getRights')->willReturn($rights);
+        $accountStub = $this->createStub(AccountDataInterface::class);
+        $accountStub->method('getRights')->willReturn($rights);
 
-        $resolver = $this->createStub(AccountTypeResolverInterface::class);
-        $resolver->method('resolveAccount')->willReturn($account);
+        $resolverStub = $this->createStub(AccountTypeResolverInterface::class);
+        $resolverStub->method('resolveAccount')->willReturn($accountStub);
 
-        return $resolver;
+        return $resolverStub;
     }
 
     private function bridge(bool $needsRehash): PasswordServiceBridgeInterface
     {
-        $bridge = $this->createStub(PasswordServiceBridgeInterface::class);
-        $bridge->method('passwordNeedsRehash')->willReturn($needsRehash);
+        $bridgeStub = $this->createStub(PasswordServiceBridgeInterface::class);
+        $bridgeStub->method('passwordNeedsRehash')->willReturn($needsRehash);
 
-        return $bridge;
+        return $bridgeStub;
     }
 
     private function getSut(
@@ -391,9 +391,9 @@ class PasswordChangeSubscriberTest extends TestCase
 
     private function clock(): ChangeClockInterface
     {
-        $clock = $this->createStub(ChangeClockInterface::class);
-        $clock->method('now')->willReturn(new DateTimeImmutable('2026-08-21 10:00:00'));
+        $clockStub = $this->createStub(ChangeClockInterface::class);
+        $clockStub->method('now')->willReturn(new DateTimeImmutable('2026-08-21 10:00:00'));
 
-        return $clock;
+        return $clockStub;
     }
 }

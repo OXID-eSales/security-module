@@ -23,6 +23,7 @@ use OxidEsales\SecurityModule\PasswordReuse\Infrastructure\Repository\PasswordCh
 use OxidEsales\SecurityModule\PasswordReuse\Notifier\Email\PasswordChangeEmailNotifier;
 use OxidEsales\SecurityModule\PasswordReuse\Service\AccountTypeResolverInterface;
 use OxidEsales\SecurityModule\Shared\Infrastructure\Factory\EmailFactoryInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -69,7 +70,7 @@ final class PasswordChangeEmailNotifierTest extends TestCase
 
         $sut = $this->getSut(
             emailFactory: $this->emailFactoryReturning($emailModelMock),
-            accountTypeResolver: $this->accountResolverReturning($this->account($email, 1)),
+            accountTypeResolver: $this->accountResolverReturning($this->account($email)),
             contentRepository: $contentRepositoryMock,
             renderer: $rendererMock,
             language: $this->languageWithAbbr(1, 'en'),
@@ -98,7 +99,7 @@ final class PasswordChangeEmailNotifierTest extends TestCase
 
         $sut = $this->getSut(
             emailFactory: $this->emailFactoryReturning($emailModelMock),
-            accountTypeResolver: $this->accountResolverReturning($this->account($email, 1)),
+            accountTypeResolver: $this->accountResolverReturning($this->account($email)),
             contentRepository: $contentRepositoryStub,
             shopAdapter: $this->shopAdapterWith([self::SUBJECT_KEY => $subject, self::BODY_KEY => $bodyTemplate]),
             language: $this->languageWithAbbr(1, 'en'),
@@ -125,7 +126,7 @@ final class PasswordChangeEmailNotifierTest extends TestCase
 
         $sut = $this->getSut(
             emailFactory: $this->emailFactoryReturning($emailModelMock),
-            accountTypeResolver: $this->accountResolverReturning($this->account(uniqid() . '@example.com', 1)),
+            accountTypeResolver: $this->accountResolverReturning($this->account(uniqid() . '@example.com')),
             contentRepository: $contentRepositoryStub,
             renderer: $rendererStub,
             language: $this->languageWithAbbr(1, 'en'),
@@ -136,47 +137,47 @@ final class PasswordChangeEmailNotifierTest extends TestCase
     }
 
     #[Test]
-    public function notifyResolvesRecipientAndSwitchesToAffectedAccountLanguage(): void
+    #[DataProvider('requestLanguageProvider')]
+    public function notifyFormatsTimestampInRequestLanguage(string $languageAbbr, string $timestampFormat): void
     {
         $email = uniqid() . '@example.com';
-        $languageId = 5;
+        $requestLanguageId = 5;
         $subject = uniqid();
         $bodyTemplate = uniqid() . ' %s';
-        $changedAt = new DateTimeImmutable('2026-08-21 14:30:00');
-        $formattedGerman = '21.08.2026 14:30';
+        $changedAt = new DateTimeImmutable();
+        $expectedTimestamp = $changedAt->format($timestampFormat);
 
         $contentRepositoryStub = $this->createStub(PasswordChangeEmailContentRepositoryInterface::class);
         $contentRepositoryStub->method('getEmailSubject')->willReturn(null);
 
-        $baseLanguageCalls = [];
-        $languageMock = $this->createMock(Language::class);
-        $languageMock->method('getLanguageAbbr')->with($languageId)->willReturn('de');
-        $languageMock->method('setBaseLanguage')->willReturnCallback(
-            function (?int $lang = null) use (&$baseLanguageCalls): void {
-                $baseLanguageCalls[] = $lang;
-            }
+        $languageStub = $this->createStub(Language::class);
+        $languageStub->method('getBaseLanguage')->willReturn($requestLanguageId);
+        $languageStub->method('getLanguageAbbr')->willReturnCallback(
+            fn(?int $lang = null): string => $lang === $requestLanguageId ? $languageAbbr : 'en'
         );
 
         $emailModelMock = $this->createMock(Email::class);
         $emailModelMock->expects($this->once())
             ->method('sendEmail')
-            ->with($email, $subject, sprintf($bodyTemplate, $formattedGerman));
+            ->with($email, $subject, sprintf($bodyTemplate, $expectedTimestamp));
 
         $sut = $this->getSut(
             emailFactory: $this->emailFactoryReturning($emailModelMock),
-            accountTypeResolver: $this->accountResolverReturning($this->account($email, $languageId)),
+            accountTypeResolver: $this->accountResolverReturning($this->account($email)),
             contentRepository: $contentRepositoryStub,
             shopAdapter: $this->shopAdapterWith([self::SUBJECT_KEY => $subject, self::BODY_KEY => $bodyTemplate]),
-            language: $languageMock,
+            language: $languageStub,
         );
 
         $sut->notify(affectedUserId: uniqid(), changedAt: $changedAt);
+    }
 
-        $this->assertContains(
-            $languageId,
-            $baseLanguageCalls,
-            'The mail is composed in the affected account language.',
-        );
+    public static function requestLanguageProvider(): array
+    {
+        return [
+            'German renders the day-first format' => ['de', 'd.m.Y H:i'],
+            'other languages render the ISO format' => ['en', 'Y-m-d H:i'],
+        ];
     }
 
     #[Test]
@@ -193,7 +194,7 @@ final class PasswordChangeEmailNotifierTest extends TestCase
 
         $sut = $this->getSut(
             emailFactory: $this->emailFactoryReturning($emailModelStub),
-            accountTypeResolver: $this->accountResolverReturning($this->account(uniqid() . '@example.com', 1)),
+            accountTypeResolver: $this->accountResolverReturning($this->account(uniqid() . '@example.com')),
             contentRepository: $contentRepositoryStub,
             language: $this->languageWithAbbr(1, 'en'),
             logger: $loggerMock,
@@ -238,14 +239,12 @@ final class PasswordChangeEmailNotifierTest extends TestCase
         $sut->notify(affectedUserId: uniqid(), changedAt: new DateTimeImmutable());
     }
 
-    private function account(string $email, int $languageId): AccountDataInterface
+    private function account(string $email): AccountDataInterface
     {
         return new AccountData(
             userId: uniqid(),
             email: $email,
             rights: 'user',
-            languageId: $languageId,
-            shopId: 1,
         );
     }
 

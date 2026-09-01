@@ -57,33 +57,18 @@ class PasswordChangeEmailNotifier implements PasswordChangeEmailNotifierInterfac
                 return;
             }
 
-            $languageId = $account->getLanguageId();
-            $formattedChangedAt = $this->formatChangedAt($changedAt, $languageId);
+            $formattedChangedAt = $this->formatChangedAt($changedAt);
 
-            $this->sendInAccountLanguage($email, $languageId, $formattedChangedAt);
-        } catch (\Throwable $e) {
-            $this->logger->warning(
-                'Sending the password-change notification failed.',
-                ['affectedUserId' => $affectedUserId, 'exception' => $e::class, 'message' => $e->getMessage()],
-            );
-        }
-    }
-
-    private function sendInAccountLanguage(string $email, int $languageId, string $formattedChangedAt): void
-    {
-        $previousLanguageId = (int) $this->language->getBaseLanguage();
-        $this->language->setTplLanguage($languageId);
-        $this->language->setBaseLanguage($languageId);
-
-        try {
             if ($this->sendFromCmsContent($email, $formattedChangedAt)) {
                 return;
             }
 
             $this->sendFallback($email, $formattedChangedAt);
-        } finally {
-            $this->language->setTplLanguage($previousLanguageId);
-            $this->language->setBaseLanguage($previousLanguageId);
+        } catch (\Throwable $e) {
+            $this->logger->warning(
+                'Sending the password-change notification failed.',
+                ['affectedUserId' => $affectedUserId, 'exception' => $e::class, 'message' => $e->getMessage()],
+            );
         }
     }
 
@@ -155,8 +140,9 @@ class PasswordChangeEmailNotifier implements PasswordChangeEmailNotifierInterfac
         $this->emailFactory->create()->sendEmail($email, $subject, sprintf($bodyTemplate, $formattedChangedAt));
     }
 
-    private function formatChangedAt(DateTimeInterface $changedAt, int $languageId): string
+    private function formatChangedAt(DateTimeInterface $changedAt): string
     {
+        $languageId = (int) $this->language->getBaseLanguage();
         $format = $this->language->getLanguageAbbr($languageId) === self::GERMAN_ABBR
             ? self::GERMAN_FORMAT
             : self::DEFAULT_FORMAT;

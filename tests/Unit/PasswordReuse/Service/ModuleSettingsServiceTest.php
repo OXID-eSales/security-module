@@ -156,23 +156,27 @@ class ModuleSettingsServiceTest extends TestCase
     #[Test]
     public function saveReusePreventionEnabledDelegatesToModuleSettingService(): void
     {
-        $moduleSettingService = $this->createMock(ModuleSettingServiceInterface::class);
-        $moduleSettingService->expects($this->once())
+        $settingServiceSpy = $this->createMock(ModuleSettingServiceInterface::class);
+        $settingServiceSpy->expects($this->once())
             ->method('saveBoolean')
             ->with(ModuleSettingsService::REUSE_PREVENTION_ENABLE, true, Module::MODULE_ID);
 
-        $this->getSut(moduleSettingService: $moduleSettingService)->saveReusePreventionEnabled(true);
+        $sut = $this->getSut(moduleSettingService: $settingServiceSpy);
+
+        $sut->saveReusePreventionEnabled(true);
     }
 
     #[Test]
     public function saveChangeNotificationEnabledDelegatesToModuleSettingService(): void
     {
-        $moduleSettingService = $this->createMock(ModuleSettingServiceInterface::class);
-        $moduleSettingService->expects($this->once())
+        $settingServiceSpy = $this->createMock(ModuleSettingServiceInterface::class);
+        $settingServiceSpy->expects($this->once())
             ->method('saveBoolean')
             ->with(ModuleSettingsService::CHANGE_NOTIFICATION_ENABLE, false, Module::MODULE_ID);
 
-        $this->getSut(moduleSettingService: $moduleSettingService)->saveChangeNotificationEnabled(false);
+        $sut = $this->getSut(moduleSettingService: $settingServiceSpy);
+
+        $sut->saveChangeNotificationEnabled(false);
     }
 
     #[Test]
@@ -201,14 +205,14 @@ class ModuleSettingsServiceTest extends TestCase
         ?ModuleSettingServiceInterface $moduleSettingService = null,
     ): ModuleSettingsService {
         if ($moduleSettingService === null) {
-            $stub = $this->createStub(ModuleSettingServiceInterface::class);
-            $stub->method('getBoolean')
+            $settingServiceStub = $this->createStub(ModuleSettingServiceInterface::class);
+            $settingServiceStub->method('getBoolean')
                 ->willReturnCallback(fn(string $name): bool => $booleanSettings[$name] ?? false);
-            $stub->method('getString')
+            $settingServiceStub->method('getString')
                 ->willReturnCallback(
                     fn(string $name): UnicodeString => new UnicodeString($stringSettings[$name] ?? '')
                 );
-            $moduleSettingService = $stub;
+            $moduleSettingService = $settingServiceStub;
         }
 
         return new ModuleSettingsService($moduleSettingService);

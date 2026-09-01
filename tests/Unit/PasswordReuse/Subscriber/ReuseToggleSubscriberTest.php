@@ -37,12 +37,12 @@ class ReuseToggleSubscriberTest extends TestCase
     #[Test]
     public function disablingReusePreventionPurgesAllHistory(): void
     {
-        $repository = $this->createMock(PasswordHistoryRepositoryInterface::class);
-        $repository->expects($this->once())->method('purgeAll');
+        $repositorySpy = $this->createMock(PasswordHistoryRepositoryInterface::class);
+        $repositorySpy->expects($this->once())->method('purgeAll');
 
         $sut = $this->getSut(
             settings: $this->settings(enabled: false),
-            repository: $repository,
+            repository: $repositorySpy,
         );
 
         $sut->onSettingChanged($this->reuseEvent());
@@ -51,12 +51,12 @@ class ReuseToggleSubscriberTest extends TestCase
     #[Test]
     public function enablingReusePreventionDoesNotPurge(): void
     {
-        $repository = $this->createMock(PasswordHistoryRepositoryInterface::class);
-        $repository->expects($this->never())->method('purgeAll');
+        $repositorySpy = $this->createMock(PasswordHistoryRepositoryInterface::class);
+        $repositorySpy->expects($this->never())->method('purgeAll');
 
         $sut = $this->getSut(
             settings: $this->settings(enabled: true),
-            repository: $repository,
+            repository: $repositorySpy,
         );
 
         $sut->onSettingChanged($this->reuseEvent());
@@ -65,12 +65,12 @@ class ReuseToggleSubscriberTest extends TestCase
     #[Test]
     public function unrelatedSettingOfOurModuleIsIgnored(): void
     {
-        $settings = $this->createMock(ModuleSettingsServiceInterface::class);
-        $settings->expects($this->never())->method('isReusePreventionEnabled');
-        $repository = $this->createMock(PasswordHistoryRepositoryInterface::class);
-        $repository->expects($this->never())->method('purgeAll');
+        $settingsSpy = $this->createMock(ModuleSettingsServiceInterface::class);
+        $settingsSpy->expects($this->never())->method('isReusePreventionEnabled');
+        $repositorySpy = $this->createMock(PasswordHistoryRepositoryInterface::class);
+        $repositorySpy->expects($this->never())->method('purgeAll');
 
-        $sut = $this->getSut(settings: $settings, repository: $repository);
+        $sut = $this->getSut(settings: $settingsSpy, repository: $repositorySpy);
 
         $sut->onSettingChanged(
             new SettingChangedEvent(self::OTHER_SETTING, 1, Module::MODULE_ID),
@@ -80,12 +80,12 @@ class ReuseToggleSubscriberTest extends TestCase
     #[Test]
     public function reuseSettingOfAnotherModuleIsIgnored(): void
     {
-        $settings = $this->createMock(ModuleSettingsServiceInterface::class);
-        $settings->expects($this->never())->method('isReusePreventionEnabled');
-        $repository = $this->createMock(PasswordHistoryRepositoryInterface::class);
-        $repository->expects($this->never())->method('purgeAll');
+        $settingsSpy = $this->createMock(ModuleSettingsServiceInterface::class);
+        $settingsSpy->expects($this->never())->method('isReusePreventionEnabled');
+        $repositorySpy = $this->createMock(PasswordHistoryRepositoryInterface::class);
+        $repositorySpy->expects($this->never())->method('purgeAll');
 
-        $sut = $this->getSut(settings: $settings, repository: $repository);
+        $sut = $this->getSut(settings: $settingsSpy, repository: $repositorySpy);
 
         $sut->onSettingChanged(
             new SettingChangedEvent(ModuleSettingsService::REUSE_PREVENTION_ENABLE, 1, self::OTHER_MODULE),
@@ -95,15 +95,15 @@ class ReuseToggleSubscriberTest extends TestCase
     #[Test]
     public function purgeFailureIsSwallowedAndLogged(): void
     {
-        $repository = $this->createStub(PasswordHistoryRepositoryInterface::class);
-        $repository->method('purgeAll')->willThrowException(new RuntimeException('table down'));
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->once())->method('error');
+        $repositoryStub = $this->createStub(PasswordHistoryRepositoryInterface::class);
+        $repositoryStub->method('purgeAll')->willThrowException(new RuntimeException('table down'));
+        $loggerSpy = $this->createMock(LoggerInterface::class);
+        $loggerSpy->expects($this->once())->method('error');
 
         $sut = $this->getSut(
             settings: $this->settings(enabled: false),
-            repository: $repository,
-            logger: $logger,
+            repository: $repositoryStub,
+            logger: $loggerSpy,
         );
 
         $sut->onSettingChanged($this->reuseEvent());
@@ -116,10 +116,10 @@ class ReuseToggleSubscriberTest extends TestCase
 
     private function settings(bool $enabled): ModuleSettingsServiceInterface
     {
-        $settings = $this->createStub(ModuleSettingsServiceInterface::class);
-        $settings->method('isReusePreventionEnabled')->willReturn($enabled);
+        $settingsStub = $this->createStub(ModuleSettingsServiceInterface::class);
+        $settingsStub->method('isReusePreventionEnabled')->willReturn($enabled);
 
-        return $settings;
+        return $settingsStub;
     }
 
     private function getSut(

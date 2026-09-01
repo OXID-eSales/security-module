@@ -24,6 +24,7 @@ use OxidEsales\SecurityModule\PasswordReuse\Infrastructure\Repository\StoredPass
 use OxidEsales\SecurityModule\PasswordReuse\Service\AccountTypeResolverInterface;
 use OxidEsales\SecurityModule\PasswordReuse\Service\ConfirmedChangeRegistryInterface;
 use OxidEsales\SecurityModule\PasswordReuse\Service\ModuleSettingsServiceInterface;
+use OxidEsales\SecurityModule\PasswordReuse\Service\PasswordCollectionBuilder;
 use OxidEsales\SecurityModule\PasswordReuse\Service\PasswordCollectionService;
 use OxidEsales\SecurityModule\PasswordReuse\Service\PasswordCollectionServiceInterface;
 use OxidEsales\SecurityModule\PasswordReuse\Service\PasswordReuseGuardService;
@@ -179,14 +180,14 @@ final class UserMainTest extends IntegrationTestCase
     {
         $this->stubRequest('-1', 'provisioned-pw-' . uniqid());
 
-        $guard = $this->createMock(PasswordReuseGuardServiceInterface::class);
-        $guard->expects($this->never())->method('guardChange');
-        $registry = $this->createMock(ConfirmedChangeRegistryInterface::class);
-        $registry->expects($this->never())->method('confirm');
+        $guardSpy = $this->createMock(PasswordReuseGuardServiceInterface::class);
+        $guardSpy->expects($this->never())->method('guardChange');
+        $registrySpy = $this->createMock(ConfirmedChangeRegistryInterface::class);
+        $registrySpy->expects($this->never())->method('confirm');
 
         $sut = $this->getSut('-1', false, [
-            PasswordReuseGuardServiceInterface::class => $guard,
-            ConfirmedChangeRegistryInterface::class => $registry,
+            PasswordReuseGuardServiceInterface::class => $guardSpy,
+            ConfirmedChangeRegistryInterface::class => $registrySpy,
         ]);
         $sut->save();
     }
@@ -197,14 +198,14 @@ final class UserMainTest extends IntegrationTestCase
         $userId = $this->createUser('current-pw-' . uniqid());
         $this->stubRequest($userId, '');
 
-        $guard = $this->createMock(PasswordReuseGuardServiceInterface::class);
-        $guard->expects($this->never())->method('guardChange');
-        $registry = $this->createMock(ConfirmedChangeRegistryInterface::class);
-        $registry->expects($this->never())->method('confirm');
+        $guardSpy = $this->createMock(PasswordReuseGuardServiceInterface::class);
+        $guardSpy->expects($this->never())->method('guardChange');
+        $registrySpy = $this->createMock(ConfirmedChangeRegistryInterface::class);
+        $registrySpy->expects($this->never())->method('confirm');
 
         $sut = $this->getSut($userId, false, [
-            PasswordReuseGuardServiceInterface::class => $guard,
-            ConfirmedChangeRegistryInterface::class => $registry,
+            PasswordReuseGuardServiceInterface::class => $guardSpy,
+            ConfirmedChangeRegistryInterface::class => $registrySpy,
         ]);
         $sut->save();
     }
@@ -215,14 +216,14 @@ final class UserMainTest extends IntegrationTestCase
         $userId = $this->createUser('');
         $this->stubRequest($userId, 'provisioned-pw-' . uniqid());
 
-        $guard = $this->createMock(PasswordReuseGuardServiceInterface::class);
-        $guard->expects($this->never())->method('guardChange');
-        $registry = $this->createMock(ConfirmedChangeRegistryInterface::class);
-        $registry->expects($this->never())->method('confirm');
+        $guardSpy = $this->createMock(PasswordReuseGuardServiceInterface::class);
+        $guardSpy->expects($this->never())->method('guardChange');
+        $registrySpy = $this->createMock(ConfirmedChangeRegistryInterface::class);
+        $registrySpy->expects($this->never())->method('confirm');
 
         $sut = $this->getSut($userId, false, [
-            PasswordReuseGuardServiceInterface::class => $guard,
-            ConfirmedChangeRegistryInterface::class => $registry,
+            PasswordReuseGuardServiceInterface::class => $guardSpy,
+            ConfirmedChangeRegistryInterface::class => $registrySpy,
         ]);
         $sut->save();
     }
@@ -271,9 +272,11 @@ final class UserMainTest extends IntegrationTestCase
 
         $collection = new PasswordCollectionService(
             $this->container()->get(PasswordHasherInterface::class),
-            $this->container()->get(PasswordHistoryRepositoryInterface::class),
-            $settings,
-            $this->container()->get(AccountTypeResolverInterface::class),
+            new PasswordCollectionBuilder(
+                $this->container()->get(PasswordHistoryRepositoryInterface::class),
+                $settings,
+                $this->container()->get(AccountTypeResolverInterface::class),
+            ),
         );
 
         return new PasswordReuseGuardService(
@@ -286,12 +289,12 @@ final class UserMainTest extends IntegrationTestCase
 
     private function guardWithFailingCollection(): PasswordReuseGuardService
     {
-        $collection = $this->createStub(PasswordCollectionServiceInterface::class);
-        $collection->method('isCandidateInCollection')
+        $collectionStub = $this->createStub(PasswordCollectionServiceInterface::class);
+        $collectionStub->method('isCandidateInCollection')
             ->willThrowException(new PasswordReuseCheckException());
 
         return new PasswordReuseGuardService(
-            $collection,
+            $collectionStub,
             $this->settingsStub(true),
             $this->changeRegistry(),
             new NullLogger(),

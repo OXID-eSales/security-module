@@ -38,6 +38,9 @@ services:
     class: OxidEsales\SecurityModule\PasswordReuse\Service\PasswordCollectionService
     public: true
 
+  OxidEsales\SecurityModule\PasswordReuse\Service\PasswordCollectionBuilderInterface:
+    class: OxidEsales\SecurityModule\PasswordReuse\Service\PasswordCollectionBuilder
+
   OxidEsales\SecurityModule\PasswordReuse\Service\PasswordReuseGuardServiceInterface:
     class: OxidEsales\SecurityModule\PasswordReuse\Service\PasswordReuseGuardService
     public: true

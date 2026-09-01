@@ -9,12 +9,9 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Tests\Unit\PasswordReuse\Service;
 
-use OxidEsales\SecurityModule\PasswordReuse\DTO\AccountDataInterface;
 use OxidEsales\SecurityModule\PasswordReuse\Exception\PasswordReuseCheckException;
 use OxidEsales\SecurityModule\PasswordReuse\Infrastructure\Hashing\PasswordHasherInterface;
-use OxidEsales\SecurityModule\PasswordReuse\Infrastructure\Repository\PasswordHistoryRepositoryInterface;
-use OxidEsales\SecurityModule\PasswordReuse\Service\AccountTypeResolverInterface;
-use OxidEsales\SecurityModule\PasswordReuse\Service\ModuleSettingsServiceInterface;
+use OxidEsales\SecurityModule\PasswordReuse\Service\PasswordCollectionBuilderInterface;
 use OxidEsales\SecurityModule\PasswordReuse\Service\PasswordCollectionService;
 use OxidEsales\SecurityModule\PasswordReuse\Service\PasswordCollectionServiceInterface;
 use PHPUnit\Framework\Attributes\Test;
@@ -25,25 +22,23 @@ use RuntimeException;
 class PasswordCollectionServiceTest extends TestCase
 {
     #[Test]
-    public function candidateMatchingCurrentHashIsInCollectionEvenWithNoHistory(): void
+    public function candidateMatchingCurrentHashIsInCollection(): void
     {
-        $userId = uniqid('user_', true);
         $candidate = uniqid('plain_', true);
         $currentHash = uniqid('hash_', true);
 
-        $repository = $this->createStub(PasswordHistoryRepositoryInterface::class);
-        $repository->method('findRecentHashes')->willReturn([]);
-
-        $hasher = $this->createMock(PasswordHasherInterface::class);
-        $hasher->expects($this->once())
+        $hasherMock = $this->createMock(PasswordHasherInterface::class);
+        $hasherMock->expects($this->once())
             ->method('verifyPassword')
             ->with($candidate, $currentHash)
             ->willReturn(true);
 
-        $result = $this->getSut(hasher: $hasher, repository: $repository)
-            ->isCandidateInCollection($userId, $candidate, $currentHash);
+        $sut = $this->getSut(
+            passwordHasher: $hasherMock,
+            collectionBuilder: $this->builderReturning([$currentHash]),
+        );
 
-        $this->assertTrue($result);
+        $this->assertTrue($sut->isCandidateInCollection(uniqid('user_', true), $candidate, $currentHash));
     }
 
     #[Test]
@@ -53,65 +48,33 @@ class PasswordCollectionServiceTest extends TestCase
         $currentHash = uniqid('hash_current_', true);
         $previousHashes = [uniqid('hash_prev1_', true), uniqid('hash_prev2_', true)];
 
-        $repository = $this->createStub(PasswordHistoryRepositoryInterface::class);
-        $repository->method('findRecentHashes')->willReturn($previousHashes);
-
-        $hasher = $this->createStub(PasswordHasherInterface::class);
-        $hasher->method('verifyPassword')->willReturnCallback(
+        $hasherStub = $this->createStub(PasswordHasherInterface::class);
+        $hasherStub->method('verifyPassword')->willReturnCallback(
             static fn(string $plain, string $hash): bool => $hash === $previousHashes[1]
         );
 
-        $result = $this->getSut(hasher: $hasher, repository: $repository)
-            ->isCandidateInCollection(uniqid('user_', true), $candidate, $currentHash);
+        $sut = $this->getSut(
+            passwordHasher: $hasherStub,
+            collectionBuilder: $this->builderReturning([$currentHash, ...$previousHashes]),
+        );
 
-        $this->assertTrue($result);
+        $this->assertTrue($sut->isCandidateInCollection(uniqid('user_', true), $candidate, $currentHash));
     }
 
     #[Test]
     public function candidateMatchingNoMemberIsNotInCollection(): void
     {
-        $repository = $this->createStub(PasswordHistoryRepositoryInterface::class);
-        $repository->method('findRecentHashes')->willReturn([uniqid('hash_prev_', true)]);
+        $hasherStub = $this->createStub(PasswordHasherInterface::class);
+        $hasherStub->method('verifyPassword')->willReturn(false);
 
-        $hasher = $this->createStub(PasswordHasherInterface::class);
-        $hasher->method('verifyPassword')->willReturn(false);
+        $sut = $this->getSut(
+            passwordHasher: $hasherStub,
+            collectionBuilder: $this->builderReturning([uniqid('hash_', true), uniqid('hash_prev_', true)]),
+        );
 
-        $result = $this->getSut(hasher: $hasher, repository: $repository)
-            ->isCandidateInCollection(uniqid('user_', true), uniqid('plain_', true), uniqid('hash_', true));
-
-        $this->assertFalse($result);
-    }
-
-    #[Test]
-    public function collectionIsBoundedToResolvedSizeMinusOnePreviousEntries(): void
-    {
-        $userId = uniqid('user_', true);
-        $rights = 'malladmin';
-        $sizeN = mt_rand(3, 24);
-
-        $account = $this->createStub(AccountDataInterface::class);
-        $account->method('getRights')->willReturn($rights);
-
-        $resolver = $this->createStub(AccountTypeResolverInterface::class);
-        $resolver->method('resolveAccount')->willReturn($account);
-
-        $settings = $this->createMock(ModuleSettingsServiceInterface::class);
-        $settings->expects($this->once())
-            ->method('resolveCollectionSizeForRights')
-            ->with($rights)
-            ->willReturn($sizeN);
-
-        $repository = $this->createMock(PasswordHistoryRepositoryInterface::class);
-        $repository->expects($this->once())
-            ->method('findRecentHashes')
-            ->with($userId, $sizeN - 1)
-            ->willReturn([]);
-
-        $hasher = $this->createStub(PasswordHasherInterface::class);
-        $hasher->method('verifyPassword')->willReturn(false);
-
-        $this->getSut(hasher: $hasher, repository: $repository, settings: $settings, resolver: $resolver)
-            ->isCandidateInCollection($userId, uniqid('plain_', true), uniqid('hash_', true));
+        $this->assertFalse(
+            $sut->isCandidateInCollection(uniqid('user_', true), uniqid('plain_', true), uniqid('hash_', true))
+        );
     }
 
     #[Test]
@@ -120,48 +83,49 @@ class PasswordCollectionServiceTest extends TestCase
         $candidate = 'secret-plaintext';
         $legacyCurrentHash = md5('secret-plaintext');
 
-        $repository = $this->createStub(PasswordHistoryRepositoryInterface::class);
-        $repository->method('findRecentHashes')->willReturn([]);
-
-        $hasher = $this->createMock(PasswordHasherInterface::class);
-        $hasher->expects($this->once())
+        $hasherMock = $this->createMock(PasswordHasherInterface::class);
+        $hasherMock->expects($this->once())
             ->method('verifyPassword')
             ->with($candidate, $legacyCurrentHash)
             ->willReturn(true);
 
         $this->assertNotSame($candidate, $legacyCurrentHash);
 
-        $result = $this->getSut(hasher: $hasher, repository: $repository)
-            ->isCandidateInCollection(uniqid('user_', true), $candidate, $legacyCurrentHash);
+        $sut = $this->getSut(
+            passwordHasher: $hasherMock,
+            collectionBuilder: $this->builderReturning([$legacyCurrentHash]),
+        );
 
-        $this->assertTrue($result);
+        $this->assertTrue($sut->isCandidateInCollection(uniqid('user_', true), $candidate, $legacyCurrentHash));
     }
 
     #[Test]
-    public function repositoryFailureRaisesFailClosedException(): void
+    public function builderFailureRaisesFailClosedException(): void
     {
-        $repository = $this->createStub(PasswordHistoryRepositoryInterface::class);
-        $repository->method('findRecentHashes')->willThrowException(new RuntimeException('table read failed'));
+        $builderStub = $this->createStub(PasswordCollectionBuilderInterface::class);
+        $builderStub->method('build')->willThrowException(new RuntimeException('collection build failed'));
+
+        $sut = $this->getSut(collectionBuilder: $builderStub);
 
         $this->expectException(PasswordReuseCheckException::class);
 
-        $this->getSut(repository: $repository)
-            ->isCandidateInCollection(uniqid('user_', true), uniqid('plain_', true), uniqid('hash_', true));
+        $sut->isCandidateInCollection(uniqid('user_', true), uniqid('plain_', true), uniqid('hash_', true));
     }
 
     #[Test]
     public function verifyServiceFailureRaisesFailClosedException(): void
     {
-        $repository = $this->createStub(PasswordHistoryRepositoryInterface::class);
-        $repository->method('findRecentHashes')->willReturn([]);
+        $hasherStub = $this->createStub(PasswordHasherInterface::class);
+        $hasherStub->method('verifyPassword')->willThrowException(new RuntimeException('hash service unavailable'));
 
-        $hasher = $this->createStub(PasswordHasherInterface::class);
-        $hasher->method('verifyPassword')->willThrowException(new RuntimeException('hash service unavailable'));
+        $sut = $this->getSut(
+            passwordHasher: $hasherStub,
+            collectionBuilder: $this->builderReturning([uniqid('hash_', true)]),
+        );
 
         $this->expectException(PasswordReuseCheckException::class);
 
-        $this->getSut(hasher: $hasher, repository: $repository)
-            ->isCandidateInCollection(uniqid('user_', true), uniqid('plain_', true), uniqid('hash_', true));
+        $sut->isCandidateInCollection(uniqid('user_', true), uniqid('plain_', true), uniqid('hash_', true));
     }
 
     #[Test]
@@ -186,30 +150,23 @@ class PasswordCollectionServiceTest extends TestCase
     }
 
     private function getSut(
-        ?PasswordHasherInterface $hasher = null,
-        ?PasswordHistoryRepositoryInterface $repository = null,
-        ?ModuleSettingsServiceInterface $settings = null,
-        ?AccountTypeResolverInterface $resolver = null,
+        ?PasswordHasherInterface $passwordHasher = null,
+        ?PasswordCollectionBuilderInterface $collectionBuilder = null,
     ): PasswordCollectionService {
-        if ($settings === null) {
-            $settingsStub = $this->createStub(ModuleSettingsServiceInterface::class);
-            $settingsStub->method('resolveCollectionSizeForRights')->willReturn(mt_rand(3, 24));
-            $settings = $settingsStub;
-        }
-
-        if ($resolver === null) {
-            $account = $this->createStub(AccountDataInterface::class);
-            $account->method('getRights')->willReturn('user');
-            $resolverStub = $this->createStub(AccountTypeResolverInterface::class);
-            $resolverStub->method('resolveAccount')->willReturn($account);
-            $resolver = $resolverStub;
-        }
-
         return new PasswordCollectionService(
-            $hasher ?? $this->createStub(PasswordHasherInterface::class),
-            $repository ?? $this->createStub(PasswordHistoryRepositoryInterface::class),
-            $settings,
-            $resolver,
+            $passwordHasher ?? $this->createStub(PasswordHasherInterface::class),
+            $collectionBuilder ?? $this->builderReturning([]),
         );
+    }
+
+    /**
+     * @param list<string> $collection
+     */
+    private function builderReturning(array $collection): PasswordCollectionBuilderInterface
+    {
+        $builderStub = $this->createStub(PasswordCollectionBuilderInterface::class);
+        $builderStub->method('build')->willReturn($collection);
+
+        return $builderStub;
     }
 }

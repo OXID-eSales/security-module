@@ -60,25 +60,17 @@ class AccountTypeResolverTest extends TestCase
     }
 
     #[Test]
-    public function resolveAccountReturnsRecipientAndLocaleOfTheAccountData(): void
+    public function resolveAccountReturnsRecipientOfTheAccountData(): void
     {
         $email = uniqid('mail_', true);
-        $languageId = mt_rand(0, 5);
-        $shopId = mt_rand(1, 9);
 
         $sut = $this->getSut(
-            account: $this->makeAccount(
-                email: $email,
-                languageId: $languageId,
-                shopId: $shopId,
-            ),
+            account: $this->makeAccount(email: $email),
         );
 
         $affectedAccount = $sut->resolveAccount(userId: uniqid());
 
         $this->assertSame($email, $affectedAccount->getEmail());
-        $this->assertSame($languageId, $affectedAccount->getLanguageId());
-        $this->assertSame($shopId, $affectedAccount->getShopId());
     }
 
     #[Test]
@@ -106,15 +98,11 @@ class AccountTypeResolverTest extends TestCase
     private function makeAccount(
         string $rights = 'user',
         ?string $email = null,
-        ?int $languageId = null,
-        ?int $shopId = null,
     ): AccountDataInterface {
         return new AccountData(
             userId: uniqid('user_', true),
             email: $email ?? uniqid('mail_', true),
             rights: $rights,
-            languageId: $languageId ?? mt_rand(0, 5),
-            shopId: $shopId ?? mt_rand(1, 9),
         );
     }
 

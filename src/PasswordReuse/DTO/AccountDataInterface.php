@@ -16,8 +16,4 @@ interface AccountDataInterface
     public function getEmail(): string;
 
     public function getRights(): string;
-
-    public function getLanguageId(): int;
-
-    public function getShopId(): int;
 }

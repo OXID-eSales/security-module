@@ -29,6 +29,7 @@ use OxidEsales\SecurityModule\PasswordReuse\Infrastructure\Repository\StoredPass
 use OxidEsales\SecurityModule\PasswordReuse\Service\AccountTypeResolverInterface;
 use OxidEsales\SecurityModule\PasswordReuse\Service\ConfirmedChangeRegistryInterface;
 use OxidEsales\SecurityModule\PasswordReuse\Service\ModuleSettingsServiceInterface as ReuseSettingsServiceInterface;
+use OxidEsales\SecurityModule\PasswordReuse\Service\PasswordCollectionBuilder;
 use OxidEsales\SecurityModule\PasswordReuse\Service\PasswordCollectionService;
 use OxidEsales\SecurityModule\PasswordReuse\Service\PasswordCollectionServiceInterface;
 use OxidEsales\SecurityModule\PasswordReuse\Service\PasswordReuseGuardService;
@@ -92,10 +93,10 @@ class ForgotPasswordControllerTest extends IntegrationTestCase
             ->method('addErrorToDisplay')
             ->with($errorCode);
 
-        $captchaService = $this->createMock(CaptchaServiceInterface::class);
-        $captchaService->method('validate')->willThrowException(new StandardException($errorCode));
+        $captchaServiceMock = $this->createMock(CaptchaServiceInterface::class);
+        $captchaServiceMock->method('validate')->willThrowException(new StandardException($errorCode));
 
-        $subject = $this->getSut([CaptchaServiceInterface::class => $captchaService]);
+        $subject = $this->getSut([CaptchaServiceInterface::class => $captchaServiceMock]);
         $subject->forgotPassword();
     }
 
@@ -242,9 +243,11 @@ class ForgotPasswordControllerTest extends IntegrationTestCase
 
         $collection = new PasswordCollectionService(
             ContainerFacade::get(PasswordHasherInterface::class),
-            ContainerFacade::get(PasswordHistoryRepositoryInterface::class),
-            $settings,
-            ContainerFacade::get(AccountTypeResolverInterface::class),
+            new PasswordCollectionBuilder(
+                ContainerFacade::get(PasswordHistoryRepositoryInterface::class),
+                $settings,
+                ContainerFacade::get(AccountTypeResolverInterface::class),
+            ),
         );
 
         return new PasswordReuseGuardService(
@@ -257,12 +260,12 @@ class ForgotPasswordControllerTest extends IntegrationTestCase
 
     private function guardWithFailingCollection(): PasswordReuseGuardService
     {
-        $collection = $this->createStub(PasswordCollectionServiceInterface::class);
-        $collection->method('isCandidateInCollection')
+        $collectionStub = $this->createStub(PasswordCollectionServiceInterface::class);
+        $collectionStub->method('isCandidateInCollection')
             ->willThrowException(new PasswordReuseCheckException());
 
         return new PasswordReuseGuardService(
-            $collection,
+            $collectionStub,
             $this->reuseSettingsStub(true),
             $this->changeRegistry(),
             new NullLogger(),

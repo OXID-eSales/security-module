@@ -9,11 +9,11 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\PasswordReuse\Infrastructure\Repository;
 
-use DateTimeInterface;
+use DateTimeImmutable;
 
 interface PasswordHistoryRepositoryInterface
 {
-    public function append(string $userId, string $hash, DateTimeInterface $supersededAt): void;
+    public function append(string $userId, string $hash, DateTimeImmutable $supersededAt): void;
 
     /**
      * @return list<string>
