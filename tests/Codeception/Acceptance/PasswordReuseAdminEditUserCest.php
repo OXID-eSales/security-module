@@ -107,7 +107,10 @@ final class PasswordReuseAdminEditUserCest extends BaseCest
         $I->wantToTest('admin creating a new user with a first password neither blocks nor notifies (BR004)');
 
         $users = $I->loginAdmin()->openUsers();
+
+        $I->retry(6, 500);
         $users->createNewUser($this->buildNewAdminUser(), $this->buildNewAdminUserAddress());
+        $I->retry(1);
 
         $I->seeInDatabase('oxuser', ['oxusername' => self::CREATED_USER_LOGIN]);
         $createdUserId = (string) $I->grabFromDatabase('oxuser', 'oxid', ['oxusername' => self::CREATED_USER_LOGIN]);

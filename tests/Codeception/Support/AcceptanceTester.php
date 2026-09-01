@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Tests\Codeception\Support;
 
 use Codeception\Util\Fixtures;
+use Codeception\Lib\Actor\Shared\Retry;
 use OxidEsales\Codeception\Admin\AdminLoginPage;
 use OxidEsales\Codeception\Admin\AdminPanel;
 use OxidEsales\Codeception\Module\Translation\Translator;
@@ -34,6 +35,7 @@ use OxidEsales\Codeception\Page\Home;
 final class AcceptanceTester extends \Codeception\Actor
 {
     use _generated\AcceptanceTesterActions;
+    use Retry;
 
     /**
      * Open shop first page.
