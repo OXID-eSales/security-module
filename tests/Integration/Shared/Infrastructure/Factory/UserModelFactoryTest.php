@@ -7,11 +7,11 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\SecurityModule\Tests\Integration\Authentication\TwoFactorAuth\Infrastructure\Factory;
+namespace OxidEsales\SecurityModule\Tests\Integration\Shared\Infrastructure\Factory;
 
 use OxidEsales\Eshop\Application\Model\User;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\UserModelFactory;
-use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Infrastructure\Factory\UserModelFactoryInterface;
+use OxidEsales\SecurityModule\Shared\Infrastructure\Factory\UserModelFactory;
+use OxidEsales\SecurityModule\Shared\Infrastructure\Factory\UserModelFactoryInterface;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 

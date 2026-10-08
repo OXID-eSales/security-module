@@ -14,6 +14,7 @@ use OxidEsales\SecurityModule\FormSecurity\Service\ModuleSettingsService as Form
 use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsService as PasswordPolicyModuleSettings;
 use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsService as CaptchaModuleSettings;
 use OxidEsales\SecurityModule\Core\Module;
+use OxidEsales\SecurityModule\EmailVerification\Settings\EmailVerificationSettings as EmailVerificationModuleSettings;
 
 $sMetadataVersion = '2.1';
 
@@ -33,7 +34,7 @@ $aModule = [
     'url'         => 'https://github.com/OXID-eSales/security-module',
     'email'       => 'info@oxid-esales.com',
     'extend'      => [
-        \OxidEsales\Eshop\Application\Component\UserComponent::class => \OxidEsales\SecurityModule\Captcha\Shop\UserComponent::class,
+        \OxidEsales\Eshop\Application\Component\UserComponent::class => \OxidEsales\SecurityModule\Shared\Component\UserComponent::class,
         \OxidEsales\Eshop\Application\Controller\NewsletterController::class => \OxidEsales\SecurityModule\Captcha\Shop\NewsletterController::class,
         \OxidEsales\Eshop\Application\Controller\ForgotPasswordController::class => \OxidEsales\SecurityModule\Shared\Controller\ForgotPasswordController::class,
         \OxidEsales\Eshop\Application\Model\User::class => \OxidEsales\SecurityModule\Shared\Model\User::class,
@@ -150,6 +151,20 @@ $aModule = [
             'name'  => TwoFactorAuthModuleSettings::OTP_CODE_LIFETIME,
             'type'  => 'num',
             'value' => 300
+        ],
+
+        //Email verification on registration
+        [
+            'group' => 'email_verification',
+            'name'  => EmailVerificationModuleSettings::ACTIVE,
+            'type'  => 'bool',
+            'value' => false
+        ],
+        [
+            'group' => 'email_verification',
+            'name'  => EmailVerificationModuleSettings::LINK_LIFETIME,
+            'type'  => 'num',
+            'value' => 24
         ],
     ],
 ];

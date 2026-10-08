@@ -76,4 +76,10 @@ $aLang = [
     'OE_SECURITY_TWO_FACTOR_SETTINGS_DESCRIPTION' => 'Add an extra layer of security to your account. When enabled, you will need to enter a verification code sent to your email each time you log in.',
     'OE_SECURITY_TWO_FACTOR_ENABLE'               => 'Enable two-factor authentication',
     'OE_SECURITY_TWO_FA_SETTINGS_SAVED'           => 'Two-factor authentication settings have been saved.',
+
+    'ERROR_EMAIL_NOT_VERIFIED'                 => 'Please confirm your email address first. We have sent you a link to do so.',
+    'ERROR_EMAIL_ALREADY_VERIFIED'             => 'Your email address is already confirmed. You can log in.',
+    'ERROR_EMAIL_VERIFICATION_RESEND_COOLDOWN' => 'A new email can be requested in %d minute(s).',
+    'ERROR_EMAIL_VERIFICATION_LINK_EXPIRED'    => 'The confirmation link has expired.',
+    'ERROR_EMAIL_VERIFICATION_LINK_INVALID'    => 'The confirmation link is invalid or has already been used.',
 ];

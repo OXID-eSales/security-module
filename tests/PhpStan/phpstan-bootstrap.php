@@ -19,7 +19,7 @@ class_alias(
 
 class_alias(
     \OxidEsales\Eshop\Application\Component\UserComponent::class,
-    \OxidEsales\SecurityModule\Captcha\Shop\UserComponent_parent::class
+    \OxidEsales\SecurityModule\Shared\Component\UserComponent_parent::class
 );
 
 class_alias(

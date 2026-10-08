@@ -13,6 +13,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Update module to work with OXID eShop 7.6
+- `UserModelFactoryInterface` and `UserModelFactory` moved from `Authentication\TwoFactorAuth\Infrastructure\Factory`
+  to `Shared\Infrastructure\Factory`, as they are now used outside two-factor authentication. Projects that
+  override this service must update the namespace.
+- The `UserComponent` extension moved from `OxidEsales\SecurityModule\Captcha\Shop\UserComponent` to
+  `OxidEsales\SecurityModule\Shared\Component\UserComponent`, as it now serves captcha, two-factor authentication
+  and email verification. Modules that extend or reference the old class must use the new one.
 
 ## [4.0.2] - 2026-08-26
 

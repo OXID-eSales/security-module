@@ -76,4 +76,10 @@ $aLang = [
     'OE_SECURITY_TWO_FACTOR_SETTINGS_DESCRIPTION' => 'Fügen Sie Ihrem Konto eine zusätzliche Sicherheitsebene hinzu. Wenn aktiviert, müssen Sie bei jeder Anmeldung einen Bestätigungscode eingeben, der an Ihre E-Mail gesendet wird.',
     'OE_SECURITY_TWO_FACTOR_ENABLE'               => 'Zwei-Faktor-Authentifizierung aktivieren',
     'OE_SECURITY_TWO_FA_SETTINGS_SAVED'           => 'Die Einstellungen für die Zwei-Faktor-Authentifizierung wurden gespeichert.',
+
+    'ERROR_EMAIL_NOT_VERIFIED'                 => 'Bitte bestätigen Sie zuerst Ihre E-Mail-Adresse. Wir haben Ihnen dazu einen Link gesendet.',
+    'ERROR_EMAIL_ALREADY_VERIFIED'             => 'Ihre E-Mail-Adresse ist bereits bestätigt. Sie können sich anmelden.',
+    'ERROR_EMAIL_VERIFICATION_RESEND_COOLDOWN' => 'Eine neue E-Mail kann in %d Minute(n) angefordert werden.',
+    'ERROR_EMAIL_VERIFICATION_LINK_EXPIRED'    => 'Der Bestätigungslink ist abgelaufen.',
+    'ERROR_EMAIL_VERIFICATION_LINK_INVALID'    => 'Der Bestätigungslink ist ungültig oder wurde bereits verwendet.',
 ];

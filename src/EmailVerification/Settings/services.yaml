@@ -1,0 +1,7 @@
+services:
+  _defaults:
+    autowire: true
+    public: false
+
+  OxidEsales\SecurityModule\EmailVerification\Settings\EmailVerificationSettingsInterface:
+    class: OxidEsales\SecurityModule\EmailVerification\Settings\EmailVerificationSettings
