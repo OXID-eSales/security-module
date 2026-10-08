@@ -11,3 +11,9 @@ services:
 
   OxidEsales\SecurityModule\EmailVerification\Service\PendingUserSessionInterface:
     class: OxidEsales\SecurityModule\EmailVerification\Service\PendingUserSession
+
+  OxidEsales\SecurityModule\EmailVerification\Service\VerificationUrlBuilderInterface:
+    class: OxidEsales\SecurityModule\EmailVerification\Service\VerificationUrlBuilder
+
+  OxidEsales\SecurityModule\EmailVerification\Service\VerificationMailSenderInterface:
+    class: OxidEsales\SecurityModule\EmailVerification\Service\VerificationMailSender

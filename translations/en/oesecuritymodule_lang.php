@@ -82,4 +82,18 @@ $aLang = [
     'ERROR_EMAIL_VERIFICATION_RESEND_COOLDOWN' => 'A new email can be requested in %d minute(s).',
     'ERROR_EMAIL_VERIFICATION_LINK_EXPIRED'    => 'The confirmation link has expired.',
     'ERROR_EMAIL_VERIFICATION_LINK_INVALID'    => 'The confirmation link is invalid or has already been used.',
+
+    'ERROR_EMAIL_VERIFICATION_MAIL_NOT_SENT'   => 'The confirmation email could not be sent. Please try again later.',
+
+    'EMAIL_VERIFICATION_DATE_FORMAT'   => 'Y-m-d H:i',
+    'EMAIL_VERIFICATION_EMAIL_BUTTON'  => 'Confirm email address',
+    'EMAIL_VERIFICATION_EMAIL_SUBJECT' => 'Please confirm your email address',
+    'EMAIL_VERIFICATION_EMAIL_BODY'    => "Hello %1\$s,\n\n"
+        . "Thank you for registering at %2\$s.\n\n"
+        . "Please confirm your email address by opening the following link:\n\n"
+        . "%3\$s\n\n"
+        . "The link is valid until %4\$s and can only be used once. You can log in to your account only"
+        . " after confirming your address.\n\n"
+        . "If you didn't register, you can safely ignore this email.\n\n"
+        . "Your %2\$s team.",
 ];

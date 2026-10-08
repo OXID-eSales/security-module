@@ -1,0 +1,11 @@
+{% include "email/html/header.html.twig" with {title: subject|default("EMAIL_VERIFICATION_EMAIL_SUBJECT"|translate)} %}
+
+{% apply nl2br %}
+{%- include_content contentIdent|default('oesmemailverification') with {userName: userName, shopName: shopName, verificationLink: verificationLink, expiresAt: expiresAt} -%}
+{% endapply %}
+
+<p>
+    <a href="{{ verificationLink }}" style="display:inline-block;padding:10px 20px;background:#0d6efd;color:#ffffff;text-decoration:none;border-radius:4px;">{{ "EMAIL_VERIFICATION_EMAIL_BUTTON"|translate }}</a>
+</p>
+
+{% include "email/html/footer.html.twig" %}

@@ -68,6 +68,8 @@ final class ServiceAvailabilityTest extends IntegrationTestCase
             [\OxidEsales\SecurityModule\EmailVerification\Service\VerificationTokenGeneratorInterface::class],
             [\OxidEsales\SecurityModule\EmailVerification\Service\ResendPolicyInterface::class],
             [\OxidEsales\SecurityModule\EmailVerification\Service\PendingUserSessionInterface::class],
+            [\OxidEsales\SecurityModule\EmailVerification\Service\VerificationUrlBuilderInterface::class],
+            [\OxidEsales\SecurityModule\EmailVerification\Service\VerificationMailSenderInterface::class],
             [\OxidEsales\SecurityModule\EmailVerification\Infrastructure\Factory\PendingVerificationDtoFactoryInterface::class],
             [\OxidEsales\SecurityModule\EmailVerification\Infrastructure\Repository\PendingVerificationRepositoryInterface::class],
             [\OxidEsales\SecurityModule\EmailVerification\Infrastructure\Repository\UserVerificationRepositoryInterface::class],

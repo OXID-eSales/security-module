@@ -82,4 +82,18 @@ $aLang = [
     'ERROR_EMAIL_VERIFICATION_RESEND_COOLDOWN' => 'Eine neue E-Mail kann in %d Minute(n) angefordert werden.',
     'ERROR_EMAIL_VERIFICATION_LINK_EXPIRED'    => 'Der Bestätigungslink ist abgelaufen.',
     'ERROR_EMAIL_VERIFICATION_LINK_INVALID'    => 'Der Bestätigungslink ist ungültig oder wurde bereits verwendet.',
+
+    'ERROR_EMAIL_VERIFICATION_MAIL_NOT_SENT'   => 'Die Bestätigungs-E-Mail konnte nicht gesendet werden. Bitte versuchen Sie es später erneut.',
+
+    'EMAIL_VERIFICATION_DATE_FORMAT'   => 'd.m.Y H:i',
+    'EMAIL_VERIFICATION_EMAIL_BUTTON'  => 'E-Mail-Adresse bestätigen',
+    'EMAIL_VERIFICATION_EMAIL_SUBJECT' => 'Bitte bestätigen Sie Ihre E-Mail-Adresse',
+    'EMAIL_VERIFICATION_EMAIL_BODY'    => "Hallo %1\$s,\n\n"
+        . "vielen Dank für Ihre Registrierung bei %2\$s.\n\n"
+        . "Bitte bestätigen Sie Ihre E-Mail-Adresse, indem Sie den folgenden Link öffnen:\n\n"
+        . "%3\$s\n\n"
+        . "Der Link ist gültig bis %4\$s und kann nur einmal verwendet werden. Erst nach der Bestätigung"
+        . " können Sie sich in Ihrem Kundenkonto anmelden.\n\n"
+        . "Falls Sie sich nicht registriert haben, können Sie diese E-Mail ignorieren.\n\n"
+        . "Ihr %2\$s-Team.",
 ];
