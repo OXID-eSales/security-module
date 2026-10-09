@@ -16,8 +16,10 @@ use OxidEsales\Eshop\Core\Request;
 use Generator;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAUserServiceInterface;
+use OxidEsales\SecurityModule\EmailVerification\Facade\UserEmailVerificationFacadeInterface;
 use OxidEsales\SecurityModule\Shared\Model\User as SecurityModuleUser;
 use OxidEsales\SecurityModule\Tests\Integration\IntegrationTestCase;
 
@@ -144,6 +146,44 @@ class UserTest extends IntegrationTestCase
 
         $result = $sut->login(self::TWO_FA_USER_NAME, self::TWO_FA_USER_PASSWORD);
         $this->assertTrue($result);
+    }
+
+    #[Test]
+    public function sendRegistrationEmail(): void
+    {
+        $facadeSpy = $this->createMock(UserEmailVerificationFacadeInterface::class);
+
+        $sut = $this->getSut([UserEmailVerificationFacadeInterface::class => $facadeSpy]);
+        $sut->load($this->getTwoFAUserId());
+
+        $facadeSpy->expects($this->once())->method('initializeEmailVerification')->with($sut)->willReturn(true);
+
+        $sut->sendRegistrationEmail();
+    }
+
+    #[Test]
+    public function sendRegistrationEmailSendsTheShopMailWhenEmailVerificationIsDisabled(): void
+    {
+        $facadeSpy = $this->createMock(UserEmailVerificationFacadeInterface::class);
+
+        $sut = $this->getSut([UserEmailVerificationFacadeInterface::class => $facadeSpy]);
+        $sut->load($this->getTwoFAUserId());
+
+        $facadeSpy->expects($this->once())->method('initializeEmailVerification')->with($sut)->willReturn(false);
+
+        $sut->sendRegistrationEmail();
+    }
+
+    #[Test]
+    public function sendRegistrationEmailKeepsThePrivateSalesConfirmationMail(): void
+    {
+        $facadeSpy = $this->createMock(UserEmailVerificationFacadeInterface::class);
+        $facadeSpy->expects($this->never())->method('initializeEmailVerification');
+
+        $sut = $this->getSut([UserEmailVerificationFacadeInterface::class => $facadeSpy]);
+        $sut->load($this->getTwoFAUserId());
+
+        $sut->sendRegistrationEmail(true);
     }
 
     private function getSut(array $serviceOverrides = []): SecurityModuleUser

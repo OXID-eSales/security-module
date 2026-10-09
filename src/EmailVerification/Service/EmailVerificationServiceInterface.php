@@ -13,9 +13,13 @@ use OxidEsales\SecurityModule\EmailVerification\Exception\EmailAlreadyVerifiedEx
 use OxidEsales\SecurityModule\EmailVerification\Exception\InvalidVerificationTokenException;
 use OxidEsales\SecurityModule\EmailVerification\Exception\ResendCooldownException;
 use OxidEsales\SecurityModule\EmailVerification\Exception\VerificationTokenExpiredException;
+use OxidEsales\SecurityModule\EmailVerification\Exception\VerificationMailNotSentException;
 
 interface EmailVerificationServiceInterface
 {
+    /**
+     * @throws VerificationMailNotSentException
+     */
     public function startEmailVerification(string $userId): void;
 
     /**
@@ -27,12 +31,14 @@ interface EmailVerificationServiceInterface
     /**
      * @throws InvalidVerificationTokenException
      * @throws ResendCooldownException
+     * @throws VerificationMailNotSentException
      */
     public function resendVerificationEmailByToken(#[\SensitiveParameter] string $token): void;
 
     /**
      * @throws ResendCooldownException
      * @throws EmailAlreadyVerifiedException
+     * @throws VerificationMailNotSentException
      */
     public function resendVerificationEmailForUser(string $userId): void;
 }

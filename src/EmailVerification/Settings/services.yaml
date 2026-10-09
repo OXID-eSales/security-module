@@ -5,3 +5,4 @@ services:
 
   OxidEsales\SecurityModule\EmailVerification\Settings\EmailVerificationSettingsInterface:
     class: OxidEsales\SecurityModule\EmailVerification\Settings\EmailVerificationSettings
+    public: true

@@ -3,3 +3,12 @@ imports:
   - { resource: Service/services.yaml }
   - { resource: Infrastructure/Factory/services.yaml }
   - { resource: Infrastructure/Repository/services.yaml }
+
+services:
+  _defaults:
+    autowire: true
+    public: false
+
+  OxidEsales\SecurityModule\EmailVerification\Facade\UserEmailVerificationFacadeInterface:
+    class: OxidEsales\SecurityModule\EmailVerification\Facade\UserEmailVerificationFacade
+    public: true

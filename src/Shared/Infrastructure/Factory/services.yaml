@@ -5,3 +5,4 @@ services:
 
   OxidEsales\SecurityModule\Shared\Infrastructure\Factory\UserModelFactoryInterface:
     class: OxidEsales\SecurityModule\Shared\Infrastructure\Factory\UserModelFactory
+    public: true

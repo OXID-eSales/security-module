@@ -260,6 +260,8 @@ class UserComponentTest extends IntegrationTestCase
                     ['isCaptchaEnabled' => true, 'isHoneyPotCaptchaEnabled' => false]
                 ),
                 CaptchaServiceInterface::class => $this->createStub(CaptchaServiceInterface::class),
+                Request::class => $this->requestMock,
+                UtilsView::class => $this->utilsViewSpy,
             ],
             $serviceOverrides
         );
