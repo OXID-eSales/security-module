@@ -22,3 +22,6 @@ services:
 
   OxidEsales\SecurityModule\EmailVerification\Service\EmailVerificationServiceInterface:
     class: OxidEsales\SecurityModule\EmailVerification\Service\EmailVerificationService
+
+  OxidEsales\SecurityModule\EmailVerification\Service\VerificationPageServiceInterface:
+    class: OxidEsales\SecurityModule\EmailVerification\Service\VerificationPageService
