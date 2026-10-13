@@ -18,8 +18,16 @@ class EmailNotVerifiedExceptionTest extends TestCase
     #[Test]
     public function getUserId(): void
     {
-        $sut = new EmailNotVerifiedException(userId: $userId = uniqid());
+        $sut = new EmailNotVerifiedException(userId: $userId = uniqid(), verificationUrl: uniqid());
 
         $this->assertSame($userId, $sut->getUserId());
+    }
+
+    #[Test]
+    public function getVerificationUrl(): void
+    {
+        $sut = new EmailNotVerifiedException(userId: uniqid(), verificationUrl: $verificationUrl = uniqid());
+
+        $this->assertSame($verificationUrl, $sut->getVerificationUrl());
     }
 }

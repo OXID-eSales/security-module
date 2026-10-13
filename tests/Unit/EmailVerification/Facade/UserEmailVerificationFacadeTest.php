@@ -11,12 +11,14 @@ namespace OxidEsales\SecurityModule\Tests\Unit\EmailVerification\Facade;
 
 use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\SecurityModule\EmailVerification\DTO\PendingVerificationDtoInterface;
+use OxidEsales\SecurityModule\EmailVerification\Exception\EmailNotVerifiedException;
 use OxidEsales\SecurityModule\EmailVerification\Exception\VerificationMailNotSentException;
 use OxidEsales\SecurityModule\EmailVerification\Facade\UserEmailVerificationFacade;
 use OxidEsales\SecurityModule\EmailVerification\Facade\UserEmailVerificationFacadeInterface;
 use OxidEsales\SecurityModule\EmailVerification\Infrastructure\Repository\PendingVerificationRepositoryInterface;
 use OxidEsales\SecurityModule\EmailVerification\Service\EmailVerificationServiceInterface;
 use OxidEsales\SecurityModule\EmailVerification\Service\PendingUserSessionInterface;
+use OxidEsales\SecurityModule\EmailVerification\Service\VerificationUrlBuilderInterface;
 use OxidEsales\SecurityModule\EmailVerification\Settings\EmailVerificationSettingsInterface;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -124,17 +126,71 @@ class UserEmailVerificationFacadeTest extends TestCase
         $sut->rememberPendingUser($userId);
     }
 
+    #[Test]
+    public function stopUnverifiedLogin(): void
+    {
+        $settingsStub = $this->createConfiguredStub(EmailVerificationSettingsInterface::class, [
+            'isEmailVerificationEnabled' => true,
+        ]);
+        $pendingRepositoryStub = $this->createConfiguredStub(PendingVerificationRepositoryInterface::class, [
+            'findByUserId' => $this->createStub(PendingVerificationDtoInterface::class),
+        ]);
+        $pendingUserSessionSpy = $this->createMock(PendingUserSessionInterface::class);
+        $pendingUserSessionSpy->expects($this->once())->method('setPendingUserId')->with($userId = uniqid());
+        $urlBuilderStub = $this->createConfiguredStub(VerificationUrlBuilderInterface::class, [
+            'buildPendingPageUrl' => $url = uniqid(),
+        ]);
+
+        $sut = $this->getSut(
+            settings: $settingsStub,
+            pendingRepository: $pendingRepositoryStub,
+            pendingUserSession: $pendingUserSessionSpy,
+            urlBuilder: $urlBuilderStub,
+        );
+
+        try {
+            $sut->stopUnverifiedLogin($userId);
+            $this->fail('EmailNotVerifiedException expected.');
+        } catch (EmailNotVerifiedException $exception) {
+            $this->assertSame($userId, $exception->getUserId());
+            $this->assertSame($url, $exception->getVerificationUrl());
+        }
+    }
+
+    #[Test]
+    public function stopUnverifiedLoginLetsAConfirmedUserLogIn(): void
+    {
+        $settingsStub = $this->createConfiguredStub(EmailVerificationSettingsInterface::class, [
+            'isEmailVerificationEnabled' => true,
+        ]);
+        $pendingRepositoryStub = $this->createConfiguredStub(PendingVerificationRepositoryInterface::class, [
+            'findByUserId' => null,
+        ]);
+        $pendingUserSessionSpy = $this->createMock(PendingUserSessionInterface::class);
+        $pendingUserSessionSpy->expects($this->never())->method('setPendingUserId');
+
+        $sut = $this->getSut(
+            settings: $settingsStub,
+            pendingRepository: $pendingRepositoryStub,
+            pendingUserSession: $pendingUserSessionSpy,
+        );
+
+        $sut->stopUnverifiedLogin(uniqid());
+    }
+
     private function getSut(
         ?EmailVerificationSettingsInterface $settings = null,
         ?PendingVerificationRepositoryInterface $pendingRepository = null,
         ?EmailVerificationServiceInterface $verificationService = null,
         ?PendingUserSessionInterface $pendingUserSession = null,
+        ?VerificationUrlBuilderInterface $urlBuilder = null,
     ): UserEmailVerificationFacadeInterface {
         return new UserEmailVerificationFacade(
             settings: $settings ?? $this->createStub(EmailVerificationSettingsInterface::class),
             pendingRepository: $pendingRepository ?? $this->createStub(PendingVerificationRepositoryInterface::class),
             verificationService: $verificationService ?? $this->createStub(EmailVerificationServiceInterface::class),
             pendingUserSession: $pendingUserSession ?? $this->createStub(PendingUserSessionInterface::class),
+            urlBuilder: $urlBuilder ?? $this->createStub(VerificationUrlBuilderInterface::class),
         );
     }
 }

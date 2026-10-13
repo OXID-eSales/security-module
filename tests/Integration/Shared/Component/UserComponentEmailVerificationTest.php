@@ -9,11 +9,19 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Tests\Integration\Shared\Component;
 
+use DateTimeImmutable;
 use OxidEsales\Eshop\Application\Controller\FrontendController;
 use OxidEsales\Eshop\Application\Model\User as UserModel;
+use OxidEsales\Eshop\Core\Utils;
 use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
+use OxidEsales\EshopCommunity\Internal\Container\ContainerFactory;
+use OxidEsales\EshopCommunity\Internal\Framework\Module\Facade\ModuleSettingServiceInterface;
 use OxidEsales\EshopCommunity\Internal\Framework\Session\SessionInterface;
 use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface;
+use OxidEsales\SecurityModule\Core\Module;
+use OxidEsales\SecurityModule\EmailVerification\Infrastructure\Repository\PendingVerificationRepositoryInterface;
+use OxidEsales\SecurityModule\EmailVerification\Service\PendingUserSessionInterface;
+use OxidEsales\SecurityModule\EmailVerification\Settings\EmailVerificationSettings;
 use OxidEsales\SecurityModule\EmailVerification\Facade\UserEmailVerificationFacadeInterface;
 use OxidEsales\SecurityModule\Shared\Component\UserComponent as SecurityModuleUserComponent;
 use OxidEsales\SecurityModule\Tests\Integration\IntegrationTestCase;
@@ -23,6 +31,9 @@ use PHPUnit\Framework\Attributes\Test;
 #[AllowMockObjectsWithoutExpectations]
 class UserComponentEmailVerificationTest extends IntegrationTestCase
 {
+    private const FIXTURE_USER_NAME = 'user@oxid-esales.com';
+    private const FIXTURE_USER_PASSWORD = 'useruser';
+
     #[Test]
     public function createUserStopsAtCheckYourEmailWhenEmailVerificationIsRequired(): void
     {
@@ -66,6 +77,42 @@ class UserComponentEmailVerificationTest extends IntegrationTestCase
         $this->assertSame('oesm_email_verification?state=sent', $sut->registerUser());
     }
 
+    #[Test]
+    public function loginRedirectsToCheckYourEmailWhenEmailVerificationIsRequired(): void
+    {
+        $userId = $this->getUserId(self::FIXTURE_USER_NAME);
+        $this->get(PendingVerificationRepositoryInterface::class)->createPendingVerification(
+            userId: $userId,
+            token: uniqid(),
+            expiresAt: new DateTimeImmutable('+' . rand(1, 48) . ' hours'),
+        );
+        $_POST = ['lgn_usr' => self::FIXTURE_USER_NAME, 'lgn_pwd' => self::FIXTURE_USER_PASSWORD];
+        $this->get(SessionInterface::class)->remove('usr');
+
+        $utilsSpy = $this->createMock(Utils::class);
+        $utilsSpy->expects($this->once())
+            ->method('redirect')
+            ->with($this->logicalAnd(
+                $this->stringContains('cl=oesm_email_verification'),
+                $this->stringEndsWith('&state=pending')
+            ));
+
+        $originallyEnabled = $this->getModuleSettingService()
+            ->getBoolean(EmailVerificationSettings::ACTIVE, Module::MODULE_ID);
+        $this->getModuleSettingService()->saveBoolean(EmailVerificationSettings::ACTIVE, true, Module::MODULE_ID);
+
+        try {
+            $sut = $this->getSut([Utils::class => $utilsSpy]);
+
+            $this->assertSame('user', $sut->login());
+            $this->assertSame($userId, $this->get(PendingUserSessionInterface::class)->getPendingUserId());
+            $this->assertEmpty($this->get(SessionInterface::class)->get('usr'));
+        } finally {
+            $this->getModuleSettingService()
+                ->saveBoolean(EmailVerificationSettings::ACTIVE, $originallyEnabled, Module::MODULE_ID);
+        }
+    }
+
     private function fillRegistrationForm(): string
     {
         $userName = uniqid() . '@example.test';
@@ -94,6 +141,11 @@ class UserComponentEmailVerificationTest extends IntegrationTestCase
         $session->remove('usr');
 
         return $userName;
+    }
+
+    private function getModuleSettingService(): ModuleSettingServiceInterface
+    {
+        return ContainerFactory::getInstance()->getContainer()->get(ModuleSettingServiceInterface::class);
     }
 
     private function getUserId(string $userName): string

@@ -38,6 +38,8 @@ class User extends User_parent
 
         $userId = $this->getId();
         if ($userId && !$this->isAdmin()) {
+            $this->getService(UserEmailVerificationFacadeInterface::class)->stopUnverifiedLogin($userId);
+
             $twoFAUserService = $this->getService(TwoFAUserServiceInterface::class);
             if ($twoFAUserService->isTwoFARequired($userId) && !$twoFAUserService->isChallengeVerified($userId)) {
                 $twoFAUserService->startChallengeForUser($userId);

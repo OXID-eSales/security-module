@@ -15,6 +15,7 @@ services:
 
   OxidEsales\SecurityModule\EmailVerification\Service\VerificationUrlBuilderInterface:
     class: OxidEsales\SecurityModule\EmailVerification\Service\VerificationUrlBuilder
+    public: true
 
   OxidEsales\SecurityModule\EmailVerification\Service\VerificationMailSenderInterface:
     class: OxidEsales\SecurityModule\EmailVerification\Service\VerificationMailSender

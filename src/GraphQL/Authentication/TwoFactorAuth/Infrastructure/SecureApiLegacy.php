@@ -18,6 +18,8 @@ use OxidEsales\GraphQL\Base\Exception\InvalidLogin;
 use OxidEsales\GraphQL\Base\Infrastructure\Legacy;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\TwoFactorRequiredException;
 use OxidEsales\SecurityModule\GraphQL\Authentication\TwoFactorAuth\DataType\TwoFAPendingUser;
+use OxidEsales\SecurityModule\EmailVerification\Exception\EmailNotVerifiedException;
+use OxidEsales\SecurityModule\GraphQL\EmailVerification\Exception\EmailNotVerifiedException as EmailNotVerifiedError;
 
 final class SecureApiLegacy extends Legacy
 {
@@ -34,6 +36,8 @@ final class SecureApiLegacy extends Legacy
                 $user->login($username, $password);
             } catch (TwoFactorRequiredException) {
                 return new TwoFAPendingUser($user);
+            } catch (EmailNotVerifiedException $exception) {
+                throw new EmailNotVerifiedError(previous: $exception);
             } catch (Exception $exception) {
                 throw new InvalidLogin('Username/password combination is invalid', previous: $exception);
             }

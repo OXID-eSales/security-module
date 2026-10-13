@@ -10,10 +10,12 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\EmailVerification\Facade;
 
 use OxidEsales\Eshop\Application\Model\User;
+use OxidEsales\SecurityModule\EmailVerification\Exception\EmailNotVerifiedException;
 use OxidEsales\SecurityModule\EmailVerification\Exception\VerificationMailNotSentException;
 use OxidEsales\SecurityModule\EmailVerification\Infrastructure\Repository\PendingVerificationRepositoryInterface;
 use OxidEsales\SecurityModule\EmailVerification\Service\EmailVerificationServiceInterface;
 use OxidEsales\SecurityModule\EmailVerification\Service\PendingUserSessionInterface;
+use OxidEsales\SecurityModule\EmailVerification\Service\VerificationUrlBuilderInterface;
 use OxidEsales\SecurityModule\EmailVerification\Settings\EmailVerificationSettingsInterface;
 
 class UserEmailVerificationFacade implements UserEmailVerificationFacadeInterface
@@ -23,6 +25,7 @@ class UserEmailVerificationFacade implements UserEmailVerificationFacadeInterfac
         private PendingVerificationRepositoryInterface $pendingRepository,
         private EmailVerificationServiceInterface $verificationService,
         private PendingUserSessionInterface $pendingUserSession,
+        private VerificationUrlBuilderInterface $urlBuilder,
     ) {
     }
 
@@ -50,5 +53,19 @@ class UserEmailVerificationFacade implements UserEmailVerificationFacadeInterfac
     public function rememberPendingUser(string $userId): void
     {
         $this->pendingUserSession->setPendingUserId($userId);
+    }
+
+    public function stopUnverifiedLogin(string $userId): void
+    {
+        if (!$this->isEmailVerificationRequired($userId)) {
+            return;
+        }
+
+        $this->rememberPendingUser($userId);
+
+        throw new EmailNotVerifiedException(
+            userId: $userId,
+            verificationUrl: $this->urlBuilder->buildPendingPageUrl(),
+        );
     }
 }

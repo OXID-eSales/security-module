@@ -16,8 +16,10 @@ use OxidEsales\GraphQL\Base\DataType\User;
 use OxidEsales\GraphQL\Base\Exception\InvalidLogin;
 use OxidEsales\GraphQL\Base\Infrastructure\Legacy;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\TwoFactorRequiredException;
+use OxidEsales\SecurityModule\EmailVerification\Exception\EmailNotVerifiedException;
 use OxidEsales\SecurityModule\GraphQL\Authentication\TwoFactorAuth\DataType\TwoFAPendingUser;
 use OxidEsales\SecurityModule\GraphQL\Authentication\TwoFactorAuth\Infrastructure\SecureApiLegacy;
+use OxidEsales\SecurityModule\GraphQL\EmailVerification\Exception\EmailNotVerifiedException as EmailNotVerifiedError;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -205,6 +207,21 @@ class SecureApiLegacyTest extends TestCase
                 sprintf('SecureApiLegacy must override Legacy::%s() to delegate to the inner instance', $name)
             );
         }
+    }
+
+    #[Test]
+    public function loginThrowsEmailNotVerifiedErrorWhenEmailVerificationIsRequired(): void
+    {
+        $userModelStub = $this->createStub(EshopUserModel::class);
+        $userModelStub->method('login')
+            ->willThrowException(new EmailNotVerifiedException(userId: uniqid(), verificationUrl: uniqid()));
+        $innerStub = $this->createConfiguredStub(Legacy::class, ['getUserModel' => $userModelStub]);
+
+        $sut = $this->getSut(inner: $innerStub);
+
+        $this->expectException(EmailNotVerifiedError::class);
+
+        $sut->login(uniqid(), uniqid());
     }
 
     private function getSut(?Legacy $inner = null): SecureApiLegacy

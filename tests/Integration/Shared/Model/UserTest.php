@@ -19,6 +19,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAUserServiceInterface;
+use OxidEsales\SecurityModule\EmailVerification\Exception\EmailNotVerifiedException;
 use OxidEsales\SecurityModule\EmailVerification\Facade\UserEmailVerificationFacadeInterface;
 use OxidEsales\SecurityModule\Shared\Model\User as SecurityModuleUser;
 use OxidEsales\SecurityModule\Tests\Integration\IntegrationTestCase;
@@ -149,6 +150,41 @@ class UserTest extends IntegrationTestCase
     }
 
     #[Test]
+    public function loginThrowsEmailNotVerifiedExceptionWhenEmailVerificationIsRequired(): void
+    {
+        $userId = $this->getTwoFAUserId();
+
+        $facadeMock = $this->createMock(UserEmailVerificationFacadeInterface::class);
+        $facadeMock->method('stopUnverifiedLogin')
+            ->with($userId)
+            ->willThrowException(new EmailNotVerifiedException(userId: $userId, verificationUrl: uniqid()));
+        $twoFAUserServiceSpy = $this->createMock(TwoFAUserServiceInterface::class);
+        $twoFAUserServiceSpy->expects($this->never())->method('startChallengeForUser');
+
+        $sut = $this->getSut([
+            UserEmailVerificationFacadeInterface::class => $facadeMock,
+            TwoFAUserServiceInterface::class => $twoFAUserServiceSpy,
+        ]);
+
+        $this->expectException(EmailNotVerifiedException::class);
+
+        $sut->login(self::TWO_FA_USER_NAME, self::TWO_FA_USER_PASSWORD);
+    }
+
+    #[Test]
+    public function loginWithAWrongPasswordFailsAsUsualWhenEmailVerificationIsRequired(): void
+    {
+        $facadeSpy = $this->createMock(UserEmailVerificationFacadeInterface::class);
+        $facadeSpy->expects($this->never())->method('stopUnverifiedLogin');
+
+        $sut = $this->getSut([UserEmailVerificationFacadeInterface::class => $facadeSpy]);
+
+        $this->expectException(UserException::class);
+
+        $sut->login(self::TWO_FA_USER_NAME, uniqid());
+    }
+
+    #[Test]
     public function sendRegistrationEmail(): void
     {
         $facadeSpy = $this->createMock(UserEmailVerificationFacadeInterface::class);
@@ -193,6 +229,9 @@ class UserTest extends IntegrationTestCase
                 TwoFAUserServiceInterface::class => $this->createConfiguredStub(
                     TwoFAUserServiceInterface::class,
                     ['isTwoFARequired' => false]
+                ),
+                UserEmailVerificationFacadeInterface::class => $this->createStub(
+                    UserEmailVerificationFacadeInterface::class
                 ),
             ],
             $serviceOverrides

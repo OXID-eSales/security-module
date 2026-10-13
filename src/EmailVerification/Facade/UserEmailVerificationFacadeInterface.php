@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\EmailVerification\Facade;
 
 use OxidEsales\Eshop\Application\Model\User;
+use OxidEsales\SecurityModule\EmailVerification\Exception\EmailNotVerifiedException;
 
 interface UserEmailVerificationFacadeInterface
 {
@@ -18,4 +19,9 @@ interface UserEmailVerificationFacadeInterface
     public function initializeEmailVerification(User $user): bool;
 
     public function rememberPendingUser(string $userId): void;
+
+    /**
+     * @throws EmailNotVerifiedException
+     */
+    public function stopUnverifiedLogin(string $userId): void;
 }

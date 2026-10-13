@@ -13,6 +13,7 @@ class EmailNotVerifiedException extends EmailVerificationException
 {
     public function __construct(
         private readonly string $userId,
+        private readonly string $verificationUrl,
     ) {
         parent::__construct('ERROR_EMAIL_NOT_VERIFIED');
     }
@@ -20,5 +21,10 @@ class EmailNotVerifiedException extends EmailVerificationException
     public function getUserId(): string
     {
         return $this->userId;
+    }
+
+    public function getVerificationUrl(): string
+    {
+        return $this->verificationUrl;
     }
 }

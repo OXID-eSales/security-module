@@ -17,6 +17,7 @@ use OxidEsales\EshopCommunity\Internal\Framework\Session\SessionInterface;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Exception\TwoFactorRequiredException;
 use OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface;
 use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface;
+use OxidEsales\SecurityModule\EmailVerification\Exception\EmailNotVerifiedException;
 use OxidEsales\SecurityModule\EmailVerification\Facade\UserEmailVerificationFacadeInterface;
 use OxidEsales\SecurityModule\Shared\Infrastructure\Factory\UserModelFactoryInterface;
 
@@ -46,6 +47,9 @@ class UserComponent extends UserComponent_parent
         try {
             return parent::login();
         } catch (TwoFactorRequiredException $e) {
+            $this->getService(Utils::class)->redirect($e->getVerificationUrl());
+            return 'user';
+        } catch (EmailNotVerifiedException $e) {
             $this->getService(Utils::class)->redirect($e->getVerificationUrl());
             return 'user';
         }
