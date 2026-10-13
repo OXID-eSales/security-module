@@ -10,6 +10,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Strip session token (stoken) from GET form URLs (search, attribute filter) via new Form Security admin setting.
   The session id (sid) is still emitted when the shop needs it (e.g. cookieless sessions), so the session/basket is not
   lost on submit.
+- Optional email verification on storefront registration. When enabled, a new customer receives a
+  confirmation link and can log in (storefront and OXAPI) only after opening it.
+  - Module settings `oeSecurityEmailVerificationEnabled` (default off) and
+    `oeSecurityEmailVerificationLinkLifetime` (default 24 hours).
+  - New verification page (`cl=oesm_email_verification`) shows the result of the link and offers a new
+    confirmation mail for expired links or blocked logins. A new mail replaces the previous link, and repeated
+    requests wait longer each time.
+  - New table `oesm_email_verification`, new column `oxuser.OEEMAILVERIFIED` and a new CMS mail content.
 
 ### Changed
 - Update module to work with OXID eShop 7.6
