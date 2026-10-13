@@ -96,4 +96,14 @@ $aLang = [
         . " können Sie sich in Ihrem Kundenkonto anmelden.\n\n"
         . "Falls Sie sich nicht registriert haben, können Sie diese E-Mail ignorieren.\n\n"
         . "Ihr %2\$s-Team.",
+
+    'OE_SECURITY_EMAIL_VERIFICATION_TITLE'            => 'E-Mail-Adresse bestätigen',
+    'OE_SECURITY_EMAIL_VERIFICATION_SENT'             => 'Wir haben Ihnen eine E-Mail mit einem Bestätigungslink gesendet. Bitte öffnen Sie ihn, um Ihr Konto zu aktivieren; der Link ist %d Stunden gültig.',
+    'OE_SECURITY_EMAIL_VERIFICATION_PENDING'          => 'Ihre E-Mail-Adresse ist noch nicht bestätigt. Bitte öffnen Sie den Link in der E-Mail, die wir Ihnen gesendet haben. Danach können Sie sich anmelden.',
+    'OE_SECURITY_EMAIL_VERIFICATION_VERIFIED'         => 'Vielen Dank! Ihre E-Mail-Adresse ist bestätigt und Sie können sich jetzt anmelden.',
+    'OE_SECURITY_EMAIL_VERIFICATION_ALREADY_VERIFIED' => 'Ihre E-Mail-Adresse ist bereits bestätigt. Sie können sich anmelden.',
+    'OE_SECURITY_EMAIL_VERIFICATION_EXPIRED'          => 'Dieser Bestätigungslink ist abgelaufen. Fordern Sie unten eine neue E-Mail an; der alte Link wird damit ungültig.',
+    'OE_SECURITY_EMAIL_VERIFICATION_INVALID'          => 'Dieser Bestätigungslink ist ungültig oder wurde bereits verwendet.',
+    'OE_SECURITY_EMAIL_VERIFICATION_RESEND'           => 'Neue Bestätigungs-E-Mail senden',
+    'OE_SECURITY_EMAIL_VERIFICATION_TO_LOGIN'         => 'Anmelden',
 ];

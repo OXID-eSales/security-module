@@ -96,4 +96,14 @@ $aLang = [
         . " after confirming your address.\n\n"
         . "If you didn't register, you can safely ignore this email.\n\n"
         . "Your %2\$s team.",
+
+    'OE_SECURITY_EMAIL_VERIFICATION_TITLE'            => 'Confirm your email address',
+    'OE_SECURITY_EMAIL_VERIFICATION_SENT'             => 'We have sent you an email with a confirmation link. Please open it to activate your account; the link is valid for %d hours.',
+    'OE_SECURITY_EMAIL_VERIFICATION_PENDING'          => 'Your email address is not confirmed yet. Please open the link in the email we sent you. You can log in after that.',
+    'OE_SECURITY_EMAIL_VERIFICATION_VERIFIED'         => 'Thank you! Your email address is confirmed and you can now log in.',
+    'OE_SECURITY_EMAIL_VERIFICATION_ALREADY_VERIFIED' => 'Your email address is already confirmed. You can log in.',
+    'OE_SECURITY_EMAIL_VERIFICATION_EXPIRED'          => 'This confirmation link has expired. Request a new email below; the old link will stop working.',
+    'OE_SECURITY_EMAIL_VERIFICATION_INVALID'          => 'This confirmation link is invalid or has already been used.',
+    'OE_SECURITY_EMAIL_VERIFICATION_RESEND'           => 'Send a new confirmation email',
+    'OE_SECURITY_EMAIL_VERIFICATION_TO_LOGIN'         => 'Log in',
 ];

@@ -20,6 +20,7 @@ readonly class StoreCurrentUrlSubscriber implements EventSubscriberInterface
 {
     private const EXCLUDED_CONTROLLERS = [
         'oesm_twofactorauth',
+        'oesm_email_verification',
         'oauth',
     ];
 

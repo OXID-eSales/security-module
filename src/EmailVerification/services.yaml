@@ -5,6 +5,7 @@ imports:
   - { resource: Infrastructure/Factory/services.yaml }
   - { resource: Infrastructure/Repository/services.yaml }
   - { resource: Transput/services.yaml }
+  - { resource: Controller/services.yaml }
 
 services:
   _defaults:

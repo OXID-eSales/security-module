@@ -17,6 +17,7 @@ use OxidEsales\EshopCommunity\Internal\Framework\Session\SessionInterface;
 use OxidEsales\EshopCommunity\Internal\Transition\ShopEvents\ViewRenderedEvent;
 use OxidEsales\SecurityModule\Authentication\Service\InternalRedirectService;
 use OxidEsales\SecurityModule\Authentication\Subscriber\StoreCurrentUrlSubscriber;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class StoreCurrentUrlSubscriberTest extends TestCase
@@ -101,6 +102,32 @@ class StoreCurrentUrlSubscriberTest extends TestCase
     {
         $viewStub = $this->createStub(FrontendController::class);
         $viewStub->method('getClassKey')->willReturn('oesm_twofactorauth');
+
+        $configStub = $this->createStub(Config::class);
+        $configStub->method('isAdmin')->willReturn(false);
+        $configStub->method('getTopActiveView')->willReturn($viewStub);
+
+        $requestMock = $this->createMock(Request::class);
+        $requestMock->method('getRequestParameter')->with('fnc')->willReturn(null);
+
+        $sessionMock = $this->createMock(SessionInterface::class);
+        $sessionMock->expects($this->never())->method('set');
+
+        $sut = $this->getSut(
+            session: $sessionMock,
+            config: $configStub,
+            request: $requestMock,
+        );
+        $eventStub = $this->createStub(ViewRenderedEvent::class);
+
+        $sut->onViewRendered($eventStub);
+    }
+
+    #[Test]
+    public function onViewRenderedSkipsTheEmailVerificationController(): void
+    {
+        $viewStub = $this->createStub(FrontendController::class);
+        $viewStub->method('getClassKey')->willReturn('oesm_email_verification');
 
         $configStub = $this->createStub(Config::class);
         $configStub->method('isAdmin')->willReturn(false);

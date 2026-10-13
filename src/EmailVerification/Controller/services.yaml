@@ -1,0 +1,11 @@
+services:
+  _defaults:
+    autowire: true
+    public: false
+    bind:
+      OxidEsales\Eshop\Core\Session: '@=service("OxidEsales\\SecurityModule\\Core\\Registry").getSession()'
+
+  OxidEsales\SecurityModule\EmailVerification\Controller\EmailVerificationController:
+    public: true
+    tags:
+      - { name: 'oxid.view_controller', controller_key: 'oesm_email_verification' }
