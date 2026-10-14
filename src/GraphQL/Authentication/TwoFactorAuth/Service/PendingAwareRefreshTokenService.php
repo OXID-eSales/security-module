@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\GraphQL\Authentication\TwoFactorAuth\Service;
 
+use Lcobucci\JWT\UnencryptedToken;
 use OxidEsales\GraphQL\Base\DataType\UserInterface;
 use OxidEsales\GraphQL\Base\Service\RefreshTokenServiceInterface;
 use OxidEsales\SecurityModule\GraphQL\Authentication\TwoFactorAuth\DataType\TwoFAPendingUser;
@@ -28,7 +29,7 @@ final class PendingAwareRefreshTokenService implements RefreshTokenServiceInterf
         return $this->inner->createRefreshTokenForUser($user);
     }
 
-    public function refreshToken(string $refreshToken, string $fingerprintHash): string
+    public function refreshToken(string $refreshToken, string $fingerprintHash): UnencryptedToken
     {
         return $this->inner->refreshToken($refreshToken, $fingerprintHash);
     }

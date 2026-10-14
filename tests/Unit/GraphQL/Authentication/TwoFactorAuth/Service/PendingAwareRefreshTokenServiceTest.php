@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Tests\Unit\GraphQL\Authentication\TwoFactorAuth\Service;
 
+use Lcobucci\JWT\UnencryptedToken;
 use OxidEsales\Eshop\Application\Model\User as EshopUserModel;
 use OxidEsales\GraphQL\Base\DataType\UserInterface;
 use OxidEsales\GraphQL\Base\Service\RefreshTokenServiceInterface;
@@ -54,7 +55,7 @@ class PendingAwareRefreshTokenServiceTest extends TestCase
     {
         $refreshToken = uniqid();
         $fingerprintHash = uniqid();
-        $newToken = uniqid();
+        $newToken = $this->createStub(UnencryptedToken::class);
 
         $innerMock = $this->createMock(RefreshTokenServiceInterface::class);
         $innerMock->expects($this->once())
