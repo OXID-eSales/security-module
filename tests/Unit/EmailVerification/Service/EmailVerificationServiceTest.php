@@ -17,7 +17,7 @@ use OxidEsales\SecurityModule\EmailVerification\Exception\ResendCooldownExceptio
 use OxidEsales\SecurityModule\EmailVerification\Exception\VerificationTokenExpiredException;
 use OxidEsales\SecurityModule\EmailVerification\Exception\VerificationMailNotSentException;
 use OxidEsales\SecurityModule\EmailVerification\Infrastructure\Repository\PendingVerificationRepositoryInterface;
-use OxidEsales\SecurityModule\EmailVerification\Infrastructure\Repository\UserVerificationRepositoryInterface;
+use OxidEsales\SecurityModule\EmailVerification\Service\EmailConfirmationInterface;
 use OxidEsales\SecurityModule\EmailVerification\Service\EmailVerificationService;
 use OxidEsales\SecurityModule\EmailVerification\Service\EmailVerificationServiceInterface;
 use OxidEsales\SecurityModule\EmailVerification\Service\ResendPolicyInterface;
@@ -95,14 +95,13 @@ class EmailVerificationServiceTest extends TestCase
             'getExpiresAt' => new DateTimeImmutable('+' . rand(1, 48) . ' hours'),
         ]);
 
-        $pendingRepositorySpy = $this->createMock(PendingVerificationRepositoryInterface::class);
-        $pendingRepositorySpy->method('findByToken')->with($token = uniqid())->willReturn($pendingVerificationStub);
-        $pendingRepositorySpy->expects($this->once())->method('deletePendingVerification')->with($userId);
+        $pendingRepositoryMock = $this->createMock(PendingVerificationRepositoryInterface::class);
+        $pendingRepositoryMock->method('findByToken')->with($token = uniqid())->willReturn($pendingVerificationStub);
 
-        $userRepositorySpy = $this->createMock(UserVerificationRepositoryInterface::class);
-        $userRepositorySpy->expects($this->once())->method('markEmailVerified')->with($userId);
+        $emailConfirmationSpy = $this->createMock(EmailConfirmationInterface::class);
+        $emailConfirmationSpy->expects($this->once())->method('confirmEmail')->with($userId);
 
-        $sut = $this->getSut(pendingRepository: $pendingRepositorySpy, userRepository: $userRepositorySpy);
+        $sut = $this->getSut(pendingRepository: $pendingRepositoryMock, emailConfirmation: $emailConfirmationSpy);
 
         $sut->verifyEmail($token);
     }
@@ -128,14 +127,14 @@ class EmailVerificationServiceTest extends TestCase
             'getExpiresAt' => new DateTimeImmutable('-' . rand(1, 48) . ' hours'),
         ]);
 
-        $pendingRepositorySpy = $this->createMock(PendingVerificationRepositoryInterface::class);
-        $pendingRepositorySpy->method('findByToken')->willReturn($pendingVerificationStub);
-        $pendingRepositorySpy->expects($this->never())->method('deletePendingVerification');
+        $pendingRepositoryStub = $this->createConfiguredStub(PendingVerificationRepositoryInterface::class, [
+            'findByToken' => $pendingVerificationStub,
+        ]);
 
-        $userRepositorySpy = $this->createMock(UserVerificationRepositoryInterface::class);
-        $userRepositorySpy->expects($this->never())->method('markEmailVerified');
+        $emailConfirmationSpy = $this->createMock(EmailConfirmationInterface::class);
+        $emailConfirmationSpy->expects($this->never())->method('confirmEmail');
 
-        $sut = $this->getSut(pendingRepository: $pendingRepositorySpy, userRepository: $userRepositorySpy);
+        $sut = $this->getSut(pendingRepository: $pendingRepositoryStub, emailConfirmation: $emailConfirmationSpy);
 
         $this->expectException(VerificationTokenExpiredException::class);
 
@@ -288,7 +287,7 @@ class EmailVerificationServiceTest extends TestCase
     private function getSut(
         ?EmailVerificationSettingsInterface $settings = null,
         ?PendingVerificationRepositoryInterface $pendingRepository = null,
-        ?UserVerificationRepositoryInterface $userRepository = null,
+        ?EmailConfirmationInterface $emailConfirmation = null,
         ?VerificationTokenGeneratorInterface $tokenGenerator = null,
         ?ResendPolicyInterface $resendPolicy = null,
         ?VerificationMailSenderInterface $mailSender = null,
@@ -296,7 +295,7 @@ class EmailVerificationServiceTest extends TestCase
         return new EmailVerificationService(
             settings: $settings ?? $this->createStub(EmailVerificationSettingsInterface::class),
             pendingRepository: $pendingRepository ?? $this->createStub(PendingVerificationRepositoryInterface::class),
-            userRepository: $userRepository ?? $this->createStub(UserVerificationRepositoryInterface::class),
+            emailConfirmation: $emailConfirmation ?? $this->createStub(EmailConfirmationInterface::class),
             tokenGenerator: $tokenGenerator ?? $this->createStub(VerificationTokenGeneratorInterface::class),
             resendPolicy: $resendPolicy ?? $this->createStub(ResendPolicyInterface::class),
             mailSender: $mailSender ?? $this->createStub(VerificationMailSenderInterface::class),

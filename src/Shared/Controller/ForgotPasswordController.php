@@ -13,6 +13,8 @@ use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface;
 use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface;
+use OxidEsales\SecurityModule\EmailVerification\Facade\UserEmailVerificationFacadeInterface;
+use OxidEsales\SecurityModule\Shared\Infrastructure\Factory\UserModelFactoryInterface;
 
 /**
  * @mixin \OxidEsales\Eshop\Application\Controller\ForgotPasswordController
@@ -20,6 +22,8 @@ use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface;
  */
 class ForgotPasswordController extends ForgotPasswordController_parent
 {
+    private const PASSWORD_UPDATED_ACTION = 'forgotpwd?success=1';
+
     public function forgotPassword(): ?bool
     {
         $settingsService = $this->getService(ModuleSettingsServiceInterface::class);
@@ -39,5 +43,26 @@ class ForgotPasswordController extends ForgotPasswordController_parent
         }
 
         return parent::forgotPassword();
+    }
+
+    public function updatePassword()
+    {
+        $userId = $this->getUserIdByUpdateId();
+        $result = parent::updatePassword();
+
+        if ($userId !== null && $result === self::PASSWORD_UPDATED_ACTION) {
+            $this->getService(UserEmailVerificationFacadeInterface::class)->confirmEmailAfterPasswordReset($userId);
+        }
+
+        return $result;
+    }
+
+    private function getUserIdByUpdateId(): ?string
+    {
+        $user = $this->getService(UserModelFactoryInterface::class)->create();
+
+        $user->loadUserByUpdateId((string) $this->getUpdateId());
+
+        return $user->isLoaded() ? (string) $user->getId() : null;
     }
 }

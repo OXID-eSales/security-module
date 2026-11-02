@@ -16,6 +16,7 @@ use OxidEsales\SecurityModule\EmailVerification\Exception\VerificationMailNotSen
 use OxidEsales\SecurityModule\EmailVerification\Facade\UserEmailVerificationFacade;
 use OxidEsales\SecurityModule\EmailVerification\Facade\UserEmailVerificationFacadeInterface;
 use OxidEsales\SecurityModule\EmailVerification\Infrastructure\Repository\PendingVerificationRepositoryInterface;
+use OxidEsales\SecurityModule\EmailVerification\Service\EmailConfirmationInterface;
 use OxidEsales\SecurityModule\EmailVerification\Service\EmailVerificationServiceInterface;
 use OxidEsales\SecurityModule\EmailVerification\Service\PendingUserSessionInterface;
 use OxidEsales\SecurityModule\EmailVerification\Service\VerificationUrlBuilderInterface;
@@ -178,12 +179,76 @@ class UserEmailVerificationFacadeTest extends TestCase
         $sut->stopUnverifiedLogin(uniqid());
     }
 
+    #[Test]
+    public function confirmEmailAfterPasswordReset(): void
+    {
+        $settingsStub = $this->createConfiguredStub(EmailVerificationSettingsInterface::class, [
+            'isEmailVerificationEnabled' => true,
+        ]);
+        $pendingRepositoryStub = $this->createConfiguredStub(PendingVerificationRepositoryInterface::class, [
+            'findByUserId' => $this->createStub(PendingVerificationDtoInterface::class),
+        ]);
+        $emailConfirmationSpy = $this->createMock(EmailConfirmationInterface::class);
+        $emailConfirmationSpy->expects($this->once())->method('confirmEmail')->with($userId = uniqid());
+
+        $sut = $this->getSut(
+            settings: $settingsStub,
+            pendingRepository: $pendingRepositoryStub,
+            emailConfirmation: $emailConfirmationSpy,
+        );
+
+        $sut->confirmEmailAfterPasswordReset($userId);
+    }
+
+    #[Test]
+    public function confirmEmailAfterPasswordResetIgnoresAConfirmedUser(): void
+    {
+        $settingsStub = $this->createConfiguredStub(EmailVerificationSettingsInterface::class, [
+            'isEmailVerificationEnabled' => true,
+        ]);
+        $pendingRepositoryStub = $this->createConfiguredStub(PendingVerificationRepositoryInterface::class, [
+            'findByUserId' => null,
+        ]);
+        $emailConfirmationSpy = $this->createMock(EmailConfirmationInterface::class);
+        $emailConfirmationSpy->expects($this->never())->method('confirmEmail');
+
+        $sut = $this->getSut(
+            settings: $settingsStub,
+            pendingRepository: $pendingRepositoryStub,
+            emailConfirmation: $emailConfirmationSpy,
+        );
+
+        $sut->confirmEmailAfterPasswordReset(uniqid());
+    }
+
+    #[Test]
+    public function confirmEmailAfterPasswordResetIgnoresTheResetWhenTheFeatureIsDisabled(): void
+    {
+        $settingsStub = $this->createConfiguredStub(EmailVerificationSettingsInterface::class, [
+            'isEmailVerificationEnabled' => false,
+        ]);
+        $pendingRepositoryStub = $this->createConfiguredStub(PendingVerificationRepositoryInterface::class, [
+            'findByUserId' => $this->createStub(PendingVerificationDtoInterface::class),
+        ]);
+        $emailConfirmationSpy = $this->createMock(EmailConfirmationInterface::class);
+        $emailConfirmationSpy->expects($this->never())->method('confirmEmail');
+
+        $sut = $this->getSut(
+            settings: $settingsStub,
+            pendingRepository: $pendingRepositoryStub,
+            emailConfirmation: $emailConfirmationSpy,
+        );
+
+        $sut->confirmEmailAfterPasswordReset(uniqid());
+    }
+
     private function getSut(
         ?EmailVerificationSettingsInterface $settings = null,
         ?PendingVerificationRepositoryInterface $pendingRepository = null,
         ?EmailVerificationServiceInterface $verificationService = null,
         ?PendingUserSessionInterface $pendingUserSession = null,
         ?VerificationUrlBuilderInterface $urlBuilder = null,
+        ?EmailConfirmationInterface $emailConfirmation = null,
     ): UserEmailVerificationFacadeInterface {
         return new UserEmailVerificationFacade(
             settings: $settings ?? $this->createStub(EmailVerificationSettingsInterface::class),
@@ -191,6 +256,7 @@ class UserEmailVerificationFacadeTest extends TestCase
             verificationService: $verificationService ?? $this->createStub(EmailVerificationServiceInterface::class),
             pendingUserSession: $pendingUserSession ?? $this->createStub(PendingUserSessionInterface::class),
             urlBuilder: $urlBuilder ?? $this->createStub(VerificationUrlBuilderInterface::class),
+            emailConfirmation: $emailConfirmation ?? $this->createStub(EmailConfirmationInterface::class),
         );
     }
 }

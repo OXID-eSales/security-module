@@ -24,4 +24,6 @@ interface UserEmailVerificationFacadeInterface
      * @throws EmailNotVerifiedException
      */
     public function stopUnverifiedLogin(string $userId): void;
+
+    public function confirmEmailAfterPasswordReset(string $userId): void;
 }

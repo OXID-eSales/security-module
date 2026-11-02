@@ -20,6 +20,9 @@ services:
   OxidEsales\SecurityModule\EmailVerification\Service\VerificationMailSenderInterface:
     class: OxidEsales\SecurityModule\EmailVerification\Service\VerificationMailSender
 
+  OxidEsales\SecurityModule\EmailVerification\Service\EmailConfirmationInterface:
+    class: OxidEsales\SecurityModule\EmailVerification\Service\EmailConfirmation
+
   OxidEsales\SecurityModule\EmailVerification\Service\EmailVerificationServiceInterface:
     class: OxidEsales\SecurityModule\EmailVerification\Service\EmailVerificationService
 

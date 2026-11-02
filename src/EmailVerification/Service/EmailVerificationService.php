@@ -16,7 +16,6 @@ use OxidEsales\SecurityModule\EmailVerification\Exception\InvalidVerificationTok
 use OxidEsales\SecurityModule\EmailVerification\Exception\ResendCooldownException;
 use OxidEsales\SecurityModule\EmailVerification\Exception\VerificationTokenExpiredException;
 use OxidEsales\SecurityModule\EmailVerification\Infrastructure\Repository\PendingVerificationRepositoryInterface;
-use OxidEsales\SecurityModule\EmailVerification\Infrastructure\Repository\UserVerificationRepositoryInterface;
 use OxidEsales\SecurityModule\EmailVerification\Settings\EmailVerificationSettingsInterface;
 
 class EmailVerificationService implements EmailVerificationServiceInterface
@@ -24,7 +23,7 @@ class EmailVerificationService implements EmailVerificationServiceInterface
     public function __construct(
         private EmailVerificationSettingsInterface $settings,
         private PendingVerificationRepositoryInterface $pendingRepository,
-        private UserVerificationRepositoryInterface $userRepository,
+        private EmailConfirmationInterface $emailConfirmation,
         private VerificationTokenGeneratorInterface $tokenGenerator,
         private ResendPolicyInterface $resendPolicy,
         private VerificationMailSenderInterface $mailSender,
@@ -47,9 +46,7 @@ class EmailVerificationService implements EmailVerificationServiceInterface
             throw new VerificationTokenExpiredException();
         }
 
-        $userId = $pendingVerification->getUserId();
-        $this->userRepository->markEmailVerified($userId);
-        $this->pendingRepository->deletePendingVerification($userId);
+        $this->emailConfirmation->confirmEmail($pendingVerification->getUserId());
     }
 
     public function resendVerificationEmailByToken(#[\SensitiveParameter] string $token): void

@@ -13,6 +13,7 @@ use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\SecurityModule\EmailVerification\Exception\EmailNotVerifiedException;
 use OxidEsales\SecurityModule\EmailVerification\Exception\VerificationMailNotSentException;
 use OxidEsales\SecurityModule\EmailVerification\Infrastructure\Repository\PendingVerificationRepositoryInterface;
+use OxidEsales\SecurityModule\EmailVerification\Service\EmailConfirmationInterface;
 use OxidEsales\SecurityModule\EmailVerification\Service\EmailVerificationServiceInterface;
 use OxidEsales\SecurityModule\EmailVerification\Service\PendingUserSessionInterface;
 use OxidEsales\SecurityModule\EmailVerification\Service\VerificationUrlBuilderInterface;
@@ -26,6 +27,7 @@ class UserEmailVerificationFacade implements UserEmailVerificationFacadeInterfac
         private EmailVerificationServiceInterface $verificationService,
         private PendingUserSessionInterface $pendingUserSession,
         private VerificationUrlBuilderInterface $urlBuilder,
+        private EmailConfirmationInterface $emailConfirmation,
     ) {
     }
 
@@ -67,5 +69,14 @@ class UserEmailVerificationFacade implements UserEmailVerificationFacadeInterfac
             userId: $userId,
             verificationUrl: $this->urlBuilder->buildPendingPageUrl(),
         );
+    }
+
+    public function confirmEmailAfterPasswordReset(string $userId): void
+    {
+        if (!$this->isEmailVerificationRequired($userId)) {
+            return;
+        }
+
+        $this->emailConfirmation->confirmEmail($userId);
     }
 }
