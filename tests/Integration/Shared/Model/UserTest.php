@@ -192,7 +192,10 @@ class UserTest extends IntegrationTestCase
         $sut = $this->getSut([UserEmailVerificationFacadeInterface::class => $facadeSpy]);
         $sut->load($this->getTwoFAUserId());
 
-        $facadeSpy->expects($this->once())->method('initializeEmailVerification')->with($sut)->willReturn(true);
+        $facadeSpy->expects($this->once())
+            ->method('initializeEmailVerification')
+            ->with($sut->getId())
+            ->willReturn(true);
 
         $sut->sendRegistrationEmail();
     }
@@ -205,7 +208,10 @@ class UserTest extends IntegrationTestCase
         $sut = $this->getSut([UserEmailVerificationFacadeInterface::class => $facadeSpy]);
         $sut->load($this->getTwoFAUserId());
 
-        $facadeSpy->expects($this->once())->method('initializeEmailVerification')->with($sut)->willReturn(false);
+        $facadeSpy->expects($this->once())
+            ->method('initializeEmailVerification')
+            ->with($sut->getId())
+            ->willReturn(false);
 
         $sut->sendRegistrationEmail();
     }

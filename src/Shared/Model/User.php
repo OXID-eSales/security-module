@@ -26,7 +26,7 @@ class User extends User_parent
     public function sendRegistrationEmail(bool $sendConfirmEmail = false): void
     {
         $verificationFacade = $this->getService(UserEmailVerificationFacadeInterface::class);
-        if ($sendConfirmEmail || !$verificationFacade->initializeEmailVerification($this)) {
+        if ($sendConfirmEmail || !$verificationFacade->initializeEmailVerification((string) $this->getId())) {
             parent::sendRegistrationEmail($sendConfirmEmail);
         }
     }

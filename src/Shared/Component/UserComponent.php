@@ -46,10 +46,7 @@ class UserComponent extends UserComponent_parent
 
         try {
             return parent::login();
-        } catch (TwoFactorRequiredException $e) {
-            $this->getService(Utils::class)->redirect($e->getVerificationUrl());
-            return 'user';
-        } catch (EmailNotVerifiedException $e) {
+        } catch (TwoFactorRequiredException | EmailNotVerifiedException $e) {
             $this->getService(Utils::class)->redirect($e->getVerificationUrl());
             return 'user';
         }
@@ -86,12 +83,13 @@ class UserComponent extends UserComponent_parent
             return false;
         }
 
-        if (!$this->getService(UserEmailVerificationFacadeInterface::class)->isEmailVerificationRequired($userId)) {
+        $verificationFacade = $this->getService(UserEmailVerificationFacadeInterface::class);
+        if (!$verificationFacade->isEmailVerificationRequired($userId)) {
             return false;
         }
 
         $this->getService(UserModelFactoryInterface::class)->create()->logout();
-        $this->getService(UserEmailVerificationFacadeInterface::class)->rememberPendingUser($userId);
+        $verificationFacade->rememberPendingUser($userId);
         $this->verificationStarted = true;
 
         return true;

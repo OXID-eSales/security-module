@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\EmailVerification\Facade;
 
-use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\SecurityModule\EmailVerification\Exception\EmailNotVerifiedException;
 use OxidEsales\SecurityModule\EmailVerification\Exception\VerificationMailNotSentException;
 use OxidEsales\SecurityModule\EmailVerification\Infrastructure\Repository\PendingVerificationRepositoryInterface;
@@ -37,15 +36,16 @@ class UserEmailVerificationFacade implements UserEmailVerificationFacadeInterfac
             && $this->pendingRepository->findByUserId($userId) !== null;
     }
 
-    public function initializeEmailVerification(User $user): bool
+    public function initializeEmailVerification(string $userId): bool
     {
         if (!$this->settings->isEmailVerificationEnabled()) {
             return false;
         }
 
         try {
-            $this->verificationService->startEmailVerification((string) $user->getId());
+            $this->verificationService->startEmailVerification($userId);
         } catch (VerificationMailNotSentException) {
+            // The open verification keeps the login blocked; the customer can request a new mail.
             return true;
         }
 

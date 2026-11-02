@@ -10,23 +10,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Strip session token (stoken) from GET form URLs (search, attribute filter) via new Form Security admin setting.
   The session id (sid) is still emitted when the shop needs it (e.g. cookieless sessions), so the session/basket is not
   lost on submit.
-- Optional email verification on storefront registration. When enabled, a new customer receives a
-  confirmation link and can log in (storefront and OXAPI) only after opening it.
-  - Module settings `oeSecurityEmailVerificationEnabled` (default off) and
-    `oeSecurityEmailVerificationLinkLifetime` (default 24 hours).
-  - New verification page (`cl=oesm_email_verification`) shows the result of the link and offers a new
-    confirmation mail for expired links or blocked logins. A new mail replaces the previous link, and repeated
-    requests wait longer each time.
-  - New table `oesm_email_verification`, new column `oxuser.OEEMAILVERIFIED` and a new CMS mail content.
+- Optional email verification on storefront registration: login (storefront and OXAPI) only after confirming
+  the email address
+  - Module settings `oeSecurityEmailVerificationEnabled` and `oeSecurityEmailVerificationLinkLifetime`
+  - Verification page `cl=oesm_email_verification`
+  - Table `oesm_email_verification`, column `oxuser.OEEMAILVERIFIED`, CMS content `oesmemailverification`
 
 ### Changed
 - Update module to work with OXID eShop 7.6
 - `UserModelFactoryInterface` and `UserModelFactory` moved from `Authentication\TwoFactorAuth\Infrastructure\Factory`
-  to `Shared\Infrastructure\Factory`, as they are now used outside two-factor authentication. Projects that
-  override this service must update the namespace.
-- The `UserComponent` extension moved from `OxidEsales\SecurityModule\Captcha\Shop\UserComponent` to
-  `OxidEsales\SecurityModule\Shared\Component\UserComponent`, as it now serves captcha, two-factor authentication
-  and email verification. Modules that extend or reference the old class must use the new one.
+  to `Shared\Infrastructure\Factory`
+- `UserComponent` extension moved from `Captcha\Shop\UserComponent` to `Shared\Component\UserComponent`
 
 ## [4.0.2] - 2026-08-26
 

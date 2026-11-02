@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Tests\Unit\EmailVerification\Facade;
 
-use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\SecurityModule\EmailVerification\DTO\PendingVerificationDtoInterface;
 use OxidEsales\SecurityModule\EmailVerification\Exception\EmailNotVerifiedException;
 use OxidEsales\SecurityModule\EmailVerification\Exception\VerificationMailNotSentException;
@@ -78,13 +77,12 @@ class UserEmailVerificationFacadeTest extends TestCase
         $settingsStub = $this->createConfiguredStub(EmailVerificationSettingsInterface::class, [
             'isEmailVerificationEnabled' => true,
         ]);
-        $userStub = $this->createConfiguredStub(User::class, ['getId' => $userId = uniqid()]);
         $verificationServiceSpy = $this->createMock(EmailVerificationServiceInterface::class);
-        $verificationServiceSpy->expects($this->once())->method('startEmailVerification')->with($userId);
+        $verificationServiceSpy->expects($this->once())->method('startEmailVerification')->with($userId = uniqid());
 
         $sut = $this->getSut(settings: $settingsStub, verificationService: $verificationServiceSpy);
 
-        $this->assertTrue($sut->initializeEmailVerification($userStub));
+        $this->assertTrue($sut->initializeEmailVerification($userId));
     }
 
     #[Test]
@@ -98,7 +96,7 @@ class UserEmailVerificationFacadeTest extends TestCase
 
         $sut = $this->getSut(settings: $settingsStub, verificationService: $verificationServiceSpy);
 
-        $this->assertFalse($sut->initializeEmailVerification($this->createStub(User::class)));
+        $this->assertFalse($sut->initializeEmailVerification(uniqid()));
     }
 
     #[Test]
@@ -113,7 +111,7 @@ class UserEmailVerificationFacadeTest extends TestCase
 
         $sut = $this->getSut(settings: $settingsStub, verificationService: $verificationServiceStub);
 
-        $this->assertTrue($sut->initializeEmailVerification($this->createStub(User::class)));
+        $this->assertTrue($sut->initializeEmailVerification(uniqid()));
     }
 
     #[Test]
