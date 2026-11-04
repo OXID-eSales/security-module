@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Update module to work with OXID eShop 7.6
+- Update `oxid-esales/graphql-base` requirement to `^14.0` (the version for OXID eShop 7.6)
+- `PendingAwareRefreshTokenService::refreshToken()` now returns `Lcobucci\JWT\UnencryptedToken` instead of `string`,
+  following the `RefreshTokenServiceInterface` change in `oxid-esales/graphql-base` 14
 
 ## [4.0.2] - 2026-08-26
 
