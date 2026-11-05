@@ -10,9 +10,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Strip session token (stoken) from GET form URLs (search, attribute filter) via new Form Security admin setting.
   The session id (sid) is still emitted when the shop needs it (e.g. cookieless sessions), so the session/basket is not
   lost on submit.
+- Optional email verification on storefront registration: login (storefront and OXAPI) only after confirming
+  the email address
+  - Module settings `oeSecurityEmailVerificationEnabled` and `oeSecurityEmailVerificationLinkLifetime`
+  - Verification page `cl=oesm_email_verification`
+  - Table `oesm_email_verification`, column `oxuser.OEEMAILVERIFIED`, CMS content `oesmemailverification`
 
 ### Changed
 - Update module to work with OXID eShop 7.6
+- `UserModelFactoryInterface` and `UserModelFactory` moved from `Authentication\TwoFactorAuth\Infrastructure\Factory`
+  to `Shared\Infrastructure\Factory`
+- `UserComponent` extension moved from `Captcha\Shop\UserComponent` to `Shared\Component\UserComponent`
 
 ## [4.0.2] - 2026-08-26
 

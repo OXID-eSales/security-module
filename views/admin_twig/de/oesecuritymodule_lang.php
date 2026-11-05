@@ -56,4 +56,16 @@ $aLang = [
         'Benutzerdefinierte Themes oder zusätzliche Module können diese Einstellung über ' .
         'oViewConf.isGetFormStripStokenEnabled() integrieren. ' .
         'POST-Formulare sind nicht betroffen.',
+
+    'SHOP_MODULE_GROUP_email_verification'                  => 'E-Mail-Bestätigung',
+    'SHOP_MODULE_oeSecurityEmailVerificationEnabled'        => 'E-Mail-Bestätigung bei der Registrierung verlangen',
+    'HELP_SHOP_MODULE_oeSecurityEmailVerificationEnabled'   => 'Wenn aktiviert, erhalten neue Kundenkonten '
+        . 'statt der Willkommens-E-Mail eine Aktivierungs-E-Mail und können sich erst nach dem Öffnen des '
+        . 'Links anmelden. Betroffen sind nur Konten, die registriert werden, während diese Einstellung '
+        . 'aktiv ist; bestehende Kunden werden nie ausgesperrt. Das Newsletter-Double-Opt-in bleibt '
+        . 'davon getrennt.',
+    'SHOP_MODULE_oeSecurityEmailVerificationLinkLifetime'      => 'Gültigkeit des Bestätigungslinks (Stunden)',
+    'HELP_SHOP_MODULE_oeSecurityEmailVerificationLinkLifetime' => 'Wie lange der per E-Mail versendete '
+        . 'Bestätigungslink gültig bleibt, in Stunden. Danach kann der Kunde eine neue E-Mail anfordern. '
+        . 'Minimum: 1. Standard: 24.',
 ];

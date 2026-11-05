@@ -1,0 +1,59 @@
+{% set verificationState = verificationPage.getState().value %}
+
+{% capture append = "oxidBlock_content" %}
+    <div class="container-xxl mb-5 pb-5">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="h3 page-header">{{ translate({ ident: "OE_SECURITY_EMAIL_VERIFICATION_TITLE" }) }}</h1>
+
+                {% if verificationPage.getErrorMessage() %}
+                    <div class="alert alert-danger" id="email_verification_error">
+                        {{ translate({ ident: verificationPage.getErrorMessage(), args: verificationPage.getErrorArgument() }) }}
+                    </div>
+                {% endif %}
+
+                <div class="card">
+                    <div class="card-body">
+                        {% if verificationState == "verified" %}
+                            <p class="mb-4" id="email_verification_verified">{{ translate({ ident: "OE_SECURITY_EMAIL_VERIFICATION_VERIFIED" }) }}</p>
+                        {% elseif verificationState == "already_verified" %}
+                            <p class="mb-4" id="email_verification_already_verified">{{ translate({ ident: "OE_SECURITY_EMAIL_VERIFICATION_ALREADY_VERIFIED" }) }}</p>
+                        {% elseif verificationState == "expired" %}
+                            <p class="mb-4" id="email_verification_expired">{{ translate({ ident: "OE_SECURITY_EMAIL_VERIFICATION_EXPIRED" }) }}</p>
+                        {% elseif verificationState == "invalid" %}
+                            <p class="mb-4" id="email_verification_invalid">{{ translate({ ident: "OE_SECURITY_EMAIL_VERIFICATION_INVALID" }) }}</p>
+                        {% elseif verificationState == "pending" %}
+                            <p class="mb-4" id="email_verification_pending">{{ translate({ ident: "OE_SECURITY_EMAIL_VERIFICATION_PENDING" }) }}</p>
+                        {% else %}
+                            <p class="mb-4" id="email_verification_sent">{{ translate({ ident: "OE_SECURITY_EMAIL_VERIFICATION_SENT", args: linkLifetimeHours }) }}</p>
+                        {% endif %}
+
+                        {% if verificationState == "verified" or verificationState == "already_verified" %}
+                            <a href="{{ seo_url({ ident: oViewConf.getSelfLink()|cat("cl=account") }) }}" id="email_verification_login" class="btn btn-primary btn-responsive">
+                                {{ translate({ ident: "OE_SECURITY_EMAIL_VERIFICATION_TO_LOGIN" }) }}
+                            </a>
+                        {% endif %}
+
+                        {% if verificationPage.canResend() %}
+                            <form action="{{ oViewConf.getSelfActionLink()|raw }}" name="email_verification_resend" method="post" role="form">
+                                <div class="hidden">
+                                    {{ oViewConf.getHiddenSid()|raw }}
+                                    <input type="hidden" name="cl" value="oesm_email_verification">
+                                    <input type="hidden" name="fnc" value="resendEmail">
+                                    {% if verificationPage.getToken() %}
+                                        <input type="hidden" name="token" value="{{ verificationPage.getToken() }}">
+                                    {% endif %}
+                                </div>
+                                <button type="submit" id="email_verification_resend" class="btn btn-outline-primary btn-responsive">
+                                    {{ translate({ ident: "OE_SECURITY_EMAIL_VERIFICATION_RESEND" }) }}
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endcapture %}
+
+{% include "layout/page.html.twig" %}

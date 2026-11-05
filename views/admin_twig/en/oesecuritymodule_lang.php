@@ -54,4 +54,15 @@ $aLang = [
         'Custom themes or additional modules can integrate with this setting via ' .
         'oViewConf.isGetFormStripStokenEnabled(). ' .
         'POST forms are unaffected.',
+
+    'SHOP_MODULE_GROUP_email_verification'                  => 'Email Verification',
+    'SHOP_MODULE_oeSecurityEmailVerificationEnabled'        => 'Require email verification on registration',
+    'HELP_SHOP_MODULE_oeSecurityEmailVerificationEnabled'   => 'When enabled, new customer accounts receive '
+        . 'an activation email instead of the welcome email and can log in only after opening the link. '
+        . 'Only accounts registered while this setting is active are affected; existing customers are '
+        . 'never locked out. The newsletter double opt-in stays separate.',
+    'SHOP_MODULE_oeSecurityEmailVerificationLinkLifetime'      => 'Verification link lifetime (hours)',
+    'HELP_SHOP_MODULE_oeSecurityEmailVerificationLinkLifetime' => 'How long the emailed verification link '
+        . 'remains valid, in hours. After that the customer can request a new email. Minimum: 1. '
+        . 'Default: 24.',
 ];

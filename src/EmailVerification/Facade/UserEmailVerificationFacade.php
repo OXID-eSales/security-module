@@ -1,0 +1,82 @@
+<?php
+
+/**
+ * Copyright © OXID eSales AG. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
+declare(strict_types=1);
+
+namespace OxidEsales\SecurityModule\EmailVerification\Facade;
+
+use OxidEsales\SecurityModule\EmailVerification\Exception\EmailNotVerifiedException;
+use OxidEsales\SecurityModule\EmailVerification\Exception\VerificationMailNotSentException;
+use OxidEsales\SecurityModule\EmailVerification\Infrastructure\Repository\PendingVerificationRepositoryInterface;
+use OxidEsales\SecurityModule\EmailVerification\Service\EmailConfirmationInterface;
+use OxidEsales\SecurityModule\EmailVerification\Service\EmailVerificationServiceInterface;
+use OxidEsales\SecurityModule\EmailVerification\Service\PendingUserSessionInterface;
+use OxidEsales\SecurityModule\EmailVerification\Service\VerificationUrlBuilderInterface;
+use OxidEsales\SecurityModule\EmailVerification\Settings\EmailVerificationSettingsInterface;
+
+class UserEmailVerificationFacade implements UserEmailVerificationFacadeInterface
+{
+    public function __construct(
+        private EmailVerificationSettingsInterface $settings,
+        private PendingVerificationRepositoryInterface $pendingRepository,
+        private EmailVerificationServiceInterface $verificationService,
+        private PendingUserSessionInterface $pendingUserSession,
+        private VerificationUrlBuilderInterface $urlBuilder,
+        private EmailConfirmationInterface $emailConfirmation,
+    ) {
+    }
+
+    public function isEmailVerificationRequired(string $userId): bool
+    {
+        return $this->settings->isEmailVerificationEnabled()
+            && $this->pendingRepository->findByUserId($userId) !== null;
+    }
+
+    public function initializeEmailVerification(string $userId): bool
+    {
+        if (!$this->settings->isEmailVerificationEnabled()) {
+            return false;
+        }
+
+        try {
+            $this->verificationService->startEmailVerification($userId);
+        } catch (VerificationMailNotSentException) {
+            // The open verification keeps the login blocked; the customer can request a new mail.
+            return true;
+        }
+
+        return true;
+    }
+
+    public function rememberPendingUser(string $userId): void
+    {
+        $this->pendingUserSession->setPendingUserId($userId);
+    }
+
+    public function stopUnverifiedLogin(string $userId): void
+    {
+        if (!$this->isEmailVerificationRequired($userId)) {
+            return;
+        }
+
+        $this->rememberPendingUser($userId);
+
+        throw new EmailNotVerifiedException(
+            userId: $userId,
+            verificationUrl: $this->urlBuilder->buildPendingPageUrl(),
+        );
+    }
+
+    public function confirmEmailAfterPasswordReset(string $userId): void
+    {
+        if (!$this->isEmailVerificationRequired($userId)) {
+            return;
+        }
+
+        $this->emailConfirmation->confirmEmail($userId);
+    }
+}

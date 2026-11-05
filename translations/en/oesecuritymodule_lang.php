@@ -76,4 +76,34 @@ $aLang = [
     'OE_SECURITY_TWO_FACTOR_SETTINGS_DESCRIPTION' => 'Add an extra layer of security to your account. When enabled, you will need to enter a verification code sent to your email each time you log in.',
     'OE_SECURITY_TWO_FACTOR_ENABLE'               => 'Enable two-factor authentication',
     'OE_SECURITY_TWO_FA_SETTINGS_SAVED'           => 'Two-factor authentication settings have been saved.',
+
+    'ERROR_EMAIL_NOT_VERIFIED'                 => 'Please confirm your email address first. We have sent you a link to do so.',
+    'ERROR_EMAIL_ALREADY_VERIFIED'             => 'Your email address is already confirmed. You can log in.',
+    'ERROR_EMAIL_VERIFICATION_RESEND_COOLDOWN' => 'A new email can be requested in %d minute(s).',
+    'ERROR_EMAIL_VERIFICATION_LINK_EXPIRED'    => 'The confirmation link has expired.',
+    'ERROR_EMAIL_VERIFICATION_LINK_INVALID'    => 'The confirmation link is invalid or has already been used.',
+
+    'ERROR_EMAIL_VERIFICATION_MAIL_NOT_SENT'   => 'The confirmation email could not be sent. Please try again later.',
+
+    'EMAIL_VERIFICATION_DATE_FORMAT'   => 'Y-m-d H:i',
+    'EMAIL_VERIFICATION_EMAIL_BUTTON'  => 'Confirm email address',
+    'EMAIL_VERIFICATION_EMAIL_SUBJECT' => 'Please confirm your email address',
+    'EMAIL_VERIFICATION_EMAIL_BODY'    => "Hello %1\$s,\n\n"
+        . "Thank you for registering at %2\$s.\n\n"
+        . "Please confirm your email address by opening the following link:\n\n"
+        . "%3\$s\n\n"
+        . "The link is valid until %4\$s and can only be used once. You can log in to your account only"
+        . " after confirming your address.\n\n"
+        . "If you didn't register, you can safely ignore this email.\n\n"
+        . "Your %2\$s team.",
+
+    'OE_SECURITY_EMAIL_VERIFICATION_TITLE'            => 'Confirm your email address',
+    'OE_SECURITY_EMAIL_VERIFICATION_SENT'             => 'We have sent you an email with a confirmation link. Please open it to activate your account; the link is valid for %d hours.',
+    'OE_SECURITY_EMAIL_VERIFICATION_PENDING'          => 'Your email address is not confirmed yet. Please open the link in the email we sent you. You can log in after that.',
+    'OE_SECURITY_EMAIL_VERIFICATION_VERIFIED'         => 'Thank you! Your email address is confirmed and you can now log in.',
+    'OE_SECURITY_EMAIL_VERIFICATION_ALREADY_VERIFIED' => 'Your email address is already confirmed. You can log in.',
+    'OE_SECURITY_EMAIL_VERIFICATION_EXPIRED'          => 'This confirmation link has expired. Request a new email below; the old link will stop working.',
+    'OE_SECURITY_EMAIL_VERIFICATION_INVALID'          => 'This confirmation link is invalid or has already been used.',
+    'OE_SECURITY_EMAIL_VERIFICATION_RESEND'           => 'Send a new confirmation email',
+    'OE_SECURITY_EMAIL_VERIFICATION_TO_LOGIN'         => 'Log in',
 ];

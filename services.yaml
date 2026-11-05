@@ -1,9 +1,11 @@
 imports:
   - { resource: src/Captcha/services.yaml }
+  - { resource: src/EmailVerification/services.yaml }
   - { resource: src/FormSecurity/services.yaml }
   - { resource: src/PasswordPolicy/services.yaml }
   - { resource: src/Authentication/services.yaml }
   - { resource: src/GraphQL/services.yaml }
+  - { resource: src/Shared/services.yaml }
 
 services:
   _defaults:
@@ -16,4 +18,16 @@ services:
 
   OxidEsales\Eshop\Core\Utils:
     factory: ['@OxidEsales\SecurityModule\Core\Registry', 'getUtils']
+    public: true
+
+  OxidEsales\Eshop\Core\Request:
+    factory: ['@OxidEsales\SecurityModule\Core\Registry', 'getRequest']
+    public: true
+
+  OxidEsales\Eshop\Core\UtilsView:
+    factory: ['@OxidEsales\SecurityModule\Core\Registry', 'getUtilsView']
+    public: true
+
+  OxidEsales\EshopCommunity\Internal\Framework\Session\SessionInterface:
+    class: OxidEsales\EshopCommunity\Internal\Transition\Adapter\Session\SessionAdapter
     public: true

@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Shared\Model;
 
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAUserServiceInterface;
+use OxidEsales\SecurityModule\EmailVerification\Facade\UserEmailVerificationFacadeInterface;
 
 /**
  * User model extended
@@ -19,6 +20,17 @@ use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAUserServ
  */
 class User extends User_parent
 {
+    /**
+     * @SuppressWarnings("PHPMD.BooleanArgumentFlag")
+     */
+    public function sendRegistrationEmail(bool $sendConfirmEmail = false): void
+    {
+        $verificationFacade = $this->getService(UserEmailVerificationFacadeInterface::class);
+        if ($sendConfirmEmail || !$verificationFacade->initializeEmailVerification((string) $this->getId())) {
+            parent::sendRegistrationEmail($sendConfirmEmail);
+        }
+    }
+
     /** @phpstan-ignore missingType.return (inherited from parent without return type) */
     protected function onLogin($userName, #[\SensitiveParameter] $password)
     {
@@ -26,6 +38,8 @@ class User extends User_parent
 
         $userId = $this->getId();
         if ($userId && !$this->isAdmin()) {
+            $this->getService(UserEmailVerificationFacadeInterface::class)->stopUnverifiedLogin($userId);
+
             $twoFAUserService = $this->getService(TwoFAUserServiceInterface::class);
             if ($twoFAUserService->isTwoFARequired($userId) && !$twoFAUserService->isChallengeVerified($userId)) {
                 $twoFAUserService->startChallengeForUser($userId);

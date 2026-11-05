@@ -76,4 +76,34 @@ $aLang = [
     'OE_SECURITY_TWO_FACTOR_SETTINGS_DESCRIPTION' => 'Fügen Sie Ihrem Konto eine zusätzliche Sicherheitsebene hinzu. Wenn aktiviert, müssen Sie bei jeder Anmeldung einen Bestätigungscode eingeben, der an Ihre E-Mail gesendet wird.',
     'OE_SECURITY_TWO_FACTOR_ENABLE'               => 'Zwei-Faktor-Authentifizierung aktivieren',
     'OE_SECURITY_TWO_FA_SETTINGS_SAVED'           => 'Die Einstellungen für die Zwei-Faktor-Authentifizierung wurden gespeichert.',
+
+    'ERROR_EMAIL_NOT_VERIFIED'                 => 'Bitte bestätigen Sie zuerst Ihre E-Mail-Adresse. Wir haben Ihnen dazu einen Link gesendet.',
+    'ERROR_EMAIL_ALREADY_VERIFIED'             => 'Ihre E-Mail-Adresse ist bereits bestätigt. Sie können sich anmelden.',
+    'ERROR_EMAIL_VERIFICATION_RESEND_COOLDOWN' => 'Eine neue E-Mail kann in %d Minute(n) angefordert werden.',
+    'ERROR_EMAIL_VERIFICATION_LINK_EXPIRED'    => 'Der Bestätigungslink ist abgelaufen.',
+    'ERROR_EMAIL_VERIFICATION_LINK_INVALID'    => 'Der Bestätigungslink ist ungültig oder wurde bereits verwendet.',
+
+    'ERROR_EMAIL_VERIFICATION_MAIL_NOT_SENT'   => 'Die Bestätigungs-E-Mail konnte nicht gesendet werden. Bitte versuchen Sie es später erneut.',
+
+    'EMAIL_VERIFICATION_DATE_FORMAT'   => 'd.m.Y H:i',
+    'EMAIL_VERIFICATION_EMAIL_BUTTON'  => 'E-Mail-Adresse bestätigen',
+    'EMAIL_VERIFICATION_EMAIL_SUBJECT' => 'Bitte bestätigen Sie Ihre E-Mail-Adresse',
+    'EMAIL_VERIFICATION_EMAIL_BODY'    => "Hallo %1\$s,\n\n"
+        . "vielen Dank für Ihre Registrierung bei %2\$s.\n\n"
+        . "Bitte bestätigen Sie Ihre E-Mail-Adresse, indem Sie den folgenden Link öffnen:\n\n"
+        . "%3\$s\n\n"
+        . "Der Link ist gültig bis %4\$s und kann nur einmal verwendet werden. Erst nach der Bestätigung"
+        . " können Sie sich in Ihrem Kundenkonto anmelden.\n\n"
+        . "Falls Sie sich nicht registriert haben, können Sie diese E-Mail ignorieren.\n\n"
+        . "Ihr %2\$s-Team.",
+
+    'OE_SECURITY_EMAIL_VERIFICATION_TITLE'            => 'E-Mail-Adresse bestätigen',
+    'OE_SECURITY_EMAIL_VERIFICATION_SENT'             => 'Wir haben Ihnen eine E-Mail mit einem Bestätigungslink gesendet. Bitte öffnen Sie ihn, um Ihr Konto zu aktivieren; der Link ist %d Stunden gültig.',
+    'OE_SECURITY_EMAIL_VERIFICATION_PENDING'          => 'Ihre E-Mail-Adresse ist noch nicht bestätigt. Bitte öffnen Sie den Link in der E-Mail, die wir Ihnen gesendet haben. Danach können Sie sich anmelden.',
+    'OE_SECURITY_EMAIL_VERIFICATION_VERIFIED'         => 'Vielen Dank! Ihre E-Mail-Adresse ist bestätigt und Sie können sich jetzt anmelden.',
+    'OE_SECURITY_EMAIL_VERIFICATION_ALREADY_VERIFIED' => 'Ihre E-Mail-Adresse ist bereits bestätigt. Sie können sich anmelden.',
+    'OE_SECURITY_EMAIL_VERIFICATION_EXPIRED'          => 'Dieser Bestätigungslink ist abgelaufen. Fordern Sie unten eine neue E-Mail an; der alte Link wird damit ungültig.',
+    'OE_SECURITY_EMAIL_VERIFICATION_INVALID'          => 'Dieser Bestätigungslink ist ungültig oder wurde bereits verwendet.',
+    'OE_SECURITY_EMAIL_VERIFICATION_RESEND'           => 'Neue Bestätigungs-E-Mail senden',
+    'OE_SECURITY_EMAIL_VERIFICATION_TO_LOGIN'         => 'Anmelden',
 ];

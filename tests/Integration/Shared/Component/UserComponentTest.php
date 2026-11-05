@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace OxidEsales\SecurityModule\Tests\Integration\Captcha\Shop;
+namespace OxidEsales\SecurityModule\Tests\Integration\Shared\Component;
 
 use OxidEsales\Eshop\Core\Exception\StandardException;
 use OxidEsales\Eshop\Core\Registry;
@@ -22,7 +22,7 @@ use OxidEsales\EshopCommunity\Tests\Integration\IntegrationTestCase;
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFAShopSettings;
 use OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface;
 use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface;
-use OxidEsales\SecurityModule\Captcha\Shop\UserComponent as SecurityModuleUserComponent;
+use OxidEsales\SecurityModule\Shared\Component\UserComponent as SecurityModuleUserComponent;
 use OxidEsales\SecurityModule\Core\Module;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 
@@ -260,6 +260,8 @@ class UserComponentTest extends IntegrationTestCase
                     ['isCaptchaEnabled' => true, 'isHoneyPotCaptchaEnabled' => false]
                 ),
                 CaptchaServiceInterface::class => $this->createStub(CaptchaServiceInterface::class),
+                Request::class => $this->requestMock,
+                UtilsView::class => $this->utilsViewSpy,
             ],
             $serviceOverrides
         );

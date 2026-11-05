@@ -1,0 +1,30 @@
+services:
+  _defaults:
+    autowire: true
+    public: false
+
+  OxidEsales\SecurityModule\EmailVerification\Service\VerificationTokenGeneratorInterface:
+    class: OxidEsales\SecurityModule\EmailVerification\Service\VerificationTokenGenerator
+
+  OxidEsales\SecurityModule\EmailVerification\Service\ResendPolicyInterface:
+    class: OxidEsales\SecurityModule\EmailVerification\Service\ResendPolicy
+
+  OxidEsales\SecurityModule\EmailVerification\Service\PendingUserSessionInterface:
+    class: OxidEsales\SecurityModule\EmailVerification\Service\PendingUserSession
+    public: true
+
+  OxidEsales\SecurityModule\EmailVerification\Service\VerificationUrlBuilderInterface:
+    class: OxidEsales\SecurityModule\EmailVerification\Service\VerificationUrlBuilder
+    public: true
+
+  OxidEsales\SecurityModule\EmailVerification\Service\VerificationMailSenderInterface:
+    class: OxidEsales\SecurityModule\EmailVerification\Service\VerificationMailSender
+
+  OxidEsales\SecurityModule\EmailVerification\Service\EmailConfirmationInterface:
+    class: OxidEsales\SecurityModule\EmailVerification\Service\EmailConfirmation
+
+  OxidEsales\SecurityModule\EmailVerification\Service\EmailVerificationServiceInterface:
+    class: OxidEsales\SecurityModule\EmailVerification\Service\EmailVerificationService
+
+  OxidEsales\SecurityModule\EmailVerification\Service\VerificationPageServiceInterface:
+    class: OxidEsales\SecurityModule\EmailVerification\Service\VerificationPageService
