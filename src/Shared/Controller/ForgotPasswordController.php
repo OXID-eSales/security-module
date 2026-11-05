@@ -22,7 +22,7 @@ use OxidEsales\SecurityModule\Shared\Infrastructure\Factory\UserModelFactoryInte
  */
 class ForgotPasswordController extends ForgotPasswordController_parent
 {
-    private const PASSWORD_UPDATED_ACTION = 'forgotpwd?success=1';
+    private const RESET_SUCCESS_ACTION = 'forgotpwd?success=1';
 
     public function forgotPassword(): ?bool
     {
@@ -50,7 +50,7 @@ class ForgotPasswordController extends ForgotPasswordController_parent
         $userId = $this->getUserIdByUpdateId();
         $result = parent::updatePassword();
 
-        if ($userId !== null && $result === self::PASSWORD_UPDATED_ACTION) {
+        if ($userId !== null && $result === self::RESET_SUCCESS_ACTION) {
             $this->getService(UserEmailVerificationFacadeInterface::class)->confirmEmailAfterPasswordReset($userId);
         }
 
