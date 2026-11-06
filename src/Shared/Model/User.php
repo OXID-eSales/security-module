@@ -11,6 +11,7 @@ namespace OxidEsales\SecurityModule\Shared\Model;
 
 use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Service\TwoFAUserServiceInterface;
 use OxidEsales\SecurityModule\EmailVerification\Facade\UserEmailVerificationFacadeInterface;
+use OxidEsales\SecurityModule\SessionEviction\Service\SessionEvictionServiceInterface;
 
 /**
  * User model extended
@@ -45,5 +46,29 @@ class User extends User_parent
                 $twoFAUserService->startChallengeForUser($userId);
             }
         }
+    }
+
+    /** @phpstan-ignore missingType.return (inherited from parent without return type) */
+    public function loadActiveUser($blForceAdmin = false)
+    {
+        $sessionEviction = $this->getService(SessionEvictionServiceInterface::class);
+
+        $sessionEviction->evictUnverifiableSession($this, (bool) $blForceAdmin);
+        $result = parent::loadActiveUser($blForceAdmin);
+        $sessionEviction->bindLoginTokenToSession($this, (bool) $result);
+
+        return $result;
+    }
+
+    /** @phpstan-ignore missingType.return (inherited from parent without return type) */
+    public function save()
+    {
+        $sessionEviction = $this->getService(SessionEvictionServiceInterface::class);
+
+        $passwordHashBeforeSave = $sessionEviction->readCurrentPasswordHash($this);
+        $result = parent::save();
+        $sessionEviction->refreshTokenAfterPasswordChange($this, $passwordHashBeforeSave);
+
+        return $result;
     }
 }

@@ -3,6 +3,7 @@ imports:
   - { resource: src/EmailVerification/services.yaml }
   - { resource: src/FormSecurity/services.yaml }
   - { resource: src/PasswordPolicy/services.yaml }
+  - { resource: src/SessionEviction/services.yaml }
   - { resource: src/Authentication/services.yaml }
   - { resource: src/GraphQL/services.yaml }
   - { resource: src/Shared/services.yaml }

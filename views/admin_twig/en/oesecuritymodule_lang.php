@@ -65,4 +65,16 @@ $aLang = [
     'HELP_SHOP_MODULE_oeSecurityEmailVerificationLinkLifetime' => 'How long the emailed verification link '
         . 'remains valid, in hours. After that the customer can request a new email. Minimum: 1. '
         . 'Default: 24.',
+
+    'SHOP_MODULE_GROUP_session_eviction'                 => 'Session Eviction',
+    'SHOP_MODULE_oeSecuritySessionEvictionEnable'        => 'Log out other active sessions when a user changes their password',
+    'HELP_SHOP_MODULE_oeSecuritySessionEvictionEnable'   => 'When enabled, a password change logs the user out of their other active sessions on the next ' .
+        'request. It covers remember-me auto-login, the forgot-password reset, registration confirmation, ' .
+        'and pre-existing sessions, for storefront customers and admin users. The session that performs ' .
+        'the change stays logged in.',
+    'SHOP_MODULE_oeSecuritySessionEvictionStrict'        => 'Hard exit: also evict sessions that cannot be verified',
+    'HELP_SHOP_MODULE_oeSecuritySessionEvictionStrict'   => 'Only takes effect when the setting above is enabled. When on, a session that has a logged-in ' .
+        'user but no verifiable login state (for example a session that existed before the feature was ' .
+        'enabled, or a session from third-party single sign-on) is logged out on its next request. This ' .
+        'causes a one-time forced re-login for such sessions. Off by default.',
 ];
