@@ -48,7 +48,6 @@ class User extends User_parent
         }
     }
 
-    /** @phpstan-ignore missingType.return (inherited from parent without return type) */
     public function loadActiveUser($blForceAdmin = false)
     {
         $sessionEviction = $this->getService(SessionEvictionServiceInterface::class);
@@ -60,7 +59,6 @@ class User extends User_parent
         return $result;
     }
 
-    /** @phpstan-ignore missingType.return (inherited from parent without return type) */
     public function save()
     {
         $sessionEviction = $this->getService(SessionEvictionServiceInterface::class);

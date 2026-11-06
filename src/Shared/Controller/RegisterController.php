@@ -17,7 +17,6 @@ use OxidEsales\SecurityModule\SessionEviction\Service\ModuleSettingsServiceInter
  */
 class RegisterController extends RegisterController_parent
 {
-    /** @phpstan-ignore missingType.return (inherited from parent without return type) */
     public function confirmRegistration()
     {
         $result = parent::confirmRegistration();
