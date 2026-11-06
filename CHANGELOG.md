@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [4.1.0] - unreleased
 
 ### Added
+- Session Eviction: when enabled, changing a user's password logs the user out of their other
+  active sessions on the next request, for storefront customers and admin users. The session that
+  performs the change stays logged in
+  - Module settings `oeSecuritySessionEvictionEnable` and `oeSecuritySessionEvictionStrict`
+    ("hard exit"), both off by default
 - Strip session token (stoken) from GET form URLs (search, attribute filter) via new Form Security admin setting.
   The session id (sid) is still emitted when the shop needs it (e.g. cookieless sessions), so the session/basket is not
   lost on submit.

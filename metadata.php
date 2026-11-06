@@ -13,6 +13,7 @@ use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFAShopSet
 use OxidEsales\SecurityModule\FormSecurity\Service\ModuleSettingsService as FormSecurityModuleSettings;
 use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsService as PasswordPolicyModuleSettings;
 use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsService as CaptchaModuleSettings;
+use OxidEsales\SecurityModule\SessionEviction\Service\ModuleSettingsService as SessionEvictionModuleSettings;
 use OxidEsales\SecurityModule\Core\Module;
 use OxidEsales\SecurityModule\EmailVerification\Settings\EmailVerificationSettings as EmailVerificationModuleSettings;
 
@@ -37,6 +38,7 @@ $aModule = [
         \OxidEsales\Eshop\Application\Component\UserComponent::class => \OxidEsales\SecurityModule\Shared\Component\UserComponent::class,
         \OxidEsales\Eshop\Application\Controller\NewsletterController::class => \OxidEsales\SecurityModule\Captcha\Shop\NewsletterController::class,
         \OxidEsales\Eshop\Application\Controller\ForgotPasswordController::class => \OxidEsales\SecurityModule\Shared\Controller\ForgotPasswordController::class,
+        \OxidEsales\Eshop\Application\Controller\RegisterController::class => \OxidEsales\SecurityModule\Shared\Controller\RegisterController::class,
         \OxidEsales\Eshop\Application\Model\User::class => \OxidEsales\SecurityModule\Shared\Model\User::class,
         \OxidEsales\Eshop\Core\InputValidator::class    => \OxidEsales\SecurityModule\Shared\Core\InputValidator::class,
         \OxidEsales\Eshop\Core\ViewConfig::class        => \OxidEsales\SecurityModule\Shared\Core\ViewConfig::class
@@ -165,6 +167,20 @@ $aModule = [
             'name'  => EmailVerificationModuleSettings::LINK_LIFETIME,
             'type'  => 'num',
             'value' => 24
+        ],
+
+        //Session eviction
+        [
+            'group' => 'session_eviction',
+            'name'  => SessionEvictionModuleSettings::SESSION_EVICTION_ENABLE,
+            'type'  => 'bool',
+            'value' => false
+        ],
+        [
+            'group' => 'session_eviction',
+            'name'  => SessionEvictionModuleSettings::SESSION_EVICTION_STRICT,
+            'type'  => 'bool',
+            'value' => false
         ],
     ],
 ];

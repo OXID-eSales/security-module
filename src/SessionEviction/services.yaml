@@ -1,0 +1,21 @@
+services:
+  _defaults:
+    public: false
+    autowire: true
+    bind:
+      OxidEsales\Eshop\Core\Session: '@=service("OxidEsales\\SecurityModule\\Core\\Registry").getSession()'
+
+  OxidEsales\SecurityModule\SessionEviction\Service\ModuleSettingsServiceInterface:
+    class: OxidEsales\SecurityModule\SessionEviction\Service\ModuleSettingsService
+    public: true
+
+  OxidEsales\SecurityModule\SessionEviction\Service\SessionEvictionGuardInterface:
+    class: OxidEsales\SecurityModule\SessionEviction\Service\SessionEvictionGuard
+    public: true
+
+  OxidEsales\SecurityModule\SessionEviction\Service\SessionEvictionServiceInterface:
+    class: OxidEsales\SecurityModule\SessionEviction\Service\SessionEvictionService
+    public: true
+
+  OxidEsales\SecurityModule\SessionEviction\Infrastructure\Repository\StoredPasswordRepositoryInterface:
+    class: OxidEsales\SecurityModule\SessionEviction\Infrastructure\Repository\StoredPasswordRepository

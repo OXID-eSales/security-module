@@ -16,6 +16,7 @@ use OxidEsales\SecurityModule\Authentication\TwoFactorAuth\Settings\TwoFAShopSet
 use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsService as CaptchaModuleSettingsService;
 use OxidEsales\SecurityModule\Core\Module;
 use OxidEsales\SecurityModule\FormSecurity\Service\ModuleSettingsService as FormSecurityModuleSettings;
+use OxidEsales\SecurityModule\SessionEviction\Service\ModuleSettingsService as SessionEvictionModuleSettings;
 use OxidEsales\SecurityModule\Tests\Codeception\Support\AcceptanceTester;
 use OxidEsales\SecurityModule\PasswordPolicy\Service\ModuleSettingsServiceInterface as PasswordSettingsServiceInterface;
 
@@ -53,6 +54,21 @@ abstract class BaseCest
         ContainerFacade::get(ModuleSettingServiceInterface::class)->saveBoolean(
             TwoFAShopSettings::ACTIVE,
             $state,
+            Module::MODULE_ID
+        );
+    }
+
+    protected function setSessionEvictionState(bool $enabled, bool $strict = false): void
+    {
+        $moduleSettingService = ContainerFacade::get(ModuleSettingServiceInterface::class);
+        $moduleSettingService->saveBoolean(
+            SessionEvictionModuleSettings::SESSION_EVICTION_ENABLE,
+            $enabled,
+            Module::MODULE_ID
+        );
+        $moduleSettingService->saveBoolean(
+            SessionEvictionModuleSettings::SESSION_EVICTION_STRICT,
+            $strict,
             Module::MODULE_ID
         );
     }
