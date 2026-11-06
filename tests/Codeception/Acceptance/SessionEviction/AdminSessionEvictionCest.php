@@ -42,17 +42,23 @@ class AdminSessionEvictionCest extends BaseCest
         $this->setHoneyPotCaptchaState(false);
         $this->setPasswordState(false);
         $this->setSessionEvictionState(true);
-
-        // The Db module keeps changes between tests (cleanup: false) and the acting-session
-        // test changes this admin's password, so rebuild the admin fixture to a known state
-        // before each test runs.
-        $I->deleteFromDatabase('oxuser', ['OXID' => self::ADMIN_OXID]);
-        $I->haveInDatabase('oxuser', $this->adminFixtureRow());
+        $this->restoreAdminFixture($I);
     }
 
     public function _after(AcceptanceTester $I): void
     {
         $this->setSessionEvictionState(false);
+        $this->restoreAdminFixture($I);
+    }
+
+    private function restoreAdminFixture(AcceptanceTester $I): void
+    {
+        // The Db module keeps changes between tests (cleanup: false) and the acting-session
+        // test changes this admin's password. Rebuild the admin fixture to a known state
+        // before AND after each test, so a changed password never leaks into a later test
+        // or a later Cest.
+        $I->deleteFromDatabase('oxuser', ['OXID' => self::ADMIN_OXID]);
+        $I->haveInDatabase('oxuser', $this->adminFixtureRow());
     }
 
     public function testOtherAdminBackendSessionEvictedAfterPasswordChange(AcceptanceTester $I): void

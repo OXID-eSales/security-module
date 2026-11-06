@@ -44,18 +44,7 @@ class RememberMeSessionEvictionCest extends BaseCest
         $this->setHoneyPotCaptchaState(false);
         $this->setPasswordState(false);
         $this->setSessionEvictionState(true);
-
-        // The Db module keeps changes between tests (cleanup: false), so restore the
-        // fixture user's known password ('useruser') before each test runs.
-        $userData = $this->getExistingUserData();
-        $I->updateInDatabase(
-            'oxuser',
-            [
-                'OXPASSWORD' => 'c9dadd994241c9e5fa6469547009328a',
-                'OXPASSSALT' => '7573657275736572',
-            ],
-            ['OXID' => $userData['userId']]
-        );
+        $this->restoreFixtureUserPassword($I);
 
         $config = Registry::getConfig();
         $this->originalRememberMe = (bool) $config->getConfigParam('blShowRememberMe');
@@ -66,6 +55,23 @@ class RememberMeSessionEvictionCest extends BaseCest
     {
         $this->setSessionEvictionState(false);
         Registry::getConfig()->saveShopConfVar('bool', 'blShowRememberMe', $this->originalRememberMe);
+        $this->restoreFixtureUserPassword($I);
+    }
+
+    private function restoreFixtureUserPassword(AcceptanceTester $I): void
+    {
+        // The Db module keeps changes between tests (cleanup: false). Restore the fixture
+        // user's known password ('useruser') before AND after each test, so a password
+        // changed in a test never leaks into a later test or a later Cest.
+        $userData = $this->getExistingUserData();
+        $I->updateInDatabase(
+            'oxuser',
+            [
+                'OXPASSWORD' => 'c9dadd994241c9e5fa6469547009328a',
+                'OXPASSSALT' => '7573657275736572',
+            ],
+            ['OXID' => $userData['userId']]
+        );
     }
 
     public function testRememberMeSessionEndedAfterPasswordChange(AcceptanceTester $I): void

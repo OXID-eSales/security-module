@@ -39,9 +39,20 @@ class StandardLoginRegressionCest extends BaseCest
         $this->setCaptchaState(false);
         $this->setHoneyPotCaptchaState(false);
         $this->setPasswordState(false);
+        $this->restoreFixtureUserPassword($I);
+    }
 
-        // The Db module keeps changes between tests (cleanup: false), so restore the
-        // fixture user's known password ('useruser') before each test runs.
+    public function _after(AcceptanceTester $I): void
+    {
+        $this->setSessionEvictionState(false);
+        $this->restoreFixtureUserPassword($I);
+    }
+
+    private function restoreFixtureUserPassword(AcceptanceTester $I): void
+    {
+        // The Db module keeps changes between tests (cleanup: false). Restore the fixture
+        // user's known password ('useruser') before AND after each test, so a password
+        // changed in a test never leaks into a later test or a later Cest.
         $userData = $this->getExistingUserData();
         $I->updateInDatabase(
             'oxuser',
@@ -51,11 +62,6 @@ class StandardLoginRegressionCest extends BaseCest
             ],
             ['OXID' => $userData['userId']]
         );
-    }
-
-    public function _after(AcceptanceTester $I): void
-    {
-        $this->setSessionEvictionState(false);
     }
 
     public function testStandardLoginIsLoggedOutAfterPasswordChangeWithFeatureOn(
