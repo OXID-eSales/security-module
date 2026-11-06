@@ -27,6 +27,9 @@ class StoredPasswordRepository implements StoredPasswordRepositoryInterface
             ->where('OXID = :userId')
             ->setParameter('userId', $userId);
 
-        return (string) $queryBuilder->execute()->fetchOne();
+        /** @var \Doctrine\DBAL\Result $result */
+        $result = $queryBuilder->execute();
+
+        return (string) $result->fetchOne();
     }
 }

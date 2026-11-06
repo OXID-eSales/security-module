@@ -46,7 +46,6 @@ class ForgotPasswordController extends ForgotPasswordController_parent
         return parent::forgotPassword();
     }
 
-    /** @phpstan-ignore missingType.return (inherited from parent without return type) */
     public function updatePassword()
     {
         $userId = $this->getUserIdByUpdateId();
