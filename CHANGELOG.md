@@ -21,6 +21,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `UserModelFactoryInterface` and `UserModelFactory` moved from `Authentication\TwoFactorAuth\Infrastructure\Factory`
   to `Shared\Infrastructure\Factory`
 - `UserComponent` extension moved from `Captcha\Shop\UserComponent` to `Shared\Component\UserComponent`
+- Update `oxid-esales/graphql-base` requirement to `^14.0` (the version for OXID eShop 7.6)
+- `PendingAwareRefreshTokenService::refreshToken()` now returns `Lcobucci\JWT\UnencryptedToken` instead of `string`,
+  following the `RefreshTokenServiceInterface` change in `oxid-esales/graphql-base` 14
 
 ## [4.0.2] - 2026-08-26
 
