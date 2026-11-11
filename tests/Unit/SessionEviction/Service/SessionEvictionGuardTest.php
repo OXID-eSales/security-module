@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Tests\Unit\SessionEviction\Service;
 
-use OxidEsales\Eshop\Core\Session;
+use OxidEsales\EshopCommunity\Internal\Framework\Session\SessionInterface;
 use OxidEsales\SecurityModule\SessionEviction\Service\SessionEvictionGuard;
 use OxidEsales\SecurityModule\SessionEviction\Service\SessionEvictionGuardInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -22,8 +22,8 @@ final class SessionEvictionGuardTest extends TestCase
     #[DataProvider('hasLoginTokenDataProvider')]
     public function hasLoginTokenReflectsTokenPresence(mixed $sessionValue, bool $expected): void
     {
-        $session = $this->createStub(Session::class);
-        $session->method('getVariable')->willReturnMap([
+        $session = $this->createStub(SessionInterface::class);
+        $session->method('get')->willReturnMap([
             ['login-token', $sessionValue],
         ]);
 
@@ -43,8 +43,8 @@ final class SessionEvictionGuardTest extends TestCase
     #[DataProvider('hasUserIdDataProvider')]
     public function hasUserIdReflectsUserVariablePresence(string $param, mixed $sessionValue, bool $expected): void
     {
-        $session = $this->createStub(Session::class);
-        $session->method('getVariable')->willReturnMap([
+        $session = $this->createStub(SessionInterface::class);
+        $session->method('get')->willReturnMap([
             [$param, $sessionValue],
         ]);
 
@@ -65,9 +65,9 @@ final class SessionEvictionGuardTest extends TestCase
     #[Test]
     public function forgetUserIdDeletesOnlyTheGivenUserIdVariable(): void
     {
-        $session = $this->createMock(Session::class);
+        $session = $this->createMock(SessionInterface::class);
         $session->expects($this->once())
-            ->method('deleteVariable')
+            ->method('remove')
             ->with('usr');
 
         $this->getSut(session: $session)->forgetUserId('usr');
@@ -77,11 +77,12 @@ final class SessionEvictionGuardTest extends TestCase
     public function forgetUserIdNeverTouchesTokenOrOtherVariables(): void
     {
         $deleted = [];
-        $session = $this->createMock(Session::class);
+        $session = $this->createMock(SessionInterface::class);
         $session->expects($this->once())
-            ->method('deleteVariable')
-            ->willReturnCallback(function (string $name) use (&$deleted): void {
+            ->method('remove')
+            ->willReturnCallback(function (string $name) use (&$deleted): mixed {
                 $deleted[] = $name;
+                return null;
             });
 
         $this->getSut(session: $session)->forgetUserId('auth');
@@ -98,8 +99,8 @@ final class SessionEvictionGuardTest extends TestCase
         mixed $sessionValue,
         bool $expected
     ): void {
-        $session = $this->createStub(Session::class);
-        $session->method('getVariable')->willReturnMap([
+        $session = $this->createStub(SessionInterface::class);
+        $session->method('get')->willReturnMap([
             [$param, $sessionValue],
         ]);
 
@@ -123,10 +124,10 @@ final class SessionEvictionGuardTest extends TestCase
     }
 
     private function getSut(
-        ?Session $session = null,
+        ?SessionInterface $session = null,
     ): SessionEvictionGuardInterface {
         return new SessionEvictionGuard(
-            session: $session ?? $this->createStub(Session::class),
+            session: $session ?? $this->createStub(SessionInterface::class),
         );
     }
 }

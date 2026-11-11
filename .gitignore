@@ -3,7 +3,6 @@
 tests/.phpunit.result.cache
 .deptrac.cache
 composer.lock
-/vendor
 /vendor/
 tests/reports/
 tests/Reports/

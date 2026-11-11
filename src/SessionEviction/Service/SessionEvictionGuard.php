@@ -9,34 +9,34 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\SessionEviction\Service;
 
-use OxidEsales\Eshop\Core\Session;
+use OxidEsales\EshopCommunity\Internal\Framework\Session\SessionInterface;
 
 class SessionEvictionGuard implements SessionEvictionGuardInterface
 {
     private const CORE_LOGIN_TOKEN = 'login-token';
 
     public function __construct(
-        private readonly Session $session
+        private readonly SessionInterface $session
     ) {
     }
 
     public function hasLoginToken(): bool
     {
-        return (string)$this->session->getVariable(self::CORE_LOGIN_TOKEN) !== '';
+        return (string)$this->session->get(self::CORE_LOGIN_TOKEN) !== '';
     }
 
     public function hasUserId(string $userIdParameter): bool
     {
-        return (string)$this->session->getVariable($userIdParameter) !== '';
+        return (string)$this->session->get($userIdParameter) !== '';
     }
 
     public function forgetUserId(string $userIdParameter): void
     {
-        $this->session->deleteVariable($userIdParameter);
+        $this->session->remove($userIdParameter);
     }
 
     public function isActingSessionUser(string $userId, string $userIdParameter): bool
     {
-        return (string)$this->session->getVariable($userIdParameter) === $userId;
+        return (string)$this->session->get($userIdParameter) === $userId;
     }
 }

@@ -2,8 +2,6 @@ services:
   _defaults:
     public: false
     autowire: true
-    bind:
-      OxidEsales\Eshop\Core\Session: '@=service("OxidEsales\\SecurityModule\\Core\\Registry").getSession()'
 
   OxidEsales\SecurityModule\SessionEviction\Service\ModuleSettingsServiceInterface:
     class: OxidEsales\SecurityModule\SessionEviction\Service\ModuleSettingsService
