@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\SessionEviction\Service;
 
 use OxidEsales\Eshop\Application\Model\User;
+use OxidEsales\SecurityModule\Shared\Infrastructure\Factory\UserModelFactoryInterface;
 
 class SessionEvictionService implements SessionEvictionServiceInterface
 {
@@ -19,6 +20,7 @@ class SessionEvictionService implements SessionEvictionServiceInterface
     public function __construct(
         private ModuleSettingsServiceInterface $settings,
         private SessionEvictionGuardInterface $guard,
+        private UserModelFactoryInterface $userModelFactory,
     ) {
     }
 
@@ -29,7 +31,7 @@ class SessionEvictionService implements SessionEvictionServiceInterface
         }
 
         $userIdParameter = $this->userIdParameter($user, $forceAdmin);
-        if ($this->guard->hasUserId($userIdParameter) && !$this->guard->hasLoginToken()) {
+        if ($this->guard->getUserId($userIdParameter) !== '' && !$this->guard->hasLoginToken()) {
             $this->guard->forgetUserId($userIdParameter);
         }
     }
@@ -41,6 +43,23 @@ class SessionEvictionService implements SessionEvictionServiceInterface
         }
 
         if (!$this->guard->hasLoginToken()) {
+            $user->setSessionLoginToken();
+        }
+    }
+
+    public function bindLoginTokenToSessionUser(): void
+    {
+        if (!$this->settings->isEnabled()) {
+            return;
+        }
+
+        $userId = $this->guard->getUserId(self::STOREFRONT_USER_ID_PARAMETER);
+        if ($userId === '') {
+            return;
+        }
+
+        $user = $this->userModelFactory->create();
+        if ($user->load($userId)) {
             $user->setSessionLoginToken();
         }
     }

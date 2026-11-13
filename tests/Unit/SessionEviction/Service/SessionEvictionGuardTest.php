@@ -40,25 +40,28 @@ final class SessionEvictionGuardTest extends TestCase
     }
 
     #[Test]
-    #[DataProvider('hasUserIdDataProvider')]
-    public function hasUserIdReflectsUserVariablePresence(string $param, mixed $sessionValue, bool $expected): void
+    #[DataProvider('getUserIdDataProvider')]
+    public function getUserIdReturnsTheSessionUserIdAsString(string $param, mixed $sessionValue, string $expected): void
     {
         $session = $this->createStub(SessionInterface::class);
         $session->method('get')->willReturnMap([
             [$param, $sessionValue],
         ]);
 
-        $this->assertSame($expected, $this->getSut(session: $session)->hasUserId($param));
+        $this->assertSame($expected, $this->getSut(session: $session)->getUserId($param));
     }
 
-    public static function hasUserIdDataProvider(): array
+    public static function getUserIdDataProvider(): array
     {
+        $userId = uniqid('user-', true);
+        $adminId = uniqid('admin-', true);
+
         return [
-            'storefront usr set'   => ['usr', uniqid('user-', true), true],
-            'storefront usr empty' => ['usr', '', false],
-            'storefront usr unset' => ['usr', null, false],
-            'admin auth set'       => ['auth', uniqid('admin-', true), true],
-            'admin auth unset'     => ['auth', null, false],
+            'storefront usr set'   => ['usr', $userId, $userId],
+            'storefront usr empty' => ['usr', '', ''],
+            'storefront usr unset' => ['usr', null, ''],
+            'admin auth set'       => ['auth', $adminId, $adminId],
+            'admin auth unset'     => ['auth', null, ''],
         ];
     }
 

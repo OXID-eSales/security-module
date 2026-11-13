@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Shared\Controller;
 
-use OxidEsales\SecurityModule\SessionEviction\Service\ModuleSettingsServiceInterface as SessionEvictionSettings;
+use OxidEsales\SecurityModule\SessionEviction\Service\SessionEvictionServiceInterface;
 
 /**
  * @mixin \OxidEsales\Eshop\Application\Controller\RegisterController
@@ -17,16 +17,14 @@ use OxidEsales\SecurityModule\SessionEviction\Service\ModuleSettingsServiceInter
  */
 class RegisterController extends RegisterController_parent
 {
+    private const CONFIRM_SUCCESS_ACTION = 'register?confirmstate=1';
+
     public function confirmRegistration()
     {
         $result = parent::confirmRegistration();
 
-        $settingsService = $this->getService(SessionEvictionSettings::class);
-        if ($settingsService->isEnabled()) {
-            $user = $this->getUser();
-            if ($user) {
-                $user->setSessionLoginToken();
-            }
+        if ($result === self::CONFIRM_SUCCESS_ACTION) {
+            $this->getService(SessionEvictionServiceInterface::class)->bindLoginTokenToSessionUser();
         }
 
         return $result;

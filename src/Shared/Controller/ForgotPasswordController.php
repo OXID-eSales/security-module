@@ -14,7 +14,7 @@ use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface;
 use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface;
 use OxidEsales\SecurityModule\EmailVerification\Facade\UserEmailVerificationFacadeInterface;
-use OxidEsales\SecurityModule\SessionEviction\Service\ModuleSettingsServiceInterface as SessionEvictionSettings;
+use OxidEsales\SecurityModule\SessionEviction\Service\SessionEvictionServiceInterface;
 use OxidEsales\SecurityModule\Shared\Infrastructure\Factory\UserModelFactoryInterface;
 
 /**
@@ -53,14 +53,7 @@ class ForgotPasswordController extends ForgotPasswordController_parent
 
         if ($userId !== null && $result === self::RESET_SUCCESS_ACTION) {
             $this->getService(UserEmailVerificationFacadeInterface::class)->confirmEmailAfterPasswordReset($userId);
-        }
-
-        $settingsService = $this->getService(SessionEvictionSettings::class);
-        if ($settingsService->isEnabled()) {
-            $user = $this->getUser();
-            if ($user) {
-                $user->setSessionLoginToken();
-            }
+            $this->getService(SessionEvictionServiceInterface::class)->bindLoginTokenToSessionUser();
         }
 
         return $result;

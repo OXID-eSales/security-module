@@ -13,7 +13,7 @@ interface SessionEvictionGuardInterface
 {
     public function hasLoginToken(): bool;
 
-    public function hasUserId(string $userIdParameter): bool;
+    public function getUserId(string $userIdParameter): string;
 
     public function forgetUserId(string $userIdParameter): void;
 }

@@ -16,4 +16,6 @@ interface SessionEvictionServiceInterface
     public function evictUnverifiableSession(User $user, bool $forceAdmin): void;
 
     public function bindLoginTokenToSession(User $user, bool $userLoaded): void;
+
+    public function bindLoginTokenToSessionUser(): void;
 }

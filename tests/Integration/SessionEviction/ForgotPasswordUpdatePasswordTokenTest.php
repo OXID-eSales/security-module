@@ -9,83 +9,86 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Tests\Integration\SessionEviction;
 
-use OxidEsales\Eshop\Application\Model\User as EshopUser;
-use OxidEsales\Eshop\Core\Registry;
-use OxidEsales\Eshop\Core\Request;
-use OxidEsales\Eshop\Core\UtilsView;
-use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
-use OxidEsales\SecurityModule\SessionEviction\Service\ModuleSettingsServiceInterface;
+use OxidEsales\Eshop\Application\Model\User as UserModel;
 use OxidEsales\SecurityModule\Shared\Controller\ForgotPasswordController as ModuleForgotPasswordController;
 use OxidEsales\SecurityModule\Tests\Integration\IntegrationTestCase;
 use PHPUnit\Framework\Attributes\Test;
 
 final class ForgotPasswordUpdatePasswordTokenTest extends IntegrationTestCase
 {
-    protected UtilsView $utilsViewStub;
-    protected Request $requestStub;
+    use SessionEvictionTestTrait;
 
-    public function setUp(): void
+    private const RESET_SUCCESS_ACTION = 'forgotpwd?success=1';
+
+    #[Test]
+    public function resetUserStaysLoggedInWithStrictMode(): void
     {
-        parent::setUp();
+        $user = $this->createUserWithUpdateId();
+        $this->startSession();
+        $this->sendResetForm($user);
 
-        $this->utilsViewStub = $this->createStub(UtilsView::class);
-
-        $this->requestStub = $this->getMockBuilder(Request::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['getRequestParameter'])
-            ->getMock();
-        $this->requestStub->method('getRequestParameter')->withAnyParameters()->willReturn('');
-
-        Registry::set(UtilsView::class, $this->utilsViewStub);
-        Registry::set(Request::class, $this->requestStub);
+        $this->runWithSessionEviction(true, true, function () use ($user): void {
+            $this->assertSame(self::RESET_SUCCESS_ACTION, $this->getSut()->updatePassword());
+            $this->assertNotSame('', (string) $this->session()->get('login-token'));
+            $this->assertSame($user->getId(), $this->nextRequestUserId());
+        });
     }
 
     #[Test]
-    public function featureOffDoesNotSetLoginToken(): void
+    public function resetReplacesTheTokenOfAnotherUserLoggedInInTheSameBrowser(): void
     {
-        $user = $this->createMock(EshopUser::class);
-        $user->expects($this->never())->method('setSessionLoginToken');
+        $user = $this->createUserWithUpdateId();
+        $this->startSession('testuser', uniqid('token-', true));
+        $this->sendResetForm($user);
 
-        $subject = $this->getSut(false, $user);
-        $subject->updatePassword();
+        $this->runWithSessionEviction(true, true, function () use ($user): void {
+            $this->assertSame(self::RESET_SUCCESS_ACTION, $this->getSut()->updatePassword());
+            $this->assertSame($user->getId(), $this->nextRequestUserId());
+        });
     }
 
     #[Test]
-    public function featureOnWithLoggedInUserSetsLoginToken(): void
+    public function resetSetsNoTokenWhenTheFeatureIsDisabled(): void
     {
-        $user = $this->createMock(EshopUser::class);
-        $user->expects($this->once())->method('setSessionLoginToken');
+        $user = $this->createUserWithUpdateId();
+        $this->startSession();
+        $this->sendResetForm($user);
 
-        $subject = $this->getSut(true, $user);
-        $subject->updatePassword();
+        $this->runWithSessionEviction(false, false, function (): void {
+            $this->assertSame(self::RESET_SUCCESS_ACTION, $this->getSut()->updatePassword());
+        });
+
+        $this->assertNull($this->session()->get('login-token'));
     }
 
     #[Test]
-    public function featureOnWithNoLoggedInUserDoesNothing(): void
+    public function failedResetSetsNoToken(): void
     {
-        $subject = $this->getSut(true, false);
+        $user = $this->createUserWithUpdateId();
+        $this->startSession();
+        $this->sendResetForm($user, 'Aa1!' . uniqid());
 
-        $this->assertNull($subject->updatePassword());
+        $this->runWithSessionEviction(true, true, function (): void {
+            $this->assertNotSame(self::RESET_SUCCESS_ACTION, $this->getSut()->updatePassword());
+        });
+
+        $this->assertNull($this->session()->get('login-token'));
+        $this->assertNull($this->session()->get('usr'));
     }
 
-    private function getSut(bool $enabled, EshopUser|false $user): ModuleForgotPasswordController
+    private function sendResetForm(UserModel $user, ?string $confirmation = null): void
     {
-        $services = [
-            ModuleSettingsServiceInterface::class => $this->createConfiguredStub(
-                ModuleSettingsServiceInterface::class,
-                ['isEnabled' => $enabled]
-            ),
-        ];
+        $password = 'Aa1!' . uniqid();
 
-        /** @var ModuleForgotPasswordController $sut */
-        $sut = $this->getMockBuilder(ModuleForgotPasswordController::class)
-            ->onlyMethods(['getService', 'getUser'])
-            ->getMock();
-        $sut->method('getService')->with($this->anything())->willReturnCallback(
-            fn(string $id) => $services[$id] ?? ContainerFacade::get($id)
-        );
-        $sut->method('getUser')->willReturn($user);
+        $this->sendRequest([
+            'uid' => $user->getUpdateId(),
+            'password_new' => $password,
+            'password_new_confirm' => $confirmation ?? $password,
+        ]);
+    }
 
-        return $sut;
+    private function getSut(): ModuleForgotPasswordController
+    {
+        return oxNew(ModuleForgotPasswordController::class);
     }
 }

@@ -25,9 +25,9 @@ class SessionEvictionGuard implements SessionEvictionGuardInterface
         return (string)$this->session->get(self::CORE_LOGIN_TOKEN) !== '';
     }
 
-    public function hasUserId(string $userIdParameter): bool
+    public function getUserId(string $userIdParameter): string
     {
-        return (string)$this->session->get($userIdParameter) !== '';
+        return (string)$this->session->get($userIdParameter);
     }
 
     public function forgetUserId(string $userIdParameter): void

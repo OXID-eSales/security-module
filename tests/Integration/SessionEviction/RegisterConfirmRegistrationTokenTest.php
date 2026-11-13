@@ -9,61 +9,73 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Tests\Integration\SessionEviction;
 
-use OxidEsales\Eshop\Application\Model\User as EshopUser;
-use OxidEsales\EshopCommunity\Core\Di\ContainerFacade;
-use OxidEsales\SecurityModule\SessionEviction\Service\ModuleSettingsServiceInterface;
 use OxidEsales\SecurityModule\Shared\Controller\RegisterController as ModuleRegisterController;
 use OxidEsales\SecurityModule\Tests\Integration\IntegrationTestCase;
 use PHPUnit\Framework\Attributes\Test;
 
 final class RegisterConfirmRegistrationTokenTest extends IntegrationTestCase
 {
-    #[Test]
-    public function featureOffDoesNotSetLoginToken(): void
-    {
-        $user = $this->createMock(EshopUser::class);
-        $user->expects($this->never())->method('setSessionLoginToken');
+    use SessionEvictionTestTrait;
 
-        $subject = $this->getSut(false, $user);
-        $subject->confirmRegistration();
+    private const CONFIRM_SUCCESS_ACTION = 'register?confirmstate=1';
+
+    #[Test]
+    public function confirmedUserStaysLoggedInWithStrictMode(): void
+    {
+        $user = $this->createUserWithUpdateId();
+        $this->startSession();
+        $this->sendRequest(['uid' => $user->getUpdateId()]);
+
+        $this->runWithSessionEviction(true, true, function () use ($user): void {
+            $this->assertSame(self::CONFIRM_SUCCESS_ACTION, $this->getSut()->confirmRegistration());
+            $this->assertNotSame('', (string) $this->session()->get('login-token'));
+            $this->assertSame($user->getId(), $this->nextRequestUserId());
+        });
     }
 
     #[Test]
-    public function featureOnWithLoggedInUserSetsLoginToken(): void
+    public function confirmationReplacesTheTokenOfAnotherUserLoggedInInTheSameBrowser(): void
     {
-        $user = $this->createMock(EshopUser::class);
-        $user->expects($this->once())->method('setSessionLoginToken');
+        $user = $this->createUserWithUpdateId();
+        $this->startSession('testuser', uniqid('token-', true));
+        $this->sendRequest(['uid' => $user->getUpdateId()]);
 
-        $subject = $this->getSut(true, $user);
-        $subject->confirmRegistration();
+        $this->runWithSessionEviction(true, true, function () use ($user): void {
+            $this->assertSame(self::CONFIRM_SUCCESS_ACTION, $this->getSut()->confirmRegistration());
+            $this->assertSame($user->getId(), $this->nextRequestUserId());
+        });
     }
 
     #[Test]
-    public function featureOnWithNoLoggedInUserDoesNothing(): void
+    public function confirmationSetsNoTokenWhenTheFeatureIsDisabled(): void
     {
-        $subject = $this->getSut(true, false);
+        $user = $this->createUserWithUpdateId();
+        $this->startSession();
+        $this->sendRequest(['uid' => $user->getUpdateId()]);
 
-        $this->assertSame('account', $subject->confirmRegistration());
+        $this->runWithSessionEviction(false, false, function (): void {
+            $this->assertSame(self::CONFIRM_SUCCESS_ACTION, $this->getSut()->confirmRegistration());
+        });
+
+        $this->assertNull($this->session()->get('login-token'));
     }
 
-    private function getSut(bool $enabled, EshopUser|false $user): ModuleRegisterController
+    #[Test]
+    public function failedConfirmationSetsNoToken(): void
     {
-        $services = [
-            ModuleSettingsServiceInterface::class => $this->createConfiguredStub(
-                ModuleSettingsServiceInterface::class,
-                ['isEnabled' => $enabled]
-            ),
-        ];
+        $this->startSession();
+        $this->sendRequest(['uid' => uniqid()]);
 
-        /** @var ModuleRegisterController $sut */
-        $sut = $this->getMockBuilder(ModuleRegisterController::class)
-            ->onlyMethods(['getService', 'getUser'])
-            ->getMock();
-        $sut->method('getService')->with($this->anything())->willReturnCallback(
-            fn(string $id) => $services[$id] ?? ContainerFacade::get($id)
-        );
-        $sut->method('getUser')->willReturn($user);
+        $this->runWithSessionEviction(true, true, function (): void {
+            $this->assertNotSame(self::CONFIRM_SUCCESS_ACTION, $this->getSut()->confirmRegistration());
+        });
 
-        return $sut;
+        $this->assertNull($this->session()->get('login-token'));
+        $this->assertNull($this->session()->get('usr'));
+    }
+
+    private function getSut(): ModuleRegisterController
+    {
+        return oxNew(ModuleRegisterController::class);
     }
 }

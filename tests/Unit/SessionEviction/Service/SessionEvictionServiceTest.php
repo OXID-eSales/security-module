@@ -13,6 +13,7 @@ use OxidEsales\Eshop\Application\Model\User;
 use OxidEsales\SecurityModule\SessionEviction\Service\ModuleSettingsServiceInterface;
 use OxidEsales\SecurityModule\SessionEviction\Service\SessionEvictionGuardInterface;
 use OxidEsales\SecurityModule\SessionEviction\Service\SessionEvictionService;
+use OxidEsales\SecurityModule\Shared\Infrastructure\Factory\UserModelFactoryInterface;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
@@ -42,7 +43,7 @@ final class SessionEvictionServiceTest extends TestCase
     public function evictUnverifiableSessionForgetsTokenlessStorefrontSessionUser(): void
     {
         $guard = $this->createMock(SessionEvictionGuardInterface::class);
-        $guard->method('hasUserId')->willReturn(true);
+        $guard->method('getUserId')->willReturn(uniqid('user-', true));
         $guard->method('hasLoginToken')->willReturn(false);
         $guard->expects($this->once())->method('forgetUserId')->with('usr');
 
@@ -54,7 +55,7 @@ final class SessionEvictionServiceTest extends TestCase
     public function evictUnverifiableSessionUsesAdminParameterWhenForced(): void
     {
         $guard = $this->createMock(SessionEvictionGuardInterface::class);
-        $guard->method('hasUserId')->willReturn(true);
+        $guard->method('getUserId')->willReturn(uniqid('user-', true));
         $guard->method('hasLoginToken')->willReturn(false);
         $guard->expects($this->once())->method('forgetUserId')->with('auth');
 
@@ -66,7 +67,7 @@ final class SessionEvictionServiceTest extends TestCase
     public function evictUnverifiableSessionKeepsSessionThatCarriesAToken(): void
     {
         $guard = $this->createMock(SessionEvictionGuardInterface::class);
-        $guard->method('hasUserId')->willReturn(true);
+        $guard->method('getUserId')->willReturn(uniqid('user-', true));
         $guard->method('hasLoginToken')->willReturn(true);
         $guard->expects($this->never())->method('forgetUserId');
 
@@ -78,7 +79,7 @@ final class SessionEvictionServiceTest extends TestCase
     public function evictUnverifiableSessionDoesNothingWhenNoSessionUserIsPresent(): void
     {
         $guard = $this->createMock(SessionEvictionGuardInterface::class);
-        $guard->method('hasUserId')->willReturn(false);
+        $guard->method('getUserId')->willReturn('');
         $guard->expects($this->never())->method('forgetUserId');
 
         $this->getSut(settings: $this->settingsStub(enabled: true, strict: true), guard: $guard)
@@ -89,7 +90,7 @@ final class SessionEvictionServiceTest extends TestCase
     public function evictUnverifiableSessionUsesAdminParameterForAnAdminUser(): void
     {
         $guard = $this->createMock(SessionEvictionGuardInterface::class);
-        $guard->method('hasUserId')->willReturn(true);
+        $guard->method('getUserId')->willReturn(uniqid('user-', true));
         $guard->method('hasLoginToken')->willReturn(false);
         $guard->expects($this->once())->method('forgetUserId')->with('auth');
 
@@ -137,14 +138,73 @@ final class SessionEvictionServiceTest extends TestCase
             ->bindLoginTokenToSession($user, true);
     }
 
+    #[Test]
+    public function bindLoginTokenToSessionUserDoesNothingWhenDisabled(): void
+    {
+        $factory = $this->createMock(UserModelFactoryInterface::class);
+        $factory->expects($this->never())->method('create');
+
+        $this->getSut(
+            settings: $this->settingsStub(enabled: false),
+            guard: $this->guardStub(userId: uniqid('user-', true)),
+            userModelFactory: $factory,
+        )->bindLoginTokenToSessionUser();
+    }
+
+    #[Test]
+    public function bindLoginTokenToSessionUserDoesNothingWithoutSessionUser(): void
+    {
+        $factory = $this->createMock(UserModelFactoryInterface::class);
+        $factory->expects($this->never())->method('create');
+
+        $this->getSut(guard: $this->guardStub(userId: ''), userModelFactory: $factory)
+            ->bindLoginTokenToSessionUser();
+    }
+
+    #[Test]
+    public function bindLoginTokenToSessionUserSetsTokenForTheStorefrontSessionUser(): void
+    {
+        $userId = uniqid('user-', true);
+
+        $guard = $this->createMock(SessionEvictionGuardInterface::class);
+        $guard->expects($this->once())->method('getUserId')->with('usr')->willReturn($userId);
+
+        $user = $this->createMock(User::class);
+        $user->expects($this->once())->method('load')->with($userId)->willReturn(true);
+        $user->expects($this->once())->method('setSessionLoginToken');
+
+        $this->getSut(guard: $guard, userModelFactory: $this->factoryStub($user))
+            ->bindLoginTokenToSessionUser();
+    }
+
+    #[Test]
+    public function bindLoginTokenToSessionUserSetsNoTokenForAnUnknownUser(): void
+    {
+        $user = $this->createMock(User::class);
+        $user->method('load')->willReturn(false);
+        $user->expects($this->never())->method('setSessionLoginToken');
+
+        $this->getSut(
+            guard: $this->guardStub(userId: uniqid('user-', true)),
+            userModelFactory: $this->factoryStub($user),
+        )->bindLoginTokenToSessionUser();
+    }
+
     private function getSut(
         ?ModuleSettingsServiceInterface $settings = null,
         ?SessionEvictionGuardInterface $guard = null,
+        ?UserModelFactoryInterface $userModelFactory = null,
     ): SessionEvictionService {
         return new SessionEvictionService(
             $settings ?? $this->settingsStub(enabled: true),
             $guard ?? $this->createStub(SessionEvictionGuardInterface::class),
+            $userModelFactory ?? $this->createStub(UserModelFactoryInterface::class),
         );
+    }
+
+    private function factoryStub(User $user): UserModelFactoryInterface
+    {
+        return $this->createConfiguredStub(UserModelFactoryInterface::class, ['create' => $user]);
     }
 
     private function settingsStub(bool $enabled, bool $strict = false): ModuleSettingsServiceInterface
@@ -157,13 +217,13 @@ final class SessionEvictionServiceTest extends TestCase
 
     private function guardStub(
         bool $hasLoginToken = false,
-        bool $hasUserId = false,
+        string $userId = '',
     ): SessionEvictionGuardInterface {
         return $this->createConfiguredStub(
             SessionEvictionGuardInterface::class,
             [
                 'hasLoginToken' => $hasLoginToken,
-                'hasUserId' => $hasUserId,
+                'getUserId' => $userId,
             ]
         );
     }
