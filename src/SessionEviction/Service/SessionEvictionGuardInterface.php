@@ -16,6 +16,4 @@ interface SessionEvictionGuardInterface
     public function hasUserId(string $userIdParameter): bool;
 
     public function forgetUserId(string $userIdParameter): void;
-
-    public function isActingSessionUser(string $userId, string $userIdParameter): bool;
 }

@@ -91,38 +91,6 @@ final class SessionEvictionGuardTest extends TestCase
         $this->assertNotContains('login-token', $deleted);
     }
 
-    #[Test]
-    #[DataProvider('isActingSessionUserDataProvider')]
-    public function isActingSessionUserComparesSessionUserWithGivenId(
-        string $userId,
-        string $param,
-        mixed $sessionValue,
-        bool $expected
-    ): void {
-        $session = $this->createStub(SessionInterface::class);
-        $session->method('get')->willReturnMap([
-            [$param, $sessionValue],
-        ]);
-
-        $sut = $this->getSut(session: $session);
-
-        $this->assertSame($expected, $sut->isActingSessionUser($userId, $param));
-    }
-
-    public static function isActingSessionUserDataProvider(): array
-    {
-        $userId = uniqid('user-', true);
-        $otherUserId = uniqid('other-', true);
-        $adminId = uniqid('admin-', true);
-
-        return [
-            'session owns this user'        => [$userId, 'usr', $userId, true],
-            'session owns a different user' => [$userId, 'usr', $otherUserId, false],
-            'session has no user'           => [$userId, 'usr', null, false],
-            'admin session owns user'       => [$adminId, 'auth', $adminId, true],
-        ];
-    }
-
     private function getSut(
         ?SessionInterface $session = null,
     ): SessionEvictionGuardInterface {

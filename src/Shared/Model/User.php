@@ -48,6 +48,9 @@ class User extends User_parent
         }
     }
 
+    /**
+     * @SuppressWarnings("PHPMD.BooleanArgumentFlag")
+     */
     public function loadActiveUser($blForceAdmin = false)
     {
         $sessionEviction = $this->getService(SessionEvictionServiceInterface::class);
@@ -55,17 +58,6 @@ class User extends User_parent
         $sessionEviction->evictUnverifiableSession($this, (bool) $blForceAdmin);
         $result = parent::loadActiveUser($blForceAdmin);
         $sessionEviction->bindLoginTokenToSession($this, (bool) $result);
-
-        return $result;
-    }
-
-    public function save()
-    {
-        $sessionEviction = $this->getService(SessionEvictionServiceInterface::class);
-
-        $passwordHashBeforeSave = $sessionEviction->readCurrentPasswordHash($this);
-        $result = parent::save();
-        $sessionEviction->refreshTokenAfterPasswordChange($this, $passwordHashBeforeSave);
 
         return $result;
     }

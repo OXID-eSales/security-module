@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\SessionEviction\Service;
 
 use OxidEsales\Eshop\Application\Model\User;
-use OxidEsales\SecurityModule\SessionEviction\Infrastructure\Repository\StoredPasswordRepositoryInterface;
 
 class SessionEvictionService implements SessionEvictionServiceInterface
 {
@@ -20,7 +19,6 @@ class SessionEvictionService implements SessionEvictionServiceInterface
     public function __construct(
         private ModuleSettingsServiceInterface $settings,
         private SessionEvictionGuardInterface $guard,
-        private StoredPasswordRepositoryInterface $passwordRepository,
     ) {
     }
 
@@ -43,34 +41,6 @@ class SessionEvictionService implements SessionEvictionServiceInterface
         }
 
         if (!$this->guard->hasLoginToken()) {
-            $user->setSessionLoginToken();
-        }
-    }
-
-    public function readCurrentPasswordHash(User $user): string
-    {
-        if (!$this->settings->isEnabled()) {
-            return '';
-        }
-
-        $userId = (string) $user->getId();
-
-        return $userId !== '' ? $this->passwordRepository->getPasswordHash($userId) : '';
-    }
-
-    public function refreshTokenAfterPasswordChange(User $user, string $passwordHashBeforeSave): void
-    {
-        if (!$this->settings->isEnabled() || $passwordHashBeforeSave === '') {
-            return;
-        }
-
-        $passwordHashAfterSave = (string) $user->getFieldData('oxpassword');
-        if ($passwordHashAfterSave === '' || $passwordHashBeforeSave === $passwordHashAfterSave) {
-            return;
-        }
-
-        $userIdParameter = $this->userIdParameter($user, false);
-        if ($this->guard->isActingSessionUser((string) $user->getId(), $userIdParameter)) {
             $user->setSessionLoginToken();
         }
     }

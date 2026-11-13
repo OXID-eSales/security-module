@@ -7,9 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [5.0.0] - unreleased
 
 ### Added
-- Session Eviction: when enabled, changing a user's password logs the user out of their other
-  active sessions on the next request, for storefront customers and admin users. The session that
-  performs the change stays logged in
+- Session Eviction: when enabled, changing a user's password logs the user out of all their
+  sessions on the next request, including the session that performed the change, for storefront
+  customers and admin users
   - Module settings `oeSecuritySessionEvictionEnable` and `oeSecuritySessionEvictionStrict`
     ("hard exit"), both off by default
 - Strip session token (stoken) from GET form URLs (search, attribute filter) via new Form Security admin setting.

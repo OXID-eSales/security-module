@@ -34,9 +34,4 @@ class SessionEvictionGuard implements SessionEvictionGuardInterface
     {
         $this->session->remove($userIdParameter);
     }
-
-    public function isActingSessionUser(string $userId, string $userIdParameter): bool
-    {
-        return (string)$this->session->get($userIdParameter) === $userId;
-    }
 }

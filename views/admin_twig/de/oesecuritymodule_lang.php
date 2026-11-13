@@ -70,11 +70,11 @@ $aLang = [
         . 'Minimum: 1. Standard: 24.',
 
     'SHOP_MODULE_GROUP_session_eviction'                 => 'Session-Abmeldung',
-    'SHOP_MODULE_oeSecuritySessionEvictionEnable'        => 'Andere aktive Sitzungen abmelden, wenn ein Benutzer sein Passwort ändert',
-    'HELP_SHOP_MODULE_oeSecuritySessionEvictionEnable'   => 'Wenn aktiviert, meldet eine Passwortänderung den Benutzer bei seiner nächsten Anfrage aus seinen ' .
-        'anderen aktiven Sitzungen ab. Erfasst werden Angemeldet-bleiben-Autologin, das Zurücksetzen per ' .
+    'SHOP_MODULE_oeSecuritySessionEvictionEnable'        => 'Alle Sitzungen eines Benutzers abmelden, wenn sich sein Passwort ändert',
+    'HELP_SHOP_MODULE_oeSecuritySessionEvictionEnable'   => 'Wenn aktiviert, meldet eine Passwortänderung den Benutzer bei der nächsten Anfrage aus allen ' .
+        'seinen Sitzungen ab. Erfasst werden Angemeldet-bleiben-Autologin, das Zurücksetzen per ' .
         'Passwort-vergessen, die Registrierungsbestätigung und bereits bestehende Sitzungen, für ' .
-        'Storefront-Kunden und Admin-Benutzer. Die Sitzung, die die Änderung durchführt, bleibt angemeldet.',
+        'Storefront-Kunden und Admin-Benutzer, auch aus der Sitzung, die die Änderung durchführt.',
     'SHOP_MODULE_oeSecuritySessionEvictionStrict'        => 'Hard Exit: auch nicht verifizierbare Sitzungen abmelden',
     'HELP_SHOP_MODULE_oeSecuritySessionEvictionStrict'   => 'Nur wirksam, wenn die obige Einstellung aktiviert ist. Wenn aktiv, wird eine Sitzung mit ' .
         'angemeldetem Benutzer aber ohne verifizierbaren Anmeldestatus (zum Beispiel eine Sitzung, die vor ' .

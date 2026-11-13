@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Tests\Unit\SessionEviction\Service;
 
 use OxidEsales\Eshop\Application\Model\User;
-use OxidEsales\SecurityModule\SessionEviction\Infrastructure\Repository\StoredPasswordRepositoryInterface;
 use OxidEsales\SecurityModule\SessionEviction\Service\ModuleSettingsServiceInterface;
 use OxidEsales\SecurityModule\SessionEviction\Service\SessionEvictionGuardInterface;
 use OxidEsales\SecurityModule\SessionEviction\Service\SessionEvictionService;
@@ -138,134 +137,13 @@ final class SessionEvictionServiceTest extends TestCase
             ->bindLoginTokenToSession($user, true);
     }
 
-    #[Test]
-    public function readCurrentPasswordHashReturnsEmptyWhenDisabled(): void
-    {
-        $repository = $this->createMock(StoredPasswordRepositoryInterface::class);
-        $repository->expects($this->never())->method('getPasswordHash');
-
-        $this->assertSame(
-            '',
-            $this->getSut(settings: $this->settingsStub(enabled: false), repository: $repository)
-                ->readCurrentPasswordHash($this->userStub(id: 'user-1'))
-        );
-    }
-
-    #[Test]
-    public function readCurrentPasswordHashReturnsEmptyForUnsavedUser(): void
-    {
-        $repository = $this->createMock(StoredPasswordRepositoryInterface::class);
-        $repository->expects($this->never())->method('getPasswordHash');
-
-        $this->assertSame(
-            '',
-            $this->getSut(settings: $this->settingsStub(enabled: true), repository: $repository)
-                ->readCurrentPasswordHash($this->userStub(id: ''))
-        );
-    }
-
-    #[Test]
-    public function readCurrentPasswordHashReadsStoredHashFromRepository(): void
-    {
-        $storedHash = uniqid('hash-', true);
-        $repository = $this->createMock(StoredPasswordRepositoryInterface::class);
-        $repository->expects($this->once())->method('getPasswordHash')->with('user-1')->willReturn($storedHash);
-
-        $this->assertSame(
-            $storedHash,
-            $this->getSut(settings: $this->settingsStub(enabled: true), repository: $repository)
-                ->readCurrentPasswordHash($this->userStub(id: 'user-1'))
-        );
-    }
-
-    #[Test]
-    public function refreshTokenDoesNothingWhenDisabled(): void
-    {
-        $user = $this->createMock(User::class);
-        $user->expects($this->never())->method('setSessionLoginToken');
-
-        $this->getSut(settings: $this->settingsStub(enabled: false))
-            ->refreshTokenAfterPasswordChange($user, uniqid('hash-', true));
-    }
-
-    #[Test]
-    public function refreshTokenDoesNothingWithoutAPriorHash(): void
-    {
-        $guard = $this->createMock(SessionEvictionGuardInterface::class);
-        $guard->expects($this->never())->method('isActingSessionUser');
-        $user = $this->createMock(User::class);
-        $user->expects($this->never())->method('setSessionLoginToken');
-
-        $this->getSut(settings: $this->settingsStub(enabled: true), guard: $guard)
-            ->refreshTokenAfterPasswordChange($user, '');
-    }
-
-    #[Test]
-    public function refreshTokenDoesNothingWhenPasswordUnchanged(): void
-    {
-        $hash = uniqid('hash-', true);
-        $guard = $this->createMock(SessionEvictionGuardInterface::class);
-        $guard->expects($this->never())->method('isActingSessionUser');
-        $user = $this->createMock(User::class);
-        $user->method('getFieldData')->willReturn($hash);
-        $user->expects($this->never())->method('setSessionLoginToken');
-
-        $this->getSut(settings: $this->settingsStub(enabled: true), guard: $guard)
-            ->refreshTokenAfterPasswordChange($user, $hash);
-    }
-
-    #[Test]
-    public function refreshTokenDoesNothingWhenTheNewHashIsEmpty(): void
-    {
-        $guard = $this->createMock(SessionEvictionGuardInterface::class);
-        $guard->expects($this->never())->method('isActingSessionUser');
-        $user = $this->createMock(User::class);
-        $user->method('getFieldData')->willReturn('');
-        $user->expects($this->never())->method('setSessionLoginToken');
-
-        $this->getSut(settings: $this->settingsStub(enabled: true), guard: $guard)
-            ->refreshTokenAfterPasswordChange($user, uniqid('old-', true));
-    }
-
-    #[Test]
-    public function refreshTokenRefreshesTokenWhenPasswordChangedForActingSession(): void
-    {
-        $user = $this->createMock(User::class);
-        $user->method('getFieldData')->willReturn(uniqid('new-', true));
-        $user->method('getId')->willReturn('user-1');
-        $user->method('isAdmin')->willReturn(false);
-        $user->expects($this->once())->method('setSessionLoginToken');
-
-        $this->getSut(
-            settings: $this->settingsStub(enabled: true),
-            guard: $this->guardStub(isActingSessionUser: true),
-        )->refreshTokenAfterPasswordChange($user, uniqid('old-', true));
-    }
-
-    #[Test]
-    public function refreshTokenDoesNotRefreshWhenAnotherSessionOwnsTheUser(): void
-    {
-        $user = $this->createMock(User::class);
-        $user->method('getFieldData')->willReturn(uniqid('new-', true));
-        $user->method('getId')->willReturn('user-1');
-        $user->method('isAdmin')->willReturn(false);
-        $user->expects($this->never())->method('setSessionLoginToken');
-
-        $this->getSut(
-            settings: $this->settingsStub(enabled: true),
-            guard: $this->guardStub(isActingSessionUser: false),
-        )->refreshTokenAfterPasswordChange($user, uniqid('old-', true));
-    }
-
     private function getSut(
         ?ModuleSettingsServiceInterface $settings = null,
         ?SessionEvictionGuardInterface $guard = null,
-        ?StoredPasswordRepositoryInterface $repository = null,
     ): SessionEvictionService {
         return new SessionEvictionService(
             $settings ?? $this->settingsStub(enabled: true),
             $guard ?? $this->createStub(SessionEvictionGuardInterface::class),
-            $repository ?? $this->createStub(StoredPasswordRepositoryInterface::class),
         );
     }
 
@@ -280,23 +158,21 @@ final class SessionEvictionServiceTest extends TestCase
     private function guardStub(
         bool $hasLoginToken = false,
         bool $hasUserId = false,
-        bool $isActingSessionUser = false,
     ): SessionEvictionGuardInterface {
         return $this->createConfiguredStub(
             SessionEvictionGuardInterface::class,
             [
                 'hasLoginToken' => $hasLoginToken,
                 'hasUserId' => $hasUserId,
-                'isActingSessionUser' => $isActingSessionUser,
             ]
         );
     }
 
-    private function userStub(bool $isAdmin = false, string $id = ''): User
+    private function userStub(bool $isAdmin = false): User
     {
         return $this->createConfiguredStub(
             User::class,
-            ['isAdmin' => $isAdmin, 'getId' => $id]
+            ['isAdmin' => $isAdmin]
         );
     }
 }

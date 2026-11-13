@@ -18,8 +18,8 @@ use OxidEsales\SecurityModule\Tests\Codeception\Support\AcceptanceTester;
 /**
  * Feature on: the admin backend uses the 'auth' session variable and a login-token
  * bound to the admin password hash (FR009). An admin backend session whose token is
- * for the old password is evicted on its next request, while the acting admin session
- * that performs the change stays logged in and usable (FR007).
+ * for the old password is evicted on its next request, including the admin session
+ * that performs the change itself.
  *
  * @group oe_security_module
  * @group oe_security_module_session_eviction
@@ -34,7 +34,6 @@ class AdminSessionEvictionCest extends BaseCest
     private const ADMIN_PASSWORD_SALT = '6631386565336161636139613634663766383538633566623662613036636539';
 
     private string $loginUserFieldId = '#usr';
-    private string $loginPasswordFieldId = '#pwd';
 
     public function _before(AcceptanceTester $I): void
     {
@@ -82,28 +81,20 @@ class AdminSessionEvictionCest extends BaseCest
         (new AdminLoginPage($I))->seeLoginForm();
     }
 
-    public function testActingAdminSessionPreservedAfterOwnPasswordChange(AcceptanceTester $I): void
+    public function testActingAdminSessionEvictedAfterOwnPasswordChange(AcceptanceTester $I): void
     {
-        $I->wantToTest('the admin changing its own password through the backend stays logged in');
+        $I->wantToTest('the admin changing its own password through the backend is logged out on the next request');
 
         $adminPanel = $this->loginToAdminBackend($I);
 
-        // Change this admin's own password through the real backend Users UI; the save goes
-        // through the gated User::save() override which refreshes the acting session token.
         $adminPanel
             ->openUsers()
             ->findByUserName(self::ADMIN_LOGIN)
             ->updatePassword('NewAdminPass123!');
 
-        // The next backend request must keep the acting admin logged in (not bounced to login)
-        // and the backend must stay usable.
         $I->reloadPage();
-        $I->waitForDocumentReadyState();
-        $I->dontSeeElement($this->loginUserFieldId);
-        $I->dontSeeElement($this->loginPasswordFieldId);
-
-        $adminPanel->openHomePage();
-        $I->see(Translator::translate('HOME_DESC'));
+        $I->waitForElement($this->loginUserFieldId);
+        (new AdminLoginPage($I))->seeLoginForm();
     }
 
     private function loginToAdminBackend(AcceptanceTester $I): AdminPanel

@@ -14,6 +14,3 @@ services:
   OxidEsales\SecurityModule\SessionEviction\Service\SessionEvictionServiceInterface:
     class: OxidEsales\SecurityModule\SessionEviction\Service\SessionEvictionService
     public: true
-
-  OxidEsales\SecurityModule\SessionEviction\Infrastructure\Repository\StoredPasswordRepositoryInterface:
-    class: OxidEsales\SecurityModule\SessionEviction\Infrastructure\Repository\StoredPasswordRepository

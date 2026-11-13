@@ -16,8 +16,4 @@ interface SessionEvictionServiceInterface
     public function evictUnverifiableSession(User $user, bool $forceAdmin): void;
 
     public function bindLoginTokenToSession(User $user, bool $userLoaded): void;
-
-    public function readCurrentPasswordHash(User $user): string;
-
-    public function refreshTokenAfterPasswordChange(User $user, string $passwordHashBeforeSave): void;
 }
