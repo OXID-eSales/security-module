@@ -69,9 +69,11 @@ $aLang = [
     'SHOP_MODULE_GROUP_session_eviction'                 => 'Session Eviction',
     'SHOP_MODULE_oeSecuritySessionEvictionEnable'        => 'Log out all sessions of a user when their password changes',
     'HELP_SHOP_MODULE_oeSecuritySessionEvictionEnable'   => 'When enabled, a password change logs the user out of all their sessions on the next ' .
-        'request. It covers remember-me auto-login, the forgot-password reset, registration confirmation, ' .
-        'and pre-existing sessions, for storefront customers and admin users, including the session that ' .
-        'performs the change.',
+        'request, for storefront customers and admin users, including the session that performs the change. ' .
+        'It covers standard login, remember-me auto-login, the forgot-password reset and registration ' .
+        'confirmation. A session that already existed when this setting was enabled is only covered after ' .
+        'its next request; if it stays idle until the password change, it remains logged in. For full ' .
+        'protection, also enable the hard exit below.',
     'SHOP_MODULE_oeSecuritySessionEvictionStrict'        => 'Hard exit: also evict sessions that cannot be verified',
     'HELP_SHOP_MODULE_oeSecuritySessionEvictionStrict'   => 'Only takes effect when the setting above is enabled. When on, a session that has a logged-in ' .
         'user but no verifiable login state (for example a session that existed before the feature was ' .
