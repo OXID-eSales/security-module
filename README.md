@@ -115,6 +115,30 @@ the module falls back to the built-in translated plain-text mail.
 > the mail template into CMS content manually — e.g. for additional languages or for EE subshops
 > other than shop 1.
 
+### Session Eviction
+
+When a customer or admin user changes their password, the module logs the user out of all their sessions on the
+next request, including the session that performed the change. This lets a user end a session someone else has
+taken over, just by changing the password. Besides the standard login, it covers sessions opened by remember-me
+auto-login, the forgot-password reset and the registration confirmation, which the shop alone does not check
+against the password.
+
+#### Configuration
+
+- Enable/Disable session eviction (off by default)
+- Hard exit / strict mode (off by default, only together with the setting above)
+
+#### Limits
+
+- Without strict mode, a session that already existed when the feature was enabled is only covered after its
+  next request. If it stays idle until the password change, it remains logged in.
+- Strict mode ends every logged-in session that cannot be verified against the password completely: the user is
+  logged out, the basket, all other session data and the remember-me cookie are removed and a new session is
+  started.
+- **ERP and OSC sessions that log in as a customer cannot be verified either, so strict mode ends them too.** Do
+  not enable strict mode if you use ERP or OSC to log in as a customer.
+- OXAPI (GraphQL) tokens are not affected by this feature.
+
 ### Running the tests and quality tools
 
 Check the "scripts" section in the `composer.json` file for the available commands. Those commands can be executed
