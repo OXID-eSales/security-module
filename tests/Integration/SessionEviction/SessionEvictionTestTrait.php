@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Tests\Integration\SessionEviction;
 
+use OxidEsales\Eshop\Application\Model\Article;
 use OxidEsales\Eshop\Application\Model\User as UserModel;
 use OxidEsales\Eshop\Core\Registry;
 use OxidEsales\Eshop\Core\Request;
@@ -46,16 +47,48 @@ trait SessionEvictionTestTrait
         }
     }
 
-    private function createUserWithUpdateId(): UserModel
+    private function createUser(): UserModel
     {
         $user = oxNew(UserModel::class);
-        $user->setId(uniqid());
-        $user->assign(['oxusername' => uniqid() . '@example.test', 'oxshopid' => 1, 'oxactive' => 1]);
+        $user->setId(uniqid('userId'));
+        $user->assign([
+            'oxusername' => uniqid('userName') . '@example.test',
+            'oxshopid' => Registry::getConfig()->getShopId(),
+            'oxactive' => 1,
+        ]);
         $user->save();
         $user->load($user->getId());
+
+        return $user;
+    }
+
+    private function createUserWithUpdateId(): UserModel
+    {
+        $user = $this->createUser();
         $user->getUpdateId();
 
         return $user;
+    }
+
+    private function createArticle(): string
+    {
+        $article = oxNew(Article::class);
+        $article->setId(uniqid('articleId'));
+        $article->assign([
+            'oxshopid' => Registry::getConfig()->getShopId(),
+            'oxactive' => 1,
+            'oxtitle' => uniqid('articleTitle'),
+            'oxprice' => rand(1, 100),
+            'oxstock' => rand(5, 50),
+            'oxstockflag' => 1,
+            'oxparentid' => '',
+            'oxvarstock' => 0,
+            'oxvarcount' => 0,
+        ]);
+        $article->save();
+        $article->load($article->getId());
+
+        return $article->getId();
     }
 
     private function sendRequest(array $parameters): void

@@ -15,5 +15,5 @@ interface SessionEvictionGuardInterface
 
     public function getUserId(string $userIdParameter): string;
 
-    public function forgetUserId(string $userIdParameter): void;
+    public function destroySession(): void;
 }

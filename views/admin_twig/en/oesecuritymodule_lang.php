@@ -75,6 +75,9 @@ $aLang = [
     'SHOP_MODULE_oeSecuritySessionEvictionStrict'        => 'Hard exit: also evict sessions that cannot be verified',
     'HELP_SHOP_MODULE_oeSecuritySessionEvictionStrict'   => 'Only takes effect when the setting above is enabled. When on, a session that has a logged-in ' .
         'user but no verifiable login state (for example a session that existed before the feature was ' .
-        'enabled, or a session from third-party single sign-on) is logged out on its next request. This ' .
-        'causes a one-time forced re-login for such sessions. Off by default.',
+        'enabled) is ended completely on its next request: the user is logged out, the basket and all ' .
+        'other session data are deleted, the "Keep me logged in" cookie is removed and a new session is ' .
+        'started. Warning: ERP and OSC sessions that log in as a customer have no verifiable login state ' .
+        'either and are ended as well. Do not enable this setting if you use ERP or OSC to log in as a ' .
+        'customer. Off by default.',
 ];

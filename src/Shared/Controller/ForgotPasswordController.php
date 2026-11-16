@@ -10,7 +10,8 @@ declare(strict_types=1);
 namespace OxidEsales\SecurityModule\Shared\Controller;
 
 use OxidEsales\Eshop\Core\Exception\StandardException;
-use OxidEsales\Eshop\Core\Registry;
+use OxidEsales\Eshop\Core\Request;
+use OxidEsales\Eshop\Core\UtilsView;
 use OxidEsales\SecurityModule\Captcha\Service\CaptchaServiceInterface;
 use OxidEsales\SecurityModule\Captcha\Service\ModuleSettingsServiceInterface;
 use OxidEsales\SecurityModule\EmailVerification\Facade\UserEmailVerificationFacadeInterface;
@@ -36,10 +37,10 @@ class ForgotPasswordController extends ForgotPasswordController_parent
 
         try {
             $captchaService->validate(
-                Registry::getRequest()
+                $this->getService(Request::class)
             );
         } catch (StandardException $e) {
-            Registry::getUtilsView()->addErrorToDisplay($e->getMessage());
+            $this->getService(UtilsView::class)->addErrorToDisplay($e->getMessage());
             return false;
         }
 

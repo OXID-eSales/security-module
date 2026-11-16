@@ -38,7 +38,7 @@ final class ForgotPasswordUpdatePasswordTokenTest extends IntegrationTestCase
     public function resetReplacesTheTokenOfAnotherUserLoggedInInTheSameBrowser(): void
     {
         $user = $this->createUserWithUpdateId();
-        $this->startSession('testuser', uniqid('token-', true));
+        $this->startSession(uniqid('otherUserId'), uniqid('loginToken'));
         $this->sendResetForm($user);
 
         $this->runWithSessionEviction(true, true, function () use ($user): void {
@@ -66,7 +66,7 @@ final class ForgotPasswordUpdatePasswordTokenTest extends IntegrationTestCase
     {
         $user = $this->createUserWithUpdateId();
         $this->startSession();
-        $this->sendResetForm($user, 'Aa1!' . uniqid());
+        $this->sendResetForm($user, 'Aa1!' . uniqid('password'));
 
         $this->runWithSessionEviction(true, true, function (): void {
             $this->assertNotSame(self::RESET_SUCCESS_ACTION, $this->getSut()->updatePassword());
@@ -78,7 +78,7 @@ final class ForgotPasswordUpdatePasswordTokenTest extends IntegrationTestCase
 
     private function sendResetForm(UserModel $user, ?string $confirmation = null): void
     {
-        $password = 'Aa1!' . uniqid();
+        $password = 'Aa1!' . uniqid('password');
 
         $this->sendRequest([
             'uid' => $user->getUpdateId(),

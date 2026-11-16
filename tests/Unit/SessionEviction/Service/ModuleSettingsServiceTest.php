@@ -23,12 +23,12 @@ final class ModuleSettingsServiceTest extends TestCase
     #[DataProvider('gettersDataProvider')]
     public function returnsConfiguredBooleanModuleSetting(string $method, string $key, bool $settingValue): void
     {
-        $settingService = $this->createMock(ModuleSettingServiceInterface::class);
-        $settingService->method('getBoolean')
+        $moduleSettingServiceMock = $this->createMock(ModuleSettingServiceInterface::class);
+        $moduleSettingServiceMock->method('getBoolean')
             ->with($key, Module::MODULE_ID)
             ->willReturn($settingValue);
 
-        $sut = $this->getSut(moduleSettingService: $settingService);
+        $sut = $this->getSut(moduleSettingService: $moduleSettingServiceMock);
 
         $this->assertSame($settingValue, $sut->$method());
     }
@@ -60,7 +60,7 @@ final class ModuleSettingsServiceTest extends TestCase
     }
 
     private function getSut(
-        ModuleSettingServiceInterface $moduleSettingService = null,
+        ?ModuleSettingServiceInterface $moduleSettingService = null,
     ): ModuleSettingsServiceInterface {
         return new ModuleSettingsService(
             moduleSettingService: $moduleSettingService

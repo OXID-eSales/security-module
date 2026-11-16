@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   customers and admin users
   - Module settings `oeSecuritySessionEvictionEnable` and `oeSecuritySessionEvictionStrict`
     ("hard exit"), both off by default
+  - Strict mode ends a session without a verifiable login state completely: the user is logged out,
+    the basket, all other session data and the remember-me cookie are removed and a new session is
+    started. ERP and OSC sessions that log in as a customer are ended as well
 - Strip session token (stoken) from GET form URLs (search, attribute filter) via new Form Security admin setting.
   The session id (sid) is still emitted when the shop needs it (e.g. cookieless sessions), so the session/basket is not
   lost on submit.

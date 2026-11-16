@@ -20,26 +20,28 @@ final class UserLoadActiveUserTest extends IntegrationTestCase
     #[Test]
     public function loadActiveUserDelegatesToSessionEvictionServiceAroundParent(): void
     {
-        $service = $this->createMock(SessionEvictionServiceInterface::class);
-        $service->expects($this->once())
+        $sessionEvictionServiceSpy = $this->createMock(SessionEvictionServiceInterface::class);
+        $sessionEvictionServiceSpy->expects($this->once())
             ->method('evictUnverifiableSession')
             ->with($this->isInstanceOf(SecurityModuleUser::class), false);
-        $service->expects($this->once())
+        $sessionEvictionServiceSpy->expects($this->once())
             ->method('bindLoginTokenToSession')
             ->with($this->isInstanceOf(SecurityModuleUser::class), $this->isBool());
 
-        $this->getSut([SessionEvictionServiceInterface::class => $service])->loadActiveUser();
+        $sut = $this->getSut(serviceOverrides: [SessionEvictionServiceInterface::class => $sessionEvictionServiceSpy]);
+        $sut->loadActiveUser();
     }
 
     #[Test]
     public function loadActiveUserForwardsTheForceAdminFlag(): void
     {
-        $service = $this->createMock(SessionEvictionServiceInterface::class);
-        $service->expects($this->once())
+        $sessionEvictionServiceSpy = $this->createMock(SessionEvictionServiceInterface::class);
+        $sessionEvictionServiceSpy->expects($this->once())
             ->method('evictUnverifiableSession')
             ->with($this->isInstanceOf(SecurityModuleUser::class), true);
 
-        $this->getSut([SessionEvictionServiceInterface::class => $service])->loadActiveUser(true);
+        $sut = $this->getSut(serviceOverrides: [SessionEvictionServiceInterface::class => $sessionEvictionServiceSpy]);
+        $sut->loadActiveUser(true);
     }
 
     private function getSut(array $serviceOverrides = []): SecurityModuleUser

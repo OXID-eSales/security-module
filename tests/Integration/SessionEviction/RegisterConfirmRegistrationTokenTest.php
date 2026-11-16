@@ -37,7 +37,7 @@ final class RegisterConfirmRegistrationTokenTest extends IntegrationTestCase
     public function confirmationReplacesTheTokenOfAnotherUserLoggedInInTheSameBrowser(): void
     {
         $user = $this->createUserWithUpdateId();
-        $this->startSession('testuser', uniqid('token-', true));
+        $this->startSession(uniqid('otherUserId'), uniqid('loginToken'));
         $this->sendRequest(['uid' => $user->getUpdateId()]);
 
         $this->runWithSessionEviction(true, true, function () use ($user): void {
@@ -64,7 +64,7 @@ final class RegisterConfirmRegistrationTokenTest extends IntegrationTestCase
     public function failedConfirmationSetsNoToken(): void
     {
         $this->startSession();
-        $this->sendRequest(['uid' => uniqid()]);
+        $this->sendRequest(['uid' => uniqid('updateId')]);
 
         $this->runWithSessionEviction(true, true, function (): void {
             $this->assertNotSame(self::CONFIRM_SUCCESS_ACTION, $this->getSut()->confirmRegistration());

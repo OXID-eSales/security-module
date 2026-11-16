@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\Tests\Unit\SessionEviction\Service;
 
+use OxidEsales\Eshop\Core\Session;
 use OxidEsales\EshopCommunity\Internal\Framework\Session\SessionInterface;
 use OxidEsales\SecurityModule\SessionEviction\Service\SessionEvictionGuard;
 use OxidEsales\SecurityModule\SessionEviction\Service\SessionEvictionGuardInterface;
@@ -22,18 +23,20 @@ final class SessionEvictionGuardTest extends TestCase
     #[DataProvider('hasLoginTokenDataProvider')]
     public function hasLoginTokenReflectsTokenPresence(mixed $sessionValue, bool $expected): void
     {
-        $session = $this->createStub(SessionInterface::class);
-        $session->method('get')->willReturnMap([
+        $sessionStub = $this->createStub(SessionInterface::class);
+        $sessionStub->method('get')->willReturnMap([
             ['login-token', $sessionValue],
         ]);
 
-        $this->assertSame($expected, $this->getSut(session: $session)->hasLoginToken());
+        $sut = $this->getSut(session: $sessionStub);
+
+        $this->assertSame($expected, $sut->hasLoginToken());
     }
 
     public static function hasLoginTokenDataProvider(): array
     {
         return [
-            'non-empty token present' => [uniqid('token-', true), true],
+            'non-empty token present' => [uniqid('loginToken'), true],
             'empty string token'      => ['', false],
             'null (unset)'            => [null, false],
         ];
@@ -43,18 +46,20 @@ final class SessionEvictionGuardTest extends TestCase
     #[DataProvider('getUserIdDataProvider')]
     public function getUserIdReturnsTheSessionUserIdAsString(string $param, mixed $sessionValue, string $expected): void
     {
-        $session = $this->createStub(SessionInterface::class);
-        $session->method('get')->willReturnMap([
+        $sessionStub = $this->createStub(SessionInterface::class);
+        $sessionStub->method('get')->willReturnMap([
             [$param, $sessionValue],
         ]);
 
-        $this->assertSame($expected, $this->getSut(session: $session)->getUserId($param));
+        $sut = $this->getSut(session: $sessionStub);
+
+        $this->assertSame($expected, $sut->getUserId($param));
     }
 
     public static function getUserIdDataProvider(): array
     {
-        $userId = uniqid('user-', true);
-        $adminId = uniqid('admin-', true);
+        $userId = uniqid('userId');
+        $adminId = uniqid('adminId');
 
         return [
             'storefront usr set'   => ['usr', $userId, $userId],
@@ -66,39 +71,32 @@ final class SessionEvictionGuardTest extends TestCase
     }
 
     #[Test]
-    public function forgetUserIdDeletesOnlyTheGivenUserIdVariable(): void
+    public function destroySessionDropsTheBasketBeforeStartingANewSession(): void
     {
-        $session = $this->createMock(SessionInterface::class);
-        $session->expects($this->once())
-            ->method('remove')
-            ->with('usr');
-
-        $this->getSut(session: $session)->forgetUserId('usr');
-    }
-
-    #[Test]
-    public function forgetUserIdNeverTouchesTokenOrOtherVariables(): void
-    {
-        $deleted = [];
-        $session = $this->createMock(SessionInterface::class);
-        $session->expects($this->once())
-            ->method('remove')
-            ->willReturnCallback(function (string $name) use (&$deleted): mixed {
-                $deleted[] = $name;
-                return null;
+        $calls = [];
+        $shopSessionSpy = $this->createMock(Session::class);
+        $shopSessionSpy->expects($this->once())->method('delBasket')
+            ->willReturnCallback(function () use (&$calls): void {
+                $calls[] = 'delBasket';
+            });
+        $shopSessionSpy->expects($this->once())->method('initNewSession')
+            ->willReturnCallback(function () use (&$calls): void {
+                $calls[] = 'initNewSession';
             });
 
-        $this->getSut(session: $session)->forgetUserId('auth');
+        $sut = $this->getSut(shopSession: $shopSessionSpy);
+        $sut->destroySession();
 
-        $this->assertSame(['auth'], $deleted);
-        $this->assertNotContains('login-token', $deleted);
+        $this->assertSame(['delBasket', 'initNewSession'], $calls);
     }
 
     private function getSut(
         ?SessionInterface $session = null,
+        ?Session $shopSession = null,
     ): SessionEvictionGuardInterface {
         return new SessionEvictionGuard(
             session: $session ?? $this->createStub(SessionInterface::class),
+            shopSession: $shopSession ?? $this->createStub(Session::class),
         );
     }
 }

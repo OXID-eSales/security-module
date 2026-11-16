@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace OxidEsales\SecurityModule\SessionEviction\Service;
 
+use OxidEsales\Eshop\Core\Session;
 use OxidEsales\EshopCommunity\Internal\Framework\Session\SessionInterface;
 
 class SessionEvictionGuard implements SessionEvictionGuardInterface
@@ -16,7 +17,8 @@ class SessionEvictionGuard implements SessionEvictionGuardInterface
     private const CORE_LOGIN_TOKEN = 'login-token';
 
     public function __construct(
-        private readonly SessionInterface $session
+        private readonly SessionInterface $session,
+        private readonly Session $shopSession,
     ) {
     }
 
@@ -30,8 +32,9 @@ class SessionEvictionGuard implements SessionEvictionGuardInterface
         return (string)$this->session->get($userIdParameter);
     }
 
-    public function forgetUserId(string $userIdParameter): void
+    public function destroySession(): void
     {
-        $this->session->remove($userIdParameter);
+        $this->shopSession->delBasket();
+        $this->shopSession->initNewSession();
     }
 }

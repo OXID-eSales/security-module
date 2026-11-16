@@ -77,8 +77,11 @@ $aLang = [
         'Storefront-Kunden und Admin-Benutzer, auch aus der Sitzung, die die Änderung durchführt.',
     'SHOP_MODULE_oeSecuritySessionEvictionStrict'        => 'Hard Exit: auch nicht verifizierbare Sitzungen abmelden',
     'HELP_SHOP_MODULE_oeSecuritySessionEvictionStrict'   => 'Nur wirksam, wenn die obige Einstellung aktiviert ist. Wenn aktiv, wird eine Sitzung mit ' .
-        'angemeldetem Benutzer aber ohne verifizierbaren Anmeldestatus (zum Beispiel eine Sitzung, die vor ' .
-        'Aktivierung der Funktion bestand, oder eine Sitzung aus Drittanbieter-Single-Sign-On) bei ihrer ' .
-        'nächsten Anfrage abgemeldet. Dies führt zu einer einmaligen erneuten Anmeldung für solche ' .
-        'Sitzungen. Standardmäßig deaktiviert.',
+        'angemeldetem Benutzer, aber ohne verifizierbaren Anmeldestatus (zum Beispiel eine Sitzung, die vor ' .
+        'Aktivierung der Funktion bestand) bei ihrer nächsten Anfrage vollständig beendet: Der Benutzer ' .
+        'wird abgemeldet, der Warenkorb und alle anderen Sitzungsdaten werden gelöscht, das ' .
+        '„Angemeldet bleiben“-Cookie wird entfernt und eine neue Sitzung gestartet. Achtung: Auch ERP- und ' .
+        'OSC-Sitzungen, die sich als Kunde anmelden, haben keinen verifizierbaren Anmeldestatus und werden ' .
+        'ebenfalls beendet. Aktivieren Sie diese Einstellung nicht, wenn Sie ERP oder OSC zur Anmeldung ' .
+        'als Kunde nutzen. Standardmäßig deaktiviert.',
 ];

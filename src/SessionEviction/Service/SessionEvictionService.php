@@ -18,9 +18,9 @@ class SessionEvictionService implements SessionEvictionServiceInterface
     private const STOREFRONT_USER_ID_PARAMETER = 'usr';
 
     public function __construct(
-        private ModuleSettingsServiceInterface $settings,
-        private SessionEvictionGuardInterface $guard,
-        private UserModelFactoryInterface $userModelFactory,
+        private readonly ModuleSettingsServiceInterface $settings,
+        private readonly SessionEvictionGuardInterface $guard,
+        private readonly UserModelFactoryInterface $userModelFactory,
     ) {
     }
 
@@ -32,7 +32,8 @@ class SessionEvictionService implements SessionEvictionServiceInterface
 
         $userIdParameter = $this->userIdParameter($user, $forceAdmin);
         if ($this->guard->getUserId($userIdParameter) !== '' && !$this->guard->hasLoginToken()) {
-            $this->guard->forgetUserId($userIdParameter);
+            $user->logout();
+            $this->guard->destroySession();
         }
     }
 

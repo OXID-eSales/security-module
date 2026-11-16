@@ -207,6 +207,8 @@ class ForgotPasswordControllerTest extends IntegrationTestCase
                     ['isCaptchaEnabled' => true]
                 ),
                 CaptchaServiceInterface::class => $this->createStub(CaptchaServiceInterface::class),
+                Request::class => $this->requestMock,
+                UtilsView::class => $this->utilsViewSpy,
             ],
             $serviceOverrides
         );
