@@ -12,20 +12,13 @@ namespace OxidEsales\SecurityModule\Tests\Codeception\Acceptance\SessionEviction
 use OxidEsales\Codeception\Admin\AdminLoginPage;
 use OxidEsales\Codeception\Admin\AdminPanel;
 use OxidEsales\Codeception\Module\Translation\Translator;
-use OxidEsales\SecurityModule\Tests\Codeception\Acceptance\BaseCest;
 use OxidEsales\SecurityModule\Tests\Codeception\Support\AcceptanceTester;
 
 /**
- * Feature on: the admin backend uses the 'auth' session variable and a login-token
- * bound to the admin password hash (FR009). An admin backend session whose token is
- * for the old password is evicted on its next request, including the admin session
- * that performs the change itself.
- *
  * @group oe_security_module
  * @group oe_security_module_session_eviction
- * @group flow:admin-backend-session-eviction
  */
-class AdminSessionEvictionCest extends BaseCest
+final class AdminSessionEvictionCest extends SessionEvictionBaseCest
 {
     private const ADMIN_OXID = 'oxdefaultadmin';
     private const ADMIN_LOGIN = 'admin@myoxideshop.com';
@@ -33,71 +26,49 @@ class AdminSessionEvictionCest extends BaseCest
     private const ADMIN_PASSWORD_HASH = '6cb4a34e1b66d3445108cd91b67f98b9';
     private const ADMIN_PASSWORD_SALT = '6631386565336161636139613634663766383538633566623662613036636539';
 
-    private string $loginUserFieldId = '#usr';
+    private string $loginUserField = '#usr';
 
     public function _before(AcceptanceTester $I): void
     {
-        $this->setCaptchaState(false);
-        $this->setHoneyPotCaptchaState(false);
-        $this->setPasswordState(false);
-        $this->setSessionEvictionState(true);
+        parent::_before($I);
         $this->restoreAdminFixture($I);
+        $this->setSessionEvictionState(true);
     }
 
     public function _after(AcceptanceTester $I): void
     {
-        $this->setSessionEvictionState(false);
+        parent::_after($I);
         $this->restoreAdminFixture($I);
     }
 
-    private function restoreAdminFixture(AcceptanceTester $I): void
+    public function otherAdminSessionIsLoggedOutAfterPasswordChange(AcceptanceTester $I): void
     {
-        // The Db module keeps changes between tests (cleanup: false) and the acting-session
-        // test changes this admin's password. Rebuild the admin fixture to a known state
-        // before AND after each test, so a changed password never leaks into a later test
-        // or a later Cest.
-        $I->deleteFromDatabase('oxuser', ['OXID' => self::ADMIN_OXID]);
-        $I->haveInDatabase('oxuser', $this->adminFixtureRow());
-    }
+        $I->wantToTest('an admin session is logged out after the admin password changes elsewhere');
 
-    public function testOtherAdminBackendSessionEvictedAfterPasswordChange(AcceptanceTester $I): void
-    {
-        $I->wantToTest('an admin backend session is logged out on its next request after the password changes');
+        $this->loginToAdmin($I);
 
-        $this->loginToAdminBackend($I);
-
-        // The admin password is changed elsewhere (updated directly in the database), so this
-        // session's login-token becomes stale.
         $I->updateInDatabase(
             'oxuser',
-            ['OXPASSWORD' => password_hash('ChangedElsewhere987!', PASSWORD_BCRYPT)],
+            ['OXPASSWORD' => password_hash(uniqid('password'), PASSWORD_BCRYPT)],
             ['OXID' => self::ADMIN_OXID]
         );
 
-        // The next backend request must evict this session (stale login-token) and bounce it
-        // to the admin login form.
-        $I->reloadPage();
-        $I->waitForElement($this->loginUserFieldId);
-        (new AdminLoginPage($I))->seeLoginForm();
+        $this->seeAdminLoginForm($I);
     }
 
-    public function testActingAdminSessionEvictedAfterOwnPasswordChange(AcceptanceTester $I): void
+    public function adminChangingOwnPasswordIsLoggedOut(AcceptanceTester $I): void
     {
-        $I->wantToTest('the admin changing its own password through the backend is logged out on the next request');
+        $I->wantToTest('the admin changing the own password is logged out on the next request');
 
-        $adminPanel = $this->loginToAdminBackend($I);
-
-        $adminPanel
+        $this->loginToAdmin($I)
             ->openUsers()
             ->findByUserName(self::ADMIN_LOGIN)
-            ->updatePassword('NewAdminPass123!');
+            ->updatePassword(uniqid('Password1!'));
 
-        $I->reloadPage();
-        $I->waitForElement($this->loginUserFieldId);
-        (new AdminLoginPage($I))->seeLoginForm();
+        $this->seeAdminLoginForm($I);
     }
 
-    private function loginToAdminBackend(AcceptanceTester $I): AdminPanel
+    private function loginToAdmin(AcceptanceTester $I): AdminPanel
     {
         Translator::switchTranslationDomain(Translator::TRANSLATION_DOMAIN_ADMIN);
 
@@ -107,9 +78,17 @@ class AdminSessionEvictionCest extends BaseCest
         return $adminLoginPage->login(self::ADMIN_LOGIN, self::ADMIN_PASSWORD);
     }
 
-    private function adminFixtureRow(): array
+    private function seeAdminLoginForm(AcceptanceTester $I): void
     {
-        return [
+        $I->reloadPage();
+        $I->waitForElement($this->loginUserField);
+        (new AdminLoginPage($I))->seeLoginForm();
+    }
+
+    private function restoreAdminFixture(AcceptanceTester $I): void
+    {
+        $I->deleteFromDatabase('oxuser', ['OXID' => self::ADMIN_OXID]);
+        $I->haveInDatabase('oxuser', [
             'OXID' => self::ADMIN_OXID,
             'OXACTIVE' => 1,
             'OXRIGHTS' => 'malladmin',
@@ -129,6 +108,6 @@ class AdminSessionEvictionCest extends BaseCest
             'OXBONI' => 1000,
             'OXCREATE' => '2003-01-01 00:00:00',
             'OXREGISTER' => '2003-01-01 00:00:00',
-        ];
+        ]);
     }
 }
