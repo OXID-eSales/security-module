@@ -85,6 +85,9 @@ $aLang = [
 
     'ERROR_EMAIL_VERIFICATION_MAIL_NOT_SENT'   => 'The confirmation email could not be sent. Please try again later.',
 
+    // Overrides the shop text: an unconfirmed account can be recovered via "Forgot password".
+    'ERROR_MESSAGE_USER_USEREXISTS' => 'An error has occurred with this e-mail address. Please first use the "Forgot password" function to set a new password. If that does not help, contact our support.',
+
     'EMAIL_VERIFICATION_DATE_FORMAT'   => 'Y-m-d H:i',
     'EMAIL_VERIFICATION_EMAIL_BUTTON'  => 'Confirm email address',
     'EMAIL_VERIFICATION_EMAIL_SUBJECT' => 'Please confirm your email address',

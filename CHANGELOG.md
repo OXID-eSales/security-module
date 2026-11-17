@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Module settings `oeSecurityEmailVerificationEnabled` and `oeSecurityEmailVerificationLinkLifetime`
   - Verification page `cl=oesm_email_verification`
   - Table `oesm_email_verification`, column `oxuser.OEEMAILVERIFIED`, CMS content `oesmemailverification`
+  - A successful password reset confirms a pending email verification, in the storefront and via OXAPI
+    (`customerPasswordReset` of `oxid-esales/graphql-storefront`)
+  - `ERROR_MESSAGE_USER_USEREXISTS` now points customers to "Forgot password" before contacting the support
 
 ### Changed
 - Update module to work with OXID eShop 7.6

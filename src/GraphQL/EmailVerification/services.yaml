@@ -1,0 +1,10 @@
+services:
+  _defaults:
+    public: false
+    autowire: true
+
+  OxidEsales\SecurityModule\GraphQL\EmailVerification\Decorator\PasswordResetEmailVerificationDecorator:
+    decorates: OxidEsales\GraphQL\Storefront\Customer\Service\PasswordInterface
+    decoration_on_invalid: ignore
+    arguments:
+      $originalService: '@.inner'

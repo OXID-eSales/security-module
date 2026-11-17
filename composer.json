@@ -33,7 +33,8 @@
         "codeception/module-rest": "*",
         "oxid-esales/codeception-modules": "dev-b-7.6.x",
         "oxid-esales/codeception-page-objects": "dev-b-7.6.x",
-        "mikey179/vfsstream": "^1.6"
+        "mikey179/vfsstream": "^1.6",
+        "oxid-esales/graphql-storefront": "dev-b-7.6.x"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,

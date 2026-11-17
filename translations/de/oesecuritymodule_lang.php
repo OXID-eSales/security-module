@@ -85,6 +85,9 @@ $aLang = [
 
     'ERROR_EMAIL_VERIFICATION_MAIL_NOT_SENT'   => 'Die Bestätigungs-E-Mail konnte nicht gesendet werden. Bitte versuchen Sie es später erneut.',
 
+    // Überschreibt den Shop-Text: ein unbestätigtes Konto lässt sich über "Passwort vergessen" wiederherstellen.
+    'ERROR_MESSAGE_USER_USEREXISTS' => 'Bei dieser E-Mail-Adresse ist ein Fehler aufgetreten. Bitte nutzen Sie zunächst die Funktion "Passwort vergessen", um ein neues Passwort zu setzen. Falls das nicht hilft, wenden Sie sich an unseren Support.',
+
     'EMAIL_VERIFICATION_DATE_FORMAT'   => 'd.m.Y H:i',
     'EMAIL_VERIFICATION_EMAIL_BUTTON'  => 'E-Mail-Adresse bestätigen',
     'EMAIL_VERIFICATION_EMAIL_SUBJECT' => 'Bitte bestätigen Sie Ihre E-Mail-Adresse',
