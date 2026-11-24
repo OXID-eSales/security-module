@@ -18,7 +18,7 @@ use OxidEsales\SecurityModule\Shared\Infrastructure\Factory\UserModelFactoryInte
  * The password reset link goes to the registered address, so a successful reset over OXAPI
  * confirms that address the same way the storefront reset does.
  */
-class PasswordResetEmailVerificationDecorator implements PasswordInterface
+class PasswordResetDecorator implements PasswordInterface
 {
     public function __construct(
         private readonly PasswordInterface $originalService,

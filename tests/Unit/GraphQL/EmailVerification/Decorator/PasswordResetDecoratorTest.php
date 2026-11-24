@@ -13,12 +13,12 @@ use OxidEsales\Eshop\Application\Model\User as EshopUserModel;
 use OxidEsales\GraphQL\Storefront\Customer\DataType\Customer as CustomerDataType;
 use OxidEsales\GraphQL\Storefront\Customer\Service\PasswordInterface;
 use OxidEsales\SecurityModule\EmailVerification\Facade\UserEmailVerificationFacadeInterface;
-use OxidEsales\SecurityModule\GraphQL\EmailVerification\Decorator\PasswordResetEmailVerificationDecorator;
+use OxidEsales\SecurityModule\GraphQL\EmailVerification\Decorator\PasswordResetDecorator;
 use OxidEsales\SecurityModule\Shared\Infrastructure\Factory\UserModelFactoryInterface;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
-class PasswordResetEmailVerificationDecoratorTest extends TestCase
+class PasswordResetDecoratorTest extends TestCase
 {
     #[Test]
     public function resetPasswordConfirmsTheEmailOfTheResetUser(): void
@@ -144,8 +144,8 @@ class PasswordResetEmailVerificationDecoratorTest extends TestCase
         ?PasswordInterface $originalService = null,
         ?UserModelFactoryInterface $userModelFactory = null,
         ?UserEmailVerificationFacadeInterface $verificationFacade = null,
-    ): PasswordResetEmailVerificationDecorator {
-        return new PasswordResetEmailVerificationDecorator(
+    ): PasswordResetDecorator {
+        return new PasswordResetDecorator(
             originalService: $originalService ?? $this->createStub(PasswordInterface::class),
             userModelFactory: $userModelFactory ?? $this->createStub(UserModelFactoryInterface::class),
             verificationFacade: $verificationFacade ?? $this->createStub(UserEmailVerificationFacadeInterface::class),

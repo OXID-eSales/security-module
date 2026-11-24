@@ -3,8 +3,13 @@ services:
     public: false
     autowire: true
 
-  OxidEsales\SecurityModule\GraphQL\EmailVerification\Decorator\PasswordResetEmailVerificationDecorator:
+  OxidEsales\SecurityModule\GraphQL\EmailVerification\Factory\PasswordResetDecoratorFactoryInterface:
+    class: OxidEsales\SecurityModule\GraphQL\EmailVerification\Factory\PasswordResetDecoratorFactory
+
+  OxidEsales\SecurityModule\GraphQL\EmailVerification\Decorator\PasswordResetDecorator:
+    class: OxidEsales\GraphQL\Storefront\Customer\Service\PasswordInterface
     decorates: OxidEsales\GraphQL\Storefront\Customer\Service\PasswordInterface
     decoration_on_invalid: ignore
-    arguments:
-      $originalService: '@.inner'
+    autowire: false
+    factory: ['@OxidEsales\SecurityModule\GraphQL\EmailVerification\Factory\PasswordResetDecoratorFactoryInterface', 'create']
+    arguments: ['@.inner']
