@@ -135,8 +135,11 @@ against the password.
 - Strict mode ends every logged-in session that cannot be verified against the password completely: the user is
   logged out, the basket, all other session data and the remember-me cookie are removed and a new session is
   started.
-- **ERP and OSC sessions that log in as a customer cannot be verified either, so strict mode ends them too.** Do
-  not enable strict mode if you use ERP or OSC to log in as a customer.
+- **Customer-impersonation sessions opened without a password are ended too.** Integrations that drop a customer
+  straight into a live storefront session ("log in as / view shop as customer") without a password check create a
+  session with no login token, so strict mode cannot verify it and ends it on the customer's next request. A login
+  that runs the normal password check is unaffected. Do not enable strict mode if you rely on such passwordless
+  impersonation.
 - OXAPI (GraphQL) tokens are not affected by this feature.
 
 ### Running the tests and quality tools

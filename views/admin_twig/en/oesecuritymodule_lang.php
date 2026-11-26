@@ -79,7 +79,8 @@ $aLang = [
         'user but no verifiable login state (for example a session that existed before the feature was ' .
         'enabled) is ended completely on its next request: the user is logged out, the basket and all ' .
         'other session data are deleted, the "Keep me logged in" cookie is removed and a new session is ' .
-        'started. Warning: ERP and OSC sessions that log in as a customer have no verifiable login state ' .
-        'either and are ended as well. Do not enable this setting if you use ERP or OSC to log in as a ' .
-        'customer. Off by default.',
+        'started. Warning: customer-impersonation sessions opened without a password ("log in as / view ' .
+        'shop as customer") have no login token either and are ended as well. A login that runs the ' .
+        'normal password check is unaffected. Do not enable this setting if you rely on such passwordless ' .
+        'impersonation. Off by default.',
 ];
